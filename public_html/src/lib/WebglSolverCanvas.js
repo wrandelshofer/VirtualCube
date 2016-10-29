@@ -45,8 +45,8 @@ WebGLSolverCanvas.prototype.openCanvas = function() {
 	
   this.gl=J3DI.initWebGL(
     this.canvas, // id of the canvas element
-    ["lib/shaders/texture.vshader"], // id of the vertex shader
-    ["lib/shaders/texture.fshader"], // id of the fragment shader
+    ["lib/shaders/texture.vert"], // id of the vertex shader
+    ["lib/shaders/texture.frag"], // id of the fragment shader
     ["vPos","vNormal","vColor","vTexture"], // attribute names
     ["camPos","lightPos","mvMatrix","mvNormalMatrix","mvpMatrix","mPhong","mTexture","mHasTexture"], // uniform names
     [0, 0, 0, 0], // clear color rgba

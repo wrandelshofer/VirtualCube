@@ -1,5 +1,5 @@
 /*
- * @(#)phong.vshader  1.1  2012-07-15
+ * @(#)phong.vert
  *
  * Copyright (c) 2011-2012 Werner Randelshofer, Immensee, Switzerland.
  * All rights reserved.

@@ -44,8 +44,8 @@ WebglPlayerApplet.prototype.openCanvas = function() {
 module.log('WebglPlayerApplet '+this.parameters.baseurl);	
   this.gl=J3DI.initWebGL(
 		this.canvas, // id of the canvas element
-		[this.parameters.baseurl+"/shaders/texture.vshader"], // id of the vertex shader
-	  [this.parameters.baseurl+"/shaders/texture.fshader"], // id of the fragment shader
+		[this.parameters.baseurl+"/shaders/texture.vert"], // id of the vertex shader
+	  [this.parameters.baseurl+"/shaders/texture.frag"], // id of the fragment shader
 		["vPos","vNormal","vColor","vTexture"], // attribute names
 		["camPos","lightPos","mvMatrix","mvNormalMatrix","mvpMatrix","mPhong","mTexture","mHasTexture"], // uniform names
 		[0, 0, 0, 0], // clear color rgba

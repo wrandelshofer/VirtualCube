@@ -128,14 +128,14 @@
       <attribute name="file"/>
       <attribute name="shaders"/>
       <sequential>
-        <local name="texture.fshader"/>
-        <local name="texture.vshader"/>
-        <property name="fshader.url" value="@{shaders}/texture.fshader"/>
-        <property name="vshader.url" value="@{shaders}/texture.vshader"/>
-        <replace file="${build.generate}/${fshader.url}" token="${line.separator}" value="\n"/>
-        <replace file="${build.generate}/${vshader.url}" token="${line.separator}" value="\n"/>
-        <loadfile property="fshader.obj" encoding="UTF-8" srcFile="${build.generate}/${fshader.url}"/>
-        <loadfile property="vshader.obj" encoding="UTF-8" srcFile="${build.generate}/${vshader.url}"/>
+        <local name="texture.frag"/>
+        <local name="texture.vert"/>
+        <property name="frag.url" value="@{shaders}/texture.frag"/>
+        <property name="vert.url" value="@{shaders}/texture.vert"/>
+        <replace file="${build.generate}/${frag.url}" token="${line.separator}" value="\n"/>
+        <replace file="${build.generate}/${vert.url}" token="${line.separator}" value="\n"/>
+        <loadfile property="frag.obj" encoding="UTF-8" srcFile="${build.generate}/${frag.url}"/>
+        <loadfile property="vert.obj" encoding="UTF-8" srcFile="${build.generate}/${vert.url}"/>
         <loadfile property="file.text" encoding="UTF-8" srcFile="${build.generate}/@{file}"/>
         <propertyeval name="file.replaced" from="${file.text}"/>
         <echo file="${build.generate}/@{file}" message="${file.replaced}"/>

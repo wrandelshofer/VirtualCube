@@ -1,5 +1,5 @@
 /*
- * @(#)phong.fshader  1.1  2012-07-15
+ * @(#)texture.frag
  *
  * Copyright (c) 2011-2012 Werner Randelshofer, Immensee, Switzerland.
  * All rights reserved.
@@ -10,10 +10,10 @@
  */
 
 // WebGL Fragment Shader
-
 #ifdef GL_ES
     precision mediump float;
 #endif
+
 // World information
 // -----------------
 uniform vec3 camPos;         // camera position in world coordinates
@@ -22,6 +22,8 @@ uniform vec3 lightPos;       // light position in world coordinates
 // Model information
 // -----------------
 uniform vec4 mPhong;         // vertex ambient, diffuse, specular, shininess
+uniform sampler2D mTexture;  // texture
+uniform bool mHasTexture; 
 
 
 // Fragment information
@@ -29,6 +31,7 @@ uniform vec4 mPhong;         // vertex ambient, diffuse, specular, shininess
 varying vec4 fColor;
 varying vec4 fNormal;
 varying vec4 fPos;
+varying vec2 fTexture;       // fragment texture cooordinates
 
 
 void main() {
@@ -38,8 +41,11 @@ void main() {
   float specular=pow( max(0.0,-dot(reflect(wi, n), wo)), mPhong.w)*mPhong.z;
   float diffuse=max(0.0,dot(wi,n))*mPhong.y;
   float ambient=mPhong.x;
-  gl_FragColor=vec4(fColor.rgb*(diffuse+ambient)+specular*vec3(1,1,1), fColor.a);
-  //gl_FragColor=vec4(n.x,n.y,n.z, fColor.a);
+  
+  vec4 color=(mHasTexture)?texture2D(mTexture, fTexture):fColor;
+  
+  gl_FragColor=vec4(color.rgb*(diffuse+ambient)+specular*vec3(1,1,1), color.a);
+  //gl_FragColor=vec4(n.x,n.y,n.z, color.a);
 }
  
  

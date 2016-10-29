@@ -1,5 +1,5 @@
 /*
- * @(#)color.fshader  1.0  2014-02-08
+ * @(#)color.frag
  *
  * Copyright (c) 2014 Werner Randelshofer, Immensee, Switzerland.
  * All rights reserved.
