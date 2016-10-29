@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="virtualcube" default="all" basedir=".">
+    <target name="init">
+        <property name="name" value="${ant.project.name}"/>
+        <property name="projectdir" value="."/>
+        <property name="src" value="public_html/src"/>
+        <property name="build" value="public_html/build"/>
+        <property name="build.concat" value="${build}/concat"/>
+        <property name="build.generate" value="${build}/generate"/>
+        <property name="buildInv" value=".."/>
+        <property name="author" value="Werner Randelshofer"/>
+        <property name="version" value="1.0.7"/>
+        <property name="date" value="2015-09-29"/>
+        <property name="dist" value="dist"/>
+        <property name="lib" value="lib"/>
+        <property name="dist.bundle" value="${dist}/${name}"/>
+        <property name="distname" value="virtualcubejs"/>
+    </target>
+    <target name="clean" depends="init">
+        <delete dir="${build}"/>
+        <delete dir="${dist}"/>
+    </target>
+    <macrodef name="propertyeval">
+      <attribute name="name"/>
+      <attribute name="from"/>
+      <sequential>
+        <property name="@{name}" value="@{from}"/>
+      </sequential>
+    </macrodef>
+    <macrodef name="generatepreloader2x2">
+      <attribute name="file"/>
+      <attribute name="model"/>
+      <sequential>
+        <local name="corner.url"/>
+        <local name="corner_r.url"/>
+        <local name="corner_u.url"/>
+        <local name="corner_f.url"/>
+        <local name="center.url"/>
+        <local name="corner.obj"/>
+        <local name="corner_r.obj"/>
+        <local name="corner_u.obj"/>
+        <local name="corner_f.obj"/>
+        <local name="center.obj"/>
+        <local name="file.text"/>
+        <local name="file.replaced"/>
+        <property name="corner.url" value="@{model}/corner.obj"/>
+        <property name="corner_r.url" value="@{model}/corner_r.obj"/>
+        <property name="corner_u.url" value="@{model}/corner_u.obj"/>
+        <property name="corner_f.url" value="@{model}/corner_f.obj"/>
+        <property name="center.url" value="@{model}/center.obj"/>
+        <replace file="${build.generate}/${corner.url}" token="${line.separator}" value="\n"/>
+        <replace file="${build.generate}/${corner_r.url}" token="${line.separator}" value="\n"/>
+        <replace file="${build.generate}/${corner_u.url}" token="${line.separator}" value="\n"/>
+        <replace file="${build.generate}/${corner_f.url}" token="${line.separator}" value="\n"/>
+        <replace file="${build.generate}/${center.url}" token="${line.separator}" value="\n"/>
+        <loadfile property="corner.obj" encoding="UTF-8" srcFile="${build.generate}/${corner.url}"/>
+        <loadfile property="corner_r.obj" encoding="UTF-8" srcFile="${build.generate}/${corner_r.url}"/>
+        <loadfile property="corner_u.obj" encoding="UTF-8" srcFile="${build.generate}/${corner_u.url}"/>
+        <loadfile property="corner_f.obj" encoding="UTF-8" srcFile="${build.generate}/${corner_f.url}"/>
+        <loadfile property="center.obj" encoding="UTF-8" srcFile="${build.generate}/${center.url}"/>
+        <loadfile property="file.text" encoding="UTF-8" srcFile="${build.generate}/@{file}"/>
+        <propertyeval name="file.replaced" from="${file.text}"/>
+        <echo file="${build.generate}/@{file}" message="${file.replaced}"/>
+      </sequential>
+    </macrodef>
+    <macrodef name="generatepreloader3x3">
+      <attribute name="file"/>
+      <attribute name="model"/>
+      <sequential>
+        <local name="corner.url"/>
+        <local name="corner_r.url"/>
+        <local name="corner_u.url"/>
+        <local name="corner_f.url"/>
+        <local name="edge.url"/>
+        <local name="edge_r.url"/>
+        <local name="edge_u.url"/>
+        <local name="side.url"/>
+        <local name="side_r.url"/>
+        <local name="center.url"/>
+        <local name="corner.obj"/>
+        <local name="corner_r.obj"/>
+        <local name="corner_u.obj"/>
+        <local name="corner_f.obj"/>
+        <local name="edge.obj"/>
+        <local name="edge_r.obj"/>
+        <local name="edge_u.obj"/>
+        <local name="side.obj"/>
+        <local name="side_r.obj"/>
+        <local name="center.obj"/>
+        <local name="file.text"/>
+        <local name="file.replaced"/>
+        <property name="corner.url" value="@{model}/corner.obj"/>
+        <property name="corner_r.url" value="@{model}/corner_r.obj"/>
+        <property name="corner_u.url" value="@{model}/corner_u.obj"/>
+        <property name="corner_f.url" value="@{model}/corner_f.obj"/>
+        <property name="edge.url" value="@{model}/edge.obj"/>
+        <property name="edge_r.url" value="@{model}/edge_r.obj"/>
+        <property name="edge_u.url" value="@{model}/edge_u.obj"/>
+        <property name="side.url" value="@{model}/side.obj"/>
+        <property name="side_r.url" value="@{model}/side_r.obj"/>
+        <property name="center.url" value="@{model}/center.obj"/>
+        <replace file="${build.generate}/${corner.url}" token="${line.separator}" value="\n"/>
+        <replace file="${build.generate}/${corner_r.url}" token="${line.separator}" value="\n"/>
+        <replace file="${build.generate}/${corner_u.url}" token="${line.separator}" value="\n"/>
+        <replace file="${build.generate}/${corner_f.url}" token="${line.separator}" value="\n"/>
+        <replace file="${build.generate}/${edge.url}" token="${line.separator}" value="\n"/>
+        <replace file="${build.generate}/${edge_r.url}" token="${line.separator}" value="\n"/>
+        <replace file="${build.generate}/${edge_u.url}" token="${line.separator}" value="\n"/>
+        <replace file="${build.generate}/${side.url}" token="${line.separator}" value="\n"/>
+        <replace file="${build.generate}/${side_r.url}" token="${line.separator}" value="\n"/>
+        <replace file="${build.generate}/${center.url}" token="${line.separator}" value="\n"/>
+        <loadfile property="corner.obj" encoding="UTF-8" srcFile="${build.generate}/${corner.url}"/>
+        <loadfile property="corner_r.obj" encoding="UTF-8" srcFile="${build.generate}/${corner_r.url}"/>
+        <loadfile property="corner_u.obj" encoding="UTF-8" srcFile="${build.generate}/${corner_u.url}"/>
+        <loadfile property="corner_f.obj" encoding="UTF-8" srcFile="${build.generate}/${corner_f.url}"/>
+        <loadfile property="edge.obj" encoding="UTF-8" srcFile="${build.generate}/${edge.url}"/>
+        <loadfile property="edge_r.obj" encoding="UTF-8" srcFile="${build.generate}/${edge_r.url}"/>
+        <loadfile property="edge_u.obj" encoding="UTF-8" srcFile="${build.generate}/${edge_u.url}"/>
+        <loadfile property="side.obj" encoding="UTF-8" srcFile="${build.generate}/${side.url}"/>
+        <loadfile property="side_r.obj" encoding="UTF-8" srcFile="${build.generate}/${side_r.url}"/>
+        <loadfile property="center.obj" encoding="UTF-8" srcFile="${build.generate}/${center.url}"/>
+        <loadfile property="file.text" encoding="UTF-8" srcFile="${build.generate}/@{file}"/>
+        <propertyeval name="file.replaced" from="${file.text}"/>
+        <echo file="${build.generate}/@{file}" message="${file.replaced}"/>
+      </sequential>
+    </macrodef>
+    <macrodef name="generatepreloaderShaders">
+      <attribute name="file"/>
+      <attribute name="shaders"/>
+      <sequential>
+        <local name="texture.fshader"/>
+        <local name="texture.vshader"/>
+        <property name="fshader.url" value="@{shaders}/texture.fshader"/>
+        <property name="vshader.url" value="@{shaders}/texture.vshader"/>
+        <replace file="${build.generate}/${fshader.url}" token="${line.separator}" value="\n"/>
+        <replace file="${build.generate}/${vshader.url}" token="${line.separator}" value="\n"/>
+        <loadfile property="fshader.obj" encoding="UTF-8" srcFile="${build.generate}/${fshader.url}"/>
+        <loadfile property="vshader.obj" encoding="UTF-8" srcFile="${build.generate}/${vshader.url}"/>
+        <loadfile property="file.text" encoding="UTF-8" srcFile="${build.generate}/@{file}"/>
+        <propertyeval name="file.replaced" from="${file.text}"/>
+        <echo file="${build.generate}/@{file}" message="${file.replaced}"/>
+      </sequential>
+    </macrodef>
+
+    <target name="build.generate" depends="init,clean">
+      <!-- Incorporates models and shaders into PreloadXxxx.js scripts.
+            So that the folders lib/models and lib/shaders are no longer needed after this build step.
+       -->
+        <mkdir dir="${build.generate}"/>
+        <copy todir="${build.generate}">
+            <fileset dir="${src}">
+                <exclude name="**/_notes/**"/>
+                <exclude name="lib/models/full*/**"/>
+                <exclude name="lib/models/simple*/**"/>
+                <exclude name="lib/models/vcube3/**"/>
+                <exclude name="lib/models/vcube3b/**"/>
+                <exclude name="lib/shaders/phong.*"/>
+                <exclude name="lib/buildconfig*"/>
+                <exclude name="lib/TwoDSolverCanvas.js"/>
+                <exclude name="lib/SolverCanvas.js"/>
+                <exclude name="lib/WebglSolverCanvas.js"/>
+                <exclude name="lib/cubesolver.js"/>
+                <exclude name="**/.*"/>
+            </fileset>
+        </copy>
+        <generatepreloader2x2 file="lib/PreloadPocketCubeS1.js" model="lib/models/pocketcubes1"/>
+        <generatepreloader2x2 file="lib/PreloadPocketCubeS4.js" model="lib/models/pocketcubes4"/>
+        <generatepreloader3x3 file="lib/PreloadRubiksCubeS1.js" model="lib/models/rubikscubes1"/>
+        <generatepreloader3x3 file="lib/PreloadRubiksCubeS4.js" model="lib/models/rubikscubes4"/>
+        <generatepreloaderShaders file="lib/PreloadWebglShaders.js" shaders="lib/shaders"/>
+        <delete dir="${build.generate}/lib/models"/>
+        <delete dir="${build.generate}/lib/shaders"/>
+    </target>
+    <target name="build" depends="init,clean,build.generate,build.concat">
+    </target>
+    <target name="build.concat" depends="init,build.generate">
+      <!-- Concatenates all script files into a single file.
+       -->
+      <concat destfile="${build.concat}/lib/virtualcube.js">
+      <header trimleading="yes">/* @(#)virtualcube.js ${version} ${date}
+        * Copyright (c) 2016 Werner Randelshofer, Switzerland.
+        * You may not use, copy or modify this file, except in compliance with the
+        * accompanying license terms.
+        */
+      {
+      </header>
+      <footer trimleading="yes">
+      }
+      </footer>    
+      <fileset file="${lib}/almond.js"/>
+         <fileset dir="${build.generate}/lib">
+           <include name="*.js"/>
+           <exclude name="virtualcube.js"/>
+         </fileset> 
+      </concat>
+        <copy todir="${build.concat}">
+            <fileset dir="${build.generate}">
+                <exclude name="lib/**"/>
+                <exclude name="**/.*"/>
+            </fileset>
+        </copy>
+    </target>
+    <target name="dist" depends="init,build">
+        <mkdir dir="${dist}"/>
+        <zip file="${dist}/${distname}-${version}.zip">
+            <fileset dir="${build.concat}">
+                <exclude name="**/.*"/>
+            </fileset>
+        </zip>
+    </target>
+    <target name="dist-src" depends="init">
+        <mkdir dir="${dist}"/>
+        <zip file="${dist}/${distname}-${version}-src.zip">
+            <fileset dir=".">
+                <include name="nbproject/**"/>
+                <include name="lib/**"/>
+                <include name="${src}/**"/>
+                <include name="public_html/index.html"/>
+                <include name="build.xml"/>
+                <include name="build-virtualcube.xml"/>
+                <exclude name="**/.*"/>
+                <exclude name="**/_notes/**"/>
+            </fileset>
+        </zip>
+    </target>
+
+    <target name="all">
+        <!-- TODO define script. See Help menu or http://ant.apache.org/ -->
+    </target>
+</project>

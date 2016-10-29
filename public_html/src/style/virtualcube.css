@@ -1,0 +1,55 @@
+@charset "UTF-8";
+/*
+ * @(#)virtualcube.css  1.0  2014-01-13
+ *
+ * Copyright (c) 2013 Werner Randelshofer, Switzerland.
+ * You may not use, copy or modify this file, except in compliance with the
+ * accompanying license terms.
+ */
+
+/* Stylesheet for the VirtualCube JavaScript applet.
+   This stylesheet is used to style the following HTML code:
+
+ <div class="virtualcube"">
+   <canvas class="cube-canvas" width="220" height="220"/>
+   <div class="button-toolbar">
+      <div class="reset-button">Reset</div>
+      <div class="undo-button">Undo</div>
+      <div class="redo-button">Redo</div>
+      <div class="scramble-button">Scramble</div>
+   </div>
+ </div>
+ 
+*/
+
+
+.virtualcube {
+  display:inline-block;
+  width:220px;
+  height:274px;
+}
+.virtualcube .cube-canvas {
+  width:220px;
+  height:220px;
+  object-fit:contain;
+  border:1px solid #ccc;
+}
+.virtualcube .button-toolbar {
+  width:220px;
+  height:54px;
+}
+.virtualcube .button-toolbar button {
+}
+.virtualcube .button-toolbar button:active {
+}
+.virtualcube .button-toolbar .reset-button {
+}
+.virtualcube .button-toolbar .undo-button {
+}
+.virtualcube .button-toolbar .redo-button {
+}
+.virtualcube .button-toolbar .scramble-button {
+}
+
+
+

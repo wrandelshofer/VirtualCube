@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>VirtualCube</title>
+  </head>
+  <body>
+    <h1>VirtualCube JavaScript Applet</h1>
+    <p>With the VirtualCube JavaScript Applet you can integrate interactive
+      Rubik's Cube-like puzzles into your HTML page. The virtual cubes can be rotated
+      and twisted.</p>
+    <section>
+      <h2>Examples</h2>
+      <p><a href="pocketcube.html">Pocket Cube</a></p>
+      <p><a href="rubikscube.html">Rubik's Cube</a></p>
+    </section>
+    <section>
+      <h2>Tests</h2>
+      <p><a href="test/index.html">Tests</a></p>
+    </section>
+    <section>
+      <h2>Usage</h2>
+      <p>The VirtualCube JavaScript Applet consists of the following files:</p>
+      <dl>
+        <dt><kbd>virtualcube.js</kbd></dt><dd>This file contains the JavaScript code.</dd>
+        <dt><kbd>virtualcube.css</kbd></dt><dd>This is an optional stylesheet file which you can change to alter the appearance of the VirtualCube JavaScript Applet.</dd>
+      </dl>
+      <p>You can include these files with the following code into your HTML page:</p>
+      <pre><code>
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;meta charset="utf-8"&gt;
+  &lt;script src="lib/virtualcube.js"&gt;&lt;/script&gt;
+  &lt;link href="style/virtualcube.css" rel="stylesheet" type="text/css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  ...
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+      <p>Once you have include these files you can include a virtual Rubik's Cube
+        anywhere in the body of your HTML page using the following code:</p>
+      <pre><code>
+  &lt;div class="virtualcube" 
+       kind="RubiksCube" 
+       stickersImage="img/RubiksCube_512.gif"&gt;&lt;/div&gt;
+</code></pre>
+      This code has the following meaning:
+      <dl>
+        <dt><kbd>class="virtualcube" </kbd></dt><dd>The VirtualCube JavaScript Applet is inserted into all div-Elements with the class "virtualcube". You can have more than one div-Element of this class in your HTML page.</dd>
+        <dt><kbd>kind="RubiksCube"</kbd></dt><dd>Specifies the desired cube model. You can specify <kbd>RubiksCube</kbd> or <kbd>PocketCube</kbd>.</dd>
+        <dt><kbd>stickersImage="img/RubiksCube_512.gif"</kbd></dt><dd>Specifies an image which is applied on the stickers of the cube.</dd>
+      </dl>
+    </section>
+    <section>
+      <h2>Supported Attributes</h2>
+      <p>The div-element may have the following attributes:</p>
+      <table>
+        <tr><td>alpha</td> <td>int</td> <td>Vertical orientation of the cube, -90..+90. Default: "-25"<td></tr>
+        <tr><td>beta</td> <td>int</td> <td>Horizontal orientation of the cube, -90..+90. Default: "45"<td></tr>
+        <tr><td>colorList</td> <td>[name=]int, ...</td> <td>RGB color list. Each entry consists of an optional name and a RGB value. Default: "r=#ff4600,u=#ffd200,f=#003373,l=#8c000f,d=#f8f8f8,b=#00732f"<td></tr>
+        <tr><td>faceList</td> <td>name, ...</td> <td>Maps colors from the color map to the faces of the cube; 6 integer values or color names; r, u, f, l, d, b. Default: "0,1,2,3,4,5"<td></tr>
+        <tr><td>kind</td> <td>name</td> <td>Specifies the desired cube model: <kbd>RubiksCube</kbd> or <kbd>PocketCube</kbd>. Default: <kbd>"RubiksCube"</kbd><td></tr>
+      </table>
+    </section>
+    <section>
+      <h2>Unsupported Attributes</h2>
+      <p>The following attributes are not supported:</p>
+      <table>
+        <tr><td>autoPlay</td> <td>boolean</td> <td>Set this to true, to start the player automatically. Default: "false"<td></tr>
+        <tr><td>cube</td> <td>string</td> <td>Name of a cube in the resource file. If you don't specify this parameter, the default cube of the resource file is used.<td></tr>
+        <tr><td>debug</td> <td>boolean</td> <td>Set this to 'true' to print debug informations on the console. Default: false.<td></tr>
+        <tr><td>displayLines</td> <td>int</td> <td>Number of lines of the Script display: set to 0 to switch the display off. Default: 1<td></tr>
+        <tr><td>initScript</td> <td>string</td> <td>This script is used to initialize the cube, and when the reset button is pressed. If you don't specify this parameter, no script is used.<td></tr>
+        <tr><td>locale</td> <td>language</td> <td>Locale, for example "en", "de", "fr".<td></tr>
+        <tr><td>notation</td> <td>string</td> <td>Name of a notation in the resource file. If you don't specify this parameter, the default notation of the resource file is used.<td></tr>
+        <tr><td>resourceFile</td> <td>URL</td> <td>Address of a Cube Markup XML resource file. This file can be Zip-compressed to improve the startup time of the applet. The file extension must be .xml or .zip.<td></tr>
+        <tr><td>resourceData</td> <td>xml</td> <td>Cube Markup XML resource data.<td></tr>
+        <tr><td>scaleFactor</td> <td>float</td> <td>Scale factor. Default: "1.0"<td></tr>
+        <tr><td>script</td> <td>string</td> <td>Script. Default value: "".<td></tr>
+        <tr><td>scriptType</td> <td>string</td> <td>The type of the script: "solver" or "generator". Default: "solver".<td></tr>
+        <tr><td>scriptProgress</td> <td>int</td> <td>Position of the progress bar. Default value:  end of script if scriptType is 'generator', 0 if script type is "solver".<td></tr>
+        <tr><td>showPlayer</td> <td>boolean</td> <td>Set this to false, to hide the player. Default: true<td></tr>
+        <tr><td>showInfo</td> <td>boolean</td> <td>Set this to true, to display an info field on the right of the player. Default: false<td></tr>
+        <tr><td>showController</td> <td>boolean</td> <td>Set this to false, to hide the controller of the player. Default: true<td></tr>
+        <tr><td>showScrambleButton</td> <td>boolean</td> <td>Set this to false, to hide the scramble button. Default: true<td></tr>
+        <tr><td>showResetButton</td> <td>boolean</td> <td>Set this to false, to hide the reset button. Default: true.<td></tr>
+        <tr><td>showSettingsButton</td> <td>boolean</td> <td>Set this to false, to hide the settings button. Default: true<td></tr>
+        <tr><td>stickerList</td> <td>name, ...</td> <td>Maps colors from the color map to the stickers of the cube; (layerCount * layerCount * 6)
+            integer values; right, up, front, left, down, back. Default: "0 0 0 0 0 0 0 0 0, 1 1 1 1 1 1 1 1 1, 2 2 2 2 2 2 2 2 2, 3 3 3 3 3 3 3 3 3 3, 4 4 4 4 4 4 4 4 4, 5 5 5 5 5 5 5 5 5"</td></tr>
+        <tr><td>stickerBevel</td> <td>int</td> <td>Beveling of stickers image on each sticker. Default: 2<td></tr>
+        <tr><td>stickersRightList</td> <td>(name|int), ...</td> <td>Maps colors from the color table to the stickers on the side of the cube; 9 integer values. Default: "r r r, r r r, r r r"</td></tr>
+        <tr><td>stickersUpList</td> <td>(name|int), ...</td> <td>Maps colors from the color map to the stickers on the side of the cube; 9 integer values. Default: "u u u, u u u, u u u"</td></tr>
+        <tr><td>stickersFrontList</td> <td>(name|int), ...</td> <td>Maps colors from the color map to the stickers on the side of the cube; 9 integer values. Default: "f f f, f f f, f f f"</td></tr>
+        <tr><td>stickersLeftList</td> <td>(name|int), ...</td> <td>Maps colors from the color map to the stickers on the side of the cube; 9 integer values. Default: "l l l, l l l, l l l"</td></tr>
+        <tr><td>stickersDownList</td> <td>(name|int), ...</td> <td>Maps colors from the color map to the stickers on the side of the cube; 9 integer values. Default: "d d d, d d d, d d d"</td></tr>
+        <tr><td>stickersBackList</td> <td>(name|int), ...</td> <td>Maps colors from the color map to the stickers on the side of the cube; 9 integer values. Default: "b b b, b b b, b b b"</td></tr>
+        <tr><td>twistDuration</td> <td>int</td> <td>Duration of a quarter-turn twist in milliseconds. Default: "400"<td></tr>
+        <tr><td>visibleParts</td> <td>name, ...</td> <td>List of visible parts. Default: "urf,dfr,ubr,drb,ulb,dbl,ufl,dlf,ru,rf,rd,...,center"<td></tr>
+      </table>
+    </section>
+    <section>
+      <h2>License Terms</h2>
+      <p>
+        <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br /><span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/InteractiveResource" property="dct:title" rel="dct:type">VirtualCube JavaScript Applet</span> by <span xmlns:cc="http://creativecommons.org/ns#" property="cc:attributionName">Werner Randelshofer</span> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
+      </p>
+    </section>
+  </body>
+</html>
