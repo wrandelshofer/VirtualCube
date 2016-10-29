@@ -1,23 +1,44 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <script src="../lib/virtualcube.js"></script>
-  <link href="virtualcube.css" rel="stylesheet" type="text/css">
-</head>
-<body>
-  <h1>Test of the beta parameter</h1>
-<div class="virtualcube small" 
-     kind="RubiksCube"
-     beta="0"
-     ></div>
-<div class="virtualcube small" 
-     kind="RubiksCube"
-     beta="60"
-     ></div>
-<div class="virtualcube small" 
-     kind="RubiksCube"
-     beta="-40"
-     ></div>
+  <head>
+    <meta charset="utf-8">
+    <script src="../lib/virtualcube.js"></script>
+    <link href="virtualcube.css" rel="stylesheet" type="text/css">
+    <style>
+      section { float: left; }
+    </style>
+  </head>
+  <body>
+    <h1>Test of the <kbd>beta</kbd> parameter</h1>
+
+    <section><p>Default value.</p>
+      <p><div class="virtualcube small" 
+              ></div></p>
+  </section>
+
+  <section><p><kbd>beta="45"</kbd> (default)</p>
+    <div class="virtualcube small" 
+         beta="45"
+         ></div>
+  </section>
+
+  <section><p><kbd>beta="0"</kbd></p>
+    <div class="virtualcube small" 
+         beta="0"
+         ></div>
+  </section>
+
+  <section><p><kbd>beta="60"</kbd></p>
+    <div class="virtualcube small" 
+         beta="60"
+         ></div>
+  </section>
+
+  <section><p><kbd>beta="-40"</kbd></p>
+    <div class="virtualcube small" 
+         beta="-40"
+         ></div>
+  </section>
+
 </body>
 </html>

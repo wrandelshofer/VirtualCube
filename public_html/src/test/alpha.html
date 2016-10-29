@@ -1,23 +1,44 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <script src="../lib/virtualcube.js"></script>
-  <link href="virtualcube.css" rel="stylesheet" type="text/css">
-</head>
-<body>
-  <h1>Test of the alpha parameter</h1>
-<div class="virtualcube small" 
-     kind="RubiksCube"
-     alpha="0"
-     ></div>
-<div class="virtualcube small" 
-     kind="RubiksCube"
-     alpha="60"
-     ></div>
-<div class="virtualcube small" 
-     kind="RubiksCube"
-     alpha="-40"
-     ></div>
-</body>
+  <head>
+    <meta charset="utf-8">
+    <script src="../lib/virtualcube.js"></script>
+    <link href="virtualcube.css" rel="stylesheet" type="text/css">
+    <style>
+      section { float: left; }
+    </style>
+  </head>
+  <body>
+    <h1>Test of the <kbd>alpha</kbd> parameter</h1>
+
+    <section><p>Default value.</p>
+      <div class="virtualcube small" 
+           ></div>
+    </section>
+
+    <section><p><kbd>alpha="-25"</kbd> (default)</p>
+      <div class="virtualcube small" 
+           alpha="-25"
+           ></div>
+    </section>
+
+    <section><p><kbd>alpha="0"</kbd></p>
+      <div class="virtualcube small" 
+           alpha="0"
+           ></div>
+    </section>
+
+    <section><p><kbd>alpha="60"</kbd></p>
+      <div class="virtualcube small" 
+           alpha="60"
+           ></div>
+    </section>
+
+    <section><p><kbd>alpha="-40"</kbd></p>
+      <div class="virtualcube small" 
+           alpha="-40"
+           ></div>
+    </section>
+
+  </body>
 </html>

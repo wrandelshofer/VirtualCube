@@ -9,18 +9,24 @@
     </style>
   </head>
   <body>
-    <h1>Test of the <kbd>stickersimage</kbd>  parameter</h1>
+    <h1>Test of the deprecated <kbd>faces</kbd>  parameter</h1>
+    <p>This parameter should not be used, because it was not consistently implemented in all Java Applets.</p>
 
     <section><p>Default value.</p>
       <div class="virtualcube small" 
            ></div>
     </section>
 
-    <section><p><kbd>stickersimage="../img/RubiksCube_512.gif"</kbd>)</p>
+    <section><p><kbd>faces="0,1,2,3,4,5"</kbd> (default)</p>
       <div class="virtualcube small" 
-           stickersimage="../img/RubiksCube_512.gif"
+           faces="0,1,2,3,4,5"
            ></div>
     </section>
-    
+
+    <section><p><kbd>faces="5,3,0,4,2,1"</kbd>)</p>
+      <div class="virtualcube small" 
+           faces="5,3,0,4,2,1"
+           ></div>
+    </section>
   </body>
 </html>

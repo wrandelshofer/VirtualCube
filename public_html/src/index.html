@@ -57,47 +57,47 @@
       <h2>Supported Attributes</h2>
       <p>The div-element may have the following attributes:</p>
       <table>
-        <tr><td>alpha</td> <td>int</td> <td>Vertical orientation of the cube, -90..+90. Default: "-25"<td></tr>
-        <tr><td>beta</td> <td>int</td> <td>Horizontal orientation of the cube, -90..+90. Default: "45"<td></tr>
-        <tr><td>colorList</td> <td>[name=]int, ...</td> <td>RGB color list. Each entry consists of an optional name and a RGB value. Default: "r=#ff4600,u=#ffd200,f=#003373,l=#8c000f,d=#f8f8f8,b=#00732f"<td></tr>
-        <tr><td>faceList</td> <td>name, ...</td> <td>Maps colors from the color map to the faces of the cube; 6 integer values or color names; r, u, f, l, d, b. Default: "0,1,2,3,4,5"<td></tr>
-        <tr><td>kind</td> <td>name</td> <td>Specifies the desired cube model: <kbd>RubiksCube</kbd> or <kbd>PocketCube</kbd>. Default: <kbd>"RubiksCube"</kbd><td></tr>
+        <tr><td><kbd>alpha</kbd></td> <td><kbd>int</kbd></td>  <td>Vertical orientation of the cube, -90..+90. Default: "-25"<td></tr>
+        <tr><td><kbd>beta</kbd></td> <td><kbd>int</kbd></td>  <td>Horizontal orientation of the cube, -90..+90. Default: "45"<td></tr>
+        <tr><td><kbd>colorList</kbd></td> <td><kbd>[name=]int, ...</kbd></td>  <td>RGB color list. Each entry consists of an optional name and a RGB value. Default:"r=#ffd200,u=#003373,f=#8c000f,l=#f8f8f8,d=#00732f,b=#ff4600"<td></tr>
+        <tr><td><kbd>faceList</kbd></td> <td><kbd>name, ...</kbd></td>  <td>Maps colors from the color map to the faces of the cube; 6 integer values or color names; r, u, f, l, d, b. Default: "0,1,2,3,4,5"<td></tr>
+        <tr><td><kbd>kind</kbd></td> <td><kbd>name</kbd></td>  <td>Specifies the desired cube model: <kbd>RubiksCube</kbd> or <kbd>PocketCube</kbd>. Default: <kbd>"RubiksCube"</kbd><td></tr>
       </table>
     </section>
     <section>
       <h2>Unsupported Attributes</h2>
       <p>The following attributes are not supported:</p>
       <table>
-        <tr><td>autoPlay</td> <td>boolean</td> <td>Set this to true, to start the player automatically. Default: "false"<td></tr>
-        <tr><td>cube</td> <td>string</td> <td>Name of a cube in the resource file. If you don't specify this parameter, the default cube of the resource file is used.<td></tr>
-        <tr><td>debug</td> <td>boolean</td> <td>Set this to 'true' to print debug informations on the console. Default: false.<td></tr>
-        <tr><td>displayLines</td> <td>int</td> <td>Number of lines of the Script display: set to 0 to switch the display off. Default: 1<td></tr>
-        <tr><td>initScript</td> <td>string</td> <td>This script is used to initialize the cube, and when the reset button is pressed. If you don't specify this parameter, no script is used.<td></tr>
-        <tr><td>locale</td> <td>language</td> <td>Locale, for example "en", "de", "fr".<td></tr>
-        <tr><td>notation</td> <td>string</td> <td>Name of a notation in the resource file. If you don't specify this parameter, the default notation of the resource file is used.<td></tr>
-        <tr><td>resourceFile</td> <td>URL</td> <td>Address of a Cube Markup XML resource file. This file can be Zip-compressed to improve the startup time of the applet. The file extension must be .xml or .zip.<td></tr>
-        <tr><td>resourceData</td> <td>xml</td> <td>Cube Markup XML resource data.<td></tr>
-        <tr><td>scaleFactor</td> <td>float</td> <td>Scale factor. Default: "1.0"<td></tr>
-        <tr><td>script</td> <td>string</td> <td>Script. Default value: "".<td></tr>
-        <tr><td>scriptType</td> <td>string</td> <td>The type of the script: "solver" or "generator". Default: "solver".<td></tr>
-        <tr><td>scriptProgress</td> <td>int</td> <td>Position of the progress bar. Default value:  end of script if scriptType is 'generator', 0 if script type is "solver".<td></tr>
-        <tr><td>showPlayer</td> <td>boolean</td> <td>Set this to false, to hide the player. Default: true<td></tr>
-        <tr><td>showInfo</td> <td>boolean</td> <td>Set this to true, to display an info field on the right of the player. Default: false<td></tr>
-        <tr><td>showController</td> <td>boolean</td> <td>Set this to false, to hide the controller of the player. Default: true<td></tr>
-        <tr><td>showScrambleButton</td> <td>boolean</td> <td>Set this to false, to hide the scramble button. Default: true<td></tr>
-        <tr><td>showResetButton</td> <td>boolean</td> <td>Set this to false, to hide the reset button. Default: true.<td></tr>
-        <tr><td>showSettingsButton</td> <td>boolean</td> <td>Set this to false, to hide the settings button. Default: true<td></tr>
-        <tr><td>stickerList</td> <td>name, ...</td> <td>Maps colors from the color map to the stickers of the cube; (layerCount * layerCount * 6)
+        <tr><td><kbd>autoPlay</kbd></td> <td><kbd>boolean</kbd></td>  <td>Set this to true, to start the player automatically. Default: "false"<td></tr>
+        <tr><td><kbd>cube</kbd></td> <td><kbd>string</kbd></td>  <td>Name of a cube in the resource file. If you don't specify this parameter, the default cube of the resource file is used.<td></tr>
+        <tr><td><kbd>debug</kbd></td> <td><kbd>boolean</kbd></td>  <td>Set this to 'true' to print debug informations on the console. Default: false.<td></tr>
+        <tr><td><kbd>displayLines</kbd></td> <td><kbd>int</kbd></td>  <td>Number of lines of the Script display: set to 0 to switch the display off. Default: 1<td></tr>
+        <tr><td><kbd>initScript</kbd></td> <td><kbd>string</kbd></td>  <td>This script is used to initialize the cube, and when the reset button is pressed. If you don't specify this parameter, no script is used.<td></tr>
+        <tr><td><kbd>locale</kbd></td> <td><kbd>language</kbd></td>  <td>Locale, for example "en", "de", "fr".<td></tr>
+        <tr><td><kbd>notation</kbd></td> <td><kbd>string</kbd></td>  <td>Name of a notation in the resource file. If you don't specify this parameter, the default notation of the resource file is used.<td></tr>
+        <tr><td><kbd>resourceFile</kbd></td> <td><kbd>URL</kbd></td>  <td>Address of a Cube Markup XML resource file. This file can be Zip-compressed to improve the startup time of the applet. The file extension must be .xml or .zip.<td></tr>
+        <tr><td><kbd>resourceData</kbd></td> <td><kbd>xml</kbd></td>  <td>Cube Markup XML resource data.<td></tr>
+        <tr><td><kbd>scaleFactor</kbd></td> <td><kbd>float</kbd></td>  <td>Scale factor. Default: "1.0"<td></tr>
+        <tr><td><kbd>script</kbd></td> <td><kbd>string</kbd></td>  <td>Script. Default value: "".<td></tr>
+        <tr><td><kbd>scriptType</kbd></td> <td><kbd>string</kbd></td>  <td>The type of the script: "solver" or "generator". Default: "solver".<td></tr>
+        <tr><td><kbd>scriptProgress</kbd></td> <td><kbd>int</kbd></td>  <td>Position of the progress bar. Default value:  end of script if scriptType is 'generator', 0 if script type is "solver".<td></tr>
+        <tr><td><kbd>showPlayer</kbd></td> <td><kbd>boolean</kbd></td>  <td>Set this to false, to hide the player. Default: true<td></tr>
+        <tr><td><kbd>showInfo</kbd></td> <td><kbd>boolean</kbd></td>  <td>Set this to true, to display an info field on the right of the player. Default: false<td></tr>
+        <tr><td><kbd>showController</kbd></td> <td><kbd>boolean</kbd></td>  <td>Set this to false, to hide the controller of the player. Default: true<td></tr>
+        <tr><td><kbd>showScrambleButton</kbd></td> <td><kbd>boolean</kbd></td>  <td>Set this to false, to hide the scramble button. Default: true<td></tr>
+        <tr><td><kbd>showResetButton</kbd></td> <td><kbd>boolean</kbd></td>  <td>Set this to false, to hide the reset button. Default: true.<td></tr>
+        <tr><td><kbd>showSettingsButton</kbd></td> <td><kbd>boolean</kbd></td>  <td>Set this to false, to hide the settings button. Default: true<td></tr>
+        <tr><td><kbd>stickerList</kbd></td> <td><kbd>name, ...</kbd></td>  <td>Maps colors from the color map to the stickers of the cube; (layerCount * layerCount * 6)
             integer values; right, up, front, left, down, back. Default: "0 0 0 0 0 0 0 0 0, 1 1 1 1 1 1 1 1 1, 2 2 2 2 2 2 2 2 2, 3 3 3 3 3 3 3 3 3 3, 4 4 4 4 4 4 4 4 4, 5 5 5 5 5 5 5 5 5"</td></tr>
-        <tr><td>stickerBevel</td> <td>int</td> <td>Beveling of stickers image on each sticker. Default: 2<td></tr>
-        <tr><td>stickersRightList</td> <td>(name|int), ...</td> <td>Maps colors from the color table to the stickers on the side of the cube; 9 integer values. Default: "r r r, r r r, r r r"</td></tr>
-        <tr><td>stickersUpList</td> <td>(name|int), ...</td> <td>Maps colors from the color map to the stickers on the side of the cube; 9 integer values. Default: "u u u, u u u, u u u"</td></tr>
-        <tr><td>stickersFrontList</td> <td>(name|int), ...</td> <td>Maps colors from the color map to the stickers on the side of the cube; 9 integer values. Default: "f f f, f f f, f f f"</td></tr>
-        <tr><td>stickersLeftList</td> <td>(name|int), ...</td> <td>Maps colors from the color map to the stickers on the side of the cube; 9 integer values. Default: "l l l, l l l, l l l"</td></tr>
-        <tr><td>stickersDownList</td> <td>(name|int), ...</td> <td>Maps colors from the color map to the stickers on the side of the cube; 9 integer values. Default: "d d d, d d d, d d d"</td></tr>
-        <tr><td>stickersBackList</td> <td>(name|int), ...</td> <td>Maps colors from the color map to the stickers on the side of the cube; 9 integer values. Default: "b b b, b b b, b b b"</td></tr>
-        <tr><td>twistDuration</td> <td>int</td> <td>Duration of a quarter-turn twist in milliseconds. Default: "400"<td></tr>
-        <tr><td>visibleParts</td> <td>name, ...</td> <td>List of visible parts. Default: "urf,dfr,ubr,drb,ulb,dbl,ufl,dlf,ru,rf,rd,...,center"<td></tr>
+        <tr><td><kbd>stickerBevel</kbd></td> <td><kbd>int</kbd></td>  <td>Beveling of stickers image on each sticker. Default: 2<td></tr>
+        <tr><td><kbd>stickersRightList</kbd></td> <td><kbd>(name|int), ...</kbd></td>  <td>Maps colors from the color table to the stickers on the side of the cube; 9 integer values. Default: "r r r, r r r, r r r"</td></tr>
+        <tr><td><kbd>stickersUpList</kbd></td> <td><kbd>(name|int), ...</kbd></td>  <td>Maps colors from the color map to the stickers on the side of the cube; 9 integer values. Default: "u u u, u u u, u u u"</td></tr>
+        <tr><td><kbd>stickersFrontList</kbd></td> <td><kbd>(name|int), ...</kbd></td>  <td>Maps colors from the color map to the stickers on the side of the cube; 9 integer values. Default: "f f f, f f f, f f f"</td></tr>
+        <tr><td><kbd>stickersLeftList</kbd></td> <td><kbd>(name|int), ...</kbd></td>  <td>Maps colors from the color map to the stickers on the side of the cube; 9 integer values. Default: "l l l, l l l, l l l"</td></tr>
+        <tr><td><kbd>stickersDownList</kbd></td> <td><kbd>(name|int), ...</kbd></td>  <td>Maps colors from the color map to the stickers on the side of the cube; 9 integer values. Default: "d d d, d d d, d d d"</td></tr>
+        <tr><td><kbd>stickersBackList</kbd></td> <td><kbd>(name|int), ...</kbd></td>  <td>Maps colors from the color map to the stickers on the side of the cube; 9 integer values. Default: "b b b, b b b, b b b"</td></tr>
+        <tr><td><kbd>twistDuration</kbd></td> <td><kbd>int</kbd></td>  <td>Duration of a quarter-turn twist in milliseconds. Default: "400"<td></tr>
+        <tr><td><kbd>visibleParts</kbd></td> <td><kbd>name, ...</kbd></td>  <td>List of visible parts. Default: "urf,dfr,ubr,drb,ulb,dbl,ufl,dlf,ru,rf,rd,...,center"<td></tr>
       </table>
     </section>
     <section>

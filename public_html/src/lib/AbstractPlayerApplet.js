@@ -954,7 +954,15 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
      
      // parse default colorMap
      // --------------
-     let colorMap=parseColorMap("r=#ff4600,u=#ffd200,f=#003373,l=#8c000f,d=#f8f8f8,b=#00732f");
+     let deprecatedColorMap={};//parseColorMap("r=#ff4600,u=#ffd200,f=#003373,l=#8c000f,d=#f8f8f8,b=#00732f");
+     let colorMap=parseColorMap("r=#ffd200,u=#003373,f=#8c000f,l=#f8f8f8,d=#00732f,b=#ff4600");
+     for (let k in colorMap) {
+       if (k>=0&&k<=colorMap.length) {
+       deprecatedColorMap[k] = colorMap[deprecatedFaceIndices[k]];
+     }else{
+       deprecatedColorMap[k] = colorMap[k];
+     }
+     }
 
      // parse colorMap from parameter "colorTable"
      // this parameter is deprecated but still supported
@@ -965,26 +973,29 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
      if (p.colortable != null) {
        module.log('.readParameters colortable:'+p.colortable);
        console.log('WARNING: the parameter "colorTable" is deprecated, use "colorList" instead.');
-       let deprecatedColorMap=parseColorMap(p.colortable);
+       let parsedColorMap=parseColorMap(p.colortable);
        
-       for (let k in deprecatedColorMap) {
+       for (let k in parsedColorMap) {
          if (0<=k&&k<deprecatedFaceIndices.length) {
-           colorMap[deprecatedFaceIndices[k]] = deprecatedColorMap[k];
+           colorMap[deprecatedFaceIndices[k]] = parsedColorMap[k];
          }else{
-           colorMap[k] = deprecatedColorMap[k];
+           colorMap[k] = parsedColorMap[k];
          }
        }
+       deprecatedColorMap = colorMap;
      }
      
      // parse colorMap from parameter "colorList"
      if (p.colorlist != null) {
        module.log('.readParameters colorlist:'+p.colorlist);
        colorMap=parseColorMap(this.parameters.colorlist);
+       deprecatedColorMap=colorMap;
      }
 
      // parse default faceIndices
      // ---------------
      let faceIndices=[];
+     let currentColorMap=colorMap;
      for (let i=0;i<a.getFaceCount();i++) {
        faceIndices[i]=i;
      }
@@ -992,8 +1003,12 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
      // parse faceIndices from faces
      if (p.faces != null) {
        module.log('.readParameters faces:'+p.faces);
-       console.log('WARNING: the parameter "faces" is deprecated, use "faceList" instead.');
-       faceIndices = parseWordList(p.faces);
+       console.log('WARNING: the parameter "faces" is deprecated, please use "faceList" instead.');
+       let parsedIndices = parseWordList(p.faces);
+       for (let i in parsedIndices) {
+         faceIndices[deprecatedFaceIndices[i]] = parsedIndices[i];
+       }
+       currentColorMap=deprecatedColorMap;
      }
      // parse faceIndices from faceList
      if (p.facelist != null) {
@@ -1003,7 +1018,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
 
      // apply face indices
      for (let i = 0; i < a.getFaceCount(); i++) {
-      let color = colorMap[faceIndices[i]];
+      let color = currentColorMap[faceIndices[i]];
       if (color != null) {
           let face = i;
           let offset = a.getStickerOffset(face);
