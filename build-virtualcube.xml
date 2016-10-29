@@ -224,7 +224,6 @@
         </zip>
     </target>
 
-    <target name="all">
-        <!-- TODO define script. See Help menu or http://ant.apache.org/ -->
+    <target name="all" depends="dist,dist-src">
     </target>
 </project>
