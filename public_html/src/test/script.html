@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <script src="../lib/virtualcube.js"></script>
+    <link href="virtualcube.css" rel="stylesheet" type="text/css">
+    <style>
+      section { float: left; }
+    </style>
+  </head>
+  <body>
+    <h1>Test of the <kbd>script</kbd> parameter</h1>
+
+    <section><p>Default value.</p>
+      <div class="virtualcube small" 
+           ></div>
+    </section>
+
+    <section><p><kbd>script=""</kbd> (default)</p>
+      <div class="virtualcube small" 
+           script=""
+           ></div>
+    </section>
+
+    <section><p><kbd>script="R U F L D B"</kbd></p>
+      <div class="virtualcube small" 
+           script="R U F L D B"
+           ></div>
+    </section>
+
+  </body>
+</html>

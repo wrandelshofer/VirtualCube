@@ -15,6 +15,12 @@
 define("AbstractCanvas", ["J3DI","J3DIMath","Node3D"], 
 function(J3DI,J3DIMath,Node3D
 ) {
+  
+  let module = {
+  log: (false) // Enable or disable logging for this module.
+    ? function(msg) { console.log('AbstractCanvas.js '+msg); }
+    : function() {}
+}
 
 // ===============================
 //
@@ -137,13 +143,7 @@ class AbstractCanvas {
       J3DI.requestAnimFrame(f, this.canvas);
     }
   }
-  
-  /** Prints a log message. */
-  log(msg) {
-    console.log(msg);
-  }
-  
-  
+   
   
   /** @param move twistNode. */
   pushMove(move) {

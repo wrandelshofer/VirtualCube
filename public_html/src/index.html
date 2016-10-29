@@ -62,6 +62,7 @@
         <tr><td><kbd>colorList</kbd></td> <td><kbd>[name=]int, ...</kbd></td>  <td>RGB color list. Each entry consists of an optional name and a RGB value. Default:"r=#ffd200,u=#003373,f=#8c000f,l=#f8f8f8,d=#00732f,b=#ff4600"<td></tr>
         <tr><td><kbd>faceList</kbd></td> <td><kbd>name, ...</kbd></td>  <td>Maps colors from the color map to the faces of the cube; 6 integer values or color names; r, u, f, l, d, b. Default: "0,1,2,3,4,5"<td></tr>
         <tr><td><kbd>kind</kbd></td> <td><kbd>name</kbd></td>  <td>Specifies the desired cube model: <kbd>RubiksCube</kbd> or <kbd>PocketCube</kbd>. Default: <kbd>"RubiksCube"</kbd><td></tr>
+        <tr><td><kbd>script</kbd></td> <td><kbd>string</kbd></td>  <td>Script. Default value: "".<td></tr>
       </table>
     </section>
     <section>
@@ -78,7 +79,6 @@
         <tr><td><kbd>resourceFile</kbd></td> <td><kbd>URL</kbd></td>  <td>Address of a Cube Markup XML resource file. This file can be Zip-compressed to improve the startup time of the applet. The file extension must be .xml or .zip.<td></tr>
         <tr><td><kbd>resourceData</kbd></td> <td><kbd>xml</kbd></td>  <td>Cube Markup XML resource data.<td></tr>
         <tr><td><kbd>scaleFactor</kbd></td> <td><kbd>float</kbd></td>  <td>Scale factor. Default: "1.0"<td></tr>
-        <tr><td><kbd>script</kbd></td> <td><kbd>string</kbd></td>  <td>Script. Default value: "".<td></tr>
         <tr><td><kbd>scriptType</kbd></td> <td><kbd>string</kbd></td>  <td>The type of the script: "solver" or "generator". Default: "solver".<td></tr>
         <tr><td><kbd>scriptProgress</kbd></td> <td><kbd>int</kbd></td>  <td>Position of the progress bar. Default value:  end of script if scriptType is 'generator', 0 if script type is "solver".<td></tr>
         <tr><td><kbd>showPlayer</kbd></td> <td><kbd>boolean</kbd></td>  <td>Set this to false, to hide the player. Default: true<td></tr>

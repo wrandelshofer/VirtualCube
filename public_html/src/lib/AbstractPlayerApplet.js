@@ -17,7 +17,7 @@
 // --------------
 // require.js
 // --------------
-define("AbstractPlayerApplet", ["AbstractCanvas","Node3D","J3DI","J3DIMath","ScriptParser",
+define("AbstractPlayerApplet", ["AbstractCanvas","Node3D","J3DI","J3DIMath","Notation","ScriptParser",
     
 "RubiksCubeS1Cube3D",
 "RubiksCubeS4Cube3D",
@@ -25,7 +25,7 @@ define("AbstractPlayerApplet", ["AbstractCanvas","Node3D","J3DI","J3DIMath","Scr
 "PocketCubeS1Cube3D",
 "PocketCubeS4Cube3D"
 ], 
-function(AbstractCanvas,Node3D,J3DI,J3DIMath,ScriptParser,
+function(AbstractCanvas,Node3D,J3DI,J3DIMath,Notation,ScriptParser,
   
 RubiksCubeS1Cube3D,
 RubiksCubeS4Cube3D,
@@ -67,7 +67,7 @@ let parseColorMap=function(str) {
     if (i<tokens.length - 1 && tokens[i+1].indexOf('=')!=-1) {
       // found a key
       if (! tokens[i].match(/^\w+$/)) {
-        console.log('parseColorMap::found illegal key:"'+key+'" in map:"'+str+'"');
+        console.log('AbstractPlayerApplet.js .parseColorMap::found illegal key:"'+key+'" in map:"'+str+'"');
         break;
       } else {
         key = tokens[i];
@@ -97,7 +97,7 @@ let parseColorMap=function(str) {
       // found a separator
       i++; // consume separator
     } else {
-        console.log('parseColorMap::found illegal token:"'+tokens[i]+'" in map:"'+str+'"');
+        console.log('AbstractPlayerApplet.js .parseColorMap::found illegal token:"'+tokens[i]+'" in map:"'+str+'"');
         break;
     }
   }
@@ -175,7 +175,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
   createCube3D() {
     this.debugFPS = this.canvas.getAttribute("debug").indexOf("fps") != -1;
     let c = this.canvas.getAttribute("kind");
-    let cname = c==null?"":c.trim();
+    let cname = c==null||c=="null"?"":c.trim();
     if (cname.length == 0) {
       cname = "RubiksCube";
     }
@@ -215,7 +215,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
         
         
       default :
-        this.log('Error: illegal cube attribute :'+cname);
+        console.log('AbstractPlayerApplet.js Error: illegal cube attribute :'+cname);
         if (this.useFullModel) {
           c3d = new RubiksCubeS4Cube3D.Cube3D();
         } else {
@@ -1038,6 +1038,27 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
        module.log('.readParameters beta:'+p.beta);
        cube3d.attributes.yRot = -parseFloat(p.beta);
      }
+     
+     // parse resourceFile
+     // --------------
+     if (p.resourcefile != null) {
+       module.log('.readParameters resourcefile:'+p.resourcefile);
+       // FIXME implement me
+     } 
+    
+     // parse script
+     // --------------
+     if (p.script != null) {
+       module.log('.readParameters script:'+p.script);
+       // FIXME implement me
+       let notation=new Notation.DefaultNotation();
+       let parser = new ScriptParser.ScriptParser(notation);
+       try {
+       parser.parse(p.script);
+     } catch (e) {
+     console.log("AbstractPlayerApplet error parsing script:\""+p.script+'"');
+      }
+     } 
   }
 }
 

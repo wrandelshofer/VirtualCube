@@ -1,5 +1,5 @@
 /*
- * @(#)ScriptParser.js  0.1  2011-08-12
+ * @(#)ScriptAST.js  0.1  2011-08-12
  *
  * Copyright (c) 2011-2012 Werner Randelshofer, Switzerland.
  * You may not use, copy or modify this file, except in compliance with the
@@ -10,8 +10,8 @@
 // --------------
 // require.js
 // --------------
-define("ScriptParser", ["Notation","ScriptAST"],
-function (Notation,AST) {
+define("ScriptAST", ["Notation"],
+function () {
 
   /**
    * Represents an Abstract Syntax Tree Node
@@ -68,62 +68,11 @@ function (Notation,AST) {
     }
   }
 
-  /**
-   * Implements a parser for a specific notation..
-   */
-  class ScriptParser {
-    /**
-     * Creates a new parser.
-     * @param {Notation} notation
-     * @param {Map<String,Node>} macros
-     */
-    constructor(notation, macros) {
-      this.notation = notation;
-      this.macros = macros == null ? [] : macros;
-    }
-
-    /**
-     * Parses the specified string.
-     * @param {type} str
-     * @throws a message if the parsing fails.
-     */
-    parse(str) {
-      throw "parsing is not implemented yet";
-    }
-  }
-
-  /** Returns an array of script nodes. */
-  let createRandomScript = function (scrambleCount, scrambleMinCount) {
-    if (scrambleCount == null)
-      scrambleCount = 21;
-    if (scrambleMinCount == null)
-      scrambleMinCount = 6;
-
-    var scrambler = new Array(Math.floor(Math.random() * scrambleCount - scrambleMinCount) + scrambleMinCount);
-
-    // Keep track of previous axis, to avoid two subsequent moves on
-    // the same axis.
-    var prevAxis = -1;
-    var axis, layerMask, angle;
-    for (var i = 0; i < scrambleCount; i++) {
-      while ((axis = Math.floor(Math.random() * 3)) == prevAxis) {
-      }
-      prevAxis = axis;
-//    while ((layerMask = Math.floor(Math.random()*(1 << this.layerCount))) == 0) {}
-      layerMask = 1 << Math.floor(Math.random() * this.layerCount);
-      while ((angle = Math.floor(Math.random() * 5) - 2) == 0) {
-      }
-      scrambler[i] = new TwistNode(axis, layerMask, angle);
-    }
-
-    return scrambler;
-  }
-
 // ------------------
 // MODULE API    
 // ------------------
   return {
-    ScriptParser: ScriptParser,
-    createRandomScript: createRandomScript
+    Node: Node,
+    TwistNode: TwistNode,
   };
 });
