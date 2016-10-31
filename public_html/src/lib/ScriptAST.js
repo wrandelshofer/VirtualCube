@@ -24,7 +24,7 @@ function () {
       }
       
       add(child) {
-        this.children.put(child);
+        this.children.push(child);
       }
       
       setStartPosition(newValue) {
@@ -33,6 +33,19 @@ function () {
       setEndPosition(newValue) {
         this.endPosition=newValue;
       }
+      
+      applyTo(cube) {
+        for (let i=0;i<this.children.length;i++) {
+          this.children[i].applyTo(cube);
+        }
+      }
+  }
+  
+  class SequenceNode extends Node {
+      constructor() {
+        super();
+      }
+    
   }
 
   class MoveNode extends Node {
@@ -52,7 +65,10 @@ function () {
     setAngle(newValue) {
       this.angle=newValue;
     }
-    setLayeMask(newValue) {
+    setLayerCount(newValue) {
+      this.layerCount=newValue;
+    }
+    setLayerMask(newValue) {
       this.layerMask=newValue;
     }
 
@@ -100,6 +116,7 @@ function () {
 // ------------------
   return {
     Node: Node,
+    SequenceNode: SequenceNode,
   MoveNode: MoveNode
   };
 });

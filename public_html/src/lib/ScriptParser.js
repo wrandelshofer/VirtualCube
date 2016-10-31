@@ -10,8 +10,13 @@
 // --------------
 // require.js
 // --------------
-define("ScriptParser", ["Notation","ScriptAST","Tokenizer"],
-function (Notation,AST,Tokenizer) {
+define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
+function (Notation, AST, Tokenizer) {
+let module = {
+  log: (true) // Enable or disable logging for this module.
+    ? function(msg) { console.log('ScriptParser.js '+msg); }
+    : function() {}
+}
 
   /**
    * Represents an Abstract Syntax Tree Node
@@ -52,13 +57,11 @@ function (Notation,AST,Tokenizer) {
     consume(that) {
       if (that.axis == this.axis
       && that.layerMask == this.layerMask) {
-//var ts=this.toString();
         this.angle = (this.angle + that.angle) % 4;
         if (this.angle == 3)
           this.angle = -1;
         else if (this.angle == -3)
           this.angle = 1;
-//console.log('consume:'+ts+' + '+that+" => "+this);    
         return true;
       }
       return false;
@@ -68,14 +71,14 @@ function (Notation,AST,Tokenizer) {
     }
   }
 
-const UNKNOWN_MASK = 0;
-const GROUPING_MASK = 1;
-const CONJUGATION_MASK = 2;
-const COMMUTATION_MASK = 4;
-const ROTATION_MASK = 8;
-const PERMUTATION_MASK = 16;
-const INVERSION_MASK = 32;
-const REFLECTION_MASK = 64;
+  const UNKNOWN_MASK = 0;
+  const GROUPING_MASK = 1;
+  const CONJUGATION_MASK = 2;
+  const COMMUTATION_MASK = 4;
+  const ROTATION_MASK = 8;
+  const PERMUTATION_MASK = 16;
+  const INVERSION_MASK = 32;
+  const REFLECTION_MASK = 64;
 
 
   /**
@@ -90,66 +93,92 @@ const REFLECTION_MASK = 64;
     constructor(notation, localMacros) {
       this.notation = notation;
       this.macros = [];
-      
-        if (localMacros != null) {
-            for (let macro in localMacros) {
-                macros.push(macro);
-            }
+      this.tokenizer = null;
+
+      if (localMacros != null) {
+        for (let macro in localMacros) {
+          macros.push(macro);
         }
-        // global macros override local macros
-        for (let macro in notation.getMacros()) {
-            macros.push(macro);
+      }
+      // global macros override local macros
+      for (let macro in notation.getMacros()) {
+        macros.push(macro);
+      }
+    }
+
+    getTokenizer() {
+      if (this.tokenizer == null) {
+        let tt = new Tokenizer.GreedyTokenizer();
+        tt.skipWhitespace();
+        tt.parseNumbers();
+
+        let tokenToSymbolMap = this.notation.getTokenToSymbolMap();
+        for (let i in tokenToSymbolMap) {
+          tt.addKeyword(i, tokenToSymbolMap[i]);
         }
-      
+        /*
+         tt.addSpecials(this.notation.getSpecials());
+         tt.addKeywords(this.notation.getKeywords());*/
+        this.tokenizer = tt;
+      }
+      return this.tokenizer;
     }
 
     /**
      * Parses the specified string.
      * @param {type} str
+     * @return {SequenceNode} the parsed script
      * @throws a message if the parsing fails.
      */
     parse(str) {
-      let tt=new Tokenizer.GreedyTokenizer();
-      tt.skipWhitespace();
-      tt.parseNumbers();
-      tt.addSpecials(this.notation.getSpecials());
-      tt.addKeywords(this.notation.getKeywords());
+      let tt = this.getTokenizer();
       tt.setInput(str);
-      while (tt.next()!=Tokenizer.TT_EOF) {
-        console.log('tt:'+tt.getTType()+" "+tt.getTString());
+      let root = new AST.SequenceNode();
+      let i=0;
+      while (tt.nextToken() != Tokenizer.TT_EOF) {
+        tt.pushBack();
+        this.parseMove(tt, root);
+        i++;
+        if (i>100) throw "too many iterations! "+tt.getTokenType()+" pos:"+tt.pos;
       }
-      throw "parsing is not implemented yet";
+      return root;
     }
-    
+
     /**
      * Parses a move.
      * 
      * @param {Tokenizer} t
      * @param {Node} parent
-     * @returns {Node}
-     * @throws {String} describing the parse error
+     * @returns {unresolved}
+     * @throws parse exception
      */
-     parseMove(t, parent) {
-        let move = new ScriptAST.MoveNode(notation.getLayerCount());
-        parent.add(move);
+    parseMove(t, parent) {
+      let move = new AST.MoveNode(this.notation.getLayerCount());
+      parent.add(move);
 
-        if (t.nextToken() != Tokenizer.TT_WORD) {
-            throw "Move: Symbol missing.", t.getStartPosition(), t.getEndPosition();
+      if (t.nextToken() != Tokenizer.TT_KEYWORD) {
+        throw "Move: \"" + t.getStringValue() + "\" is a "+t.getTokenType()+" but not a keyword. start:" + t.getStartPosition() + " end:" + t.getEndPosition();
+      }
+      let symbols = t.getSymbolValue();
+      let symbol = null;
+      for (let i = 0; i < symbols.length; i++) {
+        if (symbols[i].getSymbol() == Notation.Symbol.MOVE) {
+          symbol = symbols[i];
+          break;
         }
-        move.setStartPosition(t.getStartPosition());
-        let token = fetchGreedy(t.sval);
-        let symbol = notation.getSymbolFor(token, Notation.Symbols.MOVE);
+      }
+      if (symbol == null) {
+        throw "Move: \"" + t.getStringValue() + "\" is not a Move. start:" + t.getStartPosition() + " end:" + t.getEndPosition();
+      }
 
-        if (Notation.Symbols.MOVE == symbol) {
-            notation.configureMoveFromToken(move, token);
-            move.setEndPosition(t.getStartPosition() + token.length() - 1);
-            t.consumeGreedy(token);
-        } else {
-            throw "Move: Invalid token " + t.sval, t.getStartPosition(), t.getEndPosition();
-        }
-        return move;
+      move.setStartPosition(t.getStartPosition());
+      move.setEndPosition(t.getEndPosition());
+      move.setAxis(symbol.getAxis());
+      move.setAngle(symbol.getAngle());
+      move.setLayerMask(symbol.getLayerMask());
+      return move;
     }
-    
+
   }
 
   /** Returns an array of script nodes. */
@@ -185,6 +214,6 @@ const REFLECTION_MASK = 64;
   return {
     ScriptParser: ScriptParser,
     createRandomScript: createRandomScript,
-  newTwistNode: (axis,layerMask,angle)=>new AST.MoveNode(3,axis,layerMask,angle)
+    newTwistNode: (axis, layerMask, angle) => new AST.MoveNode(3, axis, layerMask, angle)
   };
 });

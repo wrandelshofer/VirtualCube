@@ -577,6 +577,9 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
         }
         // Reset cube
         self.cube.reset();
+        if (self.initscript != null) {
+          self.initscript.applyTo(self.cube);
+        }
         
         self.clearUndoRedo();
         
@@ -1048,16 +1051,16 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
     
      // parse script
      // --------------
-     if (p.script != null) {
-       module.log('.readParameters script:'+p.script);
+     if (p.initscript != null) {
+       module.log('.readParameters initscript:'+p.initscript);
        // FIXME implement me
        let notation=new Notation.DefaultNotation();
        let parser = new ScriptParser.ScriptParser(notation);
        try {
-       parser.parse(p.script);
+       this.initscript=parser.parse(p.initscript);
      } catch (e) {
        console.log(e);
-     console.log("AbstractPlayerApplet error parsing script:\""+p.script+'"');
+     console.log("AbstractPlayerApplet error parsing resetscript:\""+p.initscript+'"');
       }
      } 
   }

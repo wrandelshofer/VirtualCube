@@ -23,6 +23,7 @@ function () {
   let TT_KEYWORD = "keyword"
   let TT_NUMBER = "number";
   let TT_COMMENT = "comment";
+  let TT_SPECIAL = "special";
 
 // the following ttypes are used internally
   let TT_COMMENT_BEGIN = "commentBegin"; // FIXME implement me
@@ -69,12 +70,13 @@ function () {
       this.commentBeginEnd = []; // Map<String,Strings> maps comment begin to end
       this.input = "";
       this.pos = 0;
-      this.pushBack = false;
+      this.pushedBack = false;
       this.ttype = TT_EOF;
       this.tstart = 0;
       this.tend = 0;
-      this.tstring = null;
-      this.tnumber = null;
+      this.sval = null;
+      this.nval = null;
+      this.tsymbol=null;
       this.keywordTree = new KeywordTree(null);
       this.needChar = true;
     }
@@ -146,7 +148,7 @@ function () {
      * @param {String} token
      * @returns nothing
      */
-    addKeyword(token) {
+    addKeyword(token,symbol) {
       let node = this.keywordTree;
       for (let i = 0; i < token.length; i++) {
         let ch = token.charAt(i);
@@ -158,6 +160,7 @@ function () {
         node = child;
       }
       node.keyword = token;
+      node.symbol = symbol;
     }
     /**
      * Defines keyword tokens.
@@ -189,10 +192,12 @@ function () {
     setInput(input) {
       this.input = input;
       this.pos = 0;
-      this.pushBack = false;
+      this.pushedBack = false;
       this.ttype = null;
       this.tstart = null;
-      this.tstring = null;
+      this.tend = null;
+      this.sval = null;
+      this.tsymbol=null;
       this.needChar = true;
     }
 
@@ -200,7 +205,7 @@ function () {
      * 
      * @returns [Object] token type
      */
-    getTType() {
+    getTokenType() {
       return this.ttype;
     }
 
@@ -208,23 +213,49 @@ function () {
      * 
      * @returns [String] value or null
      */
-    getTString() {
-      return this.tstring;
+    getStringValue() {
+      return this.sval;
     }
 
-    /** Returns the current token number value. 
+    /** Returns the current token numeric value. 
      * 
      * @returns [Number] value or null
      */
-    getTNumber() {
-      return this.tnumber;
+    getNumericValue() {
+      return this.nval;
     }
+    /**
+     * Returns the current token symbol value
+     * 
+     * @returns {unresolved}
+     */
+    getSymbolValue() {
+      return this.tsymbol;
+    }
+
+    /**
+     * Returns the start position of the current token
+     * 
+     * @returns {unresolved}
+     */
+    getStartPosition() {
+      return this.tstart;
+    }
+    /**
+     * Returns the end position of the current token
+     * 
+     * @returns {unresolved}
+     */
+    getEndPosition() {
+      return this.tend;
+    }
+    
     /** Parses the next token. 
      * @return [Object] ttype
      */
-    next() {
-      if (this.pushBack) {
-        this.pushBack = false;
+    nextToken() {
+      if (this.pushedBack) {
+        this.pushedBack = false;
         return this.ttype;
       }
 
@@ -241,21 +272,23 @@ function () {
 
       // try to tokenize a keyword 
       let node = this.keywordTree;
-      let keyword = null;
+      let foundNode = null;
       let end = start;
       while (ch != null && node.children[ch] != null) {
         node = node.children[ch];
         if (node.keyword != null) {
-          keyword = node.keyword;
+          foundNode = node;
           end = this.pos;
         }
         ch = this.read();
       }
-      if (keyword != null) {
+      if (foundNode != null) {
         this.setPosition(end);
         this.ttype = TT_KEYWORD;
         this.tstart = start;
-        this.tstring = keyword;
+        this.tend = end;
+        this.sval = foundNode.keyword;
+        this.tsymbol = foundNode.symbol;
         return this.ttype;
       }
       this.setPosition(start);
@@ -271,7 +304,9 @@ function () {
         }
         this.ttype = TT_NUMBER;
         this.tstart = start;
-        this.tstring = this.input.substring(start, this.pos);
+        this.tend = this.pos;
+        this.sval = this.input.substring(start, this.pos);
+        this.tsymbol = null;
         return this.ttype;
       }
 
@@ -285,15 +320,19 @@ function () {
         }
         this.ttype = TT_WORD;
         this.tstart = start;
-        this.tstring = this.input.substring(start, this.pos);
+        this.tend = this.pos;
+        this.sval = this.input.substring(start, this.pos);
+        this.tsymbol=null;
         return this.ttype;
       }
       
-      // try to tokenize a word
+      // try to tokenize a special character
       if (ch != null && this.specials[ch] != null) {
-        this.ttype = this.specials[ch];
+        this.ttype = TT_SPECIAL;
+        this.tsymbol = this.specials[ch];
         this.tstart = start;
-        this.tstring = ch;
+        this.tend = end;
+        this.sval = ch;
         return this.ttype;
       }
       // FIXME implement me
@@ -329,6 +368,10 @@ function () {
      */
     setPosition(newValue) {
       this.pos = newValue;
+    }
+    
+    pushBack() {
+      this.pushedBack=true;
     }
   }
 
