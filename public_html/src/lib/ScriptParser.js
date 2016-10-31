@@ -68,6 +68,16 @@ function (Notation,AST) {
     }
   }
 
+const UNKNOWN_MASK = 0;
+const GROUPING_MASK = 1;
+const CONJUGATION_MASK = 2;
+const COMMUTATION_MASK = 4;
+const ROTATION_MASK = 8;
+const PERMUTATION_MASK = 16;
+const INVERSION_MASK = 32;
+const REFLECTION_MASK = 64;
+
+
   /**
    * Implements a parser for a specific notation..
    */
@@ -75,11 +85,22 @@ function (Notation,AST) {
     /**
      * Creates a new parser.
      * @param {Notation} notation
-     * @param {Map<String,Node>} macros
+     * @param {Map<String,MacroNode>} localMacros
      */
-    constructor(notation, macros) {
+    constructor(notation, localMacros) {
       this.notation = notation;
-      this.macros = macros == null ? [] : macros;
+      this.macros = [];
+      
+        if (localMacros != null) {
+            for (let macro in localMacros) {
+                macros.push(macro);
+            }
+        }
+        // global macros override local macros
+        for (let macro in notation.getMacros()) {
+            macros.push(macro);
+        }
+      
     }
 
     /**
@@ -90,6 +111,36 @@ function (Notation,AST) {
     parse(str) {
       throw "parsing is not implemented yet";
     }
+    
+    /**
+     * Parses a move.
+     * 
+     * @param {Tokenizer} t
+     * @param {Node} parent
+     * @returns {Node}
+     * @throws {String} describing the parse error
+     */
+     parseMove(t, parent) {
+        let move = new ScriptAST.MoveNode(notation.getLayerCount());
+        parent.add(move);
+
+        if (t.nextToken() != Tokenizer.TT_WORD) {
+            throw "Move: Symbol missing.", t.getStartPosition(), t.getEndPosition();
+        }
+        move.setStartPosition(t.getStartPosition());
+        let token = fetchGreedy(t.sval);
+        let symbol = notation.getSymbolFor(token, Notation.Symbols.MOVE);
+
+        if (Notation.Symbols.MOVE == symbol) {
+            notation.configureMoveFromToken(move, token);
+            move.setEndPosition(t.getStartPosition() + token.length() - 1);
+            t.consumeGreedy(token);
+        } else {
+            throw "Move: Invalid token " + t.sval, t.getStartPosition(), t.getEndPosition();
+        }
+        return move;
+    }
+    
   }
 
   /** Returns an array of script nodes. */

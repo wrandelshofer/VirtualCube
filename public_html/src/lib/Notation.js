@@ -179,7 +179,17 @@ let Symbols={
 
   /** Defines a notation. */
   class Notation {
-
+      constructor() {
+        this.macros = [];
+      }
+      
+      /**
+       * Returns the macros defined by this notation.
+       * @returns {Array<MacroNode>} macros;
+       */
+      getMacro() {
+        return macros;
+      }
   }
   /** Defines a default notation. */
   class DefaultNotation extends Notation {

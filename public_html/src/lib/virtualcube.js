@@ -130,7 +130,7 @@ requirejs.config({
 });
 
 // Start the main app logic.
-requirejs(['VirtualCubeMain'],
+requirejs("VirtualCubeMain", ['VirtualCubeMain'],
 function (VirtualCubeMain) {
     //virtualube is loaded and can be used here now.
     let parameters = {};

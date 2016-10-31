@@ -10,23 +10,49 @@
 // --------------
 // require.js
 // --------------
-define("ScriptAST", ["Notation"],
+define("ScriptAST", [],
 function () {
 
   /**
    * Represents an Abstract Syntax Tree Node
    */
   class Node {
-
+      constructor() {
+        this.children=[];
+        this.startPosition=-1;
+        this.endPosition=-1;
+      }
+      
+      add(child) {
+        this.children.put(child);
+      }
+      
+      setStartPosition(newValue) {
+        this.startPosition=newValue;
+      }
+      setEndPosition(newValue) {
+        this.endPosition=newValue;
+      }
   }
 
-  class TwistNode extends Node {
+  class MoveNode extends Node {
 
     /** Script nodes. */
-    constructor(axis, layerMask, angle) {
+    constructor(layerCount, axis, layerMask, angle) {
+      this.layerCount=layerCount;
       this.axis = axis;
       this.angle = angle;
       this.layerMask = layerMask;
+    }
+    
+    setAxis(newValue) {
+      this.axis=newValue;
+    }
+    setAngle(newValue) {
+      this.angle=newValue;
+    }
+    setLayeMask(newValue) {
+      this.layerMask=newValue;
     }
 
     /** Applies the node to the specified cube. */
