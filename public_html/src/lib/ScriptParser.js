@@ -182,7 +182,7 @@ let module = {
   }
 
   /** Returns an array of script nodes. */
-  let createRandomScript = function (scrambleCount, scrambleMinCount) {
+  let createRandomScript = function (layerCount, scrambleCount, scrambleMinCount) {
     if (scrambleCount == null)
       scrambleCount = 21;
     if (scrambleMinCount == null)
@@ -199,10 +199,10 @@ let module = {
       }
       prevAxis = axis;
 //    while ((layerMask = Math.floor(Math.random()*(1 << this.layerCount))) == 0) {}
-      layerMask = 1 << Math.floor(Math.random() * this.layerCount);
+      layerMask = 1 << Math.floor(Math.random() * layerCount);
       while ((angle = Math.floor(Math.random() * 5) - 2) == 0) {
       }
-      scrambler[i] = new TwistNode(axis, layerMask, angle);
+      scrambler[i] = new AST.MoveNode(layerCount,axis, layerMask, angle);
     }
 
     return scrambler;

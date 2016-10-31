@@ -726,9 +726,8 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
     
       
     // Create random moves
-    let parser=ScriptParser.newScriptParser();
-    parser.layerCount=this.cube3d.cube.layerCount;
-    let scrambleNodes=parser.createRandomScript(scrambleCount);
+    let layerCount=this.cube3d.cube.layerCount;
+    let scrambleNodes=ScriptParser.createRandomScript(layerCount,scrambleCount);
     this.moves = this.moves.concat(scrambleNodes);
     
     // Perform the scrambling moves
@@ -739,7 +738,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
         
           // Wait until cube3d has finished twisting
           if (self.cube3d.isTwisting) {
-            self.repaint(f);
+            self.repaint(f);// busy wait!!!
             return;
           }
           
@@ -1051,9 +1050,21 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
     
      // parse script
      // --------------
+     if (p.script != null) {
+       module.log('.readParameters script:'+p.script);
+       let notation=new Notation.DefaultNotation();
+       let parser = new ScriptParser.ScriptParser(notation);
+       try {
+       this.script=parser.parse(p.script);
+     } catch (e) {
+       console.log(e);
+     console.log("AbstractPlayerApplet error parsing script:\""+p.script+'"');
+      }
+     } 
+     // parse initscript
+     // --------------
      if (p.initscript != null) {
        module.log('.readParameters initscript:'+p.initscript);
-       // FIXME implement me
        let notation=new Notation.DefaultNotation();
        let parser = new ScriptParser.ScriptParser(notation);
        try {
