@@ -15,42 +15,41 @@ function () {
 
 // ttypes for GreedyTokenizer
 // ----------------------
-let TT_WORD="word";
-let TT_EOF="eof";
-let TT_SKIP="skip";
+  let TT_WORD = "word";
+  let TT_EOF = "eof";
+  let TT_SKIP = "skip";
 
 // the following ttypes can be activated on demand
-let TT_KEYWORD="keyword"
-let TT_NUMBER="number";
-let TT_COMMENT="comment";
+  let TT_KEYWORD = "keyword"
+  let TT_NUMBER = "number";
+  let TT_COMMENT = "comment";
 
 // the following ttypes are used internally
-let TTT_COMMENT_BEGIN="commentBegin";
-let TTT_DIGIT="numberDigit";
-let TTT_KEYWORD_PART="keywordPart";
+  let TT_COMMENT_BEGIN = "commentBegin"; // FIXME implement me
+  let TT_DIGIT = "numberDigit";
 
-/**
- * Node of keyword tree.
- * 
- * Example tree structure, for the keywords "ab", and "abcd".
- * 
- * ''.KeywordTree(null)
- * ''.'a'.KeywordTree(null)
- * ''.'a'.'b'.KeywordTree("ab")
- * ''.'a'.'b'.'c'.KeywordTree(null)
- * ''.'a'.'b'.'c'.'d'.KeywordTree("abcd")
- */
-class KeywordTree  {
   /**
-   * Constructos a new instance.
-   * .
-   * @param {type} keyword
+   * Node of keyword tree.
+   * 
+   * Example tree structure, for the keywords "ab", and "abcd".
+   * 
+   * ''.KeywordTree(null)
+   * ''.'a'.KeywordTree(null)
+   * ''.'a'.'b'.KeywordTree("ab")
+   * ''.'a'.'b'.'c'.KeywordTree(null)
+   * ''.'a'.'b'.'c'.'d'.KeywordTree("abcd")
    */
-  constructor(keyword) {
-    this.keyword=keyword;
-    this.children={};
+  class KeywordTree {
+    /**
+     * Constructos a new instance.
+     * .
+     * @param {type} keyword
+     */
+    constructor(keyword) {
+      this.keyword = keyword;
+      this.children = {};
+    }
   }
-}
 
 
   /**
@@ -61,220 +60,288 @@ class KeywordTree  {
    * You can activate tokenizaton of comments, by invoking addMultilineTokens(begin,end)
    * or addSingleline.
    * You can activate tokenization of positive integer numbers, by invokint addDigitTokens().
-   * You can activate tokenization of keywords, by adding keyword tokens.
+   * You can activate tokenization of keywords, by adding keyword specials.
    */
   class GreedyTokenizer {
-      constructor() {
-        this.tokens={}; // Map<String,Object> maps text to  ttype
-        this.commentBeginEnd=[]; // Map<String,Strings> maps comment begin to end
-        this.input="";
-        this.pos=0;
-        this.pushBack=false;
-        this.ttype=TT_EOF;
-        this.tstart=0;
-        this.tend=0;
-        this.tstring=null;
-        this.keywordTree=new KeywordTree(null);
-      }
-      
-      /**
-       * Defines a character token.
-       * 
-       * @param {Character} token
-       * @param {Object} ttype
-       * @returns nothing
-       */
-      addToken(token, ttype) {
-        if (token.length!=1) throw new "token must be 1 character!, token:"+token;
-        if (ttype==TT_WORD) {
-        delete this.token[token];
-        }else{
-        this.tokens[token]=ttype;
+    constructor() {
+      this.specials = {}; // Map<Character,Object> maps char to  ttype
+      this.digits = {}; // Map<Character,Object> maps char to  ttype
+      this.commentBeginEnd = []; // Map<String,Strings> maps comment begin to end
+      this.input = "";
+      this.pos = 0;
+      this.pushBack = false;
+      this.ttype = TT_EOF;
+      this.tstart = 0;
+      this.tend = 0;
+      this.tstring = null;
+      this.tnumber = null;
+      this.keywordTree = new KeywordTree(null);
+      this.needChar = true;
+    }
+
+    /**
+     * Defines a special character token.
+     * 
+     * @param {Character} token
+     * @param {Object} ttype
+     * @returns nothing
+     */
+    addSpecial(token, ttype) {
+      if (token.length != 1)
+        throw new "token must be 1 character!, token:" + token;
+      this.specials[token] = ttype;
+    }
+    /**
+     * Adds a digit token. (Also use this for adding signs, and decimal point tokens!).
+     * 
+     * @param {Character} token
+     * @param {Object} ttype
+     * @returns nothing
+     */
+    addDigit(token, ttype) {
+      if (token.length != 1)
+        throw new "token must be 1 character!, token:" + token;
+      this.digits[token] = ttype;
+    }
+    /**
+     * Defines the tokens needed for parsing non-negative integers.
+     * 
+     * @param {String} token
+     * @param {Object} ttype
+     * @returns nothing
+     */
+    parseNumbers() {
+      this.addDigit("0", TT_DIGIT);
+      this.addDigit("1", TT_DIGIT);
+      this.addDigit("2", TT_DIGIT);
+      this.addDigit("3", TT_DIGIT);
+      this.addDigit("4", TT_DIGIT);
+      this.addDigit("5", TT_DIGIT);
+      this.addDigit("6", TT_DIGIT);
+      this.addDigit("7", TT_DIGIT);
+      this.addDigit("8", TT_DIGIT);
+      this.addDigit("9", TT_DIGIT);
+    }
+    /**
+     * Defines the specials needed for skipping whitespace.
+     * 
+     * @param {String} token
+     * @param {Object} ttype
+     * @returns nothing
+     */
+    skipWhitespace() {
+      this.addSpecial(" ", TT_SKIP);
+      this.addSpecial("\f", TT_SKIP);
+      this.addSpecial("\n", TT_SKIP);
+      this.addSpecial("\r", TT_SKIP);
+      this.addSpecial("\t", TT_SKIP);
+      this.addSpecial("\v", TT_SKIP);
+      this.addSpecial("\u00a0", TT_SKIP);
+      this.addSpecial("\u2028", TT_SKIP);
+      this.addSpecial("\u2029", TT_SKIP);
+    }
+    /**
+     * Defines a keyword token.
+     * 
+     * @param {String} token
+     * @returns nothing
+     */
+    addKeyword(token) {
+      let node = this.keywordTree;
+      for (let i = 0; i < token.length; i++) {
+        let ch = token.charAt(i);
+        let child = node.children[ch];
+        if (child == null) {
+          child = new KeywordTree(null);
+          node.children[ch] = child;
         }
+        node = child;
       }
-      /**
-       * Defines the tokens needed for parsing positive integers.
-       * 
-       * @param {String} token
-       * @param {Object} ttype
-       * @returns nothing
-       */
-      addDigitTokens() {
-        this.addToken("0",TTT_DIGIT);
-        this.addToken("1",TTT_DIGIT);
-        this.addToken("2",TTT_DIGIT);
-        this.addToken("3",TTT_DIGIT);
-        this.addToken("4",TTT_DIGIT);
-        this.addToken("5",TTT_DIGIT);
-        this.addToken("6",TTT_DIGIT);
-        this.addToken("7",TTT_DIGIT);
-        this.addToken("8",TTT_DIGIT);
-        this.addToken("9",TTT_DIGIT);
+      node.keyword = token;
+    }
+    /**
+     * Defines keyword tokens.
+     * 
+     * @param {Array<String>} tokens
+     * @returns nothing
+     */
+    addKeywords(tokens) {
+      for (let i=0;i<tokens.length;i++) {
+        this.addKeyword(tokens[i]);
       }
-      /**
-       * Defines the tokens needed for skipping whitespace.
-       * 
-       * @param {String} token
-       * @param {Object} ttype
-       * @returns nothing
-       */
-      skipWhitespaceTokens() {
-        this.addToken(" ",TT_SKIP);
-        this.addToken("\f",TT_SKIP);
-        this.addToken("\n",TT_SKIP);
-        this.addToken("\r",TT_SKIP);
-        this.addToken("\t",TT_SKIP);
-        this.addToken("\v",TT_SKIP);
-        this.addToken("\u00a0",TT_SKIP);
-        this.addToken("\u2028",TT_SKIP);
-        this.addToken("\u2029",TT_SKIP);
+    }
+    /**
+     * Defines special character tokens.
+     * 
+     * @param {Array<Character>} tokens
+     * @returns nothing
+     */
+    addSpecials(tokens) {
+      for (let i=0;i<tokens.length;i++) {
+        this.addSpecial(tokens[i],tokens[i]);
       }
-      /**
-       * Defines a keyword token.
-       * 
-       * @param {String} token
-       * @returns nothing
-       */
-      addKeyword(token) {
-        let node=this.keywordTree;
-        for (let i=0;i<token.length;i++) {
-          let ch=token.charAt(i);
-console.log('Tokenizer.addKeyword '+ch);          
-          let child=node.children[ch];
-          if (child==null) {
-            child=new KeywordTree(null);
-            node.children[ch]=child;
-          }
-          node=child;
+    }
+
+    /** Sets the input for the tokenizer. 
+     * 
+     * @param [String] input;
+     */
+    setInput(input) {
+      this.input = input;
+      this.pos = 0;
+      this.pushBack = false;
+      this.ttype = null;
+      this.tstart = null;
+      this.tstring = null;
+      this.needChar = true;
+    }
+
+    /** Returns the current token type. 
+     * 
+     * @returns [Object] token type
+     */
+    getTType() {
+      return this.ttype;
+    }
+
+    /** Returns the current token string value. 
+     * 
+     * @returns [String] value or null
+     */
+    getTString() {
+      return this.tstring;
+    }
+
+    /** Returns the current token number value. 
+     * 
+     * @returns [Number] value or null
+     */
+    getTNumber() {
+      return this.tnumber;
+    }
+    /** Parses the next token. 
+     * @return [Object] ttype
+     */
+    next() {
+      if (this.pushBack) {
+        this.pushBack = false;
+        return this.ttype;
+      }
+
+      let start = this.pos;
+      let ch = this.read();
+
+      // try to skip characters
+      while (ch != null && this.specials[ch] == TT_SKIP) {
+        ch = this.read();
+        start += 1;
+      }
+
+      // start position of the token
+
+      // try to tokenize a keyword 
+      let node = this.keywordTree;
+      let keyword = null;
+      let end = start;
+      while (ch != null && node.children[ch] != null) {
+        node = node.children[ch];
+        if (node.keyword != null) {
+          keyword = node.keyword;
+          end = this.pos;
         }
-        node.keyword=token;
+        ch = this.read();
       }
-      
-      /** Sets the input for the tokenizer. 
-       * 
-       * @param [String] input;
-       */
-      setInput(input) {
-        this.input=input;
-        this.pos=0;
-        this.pushBack=false;
-        this.ttype=null;
-        this.tstart=null;
-        this.tstring=null;
+      if (keyword != null) {
+        this.setPosition(end);
+        this.ttype = TT_KEYWORD;
+        this.tstart = start;
+        this.tstring = keyword;
+        return this.ttype;
       }
-      
-      /** Returns the current token type. 
-       * 
-       * @returns [Object] token type
-       */
-      getTType() {
+      this.setPosition(start);
+      ch = this.read();
+
+       // try to tokenize a number
+      if (ch != null && this.digits[ch] == TT_DIGIT) {
+        while (ch != null && this.digits[ch] == TT_DIGIT) {
+          ch = this.read();
+        }
+        if (ch!=null) {
+        this.unread();
+        }
+        this.ttype = TT_NUMBER;
+        this.tstart = start;
+        this.tstring = this.input.substring(start, this.pos);
+        return this.ttype;
+      }
+
+      // try to tokenize a word
+      if (ch != null && this.specials[ch] == null) {
+        while (ch != null && this.specials[ch] == null) {
+          ch = this.read();
+        }
+        if (ch!=null) {
+        this.unread();
+        }
+        this.ttype = TT_WORD;
+        this.tstart = start;
+        this.tstring = this.input.substring(start, this.pos);
         return this.ttype;
       }
       
-      /** Returns the current token string value. 
-       * 
-       * @returns [String] value or nul
-       */
-      getTString() {
-        return this.tstring;
-      }
-      
-      /** Parses the next token. 
-       * @return [Object] ttype
-       */
-      next() {
-        if (this.pushBack) {
-          this.pushBack=false;
-          return this.ttype;
-        }
-        
-        let ch=this.read();
-        
-        // try to skip characters
-        while (ch!=null&&this.tokens[ch]==TT_SKIP) {
-          ch=this.read();
-        }
-        
-        // start position of the token
-        let start=this.pos - 1; 
-        
-        // try to tokenize a keyword 
-        let node=this.keywordTree;
-        let keyword=null;
-        while (ch!=null&&node.children[ch]!=null) {
-          node=node.children[ch];
-          if (node.keyword!=null) {
-            keyword=node.keyword;
-          }
-          ch=this.read();
-        }
-        if (keyword != null) {
-          this.setPosition(start+keyword.length);
-          this.ttype=TT_KEYWORD;
-          this.tstart=start;
-          this.tstring=keyword;
-          return this.ttype;
-        }
-        
-        // try to tokenize a word
-        while (ch!=null&&this.tokens[ch]==null) {
-          ch=this.read();
-        }
-        if (ch!=null) {this.unread();}
-        if (this.pos>start+1) {
-          this.ttype=TT_WORD;
-          this.tstart=start;
-          this.tstring=this.input.substring(start,this.pos);
-          return this.ttype;
-        } else {
-          this.unread();
-        }
-        // FIXME implement me
-        this.ttype=TT_EOF;
+      // try to tokenize a word
+      if (ch != null && this.specials[ch] != null) {
+        this.ttype = this.specials[ch];
+        this.tstart = start;
+        this.tstring = ch;
         return this.ttype;
       }
-      
-      /**
-       * Reads the next character from input.
-       * 
-       * @return the next character or null in case of EOF
-       */
-      read() {
-        if (this.pos<this.input.length) {
-          let ch=this.input.charAt(this.pos);
-          this.pos = this.pos+1;
-          return ch;
-        } else {
-          this.pos=this.input.length;
-          return null;
-        }
+      // FIXME implement me
+      this.ttype = TT_EOF;
+      return this.ttype;
+    }
+
+    /**
+     * Reads the next character from input.
+     * 
+     * @return the next character or null in case of EOF
+     */
+    read() {
+      if (this.pos < this.input.length) {
+        let ch = this.input.charAt(this.pos);
+        this.pos = this.pos + 1;
+        return ch;
+      } else {
+        this.pos = this.input.length;
+        return null;
       }
-      /**
-       * Unreads the last character from input.
-       */
-      unread() {
-        if (this.pos>0) {
-          this.pos = this.pos-1;
-        }
+    }
+    /**
+     * Unreads the last character from input.
+     */
+    unread() {
+      if (this.pos > 0) {
+        this.pos = this.pos - 1;
       }
-      /**
-       * Sets the input position.
-       */
-      setPosition(newValue) {
-        this.pos=newValue;
-      }
+    }
+    /**
+     * Sets the input position.
+     */
+    setPosition(newValue) {
+      this.pos = newValue;
+    }
   }
 
 // ------------------
 // MODULE API    
 // ------------------
   return {
-    TT_WORD:TT_WORD,
-    TT_KEYWORD:TT_KEYWORD,
-    TT_SKIP:TT_SKIP,
-    TT_EOF:TT_EOF,
-    TT_NUMBER:TT_NUMBER,
-    TT_COMMENT:TT_COMMENT,
+    TT_WORD: TT_WORD,
+    TT_KEYWORD: TT_KEYWORD,
+    TT_SKIP: TT_SKIP,
+    TT_EOF: TT_EOF,
+    TT_NUMBER: TT_NUMBER,
+    TT_COMMENT: TT_COMMENT,
     GreedyTokenizer: GreedyTokenizer
   };
 });

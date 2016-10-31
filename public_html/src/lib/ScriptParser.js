@@ -10,8 +10,8 @@
 // --------------
 // require.js
 // --------------
-define("ScriptParser", ["Notation","ScriptAST"],
-function (Notation,AST) {
+define("ScriptParser", ["Notation","ScriptAST","Tokenizer"],
+function (Notation,AST,Tokenizer) {
 
   /**
    * Represents an Abstract Syntax Tree Node
@@ -109,6 +109,15 @@ const REFLECTION_MASK = 64;
      * @throws a message if the parsing fails.
      */
     parse(str) {
+      let tt=new Tokenizer.GreedyTokenizer();
+      tt.skipWhitespace();
+      tt.parseNumbers();
+      tt.addSpecials(this.notation.getSpecials());
+      tt.addKeywords(this.notation.getKeywords());
+      tt.setInput(str);
+      while (tt.next()!=Tokenizer.TT_EOF) {
+        console.log('tt:'+tt.getTType()+" "+tt.getTString());
+      }
       throw "parsing is not implemented yet";
     }
     
@@ -175,6 +184,7 @@ const REFLECTION_MASK = 64;
 // ------------------
   return {
     ScriptParser: ScriptParser,
-    createRandomScript: createRandomScript
+    createRandomScript: createRandomScript,
+  newTwistNode: (axis,layerMask,angle)=>new AST.MoveNode(3,axis,layerMask,angle)
   };
 });

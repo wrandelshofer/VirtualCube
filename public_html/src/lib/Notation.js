@@ -181,18 +181,41 @@ let Symbols={
   class Notation {
       constructor() {
         this.macros = [];
+        this.keywords = [];
+        this.specials = [];
       }
       
       /**
        * Returns the macros defined by this notation.
        * @returns {Array<MacroNode>} macros;
        */
-      getMacro() {
-        return macros;
+      getMacros() {
+        return this.macros;
+      }
+      getKeywords() {
+        return this.keywords;
+      }
+      getSpecials() {
+        return this.specials;
       }
   }
   /** Defines a default notation. */
   class DefaultNotation extends Notation {
+      constructor() {
+        super();
+        this.keywords = [
+          'R','U','F','L','D','B',
+          'R2','U2','F2','L2','D2','B2',
+          "R'","U'","F'","L'","D'","B'",
+        'MR','MU','MF','ML','MD','MB',
+        'CR','CU','CF','CL','CD','CB',
+        "MR'","MU'","MF'","ML'","MD'","MB'",
+        "CR'","CU'","CF'","CL'","CD'","CB'",
+        'MR2','MU2','MF2','ML2','MD2','MB2',
+        'CR2','CU2','CF2','CL2','CD2','CB2',
+        "'"];
+        this.specials = ['.','·','(',')'];
+      }
 
   }
 

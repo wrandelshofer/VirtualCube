@@ -1056,6 +1056,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
        try {
        parser.parse(p.script);
      } catch (e) {
+       console.log(e);
      console.log("AbstractPlayerApplet error parsing script:\""+p.script+'"');
       }
      } 

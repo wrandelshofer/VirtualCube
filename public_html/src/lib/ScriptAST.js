@@ -39,6 +39,7 @@ function () {
 
     /** Script nodes. */
     constructor(layerCount, axis, layerMask, angle) {
+      super();
       this.layerCount=layerCount;
       this.axis = axis;
       this.angle = angle;
@@ -99,6 +100,6 @@ function () {
 // ------------------
   return {
     Node: Node,
-    TwistNode: TwistNode,
+  MoveNode: MoveNode
   };
 });

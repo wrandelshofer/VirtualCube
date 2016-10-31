@@ -22,6 +22,7 @@ TokenizerTest.prototype.testUnconfiguredTokenizer=()=>{
   const TT_WORD=Tokenizer.TT_WORD;
   
   const data = [
+  [  "a", [TT_WORD,"a"] ],
   [  "hello", [TT_WORD,"hello"] ],
   [  "hello world", [TT_WORD,"hello world"] ],
   [  "hello world ", [TT_WORD,"hello world "] ],
@@ -52,6 +53,7 @@ TokenizerTest.prototype.testSkipWhitespace=()=>{
   
   const data = [
   [  "hello", [TT_WORD,"hello"] ],
+  [  "a b", [TT_WORD,"a",TT_WORD,"b"] ],
   [  "hello world", [TT_WORD,"hello",TT_WORD,"world"] ],
   [  "hello  world", [TT_WORD,"hello",TT_WORD,"world"] ],
   [  "hello world ", [TT_WORD,"hello",TT_WORD,"world"] ],
@@ -114,6 +116,39 @@ TokenizerTest.prototype.testKeyword=()=>{
     while (tt.next()!=Tokenizer.TT_EOF) {
       actual.push(tt.getTType());
       actual.push(tt.getTString());
+    }
+    console.log('  input:"'+input+'" expected:"'+expected+'" actual:"'+actual+'"');
+  assertEquals(expected,actual);
+  }
+};
+
+TokenizerTest.prototype.testDigits=()=>{
+  console.log('testKeyword');
+  
+  const Tokenizer=require("Tokenizer");
+  const TT_WORD=Tokenizer.TT_WORD;
+  const TT_KEYWORD=Tokenizer.TT_KEYWORD;
+  const TT_NUMBER=Tokenizer.TT_NUMBER;
+  
+  const data = [
+  [  "hello", [TT_WORD,null] ],
+  [  "0", [TT_NUMBER,0] ],
+  ];
+ 
+  for (let i in data) {
+    let input=data[i][0];
+    let expected=data[i][1];
+  
+  
+    let tt = new Tokenizer.GreedyTokenizer();
+    tt.addDigits();
+    tt.setInput(input);
+    
+    
+    let actual=[];
+    while (tt.next()!=Tokenizer.TT_EOF) {
+      actual.push(tt.getTType());
+      actual.push(tt.getTNumber());
     }
     console.log('  input:"'+input+'" expected:"'+expected+'" actual:"'+actual+'"');
   assertEquals(expected,actual);
