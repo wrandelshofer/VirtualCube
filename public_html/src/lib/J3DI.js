@@ -1031,6 +1031,7 @@ let doLoadObj = function (obj, text, callback, errorCallback)
   
   // recompute the normals
   if (recomputeNormals) {
+    module.log('recomputing normals for '+obj.url);
     for (let i=0;i<normalArray.length;i++) {						 
       normalArray[i]=0;
     }
