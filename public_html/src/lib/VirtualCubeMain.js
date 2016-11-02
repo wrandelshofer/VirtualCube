@@ -214,12 +214,14 @@ function (WebglPlayerApplet, TwoDPlayerApplet) {
   }
   /** Initializes the virtual cube. */
   VirtualCube.prototype.init = function () {
-    if (this.parameters.rendercontext == "2d") {
+    let rendercontext = this.parameters.rendercontext;
+    module.log('reading parameter rendercontext:'+rendercontext);
+    if (rendercontext == "2d") {
       this.canvas3d = new TwoDPlayerApplet.TwoDPlayerApplet();
-    } else if (this.parameters.rendercontext == null || this.parameters.rendercontext == "webgl") {
+    } else if (rendercontext == null || rendercontext == "webgl") {
       this.canvas3d = new WebglPlayerApplet.WebglPlayerApplet();
     } else {
-      module.error('illegal rendercontext:' + this.parameters.rendercontext);
+      module.error('illegal rendercontext:' + rendercontext);
       this.canvas3d = new WebglPlayerApplet.WebglPlayerApplet();
     }
     for (var k in this.parameters) {

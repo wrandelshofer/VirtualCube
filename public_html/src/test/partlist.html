@@ -16,22 +16,25 @@
 
     <section class="test">
       <div class="virtualcube small" 
-           partlist="urf,dfr,ubr,drb,ulb,dbl,ufl,dlf,
-ur,rf,dr,bu,rb,bd,ul,lb,dl,fu,lf,fd,
-r,u,f,l,d,b,
-center"
+           partlist="urf,dfr,ubr,drb,ulb,dbl,ufl,dlf, ur,rf,dr,bu,rb,bd,ul,lb,dl,fu,lf,fd, r,u,f,l,d,b, center"
            ></div>
-      <p><kbd>partlist="urf,dfr,ubr,drb,ulb,dbl,ufl,dlf,
-ur,rf,dr,bu,rb,bd,ul,lb,dl,fu,lf,fd,
-r,u,f,l,d,b,
-center"</kbd> (default)</p>
+      <p><kbd>partlist="urf,dfr,ubr,drb,ulb,dbl,ufl,dlf, ur,rf,dr,bu,rb,bd,ul,lb,dl,fu,lf,fd, r,u,f,l,d,b, center"</kbd> (default)</p>
     </section>
 
     <section class="test">
       <div class="virtualcube small" 
-           partlist="5,3,0,4,2,1"
+           rendercontext="webgl"
+           partlist="l,r,u,f,d,b,center"
            ></div>
-      <p><kbd>partlist="5,3,0,4,2,1"</kbd></p>
+      <p><kbd>rendercontext="webgl" partlist="l,r,u,f,d,b,center"</kbd></p>
+    </section>
+    
+    <section class="test">
+      <div class="virtualcube small" 
+           rendercontext="2d"
+           partlist="l,r,u,f,d,b,center"
+           ></div>
+      <p><kbd>rendercontext="2d" partlist="l,r,u,f,d,b,center"</kbd></p>
     </section>
   </body>
 </html>

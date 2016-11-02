@@ -37,6 +37,18 @@ PocketCubeS4Cube3D
     ? function (msg) {
       console.log('AbstractPlayerApplet.js ' + msg);
     }
+    : function () {},
+    
+    warning: (true) // Enable or disable logging for this module.
+    ? function (msg) {
+      console.log('AbstractPlayerApplet.js WARNING ' + msg);
+    }
+    : function () {},
+    
+    error: (true) // Enable or disable logging for this module.
+    ? function (msg) {
+      console.log('AbstractPlayerApplet.js ERROR ' + msg);
+    }
     : function () {}
   }
 // 
@@ -68,7 +80,7 @@ PocketCubeS4Cube3D
       if (i < tokens.length - 1 && tokens[i + 1].indexOf('=') != -1) {
         // found a key
         if (!tokens[i].match(/^\w+$/)) {
-          console.log('AbstractPlayerApplet.js .parseColorMap::found illegal key:"' + key + '" in map:"' + str + '"');
+          module.error('illegal key:"' + key + '" in map:"' + str + '"');
           break;
         } else {
           key = tokens[i];
@@ -98,7 +110,7 @@ PocketCubeS4Cube3D
         // found a separator
         i++; // consume separator
       } else {
-        console.log('AbstractPlayerApplet.js .parseColorMap::found illegal token:"' + tokens[i] + '" in map:"' + str + '"');
+        module.error('illegal token:"' + tokens[i] + '" in map:"' + str + '"');
         break;
       }
     }
@@ -216,7 +228,7 @@ PocketCubeS4Cube3D
 
 
         default :
-          console.log('AbstractPlayerApplet.js Error: illegal cube attribute :' + cname);
+          module.error('illegal cube attribute :' + cname);
           if (this.useFullModel) {
             c3d = new RubiksCubeS4Cube3D.Cube3D();
           } else {
@@ -400,6 +412,7 @@ PocketCubeS4Cube3D
 
       // draw center parts
       for (let i = 0; i < cube3d.centerCount; i++) {
+        if (!attr.isPartVisible(cube3d.centerOffset +i)) continue;
         mvMatrix.makeIdentity();
         cube3d.parts[cube3d.centerOffset + i].transform(mvMatrix);
         this.drawObject(cube3d.centerObj, mvMatrix, ccenter, attr.partsPhong[this.cube3d.centerOffset + i]);
@@ -407,6 +420,7 @@ PocketCubeS4Cube3D
 
       // draw side parts
       for (let i = 0; i < cube3d.sideCount; i++) {
+        if (!attr.isPartVisible(cube3d.sideOffset + i)) continue;
         mvMatrix.makeIdentity();
         cube3d.parts[cube3d.sideOffset + i].transform(mvMatrix);
         this.drawObject(cube3d.sideObj, mvMatrix, cparts, attr.partsPhong[this.cube3d.sideOffset + i]);
@@ -418,6 +432,7 @@ PocketCubeS4Cube3D
       }
       // draw edge parts
       for (let i = 0; i < cube3d.edgeCount; i++) {
+        if (!attr.isPartVisible(cube3d.edgeOffset + i)) continue;
         mvMatrix.makeIdentity();
         this.cube3d.parts[cube3d.edgeOffset + i].transform(mvMatrix);
         this.drawObject(cube3d.edgeObj, mvMatrix, cparts, attr.partsPhong[this.cube3d.edgeOffset + i]);
@@ -433,6 +448,7 @@ PocketCubeS4Cube3D
       }
       // draw corner parts
       for (let i = 0; i < cube3d.cornerCount; i++) {
+        if (!attr.isPartVisible(cube3d.cornerOffset + i)) continue;
         mvMatrix.makeIdentity();
         this.cube3d.parts[cube3d.cornerOffset + i].transform(mvMatrix);
         this.drawObject(cube3d.cornerObj, mvMatrix, cparts, attr.partsPhong[this.cube3d.cornerOffset + i], this.forceColorUpdate);
@@ -993,7 +1009,7 @@ PocketCubeS4Cube3D
 
       if (p.colortable != null) {
         module.log('.readParameters colortable:' + p.colortable);
-        console.log('WARNING: the parameter "colorTable" is deprecated, use "colorList" instead.');
+        module.warning('the parameter "colorTable" is deprecated, use "colorList" instead.');
         let parsedColorMap = parseColorMap(p.colortable);
 
         for (let k in parsedColorMap) {
@@ -1024,7 +1040,7 @@ PocketCubeS4Cube3D
       // parse faceIndices from faces
       if (p.faces != null) {
         module.log('.readParameters faces:' + p.faces);
-        console.log('WARNING: the parameter "faces" is deprecated, please use "faceList" instead.');
+        console.warning('the parameter "faces" is deprecated, please use "faceList" instead.');
         let parsedIndices = parseWordList(p.faces);
         for (let i in parsedIndices) {
           faceIndices[deprecatedFaceIndices[i]] = parsedIndices[i];
@@ -1074,8 +1090,8 @@ PocketCubeS4Cube3D
         try {
           this.script = parser.parse(p.script);
         } catch (e) {
-          console.log(e);
-          console.log("AbstractPlayerApplet error parsing script:\"" + p.script + '"');
+          module.error(e);
+          module.error("illegal script:\"" + p.script + '"');
         }
       }
       // parse initscript
@@ -1087,8 +1103,8 @@ PocketCubeS4Cube3D
         try {
           this.initscript = parser.parse(p.initscript);
         } catch (e) {
-          console.log(e);
-          console.log("AbstractPlayerApplet error parsing resetscript:\"" + p.initscript + '"');
+          module.error(e);
+          module.error("illegal resetscript:\"" + p.initscript + '"');
         }
       }
     }
@@ -1129,8 +1145,6 @@ PocketCubeS4Cube3D
         module.log('.readParameters partlist:' + p.partlist);
         let str = p.partlist;
         let tokens = str.split(/[ ,\n]+/);
-        module.log('tokens:' + tokens);
-
         for (let i=0;i<a.getPartCount();i++) {
           a.setPartVisible(i,false);
         }
@@ -1141,13 +1155,13 @@ PocketCubeS4Cube3D
           let partName = tokens[i];
           let partIndex = cube.NAME_PART_MAP[partName];
           if (partIndex == null) {
-            console.log('AbstractPlayerApplet error illegal part:"' + partName + '" in partlist');
+            module.error('illegal part:"' + partName + '" in partlist');
             isError = true;
           }
           a.setPartVisible(partIndex,true);
         }
         if (isError) {
-          console.log("AbstractPlayerApplet error parsing partlist:\"" + p.partlist + '"');
+          module.error("illegal partlist:\"" + p.partlist + '"');
         }
       }
     }
@@ -1169,11 +1183,12 @@ PocketCubeS4Cube3D
     }
   }
 
+class Cube3DHandler {
   /**
    * Touch handler for the canvas object.
    * Forwards everything to the mouse handler.
    */
-  Cube3DHandler.prototype.onTouchStart = function (event) {
+  onTouchStart(event) {
     if (event.touches.length == 1) {
       event.preventDefault();
       event.clientX = event.touches[0].clientX;
@@ -1183,12 +1198,12 @@ PocketCubeS4Cube3D
       this.isMouseDrag = false;
     }
   }
-  Cube3DHandler.prototype.onTouchEnd = function (event) {
+  onTouchEnd(event) {
     event.clientX = this.mousePrevX;
     event.clientY = this.mousePrevY;
     this.onMouseUp(event);
   }
-  Cube3DHandler.prototype.onTouchMove = function (event) {
+  onTouchMove(event) {
     event.clientX = event.touches[0].clientX;
     event.clientY = event.touches[0].clientY;
     this.onMouseMove(event);
@@ -1196,7 +1211,7 @@ PocketCubeS4Cube3D
   /**
    * Mouse handler for the canvas object.
    */
-  Cube3DHandler.prototype.onMouseDown = function (event) {
+  onMouseDown(event) {
     this.mouseDownX = event.clientX;
     this.mouseDownY = event.clientY;
     this.mousePrevX = event.clientX;
@@ -1207,7 +1222,7 @@ PocketCubeS4Cube3D
     this.mouseDownIsect = isect;
     this.isCubeSwipe = isect != null;
   }
-  Cube3DHandler.prototype.onMouseMove = function (event) {
+  onMouseMove(event) {
     if (this.isMouseDrag) {
       let x = event.clientX;
       let y = event.clientY;
@@ -1311,10 +1326,10 @@ PocketCubeS4Cube3D
       this.mousePrevTimeStamp = event.timeStamp;
     }
   }
-  Cube3DHandler.prototype.onMouseOut = function (event) {
+  onMouseOut(event) {
     this.isMouseDrag = false;
   }
-  Cube3DHandler.prototype.onMouseUp = function (event) {
+  onMouseUp(event) {
     this.isMouseDrag = false;
     this.isCubeSwipe = false;
 
@@ -1353,6 +1368,9 @@ PocketCubeS4Cube3D
 
     this.canvas.repaint();
   }
+
+  
+}
 
 
 // ------------------
