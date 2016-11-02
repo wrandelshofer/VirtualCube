@@ -121,7 +121,7 @@ class PocketCubeS5Cube3D extends AbstractRubiksCubeCube3D.AbstractRubiksCubeCube
   
 }
 
-PocketCubeS5Cube3D.prototype.relativeUrl = 'models/pocketcubes4/';
+PocketCubeS5Cube3D.prototype.relativeUrl = 'models/pocketcubes5/';
 PocketCubeS5Cube3D.prototype.baseUrl = 'lib/';
 
 // ------------------

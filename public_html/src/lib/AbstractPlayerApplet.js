@@ -21,6 +21,7 @@ define("AbstractPlayerApplet", ["AbstractCanvas", "Node3D", "J3DI", "J3DIMath", 
 
   "RubiksCubeS1Cube3D",
   "RubiksCubeS4Cube3D",
+  "RubiksCubeS5Cube3D",
 
   "PocketCubeS1Cube3D",
   "PocketCubeS4Cube3D",
@@ -29,6 +30,7 @@ define("AbstractPlayerApplet", ["AbstractCanvas", "Node3D", "J3DI", "J3DIMath", 
 function (AbstractCanvas, Node3D, J3DI, J3DIMath, Notation, AST, ScriptParser,
 RubiksCubeS1Cube3D,
 RubiksCubeS4Cube3D,
+RubiksCubeS5Cube3D,
 PocketCubeS1Cube3D,
 PocketCubeS4Cube3D,
 PocketCubeS5Cube3D
@@ -216,6 +218,9 @@ PocketCubeS5Cube3D
         case "RubiksCube s3" :
         case "RubiksCube s4" :
           c3d = new RubiksCubeS4Cube3D.Cube3D();
+          break;
+        case "RubiksCube s5" :
+          c3d = new RubiksCubeS5Cube3D.Cube3D();
           break;
 
         case "PocketCube s1" :
