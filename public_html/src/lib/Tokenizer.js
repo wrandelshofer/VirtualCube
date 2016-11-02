@@ -13,7 +13,7 @@
 define("Tokenizer", [],
 function () {
 
-// ttypes for GreedyTokenizer
+// ttypes for Tokenizer
 // ----------------------
   let TT_WORD = "word";
   let TT_EOF = "eof";
@@ -63,7 +63,7 @@ function () {
    * You can activate tokenization of positive integer numbers, by invokint addDigitTokens().
    * You can activate tokenization of keywords, by adding keyword specials.
    */
-  class GreedyTokenizer {
+  class Tokenizer {
     constructor() {
       this.specials = {}; // Map<Character,Object> maps char to  ttype
       this.digits = {}; // Map<Character,Object> maps char to  ttype
@@ -385,6 +385,6 @@ function () {
     TT_EOF: TT_EOF,
     TT_NUMBER: TT_NUMBER,
     TT_COMMENT: TT_COMMENT,
-    GreedyTokenizer: GreedyTokenizer
+    Tokenizer: Tokenizer
   };
 });

@@ -108,7 +108,7 @@ let module = {
 
     getTokenizer() {
       if (this.tokenizer == null) {
-        let tt = new Tokenizer.GreedyTokenizer();
+        let tt = new Tokenizer.Tokenizer();
         tt.skipWhitespace();
         tt.parseNumbers();
 

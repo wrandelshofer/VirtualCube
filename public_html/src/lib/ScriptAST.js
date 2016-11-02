@@ -88,26 +88,24 @@ function () {
     doesNothing() {
       return this.angle == 0 || this.layerMask == 0;
     }
-    /** Tries to consume the given TwistNode. 
+    /** Tries to consume the given MoveNode. 
      * Returns true if successful.
-     * This TwistNode may return true for doesNothing afterwards!);
+     * This MoveNode may return true for doesNothing afterwards!);
      */
     consume(that) {
       if (that.axis == this.axis
       && that.layerMask == this.layerMask) {
-//var ts=this.toString();
         this.angle = (this.angle + that.angle) % 4;
         if (this.angle == 3)
           this.angle = -1;
         else if (this.angle == -3)
           this.angle = 1;
-//console.log('consume:'+ts+' + '+that+" => "+this);    
         return true;
       }
       return false;
     }
     toString() {
-      return 'TwistNode{ax:' + this.axis + ' an:' + this.angle + ' lm:' + this.layerMask + '}';
+      return 'MoveNode{ax:' + this.axis + ' an:' + this.angle + ' lm:' + this.layerMask + '}';
     }
   }
 
