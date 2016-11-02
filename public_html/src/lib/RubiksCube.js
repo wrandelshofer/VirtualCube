@@ -1251,11 +1251,11 @@ function (Cube) {
     ]
   ];
   
-// Construct the name to par map.
+// Construct the name to part map.
   let cornerParts = ["urf", "dfr", "ubr", "drb", "ulb", "dbl", "ufl", "dlf"];
   let edgeParts=[ "ur","rf","dr","bu","rb","bd","ul","lb","dl","fu","lf","fd"];
   let sideParts=[ "r","u","f","l","d","b"];
-  let partMap = {center: 8};
+  let partMap = {center: 8+12+6};
   for (let i = 0; i < cornerParts.length; i++) {
     let name = cornerParts[i];
     let key1 = name.charAt(0) + name.charAt(1) + name.charAt(2);

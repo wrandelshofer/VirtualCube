@@ -13,13 +13,19 @@
 // --------------
 // require.js
 // --------------
-define("VirtualCubeMain", ["WebglPlayerApplet", "TwodPlayerApplet"],
-function (WebglPlayerApplet, TwodPlayerApplet) {
+define("VirtualCubeMain", ["WebglPlayerApplet", "TwoDPlayerApplet"],
+function (WebglPlayerApplet, TwoDPlayerApplet) {
 
   let module = {
-    log: (false) // Enable or disable logging for this module.
+    log: (true) // Enable or disable logging for this module.
     ? function (msg) {
       console.log('VirtualCubeMain.js ' + msg);
+    }
+    : function () {},
+  
+    error: (true) // Enable or disable error logging for this module.
+    ? function (msg) {
+      console.log('VirtualCubeMain.js ERROR ' + msg);
     }
     : function () {}
   }
@@ -82,7 +88,7 @@ function (WebglPlayerApplet, TwodPlayerApplet) {
       try {
         var htmlCollection = document.getElementsByClassName("virtualcube");
         if (htmlCollection.length == 0) {
-          console.log('Error: virtualcube.js no canvas or div element with class name "virtualcube" found.');
+          module.error('no canvas or div element with class name "virtualcube" found.');
           return;
         }
       } catch (err) {
@@ -174,7 +180,7 @@ function (WebglPlayerApplet, TwodPlayerApplet) {
          toolbarElem.appendChild(buttonElem);
          */
       } else {
-        console.log('Error: virtualcube.js element ' + divOrCanvas + ' is not a canvas or a div. tagName=' + divOrCanvas.tagName);
+        module.error('element ' + divOrCanvas + ' is not a canvas or a div. tagName=' + divOrCanvas.tagName);
         return;
       }
       var vr = new VirtualCube(canvasElem);
@@ -208,8 +214,14 @@ function (WebglPlayerApplet, TwodPlayerApplet) {
   }
   /** Initializes the virtual cube. */
   VirtualCube.prototype.init = function () {
-    this.canvas3d = new WebglPlayerApplet.WebglPlayerApplet();
-    //this.canvas3d = TwoDPlayerApplet.newTwoDCube3DCanvas();
+    if (this.parameters.rendercontext == "2d") {
+      this.canvas3d = new TwoDPlayerApplet.TwoDPlayerApplet();
+    } else if (this.parameters.rendercontext == null || this.parameters.rendercontext == "webgl") {
+      this.canvas3d = new WebglPlayerApplet.WebglPlayerApplet();
+    } else {
+      module.error('illegal rendercontext:' + this.parameters.rendercontext);
+      this.canvas3d = new WebglPlayerApplet.WebglPlayerApplet();
+    }
     for (var k in this.parameters) {
       this.canvas3d.parameters[k] = this.parameters[k]
     }
@@ -219,7 +231,7 @@ function (WebglPlayerApplet, TwodPlayerApplet) {
       for (var k in this.parameters) {
         this.canvas3d.parameters[k] = this.parameters[k]
       }
-      this.canvas3d = new TwodPlayerApplet.TwodPlayerApplet();
+      this.canvas3d = new TwoDPlayerApplet.TwoDPlayerApplet();
       s = this.canvas3d.setCanvas(this.canvas);
     }
   }

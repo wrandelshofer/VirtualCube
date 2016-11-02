@@ -1,5 +1,5 @@
 /*
- * @(#)TwodPlayerApplet.js  1.0  2013-12-30
+ * @(#)TwoDPlayerApplet.js  1.0  2013-12-30
  *
  * Copyright (c) 2013 Werner Randelshofer, Switzerland.
  * You may not use, copy or modify this file, except in compliance with the
@@ -13,36 +13,36 @@
 // --------------
 // require.js
 // --------------
-define("TwodPlayerApplet", ["AbstractPlayerApplet","Node3D","J3DI"], 
+define("TwoDPlayerApplet", ["AbstractPlayerApplet","Node3D","J3DI"], 
 function (AbstractPlayerApplet,Node3D,J3DI) {
 
 
 
 // ===============================
 //
-// TwodPlayerApplet
+// TwoDPlayerApplet
 //
 // ===============================
 
-/** Creates a TwodPlayerApplet. 
+/** Creates a TwoDPlayerApplet. 
     Subclasses must call initTwoDCube3DCanvas(). */
-class TwodPlayerApplet extends AbstractPlayerApplet.AbstractPlayerApplet {
+class TwoDPlayerApplet extends AbstractPlayerApplet.AbstractPlayerApplet {
   constructor() {
+    super();
     this.initTwoDCube3DCanvas();
   }
 }
 
 
-/** Initializes the TwodPlayerApplet object. */
-TwodPlayerApplet.prototype.initTwoDCube3DCanvas = function() {
-  this.initCube3DCanvas();
+/** Initializes the TwoDPlayerApplet object. */
+TwoDPlayerApplet.prototype.initTwoDCube3DCanvas = function() {
   this.g=null; //2d context
   this.useFullModel=false; //to prevent performance problems
   
 }
 
 /** Opens the canvas for rendering. Protected method. */
-TwodPlayerApplet.prototype.openCanvas = function() {
+TwoDPlayerApplet.prototype.openCanvas = function() {
   this.g = this.canvas.getContext('2d');
   if (this.g == null) return false;
   
@@ -65,14 +65,14 @@ TwodPlayerApplet.prototype.openCanvas = function() {
   return true;
 }
 /** Closes the current canvas. Protected method. */
-TwodPlayerApplet.prototype.closeCanvas = function() {
+TwoDPlayerApplet.prototype.closeCanvas = function() {
 	// empty
 }
 /**
  * This function is called before we draw.
  * It adjusts the perspective matrix to the dimensions of the canvas.
  */
-TwodPlayerApplet.prototype.reshape = function() {
+TwoDPlayerApplet.prototype.reshape = function() {
     var canvas = this.canvas;
     if (canvas.clientWidth == this.width && canvas.clientHeight == this.height)
         return;
@@ -90,7 +90,7 @@ TwodPlayerApplet.prototype.reshape = function() {
 }
 
 /** Draws the scene. * /
-TwodPlayerApplet.prototype.drawOFF = function() {
+TwoDPlayerApplet.prototype.drawOFF = function() {
   var start = new Date().getTime();
   this.faceCount=0;
   if (this.cube3d.isDrawTwoPass) {
@@ -111,11 +111,11 @@ TwodPlayerApplet.prototype.drawOFF = function() {
 }
 */
 
-TwodPlayerApplet.prototype.clearCanvas = function() {
+TwoDPlayerApplet.prototype.clearCanvas = function() {
   var g=this.g;
   g.clearRect(0, 0, this.canvas.width, this.canvas.height);
 }
-TwodPlayerApplet.prototype.flushCanvas = function() {
+TwoDPlayerApplet.prototype.flushCanvas = function() {
   var g=this.g;
   
   // The steps above only collect triangles
@@ -131,7 +131,7 @@ TwodPlayerApplet.prototype.flushCanvas = function() {
 
 
 /** Draws the scene. * /
-TwodPlayerApplet.prototype.drawSinglePassOFF = function() {
+TwoDPlayerApplet.prototype.drawSinglePassOFF = function() {
   if (!this.camPos) return;
   
 
@@ -212,7 +212,7 @@ TwodPlayerApplet.prototype.drawSinglePassOFF = function() {
 }
 */
 /** Draws the scene. * /
-TwodPlayerApplet.prototype.drawTwoPassOFF = function() {
+TwoDPlayerApplet.prototype.drawTwoPassOFF = function() {
   if (!this.camPos) return;
 
   this.reshape();
@@ -316,7 +316,7 @@ TwodPlayerApplet.prototype.drawTwoPassOFF = function() {
 */
 
 /** Draws an individual object of the scene. */
-TwodPlayerApplet.prototype.drawObject = function(obj, mvMatrix, color, phong, forceColorUpdate) {
+TwoDPlayerApplet.prototype.drawObject = function(obj, mvMatrix, color, phong, forceColorUpdate) {
   this.drawObjectCanvas2D(obj,mvMatrix,color,phong,forceColorUpdate);
 }
 
@@ -326,7 +326,7 @@ TwodPlayerApplet.prototype.drawObject = function(obj, mvMatrix, color, phong, fo
 // MODULE API    
 // ------------------
 return {
-  TwodPlayerApplet : TwodPlayerApplet
+  TwoDPlayerApplet : TwoDPlayerApplet
 };
 });
 

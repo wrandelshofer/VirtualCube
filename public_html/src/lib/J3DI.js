@@ -119,6 +119,7 @@ class J3DIObj {
     this.textureOffsetX = 0;
     this.textureOffsetY = 0;
     this.textureScale = 1;
+    this.visible=true;
   }
 
 

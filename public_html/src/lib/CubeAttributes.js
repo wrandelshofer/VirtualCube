@@ -75,6 +75,15 @@ class CubeAttributes {
   getStickerCount(face) {
     return this.stickerCounts[face];
   }
+  getPartCount() {
+    return this.partsVisible.length;
+  }
+  setPartVisible(partIndex, newValue) {
+    this.partsVisible[partIndex]=newValue;
+  }
+  isPartVisible(partIndex) {
+    return this.partsVisible[partIndex];
+  }
 }
 
 

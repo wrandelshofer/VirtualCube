@@ -159,7 +159,7 @@ class AbstractCanvas {
   
   /** Draws an individual object of the scene. */
   drawObjectCanvas2D(obj, mvMatrix, color, phong, forceColorUpdate) {
-    if (obj==null) return;
+    if (obj==null || !obj.visible) return;
     if (obj.polyIndexArray) {
     this.faceCount+=obj.polyIndexArray.length;
     }

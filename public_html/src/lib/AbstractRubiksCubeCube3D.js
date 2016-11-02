@@ -539,8 +539,12 @@ class AbstractRubiksCubeCube3D extends Cube3D.Cube3D {
   }
 }
 AbstractRubiksCubeCube3D.prototype.doValidateAttributes=function() {
-    for (var i=0; i< this.stickerObjs.length; i++) {
-      this.stickerObjs[i].hasTexture=this.attributes.stickersImageURL!=null;
+  let a = this.attributes;
+    for (let i=0; i< this.stickerObjs.length; i++) {
+      this.stickerObjs[i].hasTexture=a.stickersImageURL!=null;
+    }
+    for (let i=0; i< a.getPartCount(); i++) {
+      this.parts[i].visible=a.isPartVisible(i);
     }
 }
 

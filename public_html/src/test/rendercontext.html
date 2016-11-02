@@ -6,7 +6,7 @@
     <link href="virtualcube.css" rel="stylesheet" type="text/css">
   </head>
   <body>
-    <h1>Test of the <kbd>partlist</kbd>  parameter</h1>
+    <h1>Test of the <kbd>rendercontext</kbd>  parameter</h1>
 
     <section class="test">
       <div class="virtualcube small" 
@@ -16,22 +16,16 @@
 
     <section class="test">
       <div class="virtualcube small" 
-           partlist="urf,dfr,ubr,drb,ulb,dbl,ufl,dlf,
-ur,rf,dr,bu,rb,bd,ul,lb,dl,fu,lf,fd,
-r,u,f,l,d,b,
-center"
+           rendercontext="webgl"
            ></div>
-      <p><kbd>partlist="urf,dfr,ubr,drb,ulb,dbl,ufl,dlf,
-ur,rf,dr,bu,rb,bd,ul,lb,dl,fu,lf,fd,
-r,u,f,l,d,b,
-center"</kbd> (default)</p>
+      <p><kbd>rendercontext="webgl"</kbd> (default)</p>
     </section>
 
     <section class="test">
       <div class="virtualcube small" 
-           partlist="5,3,0,4,2,1"
+           rendercontext="2d"
            ></div>
-      <p><kbd>partlist="5,3,0,4,2,1"</kbd></p>
+      <p><kbd>rendercontext="2d"</kbd></p>
     </section>
   </body>
 </html>

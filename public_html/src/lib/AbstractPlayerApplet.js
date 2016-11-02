@@ -33,7 +33,7 @@ PocketCubeS4Cube3D
 ) {
 
   let module = {
-    log: (false) // Enable or disable logging for this module.
+    log: (true) // Enable or disable logging for this module.
     ? function (msg) {
       console.log('AbstractPlayerApplet.js ' + msg);
     }
@@ -61,7 +61,7 @@ PocketCubeS4Cube3D
     if (str == null)
       return map;
 
-    let tokens = str.split(/([ =,]+)/);
+    let tokens = str.split(/([ =,\n]+)/);
     let elementIndex = 0;
     for (let i = 0; i < tokens.length; ) {
       let key = null;
@@ -958,10 +958,11 @@ PocketCubeS4Cube3D
     readParameters(cube3d) {
       this.readOrientationParameters(cube3d);
       this.readStickerParameters(cube3d);
+      this.readPartParameters(cube3d);
       this.readScriptParameters(cube3d);
     }
 
-    /** Reads the color parameters and applies them to the provided cube 3d.
+    /** Reads the sticker parameters and applies them to the provided cube 3d.
      *
      * Note:
      * cube3d.validateAttributes() must be called after this method has been invoked.
@@ -1110,6 +1111,44 @@ PocketCubeS4Cube3D
       if (p.beta != null) {
         module.log('.readParameters beta:' + p.beta);
         cube3d.attributes.yRot = -parseFloat(p.beta);
+      }
+    }
+    /** Reads the part parameters and applies them to the provided cube 3d.
+     *
+     * Note:
+     * cube3d.validateAttributes() must be called after this method has been invoked.
+     */
+    readPartParameters(cube3d) {
+      let a = cube3d.attributes;
+      let p = this.parameters;
+      let cube = cube3d.getCube();
+
+      // parse alpha and beta
+      // --------------
+      if (p.partlist != null) {
+        module.log('.readParameters partlist:' + p.partlist);
+        let str = p.partlist;
+        let tokens = str.split(/[ ,\n]+/);
+        module.log('tokens:' + tokens);
+
+        for (let i=0;i<a.getPartCount();i++) {
+          a.setPartVisible(i,false);
+        }
+
+
+        let isError = false;
+        for (let i = 0; i < tokens.length; i++) {
+          let partName = tokens[i];
+          let partIndex = cube.NAME_PART_MAP[partName];
+          if (partIndex == null) {
+            console.log('AbstractPlayerApplet error illegal part:"' + partName + '" in partlist');
+            isError = true;
+          }
+          a.setPartVisible(partIndex,true);
+        }
+        if (isError) {
+          console.log("AbstractPlayerApplet error parsing partlist:\"" + p.partlist + '"');
+        }
       }
     }
   }

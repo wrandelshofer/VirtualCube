@@ -254,7 +254,7 @@ WebglPlayerApplet.prototype.flushCanvas = function() {
 
 /** Draws an individual object of the scene. */
 WebglPlayerApplet.prototype.drawObject = function(obj, mvMatrix, color, phong, forceColorUpdate) {
-  if (obj==null) return;
+  if (obj==null||!obj.visible) return;
   
   if (! obj.loaded) return;
   
