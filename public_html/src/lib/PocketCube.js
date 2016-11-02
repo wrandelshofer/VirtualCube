@@ -562,6 +562,36 @@ function (Cube) {
    */
   PocketCube.prototype.SIDE_SWIPE_TABLE = [];
 
+// Construct the name to par map.
+let cornerMap = {
+  urf:0,
+  dfr:1,
+  ubr:2,
+  drb:3,
+  ulb:4,
+  dbl:5,
+  ufl:6,
+  dlf:7
+}
+let partMap = {center:8};
+for (let i in cornerMap) {
+  let key1=i.charAt(0)+i.charAt(1)+i.charAt(2);
+  let key2=i.charAt(0)+i.charAt(2)+i.charAt(1);
+  let key3=i.charAt(1)+i.charAt(0)+i.charAt(2);
+  let key4=i.charAt(1)+i.charAt(2)+i.charAt(0);
+  let key5=i.charAt(2)+i.charAt(0)+i.charAt(1);
+  let key6=i.charAt(2)+i.charAt(1)+i.charAt(0);
+  partMap[key1]= cornerMap[i];
+  partMap[key2]= cornerMap[i];
+  partMap[key3]= cornerMap[i];
+  partMap[key4]= cornerMap[i];
+  partMap[key5]= cornerMap[i];
+  partMap[key6]= cornerMap[i];
+}
+/**
+ * Maps the name of a part to its part index.
+ */
+PocketCube.prototype.NAME_PART_MAP = partMap;
 
 // ------------------
 // MODULE API    
