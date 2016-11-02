@@ -32,9 +32,45 @@
     <section class="test">
       <div class="virtualcube small" 
            rendercontext="2d"
-           partlist="l,r,u,f,d,b,center"
+           partlist="l,r,u,f,d,b,df,db,dl,dr,drb,drf,dlb,dlf,center"
            ></div>
-      <p><kbd>rendercontext="2d" partlist="l,r,u,f,d,b,center"</kbd></p>
+      <p><kbd>rendercontext="2d" partlist=partlist="l,r,u,f,d,b,df,db,dl,dr,drb,drf,dlb,dlf,center"</kbd></p>
+    </section>
+    
+    <section class="test">
+      <div class="virtualcube small" 
+           partlist="rub,center"
+           kind="PocketCube"
+           ></div>
+      <p><kbd>kind="PocketCube" partlist="lfr,center"</kbd></p>
+    </section>
+    
+    <section class="test">
+      <div class="virtualcube small" 
+           partlist="rdb,b,center"
+           ></div>
+      <p><kbd>partlist="lb,center"</kbd></p>
+    </section>
+    
+    <section class="test">
+      <div class="virtualcube small" 
+           partlist="lub,b,center"
+           ></div>
+      <p><kbd>partlist="lub,center"</kbd></p>
+    </section>
+    <section class="test">
+      <div class="virtualcube small" 
+           partlist="ldb,b,center"
+           ></div>
+      <p><kbd>partlist="ldf,center"</kbd></p>
+    </section>
+    
+    <section class="test">
+      <div class="virtualcube small" 
+           kind="PocketCube"
+           partlist="ruf,luf,center"
+           ></div>
+      <p><kbd>kind="PocketCube" partlist="ruf,luf,center"</kbd></p>
     </section>
   </body>
 </html>

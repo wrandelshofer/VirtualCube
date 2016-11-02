@@ -12,6 +12,13 @@
 // --------------
 define("RubiksCube", ["Cube"],
 function (Cube) {
+  let module = {
+    log: (false) // Enable or disable logging for this module.
+    ? function (msg) {
+      console.log('RubiksCube.js ' + msg);
+    }
+    : function () {}
+  }
 
   /**
    * Represents the state of a 3-times sliced cube (Rubik's Cube) by the location 
@@ -1250,12 +1257,12 @@ function (Cube) {
       [0, 2, 1]
     ]
   ];
-  
+
 // Construct the name to part map.
   let cornerParts = ["urf", "dfr", "ubr", "drb", "ulb", "dbl", "ufl", "dlf"];
-  let edgeParts=[ "ur","rf","dr","bu","rb","bd","ul","lb","dl","fu","lf","fd"];
-  let sideParts=[ "r","u","f","l","d","b"];
-  let partMap = {center: 8+12+6};
+  let edgeParts = ["ur", "rf", "dr", "bu", "rb", "bd", "ul", "lb", "dl", "fu", "lf", "fd"];
+  let sideParts = ["r", "u", "f", "l", "d", "b"];
+  let partMap = {center: 8 + 12 + 6};
   for (let i = 0; i < cornerParts.length; i++) {
     let name = cornerParts[i];
     let key1 = name.charAt(0) + name.charAt(1) + name.charAt(2);
@@ -1275,18 +1282,18 @@ function (Cube) {
     let name = edgeParts[i];
     let key1 = name.charAt(0) + name.charAt(1);
     let key2 = name.charAt(1) + name.charAt(0);
-    partMap[key1] = i+8;
-    partMap[key2] = i+8;
+    partMap[key1] = i + 8;
+    partMap[key2] = i + 8;
   }
   for (let i = 0; i < sideParts.length; i++) {
     let name = sideParts[i];
     let key1 = name;
-    partMap[key1] = i+8+12;
+    partMap[key1] = i + 8 + 12;
   }
-/**
- * Maps the name of a part to its part index.
- */
-RubiksCube.prototype.NAME_PART_MAP = partMap;
+  /**
+   * Maps the name of a part to its part index.
+   */
+  RubiksCube.prototype.NAME_PART_MAP = partMap;
 
 
 

@@ -507,19 +507,19 @@ function (Cube3D, PocketCube, CubeAttributes, SplineInterpolator, J3DI, Node3D) 
   ];
 
 AbstractPocketCubeCube3D.prototype.boxClickToLocationMap = [
-  [[ 0, 2],[ 1, 3]],// right
-  [[ 7, 1],[ 5, 3]],// down
-  [[ 6, 0],[ 7, 1]],// front
-  [[ 4, 6],[ 5, 7]],// left
-  [[ 4, 2],[ 6, 0]],// up
-  [[ 2, 4],[ 3, 5]],// back
+  [[ 7, 6],[ 5, 4]],// left
+  [[ 7, 5],[ 1, 3]],// down
+  [[ 7, 6],[ 1, 0]],// front
+  [[ 1, 0],[ 3, 2]],// right
+  [[ 6, 4],[ 0, 2]],// up
+  [[ 5, 4],[ 3, 2]],// back
 ];
 
   AbstractPocketCubeCube3D.prototype.boxClickToAxisMap = [
-    [[0, 0], [0, 0]], // right
+    [[0, 0], [0, 0]], // left
     [[1, 1], [1, 1]], // down
     [[2, 2], [2, 2]], // front
-    [[0, 0], [0, 0]], // left
+    [[0, 0], [0, 0]], // right
     [[1, 1], [1, 1]], // up
     [[2, 2], [2, 2]], // back
   ];
