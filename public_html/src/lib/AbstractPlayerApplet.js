@@ -322,6 +322,8 @@ PocketCubeS5Cube3D
       this.viewportMatrix = new J3DIMatrix4();
 
       this.forceColorUpdate = false;
+      
+      this.reset();
     }
 
     updateMatrices() {
@@ -599,9 +601,12 @@ PocketCubeS5Cube3D
 
         // Wait until cube3d has finished twisting
         if (self.cube3d.isTwisting) {
-          self.repaint(f);
+          self.repaint(f);// busy wait
           return;
         }
+        // remove repainter needed for animation
+        self.cube3d.repainter = null;
+        
         // Reset cube
         self.cube.reset();
         if (self.initscript != null) {
@@ -610,6 +615,8 @@ PocketCubeS5Cube3D
 
         self.clearUndoRedo();
 
+        // reinstall repainter needed for animation
+        self.cube3d.repainter = this;
         // Other lenghty operations are go now
         self.cube.cancel = false;
       };
