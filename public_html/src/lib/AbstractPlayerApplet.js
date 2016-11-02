@@ -1093,7 +1093,7 @@ PocketCubeS5Cube3D
         try {
           this.script = parser.parse(p.script);
         } catch (e) {
-          module.error(e);
+          console.log(e);
           module.error("illegal script:\"" + p.script + '"');
         }
       }

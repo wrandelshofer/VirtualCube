@@ -45,7 +45,14 @@ function () {
       constructor() {
         super();
       }
-    
+  }
+
+  class NOPNode extends Node {
+      constructor(startPosition,endPosition) {
+        super();
+        this.startPostion=startPosition;
+        this.endPosition=endPosition;
+      }
   }
 
   class MoveNode extends Node {
@@ -115,6 +122,7 @@ function () {
   return {
     Node: Node,
     SequenceNode: SequenceNode,
-  MoveNode: MoveNode
+    MoveNode: MoveNode,
+    NOPNode: NOPNode
   };
 });
