@@ -1107,7 +1107,7 @@ PocketCubeS5Cube3D
           this.initscript = parser.parse(p.initscript);
         } catch (e) {
           module.error(e);
-          module.error("illegal resetscript:\"" + p.initscript + '"');
+          module.error("illegal initscript:\"" + p.initscript + '"');
         }
       }
     }
