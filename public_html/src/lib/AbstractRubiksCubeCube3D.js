@@ -1013,6 +1013,14 @@ AbstractRubiksCubeCube3D.prototype.cubeTwisted=function(evt) {
   this.repainter.repaint(f);
 }
 
+AbstractRubiksCubeCube3D.prototype.boxClickToLocationMap = [
+  [[ 0, 0+8, 2],[ 1+8, 0+8+12, 4+8],[ 1, 2+8, 3]],// right
+  [[ 7, 11+8, 1],[ 8+8, 4+8+12, 2+8],[ 5, 5+8, 3]],// down
+  [[ 6, 9+8, 0],[ 10+8, 2+8+12, 1+8],[ 7, 11+8, 1]],// front
+  [[ 4, 6+8, 6],[ 7+8, 3+8+12, 10+8],[ 5, 8+8, 7]],// left
+  [[ 4, 3+8, 2],[ 6+8, 1+8+12, 0+8],[ 6, 9+8, 0]],// up
+  [[ 2, 3+8, 4],[ 4+8, 5+8+12, 7+8],[ 3, 5+8, 5]],// back
+];
 AbstractRubiksCubeCube3D.prototype.boxClickToAxisMap = [
   [[ 0, 1, 0],[ 2, 0, 2],[ 0, 1, 0]],// right
   [[ 1, 2, 1],[ 0, 1, 0],[ 1, 2, 1]],// down

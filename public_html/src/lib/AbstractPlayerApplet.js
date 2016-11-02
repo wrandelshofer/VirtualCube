@@ -38,13 +38,13 @@ PocketCubeS4Cube3D
       console.log('AbstractPlayerApplet.js ' + msg);
     }
     : function () {},
-    
+
     warning: (true) // Enable or disable logging for this module.
     ? function (msg) {
       console.log('AbstractPlayerApplet.js WARNING ' + msg);
     }
     : function () {},
-    
+
     error: (true) // Enable or disable logging for this module.
     ? function (msg) {
       console.log('AbstractPlayerApplet.js ERROR ' + msg);
@@ -412,7 +412,8 @@ PocketCubeS4Cube3D
 
       // draw center parts
       for (let i = 0; i < cube3d.centerCount; i++) {
-        if (!attr.isPartVisible(cube3d.centerOffset +i)) continue;
+        if (!attr.isPartVisible(cube3d.centerOffset + i))
+          continue;
         mvMatrix.makeIdentity();
         cube3d.parts[cube3d.centerOffset + i].transform(mvMatrix);
         this.drawObject(cube3d.centerObj, mvMatrix, ccenter, attr.partsPhong[this.cube3d.centerOffset + i]);
@@ -420,7 +421,8 @@ PocketCubeS4Cube3D
 
       // draw side parts
       for (let i = 0; i < cube3d.sideCount; i++) {
-        if (!attr.isPartVisible(cube3d.sideOffset + i)) continue;
+        if (!attr.isPartVisible(cube3d.sideOffset + i))
+          continue;
         mvMatrix.makeIdentity();
         cube3d.parts[cube3d.sideOffset + i].transform(mvMatrix);
         this.drawObject(cube3d.sideObj, mvMatrix, cparts, attr.partsPhong[this.cube3d.sideOffset + i]);
@@ -432,7 +434,8 @@ PocketCubeS4Cube3D
       }
       // draw edge parts
       for (let i = 0; i < cube3d.edgeCount; i++) {
-        if (!attr.isPartVisible(cube3d.edgeOffset + i)) continue;
+        if (!attr.isPartVisible(cube3d.edgeOffset + i))
+          continue;
         mvMatrix.makeIdentity();
         this.cube3d.parts[cube3d.edgeOffset + i].transform(mvMatrix);
         this.drawObject(cube3d.edgeObj, mvMatrix, cparts, attr.partsPhong[this.cube3d.edgeOffset + i]);
@@ -448,7 +451,8 @@ PocketCubeS4Cube3D
       }
       // draw corner parts
       for (let i = 0; i < cube3d.cornerCount; i++) {
-        if (!attr.isPartVisible(cube3d.cornerOffset + i)) continue;
+        if (!attr.isPartVisible(cube3d.cornerOffset + i))
+          continue;
         mvMatrix.makeIdentity();
         this.cube3d.parts[cube3d.cornerOffset + i].transform(mvMatrix);
         this.drawObject(cube3d.cornerObj, mvMatrix, cparts, attr.partsPhong[this.cube3d.cornerOffset + i], this.forceColorUpdate);
@@ -1145,8 +1149,8 @@ PocketCubeS4Cube3D
         module.log('.readParameters partlist:' + p.partlist);
         let str = p.partlist;
         let tokens = str.split(/[ ,\n]+/);
-        for (let i=0;i<a.getPartCount();i++) {
-          a.setPartVisible(i,false);
+        for (let i = 0; i < a.getPartCount(); i++) {
+          a.setPartVisible(i, false);
         }
 
 
@@ -1158,7 +1162,7 @@ PocketCubeS4Cube3D
             module.error('illegal part:"' + partName + '" in partlist');
             isError = true;
           }
-          a.setPartVisible(partIndex,true);
+          a.setPartVisible(partIndex, true);
         }
         if (isError) {
           module.error("illegal partlist:\"" + p.partlist + '"');
@@ -1181,196 +1185,192 @@ PocketCubeS4Cube3D
       this.mousePrevY = undefined;
       this.mousePrevTimestamp = undefined;
     }
-  }
-
-class Cube3DHandler {
-  /**
-   * Touch handler for the canvas object.
-   * Forwards everything to the mouse handler.
-   */
-  onTouchStart(event) {
-    if (event.touches.length == 1) {
-      event.preventDefault();
+    
+    /**
+     * Touch handler for the canvas object.
+     * Forwards everything to the mouse handler.
+     */
+    onTouchStart(event) {
+      if (event.touches.length == 1) {
+        event.preventDefault();
+        event.clientX = event.touches[0].clientX;
+        event.clientY = event.touches[0].clientY;
+        this.onMouseDown(event);
+      } else {
+        this.isMouseDrag = false;
+      }
+    }
+    onTouchEnd(event) {
+      event.clientX = this.mousePrevX;
+      event.clientY = this.mousePrevY;
+      this.onMouseUp(event);
+    }
+    onTouchMove(event) {
       event.clientX = event.touches[0].clientX;
       event.clientY = event.touches[0].clientY;
-      this.onMouseDown(event);
-    } else {
-      this.isMouseDrag = false;
+      this.onMouseMove(event);
     }
-  }
-  onTouchEnd(event) {
-    event.clientX = this.mousePrevX;
-    event.clientY = this.mousePrevY;
-    this.onMouseUp(event);
-  }
-  onTouchMove(event) {
-    event.clientX = event.touches[0].clientX;
-    event.clientY = event.touches[0].clientY;
-    this.onMouseMove(event);
-  }
-  /**
-   * Mouse handler for the canvas object.
-   */
-  onMouseDown(event) {
-    this.mouseDownX = event.clientX;
-    this.mouseDownY = event.clientY;
-    this.mousePrevX = event.clientX;
-    this.mousePrevY = event.clientY;
-    this.mousePrevTimeStamp = event.timeStamp;
-    this.isMouseDrag = true;
-    let isect = this.canvas.mouseIntersectionTest(event);
-    this.mouseDownIsect = isect;
-    this.isCubeSwipe = isect != null;
-  }
-  onMouseMove(event) {
-    if (this.isMouseDrag) {
-      let x = event.clientX;
-      let y = event.clientY;
-
-      let dx2d = (this.mousePrevY - y);
-      let dy2d = (this.mousePrevX - x);
-      let dx = dx2d * (360 / this.canvas.width);
-      let dy = dy2d * (360 / this.canvas.height);
-      let mouseTimestep = (event.timeStamp - this.mousePrevTimeStamp) / 1000;
-
-      if (this.isCubeSwipe) {
-        let cube3d = this.canvas.cube3d;
-        let sqrDist = dx2d * dx2d + dy2d * dy2d;
-        if (!cube3d.isTwisting && sqrDist > 16) { // min swipe-distance: 4 pixels
-          let isect = this.canvas.mouseIntersectionTest(event);
-          if (isect != null && isect.face == this.mouseDownIsect.face) {
-
-            let u = Math.floor(isect.uv[0] * cube3d.cube.layerCount);
-            let v = Math.floor(isect.uv[1] * cube3d.cube.layerCount);
-
-            let du = isect.uv[0] - this.mouseDownIsect.uv[0];
-            let dv = isect.uv[1] - this.mouseDownIsect.uv[1];
-
-
-            let swipeAngle = Math.atan2(dv, du) * 180 / Math.PI + 180;
-            let swipeDirection = Math.round((swipeAngle) / 90) % 4;
-
-            let face = isect.face;
-            let axis = cube3d.boxSwipeToAxisMap[face][swipeDirection];
-            let layerMask = cube3d.boxSwipeToLayerMap[face][u][v][swipeDirection];
-            let angle = cube3d.boxSwipeToAngleMap[face][swipeDirection];
-            //this.log('virtualrubik face,u,v,s:'+face+' '+u+' '+v+' '+swipeDirection);
-            //this.log('virtualrubik ax,l,an   :'+axis+' '+layerMask+' '+angle);
-            if (event.shiftKey || event.metaKey) {
-              angle = 2 * angle;
-            }
-            let cube = cube3d.getCube();
-            let move = new AST.MoveNode(cube.getLayerCount(), axis, layerMask, angle);
-            this.canvas.pushMove(move);
-            move.applyTo(this.canvas.cube);
-            if (this.canvas.cube.isSolved()) {
-              this.canvas.wobble();
-            }
-
-            this.isCubeSwipe = false;
-            this.isMouseDrag = false;
-          }
-        }
-      } else {
-        let rm = new J3DIMatrix4();
-        rm.rotate(dy, 0, 1, 0);
-        rm.rotate(dx, 1, 0, 0);
-        let v = rm.loghat().divide(Math.max(0.1, mouseTimestep));
-        rm.multiply(this.canvas.rotationMatrix); // FIXME - Numerically unstable
-        this.canvas.rotationMatrix.load(rm);
-        let self = this;
-        let start = new Date().getTime();
-        let damping = 1;
-        let f = function () {
-          if (self.canvas.smoothRotationFunction != f)
-            return;
-
-          let now = new Date().getTime();
-          let h = (now - start) / 1000;
-
-          // Euler Step for 2nd Order ODE
-          // ODE:
-          //   x'(t) = v(t)
-          //   v'(t) = F(t) - ( damping * v(t) ) / m
-          // Compute:
-          //   x(t0+h) := x(t0) + h * x'(t0)
-          //           := x(t0) + h * v(t0);
-          //   v(t0+h) := v(t0) + h * v'(t0)
-          //           := v(t0) + h * (F(t0)-dampings*v(t0))/m
-          if (Math.abs(v.norm()) < 0.1) {
-            self.canvas.smoothRotationFunction = null;
-          } else {
-            let rm = new J3DIVector3(v).multiply(h).exphat();
-            rm.multiply(self.canvas.rotationMatrix); // FIXME - Numerically unstable
-            self.canvas.rotationMatrix.load(rm);
-
-            let vv = new J3DIVector3(v);
-            if (h * damping < 1) {
-              v.subtract(vv.multiply(h * damping));
-            } else {
-              v.load(0, 0, 0);
-            }
-
-            self.canvas.repaint(f);
-          }
-
-          start = now;
-        };
-        this.canvas.smoothRotationFunction = f;
-        this.canvas.repaint(f);
-
-      }
-
+    /**
+     * Mouse handler for the canvas object.
+     */
+    onMouseDown(event) {
+      this.mouseDownX = event.clientX;
+      this.mouseDownY = event.clientY;
       this.mousePrevX = event.clientX;
       this.mousePrevY = event.clientY;
       this.mousePrevTimeStamp = event.timeStamp;
+      this.isMouseDrag = true;
+      let isect = this.canvas.mouseIntersectionTest(event);
+      this.mouseDownIsect = isect;
+      this.isCubeSwipe = isect != null;
+    }
+    onMouseMove(event) {
+      if (this.isMouseDrag) {
+        let x = event.clientX;
+        let y = event.clientY;
+
+        let dx2d = (this.mousePrevY - y);
+        let dy2d = (this.mousePrevX - x);
+        let dx = dx2d * (360 / this.canvas.width);
+        let dy = dy2d * (360 / this.canvas.height);
+        let mouseTimestep = (event.timeStamp - this.mousePrevTimeStamp) / 1000;
+
+        if (this.isCubeSwipe) {
+          let cube3d = this.canvas.cube3d;
+          let sqrDist = dx2d * dx2d + dy2d * dy2d;
+          if (!cube3d.isTwisting && sqrDist > 16) { // min swipe-distance: 4 pixels
+            let isect = this.canvas.mouseIntersectionTest(event);
+            if (isect != null && isect.face == this.mouseDownIsect.face) {
+
+              let u = Math.floor(isect.uv[0] * cube3d.cube.layerCount);
+              let v = Math.floor(isect.uv[1] * cube3d.cube.layerCount);
+
+              let du = isect.uv[0] - this.mouseDownIsect.uv[0];
+              let dv = isect.uv[1] - this.mouseDownIsect.uv[1];
+
+
+              let swipeAngle = Math.atan2(dv, du) * 180 / Math.PI + 180;
+              let swipeDirection = Math.round((swipeAngle) / 90) % 4;
+
+              let face = isect.face;
+              let axis = cube3d.boxSwipeToAxisMap[face][swipeDirection];
+              let layerMask = cube3d.boxSwipeToLayerMap[face][u][v][swipeDirection];
+              let angle = cube3d.boxSwipeToAngleMap[face][swipeDirection];
+              //this.log('virtualrubik face,u,v,s:'+face+' '+u+' '+v+' '+swipeDirection);
+              //this.log('virtualrubik ax,l,an   :'+axis+' '+layerMask+' '+angle);
+              if (event.shiftKey || event.metaKey) {
+                angle = 2 * angle;
+              }
+              let cube = cube3d.getCube();
+              let move = new AST.MoveNode(cube.getLayerCount(), axis, layerMask, angle);
+              this.canvas.pushMove(move);
+              move.applyTo(this.canvas.cube);
+              if (this.canvas.cube.isSolved()) {
+                this.canvas.wobble();
+              }
+
+              this.isCubeSwipe = false;
+              this.isMouseDrag = false;
+            }
+          }
+        } else {
+          let rm = new J3DIMatrix4();
+          rm.rotate(dy, 0, 1, 0);
+          rm.rotate(dx, 1, 0, 0);
+          let v = rm.loghat().divide(Math.max(0.1, mouseTimestep));
+          rm.multiply(this.canvas.rotationMatrix); // FIXME - Numerically unstable
+          this.canvas.rotationMatrix.load(rm);
+          let self = this;
+          let start = new Date().getTime();
+          let damping = 1;
+          let f = function () {
+            if (self.canvas.smoothRotationFunction != f)
+              return;
+
+            let now = new Date().getTime();
+            let h = (now - start) / 1000;
+
+            // Euler Step for 2nd Order ODE
+            // ODE:
+            //   x'(t) = v(t)
+            //   v'(t) = F(t) - ( damping * v(t) ) / m
+            // Compute:
+            //   x(t0+h) := x(t0) + h * x'(t0)
+            //           := x(t0) + h * v(t0);
+            //   v(t0+h) := v(t0) + h * v'(t0)
+            //           := v(t0) + h * (F(t0)-dampings*v(t0))/m
+            if (Math.abs(v.norm()) < 0.1) {
+              self.canvas.smoothRotationFunction = null;
+            } else {
+              let rm = new J3DIVector3(v).multiply(h).exphat();
+              rm.multiply(self.canvas.rotationMatrix); // FIXME - Numerically unstable
+              self.canvas.rotationMatrix.load(rm);
+
+              let vv = new J3DIVector3(v);
+              if (h * damping < 1) {
+                v.subtract(vv.multiply(h * damping));
+              } else {
+                v.load(0, 0, 0);
+              }
+
+              self.canvas.repaint(f);
+            }
+
+            start = now;
+          };
+          this.canvas.smoothRotationFunction = f;
+          this.canvas.repaint(f);
+
+        }
+
+        this.mousePrevX = event.clientX;
+        this.mousePrevY = event.clientY;
+        this.mousePrevTimeStamp = event.timeStamp;
+      }
+    }
+    onMouseOut(event) {
+      this.isMouseDrag = false;
+    }
+    onMouseUp(event) {
+      this.isMouseDrag = false;
+      this.isCubeSwipe = false;
+
+
+      if (this.mouseDownX != event.clientX || this.mouseDownY != event.clientY) {
+        // the mouse has been moved between mouse down and mouse up
+        return;
+      }
+
+      let cube3d = this.canvas.cube3d;
+      if (cube3d != null && cube3d.isTwisting) {
+        return;
+      }
+
+      let isect = this.canvas.mouseIntersectionTest(event);
+
+      if (isect != null) {
+        if (event.altKey || event.ctrlKey) {
+          isect.angle *= -1;
+        }
+        if (event.shiftKey || event.metaKey) {
+          isect.angle *= 2;
+        }
+        let cube = cube3d.getCube();
+        let move = new AST.MoveNode(cube.getLayerCount(), isect.axis, isect.layerMask, isect.angle);
+        this.canvas.pushMove(move);
+        move.applyTo(this.canvas.cube);
+        if (this.canvas.cube.isSolved()) {
+          this.canvas.wobble();
+        }
+      }
+
+      // Make sure that onTouchUp can not reuse these values
+      this.mousePrevX = undefined;
+      this.mousePrevY = undefined;
+
+      this.canvas.repaint();
     }
   }
-  onMouseOut(event) {
-    this.isMouseDrag = false;
-  }
-  onMouseUp(event) {
-    this.isMouseDrag = false;
-    this.isCubeSwipe = false;
-
-
-    if (this.mouseDownX != event.clientX || this.mouseDownY != event.clientY) {
-      // the mouse has been moved between mouse down and mouse up
-      return;
-    }
-
-    let cube3d = this.canvas.cube3d;
-    if (cube3d != null && cube3d.isTwisting) {
-      return;
-    }
-
-    let isect = this.canvas.mouseIntersectionTest(event);
-
-    if (isect != null) {
-      if (event.altKey || event.ctrlKey) {
-        isect.angle *= -1;
-      }
-      if (event.shiftKey || event.metaKey) {
-        isect.angle *= 2;
-      }
-      let cube = cube3d.getCube();
-      let move = new AST.MoveNode(cube.getLayerCount(), isect.axis, isect.layerMask, isect.angle);
-      this.canvas.pushMove(move);
-      move.applyTo(this.canvas.cube);
-      if (this.canvas.cube.isSolved()) {
-        this.canvas.wobble();
-      }
-    }
-
-    // Make sure that onTouchUp can not reuse these values
-    this.mousePrevX = undefined;
-    this.mousePrevY = undefined;
-
-    this.canvas.repaint();
-  }
-
-  
-}
 
 
 // ------------------

@@ -506,6 +506,14 @@ function (Cube3D, PocketCube, CubeAttributes, SplineInterpolator, J3DI, Node3D) 
     1, 2, 2, 1 // back
   ];
 
+AbstractPocketCubeCube3D.prototype.boxClickToLocationMap = [
+  [[ 0, 2],[ 1, 3]],// right
+  [[ 7, 1],[ 5, 3]],// down
+  [[ 6, 0],[ 7, 1]],// front
+  [[ 4, 6],[ 5, 7]],// left
+  [[ 4, 2],[ 6, 0]],// up
+  [[ 2, 4],[ 3, 5]],// back
+];
 
   AbstractPocketCubeCube3D.prototype.boxClickToAxisMap = [
     [[0, 0], [0, 0]], // right

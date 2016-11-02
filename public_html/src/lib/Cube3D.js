@@ -242,13 +242,19 @@ function (Node3D, J3DIMath) {
       var isect = J3DIMath.intersectBox(ray, box);
 
       if (isect != null) {
-        var face = isect.face;
-        var u = Math.floor(isect.uv[0] * this.cube.layerCount);
-        var v = Math.floor(isect.uv[1] * this.cube.layerCount);
-
+        let face = isect.face;
+        let u = Math.floor(isect.uv[0] * this.cube.layerCount);
+        let v = Math.floor(isect.uv[1] * this.cube.layerCount);
+        
+        isect.location = this.boxClickToLocationMap[face][u][v];
         isect.axis = this.boxClickToAxisMap[face][u][v];
         isect.layerMask = this.boxClickToLayerMap[face][u][v];
         isect.angle = this.boxClickToAngleMap[face][u][v];
+        
+        isect.part=this.cube.getPartAt(isect.location);
+        if (!this.attributes.isPartVisible(isect.part)) {
+          isect=null;
+        }
       }
 
       return isect;
@@ -322,7 +328,7 @@ function (Node3D, J3DIMath) {
 
       return isect;
     }
-    
+
     getCube() {
       return this.cube;
     }
