@@ -8,21 +8,30 @@
   <body>
     <h1>Test of the <kbd>colorlist</kbd>  parameter</h1>
 
-    <section><p>Default value.</p>
+    <section class="test">
+      <div class="virtualcube small"></div>
+      <p>Default value.</p>
+    </section>
+
+    <section class="test">
       <div class="virtualcube small" 
-              ></div>
-  </section>
+           colorlist= "r=#ff4600,u=#ffd200,f=#003373,l=#8c000f,d=#f8f8f8,b=#00732f"
+           ></div>
+      <p><kbd>colorlist="r=#ff4600,u=#ffd200,f=#003373,l=#8c000f,d=#f8f8f8,b=#00732f"</kbd> (default)</p>
+    </section>
 
-  <section><p><kbd>colorlist="r=#ff4600,u=#ffd200,f=#003373,l=#8c000f,d=#f8f8f8,b=#00732f"</kbd> (default)</p>
-    <div class="virtualcube small" 
-            colorlist= "r=#ff4600,u=#ffd200,f=#003373,l=#8c000f,d=#f8f8f8,b=#00732f"
-            ></div>
-</section>
-
-<section><p><kbd>colorlist="0xff0000,0x00ff00,0x0000ff,0xffff00,0x00ffff,0xff00ff"</kbd></p>
-  <div class="virtualcube small" 
-          colorlist="0xff0000,0x00ff00,0x0000ff,0xffff00,0x00ffff,0xff00ff"
-          ></div>
-</section>
-</body>
+    <section class="test">
+      <div class="virtualcube small" 
+           colorlist= "r=#ff4600,u=#ffd200,f=#aaaaaa,l=#8c000f,d=#f8f8f8,b=#00732f"
+           ></div>
+      <p><kbd>colorlist="r=#ff4600,u=#ffd200,f=#aaaaaa,l=#8c000f,d=#f8f8f8,b=#00732f"</kbd> (default)</p>
+    </section>
+    
+    <section class="test">
+      <div class="virtualcube small" 
+           colorlist= "r=#ff4600 u=#ffd200 f=#aaaaaa l=#8c000f d=#f8f8f8 b=#00732f"
+           ></div>
+      <p><kbd>colorlist="r=#ff4600 u=#ffd200 f=#aaaaaa l=#8c000f d=#f8f8f8 b=#00732f"</kbd> (default)</p>
+    </section>
+  </body>
 </html>

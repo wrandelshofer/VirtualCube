@@ -956,6 +956,17 @@ PocketCubeS4Cube3D
      * cube3d.validateAttributes() must be called after this method has been invoked.
      */
     readParameters(cube3d) {
+      this.readOrientationParameters(cube3d);
+      this.readStickerParameters(cube3d);
+      this.readScriptParameters(cube3d);
+    }
+
+    /** Reads the color parameters and applies them to the provided cube 3d.
+     *
+     * Note:
+     * cube3d.validateAttributes() must be called after this method has been invoked.
+     */
+    readStickerParameters(cube3d) {
       let a = cube3d.attributes;
       let p = this.parameters;
 
@@ -1036,17 +1047,15 @@ PocketCubeS4Cube3D
           }
         }
       }
-
-      // parse alpha and beta
-      // --------------
-      if (p.alpha != null) {
-        module.log('.readParameters alpha:' + p.alpha);
-        cube3d.attributes.xRot = parseFloat(p.alpha);
-      }
-      if (p.beta != null) {
-        module.log('.readParameters beta:' + p.beta);
-        cube3d.attributes.yRot = -parseFloat(p.beta);
-      }
+    }
+    /** Reads the script parameters and applies them to the provided cube 3d.
+     *
+     * Note:
+     * cube3d.validateAttributes() must be called after this method has been invoked.
+     */
+    readScriptParameters(cube3d) {
+      let a = cube3d.attributes;
+      let p = this.parameters;
 
       // parse resourceFile
       // --------------
@@ -1080,6 +1089,27 @@ PocketCubeS4Cube3D
           console.log(e);
           console.log("AbstractPlayerApplet error parsing resetscript:\"" + p.initscript + '"');
         }
+      }
+    }
+
+    /** Reads the orientation parameters and applies them to the provided cube 3d.
+     *
+     * Note:
+     * cube3d.validateAttributes() must be called after this method has been invoked.
+     */
+    readOrientationParameters(cube3d) {
+      let a = cube3d.attributes;
+      let p = this.parameters;
+
+      // parse alpha and beta
+      // --------------
+      if (p.alpha != null) {
+        module.log('.readParameters alpha:' + p.alpha);
+        cube3d.attributes.xRot = parseFloat(p.alpha);
+      }
+      if (p.beta != null) {
+        module.log('.readParameters beta:' + p.beta);
+        cube3d.attributes.yRot = -parseFloat(p.beta);
       }
     }
   }

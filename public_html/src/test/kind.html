@@ -4,29 +4,29 @@
     <meta charset="utf-8">
     <script src="../lib/virtualcube.js"></script>
     <link href="virtualcube.css" rel="stylesheet" type="text/css">
-    <style>
-      section { float: left; }
-    </style>
   </head>
   <body>
     <h1>Test of the <kbd>kind</kbd>  parameter</h1>
 
-    <section><p>Default value.</p>
+    <section class="test">
       <div class="virtualcube small" 
            kind="RubiksCube"
            ></div>
+      <p>Default value.</p>
     </section>
 
-    <section><p><kbd>kind="RubiksCube"</kbd> (default)</p>
+    <section class="test">
       <div class="virtualcube small" 
            kind="RubiksCube"
            ></div>
+      <p><kbd>kind="RubiksCube"</kbd> (default)</p>
     </section>
 
-    <section><p><kbd>kind="PocketCube""</kbd>)</p>
+    <section class="test">
       <div class="virtualcube small" 
            kind="PocketCube"
            ></div>
+      <p><kbd>kind="PocketCube""</kbd>)</p>
     </section>
   </body>
 </html>
