@@ -25,8 +25,8 @@ function (Cube3D, PocketCube, CubeAttributes, SplineInterpolator, J3DI, Node3D) 
       this.cornerCount = 8;
       this.edgeCount = 0;
       this.sideCount = 0;
-      this.centerCount = 0;
-      this.partCount = 8 + 0 + 0 + 0;
+      this.centerCount = 1;
+      this.partCount = 8 + 0 + 0 + 1;
       this.cornerOffset = 0;
       this.edgeOffset = 8;
       this.sideOffset = 8;

@@ -13,7 +13,7 @@
 define("Cube", [],
 function () {
   let module = {
-    log: (true) // Enable or disable logging for this module.
+    log: (false) // Enable or disable logging for this module.
     ? function (msg) {
       console.log('Cube.js ' + msg);
     }

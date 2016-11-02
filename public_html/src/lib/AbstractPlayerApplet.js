@@ -23,17 +23,19 @@ define("AbstractPlayerApplet", ["AbstractCanvas", "Node3D", "J3DI", "J3DIMath", 
   "RubiksCubeS4Cube3D",
 
   "PocketCubeS1Cube3D",
-  "PocketCubeS4Cube3D"
+  "PocketCubeS4Cube3D",
+  "PocketCubeS5Cube3D"
 ],
 function (AbstractCanvas, Node3D, J3DI, J3DIMath, Notation, AST, ScriptParser,
 RubiksCubeS1Cube3D,
 RubiksCubeS4Cube3D,
 PocketCubeS1Cube3D,
-PocketCubeS4Cube3D
+PocketCubeS4Cube3D,
+PocketCubeS5Cube3D
 ) {
 
   let module = {
-    log: (true) // Enable or disable logging for this module.
+    log: (false) // Enable or disable logging for this module.
     ? function (msg) {
       console.log('AbstractPlayerApplet.js ' + msg);
     }
@@ -224,6 +226,9 @@ PocketCubeS4Cube3D
         case "PocketCube s4" :
           c3d = new PocketCubeS4Cube3D.Cube3D();
           break;
+        case "PocketCube s5" :
+          c3d = new PocketCubeS5Cube3D.Cube3D();
+          break;
 
 
 
@@ -397,16 +402,6 @@ PocketCubeS4Cube3D
       let attr = this.cube3d.attributes;
       cube3d.updateAttributes();
 
-      // part colors
-      let ccenter = attr.partsFillColor[cube3d.centerOffset];
-      let cparts = attr.partsFillColor[cube3d.cornerOffset];
-      //let phongparts=[0.5,0.6,0.4,16.0];//ambient, diffuse, specular, shininess
-      //let phongstickers=[0.8,0.2,0.1,8.0];//ambient, diffuse, specular, shininess
-
-      //  this.log('  center w==c3d.p          ?:'+(this.world===this.cube3d.parent));
-      //  this.log('  center c3d==c3d.parts[0].p?:'+(this.cube3d===this.cube3d.parts[0].parent));
-      //	this.world.add(this.cube3d); 
-
       // model view transformation
       let mvMatrix = this.mvMatrix;
 
@@ -416,7 +411,8 @@ PocketCubeS4Cube3D
           continue;
         mvMatrix.makeIdentity();
         cube3d.parts[cube3d.centerOffset + i].transform(mvMatrix);
-        this.drawObject(cube3d.centerObj, mvMatrix, ccenter, attr.partsPhong[this.cube3d.centerOffset + i]);
+        let cparts = attr.partsFillColor[cube3d.centerOffset + i];
+        this.drawObject(cube3d.centerObj, mvMatrix, cparts, attr.partsPhong[this.cube3d.centerOffset + i]);
       }
 
       // draw side parts
@@ -425,6 +421,7 @@ PocketCubeS4Cube3D
           continue;
         mvMatrix.makeIdentity();
         cube3d.parts[cube3d.sideOffset + i].transform(mvMatrix);
+        let cparts = attr.partsFillColor[cube3d.sideOffset + i];
         this.drawObject(cube3d.sideObj, mvMatrix, cparts, attr.partsPhong[this.cube3d.sideOffset + i]);
 
         let si = cube3d.getStickerIndexForPartIndex(cube3d.sideOffset + i, 0);
@@ -438,6 +435,7 @@ PocketCubeS4Cube3D
           continue;
         mvMatrix.makeIdentity();
         this.cube3d.parts[cube3d.edgeOffset + i].transform(mvMatrix);
+        let cparts = attr.partsFillColor[cube3d.edgeOffset + i];
         this.drawObject(cube3d.edgeObj, mvMatrix, cparts, attr.partsPhong[this.cube3d.edgeOffset + i]);
 
         let si = cube3d.getStickerIndexForPartIndex(cube3d.edgeOffset + i, 0);
@@ -455,6 +453,7 @@ PocketCubeS4Cube3D
           continue;
         mvMatrix.makeIdentity();
         this.cube3d.parts[cube3d.cornerOffset + i].transform(mvMatrix);
+        let cparts = attr.partsFillColor[cube3d.cornerOffset + i];
         this.drawObject(cube3d.cornerObj, mvMatrix, cparts, attr.partsPhong[this.cube3d.cornerOffset + i], this.forceColorUpdate);
         let si = cube3d.getStickerIndexForPartIndex(cube3d.cornerOffset + i, 1);
         this.drawObject(cube3d.stickerObjs[si], mvMatrix, attr.stickersFillColor[si], attr.stickersPhong[si], this.forceColorUpdate);
@@ -977,17 +976,17 @@ PocketCubeS4Cube3D
      */
     readParameters(cube3d) {
       this.readOrientationParameters(cube3d);
-      this.readStickerParameters(cube3d);
+      this.readColorParameters(cube3d);
       this.readPartParameters(cube3d);
       this.readScriptParameters(cube3d);
     }
 
-    /** Reads the sticker parameters and applies them to the provided cube 3d.
+    /** Reads the color parameters and applies them to the provided cube 3d.
      *
      * Note:
      * cube3d.validateAttributes() must be called after this method has been invoked.
      */
-    readStickerParameters(cube3d) {
+    readColorParameters(cube3d) {
       let a = cube3d.attributes;
       let p = this.parameters;
 

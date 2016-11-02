@@ -81,6 +81,9 @@ function() {
 let module = {
   log: (false) // Enable or disable logging for this module.
     ? function(msg) { console.log('J3DI.js '+msg); }
+    : function() {},
+  error: (true) // Enable or disable logging for this module.
+    ? function(msg) { console.log('J3DI.js  ERROR '+msg); }
     : function() {}
 }
 
@@ -906,7 +909,7 @@ let doLoadObj = function (obj, text, callback, errorCallback)
         else if (array[0] == "f") {
           // face
           if (array.length < 4) {
-            module.log(".doLoadObj *** Error: face '"+line+"' not handled");
+            module.error("face '"+line+"' not handled in "+obj.url);
             continue;
           }
 
@@ -927,7 +930,7 @@ let doLoadObj = function (obj, text, callback, errorCallback)
                         nor = parseInt(f[2]) - 1;
                     }
                     else {
-                        module.log(".doLoadObj *** Error: did not understand face '"+array[i]+"'");
+                        module.error("did not understand face '"+array[i]+"' in "+obj.url);
                       return null;
                     }
 

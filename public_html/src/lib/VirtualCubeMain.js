@@ -17,7 +17,7 @@ define("VirtualCubeMain", ["WebglPlayerApplet", "TwoDPlayerApplet"],
 function (WebglPlayerApplet, TwoDPlayerApplet) {
 
   let module = {
-    log: (true) // Enable or disable logging for this module.
+    log: (false) // Enable or disable logging for this module.
     ? function (msg) {
       console.log('VirtualCubeMain.js ' + msg);
     }
