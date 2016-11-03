@@ -487,6 +487,13 @@ function () {
       this.addToken(new MoveSymbol(1, inner, -1), "D");
       this.addToken(new MoveSymbol(2, inner, -1), "B");
 
+      this.addToken(new MoveSymbol(0, outer|inner, 1), "SR");
+      this.addToken(new MoveSymbol(1, outer|inner, 1), "SU");
+      this.addToken(new MoveSymbol(2, outer|inner, 1), "SF");
+      this.addToken(new MoveSymbol(0, outer|inner, -1), "SL");
+      this.addToken(new MoveSymbol(1, outer|inner, -1), "SD");
+      this.addToken(new MoveSymbol(2, outer|inner, -1), "SB");
+      
       this.addToken(new MoveSymbol(0, middle|outer, 1), "TR");
       this.addToken(new MoveSymbol(1, middle|outer, 1), "TU");
       this.addToken(new MoveSymbol(2, middle|outer, 1), "TF");

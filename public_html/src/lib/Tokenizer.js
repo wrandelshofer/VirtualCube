@@ -112,7 +112,7 @@ function () {
      * @param {Object} ttype
      * @returns nothing
      */
-    parseNumbers() {
+    addNumbers() {
       this.addDigit("0", TT_DIGIT);
       this.addDigit("1", TT_DIGIT);
       this.addDigit("2", TT_DIGIT);
@@ -306,6 +306,7 @@ function () {
         this.tstart = start;
         this.tend = this.pos;
         this.sval = this.input.substring(start, this.pos);
+        this.nval = Number.valueOf(this.sval);
         this.tsymbol = null;
         return this.ttype;
       }

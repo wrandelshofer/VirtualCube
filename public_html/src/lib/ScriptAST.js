@@ -99,8 +99,12 @@ function () {
       }
   }
   class RepetitionNode extends Node {
-      constructor(layerCount,startPosition,endPosition) {
+      constructor(layerCount,startPosition,endPosition,repeatCount) {
         super(layerCount,startPosition,endPosition);
+        this.repeatCount=repeatCount;
+      }
+      setRepeatCount(newValue) {
+        this.repeatCount=newValue;
       }
   }
   class NOPNode extends Node {

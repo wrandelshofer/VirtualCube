@@ -144,7 +144,7 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
           if (this.tokenizer == null) {
             let tt = new Tokenizer.Tokenizer();
             tt.skipWhitespace();
-            tt.parseNumbers();
+            tt.addNumbers();
 
             let tokenToSymbolMap = this.notation.getTokenToSymbolMap();
             for (let i in tokenToSymbolMap) {
@@ -885,7 +885,7 @@ console.log('extractSymbol:'+null+" "+symbols+" types:"+types);
             throw new ParseException("Repetitor: Invalid repeat count " + intValue, t.getStartPosition(), t.getEndPosition());
           }
           repetition.setRepeatCount(intValue);
-          repetition.setEndPosition(t.getStartPosition() + numericToken.length() - 1);
+          repetition.setEndPosition(t.getEndPosition());
           // The Integer token is now done.
 
           // Evaluate [RptrEnd] token.
@@ -927,6 +927,7 @@ console.log('extractSymbol:'+null+" "+symbols+" types:"+types);
           let symbols = t.getSymbolValue();
 
           if (this.isType(symbols, Sym.INVERTOR)) {
+            module.log('parseInvertor: "%s".',t.getStringValue());
             inversion.setEndPosition(t.getEndPosition());
             return inversion;
           }
@@ -989,7 +990,7 @@ console.log('extractSymbol:'+null+" "+symbols+" types:"+types);
             throw new ParseException("Move: \"" + t.getStringValue() + "\" is not a Move", t.getStartPosition(), t.getEndPosition());
           }
 
-          module.log('parseMove: "' + t.getStringValue() + '".');
+            module.log('parseMove: "%s".',t.getStringValue());
           move.setStartPosition(t.getStartPosition());
           move.setEndPosition(t.getEndPosition());
           move.setAxis(symbol.getAxis());
