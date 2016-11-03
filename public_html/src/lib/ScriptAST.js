@@ -17,11 +17,12 @@ function () {
    * Represents an Abstract Syntax Tree Node
    */
   class Node {
-      constructor() {
+      constructor(layerCount,startPosition,endPosition) {
         this.children=[];
-        this.startPosition=-1;
-        this.endPosition=-1;
         this.parent=null;
+        this.layerCount=layerCount;
+        this.startPostion=startPosition;
+        this.endPosition=endPosition;
       }
       
       add(child) {
@@ -33,7 +34,7 @@ function () {
       }
       remove(child) {
         if (child.parent==this) {
-          let index=this.children.indexOf(this);
+          let index=this.children.indexOf(child);
           if (index != -1) {
             this.children.splice(index,);
           }
@@ -43,7 +44,7 @@ function () {
       
       removeFromParent() {
         if (this.parent!=null) {
-          parent.remove(this);
+          this.parent.remove(this);
         }
       }
       getChildCount() {
@@ -80,17 +81,31 @@ function () {
       }
   }
  class StatementNode extends Node {
-      constructor(layerCount) {
-        super();
+      constructor(layerCount,startPosition,endPosition) {
+        super(layerCount,startPosition,endPosition);
+        this.layerCount=layerCount;
+      }
+  }
+ class GroupingNode extends Node {
+      constructor(layerCount,startPosition,endPosition) {
+        super(layerCount,startPosition,endPosition);
         this.layerCount=layerCount;
       }
   }
 
+  class InversionNode extends Node {
+      constructor(layerCount,startPosition,endPosition) {
+        super(layerCount,startPosition,endPosition);
+      }
+  }
+  class RepetitionNode extends Node {
+      constructor(layerCount,startPosition,endPosition) {
+        super(layerCount,startPosition,endPosition);
+      }
+  }
   class NOPNode extends Node {
-      constructor(startPosition,endPosition) {
-        super();
-        this.startPostion=startPosition;
-        this.endPosition=endPosition;
+      constructor(layerCount,startPosition,endPosition) {
+        super(layerCount,startPosition,endPosition);
       }
   }
 
@@ -98,8 +113,7 @@ function () {
 
     /** Script nodes. */
     constructor(layerCount, axis, layerMask, angle) {
-      super();
-      this.layerCount=layerCount;
+      super(layerCount,-1,-1);
       this.axis = axis;
       this.angle = angle;
       this.layerMask = layerMask;
@@ -159,9 +173,12 @@ function () {
 // MODULE API    
 // ------------------
   return {
+    GroupingNode: GroupingNode,
+    InversionNode: InversionNode,
     Node: Node,
     MoveNode: MoveNode,
     NOPNode: NOPNode,
+    RepetitionNode: RepetitionNode,
     SequenceNode: SequenceNode,
     StatementNode: StatementNode,
   };

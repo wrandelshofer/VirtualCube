@@ -416,6 +416,9 @@ function () {
       return this.tokenToSymbolMap;
     }
     isSyntax(symbol,syntax) {
+      if (symbol==null||syntax==null) {
+        throw "illegal arguments symbol:"+symbol+" syntax:"+syntax;
+      }
       return this.symbolToSyntaxMap[symbol]==syntax;
     }
     isSupported(symbol) {
@@ -428,19 +431,6 @@ function () {
       super();
 
       this.layerCount = layerCount == null ? 3 : layerCount;
-
-      this.keywords = [
-        'R', 'U', 'F', 'L', 'D', 'B',
-        'R2', 'U2', 'F2', 'L2', 'D2', 'B2',
-        "R'", "U'", "F'", "L'", "D'", "B'",
-        'MR', 'MU', 'MF', 'ML', 'MD', 'MB',
-        'CR', 'CU', 'CF', 'CL', 'CD', 'CB',
-        "MR'", "MU'", "MF'", "ML'", "MD'", "MB'",
-        "CR'", "CU'", "CF'", "CL'", "CD'", "CB'",
-        'MR2', 'MU2', 'MF2', 'ML2', 'MD2', 'MB2',
-        'CR2', 'CU2', 'CF2', 'CL2', 'CD2', 'CB2',
-        "'"];
-      this.specials = ['.', '·', '(', ')'];
 
       this.addToken(Symbol.NOP, "·");
       this.addToken(Symbol.NOP, ".");
@@ -497,19 +487,12 @@ function () {
       this.addToken(new MoveSymbol(1, inner, -1), "D");
       this.addToken(new MoveSymbol(2, inner, -1), "B");
 
-      this.addToken(new MoveSymbol(0, outer, -1), "R'");
-      this.addToken(new MoveSymbol(1, outer, -1), "U'");
-      this.addToken(new MoveSymbol(2, outer, -1), "F'");
-      this.addToken(new MoveSymbol(0, inner, 1), "L'");
-      this.addToken(new MoveSymbol(1, inner, 1), "D'");
-      this.addToken(new MoveSymbol(2, inner, 1), "B'");
-
-      this.addToken(new MoveSymbol(0, outer, 2), "R2");
-      this.addToken(new MoveSymbol(1, outer, 2), "U2");
-      this.addToken(new MoveSymbol(2, outer, 2), "F2");
-      this.addToken(new MoveSymbol(0, inner, -2), "L2");
-      this.addToken(new MoveSymbol(1, inner, -2), "D2");
-      this.addToken(new MoveSymbol(2, inner, -2), "B2");
+      this.addToken(new MoveSymbol(0, middle|outer, 1), "TR");
+      this.addToken(new MoveSymbol(1, middle|outer, 1), "TU");
+      this.addToken(new MoveSymbol(2, middle|outer, 1), "TF");
+      this.addToken(new MoveSymbol(0, middle|inner, -1), "TL");
+      this.addToken(new MoveSymbol(1, middle|inner, -1), "TD");
+      this.addToken(new MoveSymbol(2, middle|inner, -1), "TB");
 
       this.addToken(new MoveSymbol(0, middle, 1), "MR");
       this.addToken(new MoveSymbol(1, middle, 1), "MU");
@@ -525,12 +508,6 @@ function () {
       this.addToken(new MoveSymbol(1, all, -1), "CD");
       this.addToken(new MoveSymbol(2, all, -1), "CB");
 
-      this.addToken(new MoveSymbol(0, all, 2), "CR2");
-      this.addToken(new MoveSymbol(1, all, 2), "CU2");
-      this.addToken(new MoveSymbol(2, all, 2), "CF2");
-      this.addToken(new MoveSymbol(0, all, -2), "CL2");
-      this.addToken(new MoveSymbol(1, all, -2), "CD2");
-      this.addToken(new MoveSymbol(2, all, -2), "CB2");
 
       this.symbolToSyntaxMap[Symbol.COMMUTATION] = Syntax.PRECIRCUMFIX;
       this.symbolToSyntaxMap[Symbol.CONJUGATION] = Syntax.PREFIX;
@@ -538,6 +515,7 @@ function () {
       this.symbolToSyntaxMap[Symbol.GROUPING] = Syntax.CIRCUMFIX;
       this.symbolToSyntaxMap[Symbol.PERMUTATION] = Syntax.PRECIRCUMFIX;
       this.symbolToSyntaxMap[Symbol.REPETITION] = Syntax.SUFFIX;
+      this.symbolToSyntaxMap[Symbol.REFLECTOR] = Syntax.SUFFIX;
       this.symbolToSyntaxMap[Symbol.INVERSION] = Syntax.SUFFIX;
 
     }

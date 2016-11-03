@@ -39,7 +39,7 @@ PocketCubeS5Cube3D
 ) {
 
   let module = {
-    log: (true) // Enable or disable logging for this module.
+    log: (false) // Enable or disable logging for this module.
     ? function (msg, args) {
       if (args === undefined)
         console.log('AbstractPlayerApplet.js ' + msg);

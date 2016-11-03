@@ -11,599 +11,643 @@
 // require.js
 // --------------
 define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
-function (Notation, AST, Tokenizer) {
-  let module = {
-    log: (true) // Enable or disable logging for this module.
-    ? function (msg, args) {
-      if (args === undefined)
-        console.log('ScriptParser.js ' + msg);
-      else
-        console.log('ScriptParser.js ' + msg, args);
-    }
-    : function () {},
+    function (Notation, AST, Tokenizer) {
+      let module = {
+        log: (true) // Enable or disable logging for this module.
+            ? function (msg, args) {
+              if (args === undefined)
+                console.log('ScriptParser.js ' + msg);
+              else
+                console.log('ScriptParser.js ' + msg, args);
+            }
+        : function () {},
 
-    warning: (true) // Enable or disable logging for this module.
-    ? function (msg, args) {
-      if (args === undefined)
-        console.log('ScriptParser.js WARNING ' + msg);
-      else
-        console.log('ScriptParser.js WARNING ' + msg, args);
-    }
-    : function () {},
+        warning: (true) // Enable or disable logging for this module.
+            ? function (msg, args) {
+              if (args === undefined)
+                console.log('ScriptParser.js WARNING ' + msg);
+              else
+                console.log('ScriptParser.js WARNING ' + msg, args);
+            }
+        : function () {},
 
-    error: (true) // Enable or disable logging for this module.
-    ? function (msg, args) {
-      if (args === undefined)
-        console.log('ScriptParser.js ERROR ' + msg);
-      else
-        console.log('ScriptParser.js ERROR ' + msg, args);
-    }
-    : function () {}
-  };
+        error: (true) // Enable or disable logging for this module.
+            ? function (msg, args) {
+              if (args === undefined)
+                console.log('ScriptParser.js ERROR ' + msg);
+              else
+                console.log('ScriptParser.js ERROR ' + msg, args);
+            }
+        : function () {}
+      };
 
-  class ParseException {
-    constructor(msg, start, end) {
-      this.msg = msg;
-      this.start = start;
-      this.end = end;
-    }
-    toString() {
-      return this.msg + " at:" + this.start + ".." + this.end;
-    }
-  }
-
-  /**
-   * Represents an Abstract Syntax Tree Node
-   */
-  class Node {
-
-  }
-
-  class TwistNode extends Node {
-
-    /** Script nodes. */
-    constructor(axis, layerMask, angle) {
-      this.axis = axis;
-      this.angle = angle;
-      this.layerMask = layerMask;
-    }
-
-    /** Applies the node to the specified cube. */
-    applyTo(cube) {
-      if (!this.doesNothing()) {
-        cube.transform(this.axis, this.layerMask, this.angle);
-      }
-    }
-    /** Applies the inverse of the node to the specified cube. */
-    applyInverseTo(cube) {
-      if (!this.doesNothing()) {
-        cube.transform(this.axis, this.layerMask, -this.angle);
-      }
-    }
-    /** Returns true if this node does nothing. */
-    doesNothing() {
-      return this.angle == 0 || this.layerMask == 0;
-    }
-    /** Tries to consume the given TwistNode. 
-     * Returns true if successful.
-     * This TwistNode may return true for doesNothing afterwards!);
-     */
-    consume(that) {
-      if (that.axis == this.axis
-      && that.layerMask == this.layerMask) {
-        this.angle = (this.angle + that.angle) % 4;
-        if (this.angle == 3)
-          this.angle = -1;
-        else if (this.angle == -3)
-          this.angle = 1;
-        return true;
-      }
-      return false;
-    }
-    toString() {
-      return 'TwistNode{ax:' + this.axis + ' an:' + this.angle + ' lm:' + this.layerMask + '}';
-    }
-  }
-
-  const UNKNOWN_MASK = 0;
-  const GROUPING_MASK = 1;
-  const CONJUGATION_MASK = 2;
-  const COMMUTATION_MASK = 4;
-  const ROTATION_MASK = 8;
-  const PERMUTATION_MASK = 16;
-  const INVERSION_MASK = 32;
-  const REFLECTION_MASK = 64;
-
-
-  /**
-   * Implements a parser for a specific notation..
-   */
-  class ScriptParser {
-    /**
-     * Creates a new parser.
-     * @param {Notation} notation
-     * @param {Map<String,MacroNode>} localMacros
-     */
-    constructor(notation, localMacros) {
-      this.notation = notation;
-      this.macros = [];
-      this.tokenizer = null;
-
-      if (localMacros != null) {
-        for (let macro in localMacros) {
-          macros.push(macro);
+      class ParseException {
+        constructor(msg, start, end) {
+          this.msg = msg;
+          this.start = start;
+          this.end = end;
+        }
+        toString() {
+          return this.msg + " at:" + this.start + ".." + this.end;
         }
       }
-      // global macros override local macros
-      for (let macro in notation.getMacros()) {
-        macros.push(macro);
+
+      /**
+       * Represents an Abstract Syntax Tree Node
+       */
+      class Node {
+
       }
-    }
 
-    getTokenizer() {
-      if (this.tokenizer == null) {
-        let tt = new Tokenizer.Tokenizer();
-        tt.skipWhitespace();
-        tt.parseNumbers();
+      class TwistNode extends Node {
 
-        let tokenToSymbolMap = this.notation.getTokenToSymbolMap();
-        for (let i in tokenToSymbolMap) {
-          tt.addKeyword(i, tokenToSymbolMap[i]);
+        /** Script nodes. */
+        constructor(axis, layerMask, angle) {
+          this.axis = axis;
+          this.angle = angle;
+          this.layerMask = layerMask;
         }
-        /*
-         tt.addSpecials(this.notation.getSpecials());
-         tt.addKeywords(this.notation.getKeywords());*/
-        //tt.setSlashStarComment(...
-        //tt.setSlashSlashComment(..,
-        this.tokenizer = tt;
-      }
-      return this.tokenizer;
-    }
 
-    /**
-     * Parses the specified string.
-     * @param {type} str
-     * @return {SequenceNode} the parsed script
-     * @throws a message if the parsing fails.
-     */
-    parse(str) {
-      let tt = this.getTokenizer();
-      tt.setInput(str);
-      let root = new AST.SequenceNode();
-      let i = 0;
-      while (tt.nextToken() != Tokenizer.TT_EOF) {
-        tt.pushBack();
-        this.parseExpression(tt, root);
-        i++;
-        if (i > 1000)
-          throw "too many iterations! " + tt.getTokenType() + " pos:" + tt.pos;
-      }
-      return root;
-    }
-
-    /**
-     * Returns true if the array contains a symbol of the specified symbol type
-     * @param {type} array of symbols
-     * @param {type} type desired type
-     * @return true if array contains a symbol of the specified type
-     */
-    containsType(symbols, type) {
-      for (let i = 0; i < symbols.length; i++) {
-        let s = symbols[i];
-        if (s.getType() == type) {
-          return true;
-        }
-      }
-      return false;
-    }
-    /**
-     * Returns true if the array contains a symbol of the specified symbol type
-     * @param {type} array of symbols
-     * @param {type} type desired type
-     * @return true if array contains a symbol of the specified type
-     */
-    intersectsTypes(symbols, types) {
-      for (let i = 0; i < symbols.length; i++) {
-        let s = symbols[i];
-        for (let j = 0; j < types.length; j++) {
-          let type = types[j];
-          if (s.getType() == type) {
-            return true;
+        /** Applies the node to the specified cube. */
+        applyTo(cube) {
+          if (!this.doesNothing()) {
+            cube.transform(this.axis, this.layerMask, this.angle);
           }
         }
-      }
-      return false;
-    }
-    /**
-     * Returns true if the array contains at least one symbol, and
-     * only symbols of the specified symbol type.
-     * 
-     * @param {type} array of symbols
-     * @param {type} type desired type
-     * @return true if array contains a symbol of the specified type
-     */
-    isType(symbols, type) {
-      for (let i = 0; i < symbols.length; i++) {
-        let s = symbols[i];
-        if (s.getType() != type) {
+        /** Applies the inverse of the node to the specified cube. */
+        applyInverseTo(cube) {
+          if (!this.doesNothing()) {
+            cube.transform(this.axis, this.layerMask, -this.angle);
+          }
+        }
+        /** Returns true if this node does nothing. */
+        doesNothing() {
+          return this.angle == 0 || this.layerMask == 0;
+        }
+        /** Tries to consume the given TwistNode. 
+         * Returns true if successful.
+         * This TwistNode may return true for doesNothing afterwards!);
+         */
+        consume(that) {
+          if (that.axis == this.axis
+              && that.layerMask == this.layerMask) {
+            this.angle = (this.angle + that.angle) % 4;
+            if (this.angle == 3)
+              this.angle = -1;
+            else if (this.angle == -3)
+              this.angle = 1;
+            return true;
+          }
           return false;
         }
-      }
-      return symbols.length > 0;
-    }
-    /**
-     * Extracts the first symbol which has one of the types
-     * @param {type} array of symbols
-     * @param {type} types selection of types
-     * @return a symbol or null
-     */
-    extractSymbol(symbols, types) {
-      for (let i = 0; i < symbols.length; i++) {
-        let s = symbols[i];
-        if (types[s.getType()] != null) {
-          return s;
-        }
-      }
-      return null;
-    }
-
-    /**
-     * Parses a Statement.
-     * 
-     * @param {Tokenizer} t
-     * @param {Node} parent
-     * @returns {unresolved} the parsed statement
-     * @throws parse exception
-     */
-    parseStatement(t, parent) {
-      let ntn = this.notation;
-      let Sym = Notation.Symbol;
-      let Stx = Notation.Syntax;
-
-      // Fetch the next token.
-      if (t.nextToken() != Tokenizer.TT_KEYWORD) {
-        throw new ParseException("Statement: \"" + t.getStringValue() + "\" is a " + t.getTokenType() + " but not a keyword.", t.getStartPosition(), t.getEndPosition());
-      }
-      let symbols = t.getSymbolValue();
-
-      // Evaluate: Macro
-      if (symbols.length == 0) {
-        throw new ParseException("Statement: Unknown statement " + t.sval, t.getStartPosition(), t.getEndPosition());
-      }
-
-      // Is it a Macro?
-      if (this.containsType(symbols, Sym.MACRO)) {
-        t.pushBack();
-        return this.parseMacro(t, parent);
-      }
-
-      // Is it a Move?
-      if (this.containsType(symbols, Sym.MOVE)) {
-        t.pushBack();
-        return this.parseMove(t, parent);
-      }
-
-      // Is it a NOP?
-      if (this.containsType(symbols, Sym.NOP)) {
-        t.pushBack();
-        return this.parseNOP(t, parent);
-      }
-
-
-      // Is it a Permutation sign token? Parse a permutation.
-      let sign = this.extractSymbol(symbols, [Sym.PERMUTATION_PLUS,
-        Sym.PERMUTATION_MINUS,
-        Sym.PERMUTATION_PLUSPLUS]);
-      if (ntn.isSyntax(Sym.PERMUTATION, Notation.Syntax.PREFIX)
-      && sign != null) {
-        let startpos = t.getStartPosition();
-        t.pushBack();
-        if (t.nextToken() != StreamTokenizer.TT_KEYWORD) {
-          throw new ParseException(
-          "Permutation: Unexpected token - expected a keyword.", t.getStartPosition(), t.getEndPosition());
-        }
-        symbols = t.getSymbolValue();
-        if (!this.containsType(symbols, Sym.PERMUTATION_BEGIN)) {
-          throw new ParseException(
-          "Permutation: Unexpected token - expected permutation begin.", t.getStartPosition(), t.getEndPosition());
-        }
-
-        let pnode = this.parsePermutation(t, parent, startpos, sign);
-        return pnode;
-      }
-      // Okay, it's not a move and not a permutation sign.
-      // Since we allow for some ambiguity of the
-      // tokens used by the grouping, conjugation, commutation and permutation
-      // statement it gets a little bit complicated here.
-      // Create a bit mask with a bit for each expected statement.
-      let expressionMask
-      = ((this.containsType(symbols, Sym.GROUPING_BEGIN)) ? GROUPING_MASK : UNKNOWN_MASK) | //
-      ((ntn.isSyntax(Sym.CONJUGATION, Stx.PRECIRCUMFIX) && this.containsType(symbol, Sym.CONJUGATION_BEGIN)) ? CONJUGATION_MASK : UNKNOWN_MASK) | //
-      ((ntn.isSyntax(Sym.COMMUTATION, Stx.PRECIRCUMFIX) && this.containsType(symbols, Sym.COMMUTATION_BEGIN)) ? COMMUTATION_MASK : UNKNOWN_MASK) | //
-      ((ntn.isSyntax(Sym.ROTATION, Stx.PRECIRCUMFIX) && this.containsType(symbols, Sym.ROTATION_BEGIN)) ? ROTATION_MASK : UNKNOWN_MASK) | //
-      ((ntn.isSyntax(Sym.INVERSION, Stx.CIRCUMFIX) && this.containsType(symbols, Sym.INVERSION_BEGIN)) ? INVERSION_MASK : UNKNOWN_MASK) | //
-      ((ntn.isSyntax(Sym.REFLECTION, Stx.CIRCUMFIX) && this.containsType(symbols, Sym.REFLECTION_BEGIN)) ? REFLECTION_MASK : UNKNOWN_MASK) | //
-      ((ntn.isSupported(Sym.PERMUTATION) && this.containsType(symbols, Sym.PERMUTATION_BEGIN)) ? PERMUTATION_MASK : UNKNOWN_MASK);
-
-      // Is it a Permutation Begin token without any ambiguity?
-      if (expressionMask == PERMUTATION_MASK) {
-        return parsePermutation(t, parent, p, null);
-      }
-
-      // Is it an ambiguous permutation begin token?
-      if ((expressionMask & PERMUTATION_MASK) == PERMUTATION_MASK) {
-        let startPos = t.getStartPosition();
-        // Look ahead
-        if (t.nextToken() != Tokenizer.TT_KEYWORD) {
-          throw new ParseException("Statement: keyword expected.", t.getStartPosition(), t.getEndPosition());
-        }
-        symbols = t.getSymbolValue();
-        t.pushBack();
-        if (symbols != null && this.intersectsTypes(symbols, Sym.PERMUTATION.getSubSymbols())) {
-          return this.parsePermutation(t, parent, startPos);
-        } else {
-          return this.parseCompoundStatement(t, parent, startPos,expressionMask ^ PERMUTATION_MASK);
+        toString() {
+          return 'TwistNode{ax:' + this.axis + ' an:' + this.angle + ' lm:' + this.layerMask + '}';
         }
       }
 
-      // Is it one of the other Begin tokens?
-      if (expressionMask != UNKNOWN_MASK) {
-        return parseCompoundStatement(t, parent, expressionMask);
-      }
+      const UNKNOWN_MASK = 0;
+      const GROUPING_MASK = 1;
+      const CONJUGATION_MASK = 2;
+      const COMMUTATION_MASK = 4;
+      const ROTATION_MASK = 8;
+      const PERMUTATION_MASK = 16;
+      const INVERSION_MASK = 32;
+      const REFLECTION_MASK = 64;
 
-      throw new ParseException("Statement: Invalid Statement " + t.sval, t.getStartPosition(), t.getEndPosition());
-    }
 
-    /** Parses the remainder of a permutation statement after its PERMUTATION_BEGIN token has been consumed. 
-     * 
-     * @param {Tokenizer} t
-     * @param {Node} parent
-     * @param {int} startPos the start position of the PERMUTATION_BEGIN begin token
-     * @returns {unresolved} the parsed permutation
-     * @throws parse exception
-     */
-    parsePermutation(t, parent, startPos) {
-      throw new ParseException("Permutation: Not implemented " + t.sval, t.getStartPosition(), t.getEndPosition());
-    }
-    /** Parses a compound statement after its XXX_BEGIN token has been consumed. 
-     * 
-     * @param {Tokenizer} t
-     * @param {Node} parent
-     * @param {int} startPos the start position of the XXX_BEGIN begin token
-     * @param {int} beginTypeMask the mask indicating which XXX_BEGIN token was consumed
-     * @returns {unresolved} the parsed compound statement
-     * @throws parse exception
-     */
-    parseCompoundStatement(t, parent, startPos, beginTypeMask) {
-      let ntn = this.notation;
-      let Sym = Notation.Symbol;
-      let Stx = Notation.Syntax;
-      
-      let seq1 = new AST.SequenceNode();
-      seq1.setStartPosition(startPos);
-      parent.add(seq1);
-      let seq2 = null;
-      let grouping = seq1;
+      /**
+       * Implements a parser for a specific notation..
+       */
+      class ScriptParser {
+        /**
+         * Creates a new parser.
+         * @param {Notation} notation
+         * @param {Map<String,MacroNode>} localMacros
+         */
+        constructor(notation, localMacros) {
+          this.notation = notation;
+          this.macros = [];
+          this.tokenizer = null;
 
-        // The final type mask reflects the final type that we have determined
-        // after parsing all of the grouping.
-        let finalTypeMask = beginTypeMask & (GROUPING_MASK | CONJUGATION_MASK | COMMUTATION_MASK | ROTATION_MASK | REFLECTION_MASK | INVERSION_MASK);
-      
-        // Evaluate: {Statement} , (GROUPING_END | COMMUTATION_END | CONJUGATION_END | ROTATION_END) ;
-        TheGrouping:
-        while (true) {
-            switch (t.nextToken()) {
-                case Tokenizer.TT_KEYWORD:
-                  let symbols = t.getSymbolValue();
-                    // Look ahead the nextElement token.
-
-                    let endTypeMask
-                            = ((this.containsType(symbols, Sym.GROUPING_END)) ? GROUPING_MASK : UNKNOWN_MASK) | //
-                            ((ntn.isSyntax(Sym.CONJUGATION, Stx.PRECIRCUMFIX) && this.containsType(symbols, Sym.CONJUGATION_END)) ? CONJUGATION_MASK : UNKNOWN_MASK) | //
-                            ((ntn.isSyntax(Sym.COMMUTATION, Stx.PRECIRCUMFIX) && this.containsType(symbols, Sym.COMMUTATION_END)) ? COMMUTATION_MASK : UNKNOWN_MASK) | //
-                            ((ntn.isSyntax(Sym.INVERSION, Stx.CIRCUMFIX) && this.containsType(symbols, Sym.INVERSION_END)) ? INVERSION_MASK : UNKNOWN_MASK) | //
-                            ((ntn.isSyntax(Sym.REFLECTION, Stx.CIRCUMFIX) && this.containsType(symbols, Sym.REFLECTION_END)) ? REFLECTION_MASK : UNKNOWN_MASK) | //
-                            ((ntn.isSyntax(Sym.ROTATION, Stx.PRECIRCUMFIX) && this.containsType(symbols, Sym.ROTATION_END)) ? ROTATION_MASK : UNKNOWN_MASK);
-                    let delimiterTypeMask
-                            = ((ntn.isSyntax(Symbol.CONJUGATION, Stx.PRECIRCUMFIX) && this.containsType(symbols, Sym.CONJUGATION_DELIMITER)) ? CONJUGATION_MASK : 0) 
-                            | ((ntn.isSyntax(Sym.COMMUTATION, Stx.PRECIRCUMFIX) && this.containsType(symbols, Sym.COMMUTATION_DELIMITER)) ? COMMUTATION_MASK : 0) 
-                            | ((ntn.isSyntax(Sym.ROTATION, Stx.PRECIRCUMFIX) && this.containsType(symbols, Sym.ROTATION_DELIMITER)) ? ROTATION_MASK : 0);
-
-                    if (endTypeMask != 0) {
-                        finalTypeMask &= endTypeMask;
-                        grouping.setEndPosition(t.getEndPosition());
-                        break TheGrouping;
-
-                    } else if (delimiterTypeMask != 0) {
-                        finalTypeMask &= delimiterTypeMask;
-                        if (finalTypeMask == 0) {
-                            throw new ParseException("Grouping: Invalid delimiter.", t.getStartPosition(), t.getEndPosition());
-                        }
-                        if (seq2 == null) {
-                            seq1.setEndPosition(t.getStartPosition());
-                            seq2 = new SequenceNode(notation.getLayerCount());
-                            seq2.setStartPosition(t.getEndPosition());
-                            parent.add(seq2);
-                            grouping = seq2;
-                        } else {
-                            throw new ParseException("Grouping: Delimiter must occur only once", t.getStartPosition(), t.getEndPosition());
-                        }
- 
-                    } else {
-                        t.pushBack();
-                        this.parseExpression(t, grouping);
-                    }
-                    break;
-                case StreamPosTokenizer.TT_EOF:
-                    throw new ParseException(
-                            "Grouping: End missing.", t.getStartPosition(), t.getEndPosition());
-                default:
-                    throw new ParseException(
-                            "Grouping: Internal error.", t.getStartPosition(), t.getEndPosition());
+          if (localMacros != null) {
+            for (let macro in localMacros) {
+              macros.push(macro);
             }
+          }
+          // global macros override local macros
+          for (let macro in notation.getMacros()) {
+            macros.push(macro);
+          }
         }
-      
-        seq1.removeFromParent();
-        if (seq2 == null) {
+
+        getTokenizer() {
+          if (this.tokenizer == null) {
+            let tt = new Tokenizer.Tokenizer();
+            tt.skipWhitespace();
+            tt.parseNumbers();
+
+            let tokenToSymbolMap = this.notation.getTokenToSymbolMap();
+            for (let i in tokenToSymbolMap) {
+              tt.addKeyword(i, tokenToSymbolMap[i]);
+            }
+            /*
+             tt.addSpecials(this.notation.getSpecials());
+             tt.addKeywords(this.notation.getKeywords());*/
+            //tt.setSlashStarComment(...
+            //tt.setSlashSlashComment(..,
+            this.tokenizer = tt;
+          }
+          return this.tokenizer;
+        }
+
+        /**
+         * Parses the specified string.
+         * @param {type} str
+         * @return {SequenceNode} the parsed script
+         * @throws a message if the parsing fails.
+         */
+        parse(str) {
+          let tt = this.getTokenizer();
+          tt.setInput(str);
+          let root = new AST.SequenceNode();
+          let i = 0;
+          while (tt.nextToken() != Tokenizer.TT_EOF) {
+            tt.pushBack();
+            this.parseExpression(tt, root);
+            i++;
+            if (i > 1000)
+              throw "too many iterations! " + tt.getTokenType() + " pos:" + tt.pos;
+          }
+          return root;
+        }
+
+        /**
+         * Returns true if the array contains a symbol of the specified symbol type
+         * @param {type} array of symbols
+         * @param {type} type desired type
+         * @return true if array contains a symbol of the specified type
+         */
+        containsType(symbols, type) {
+          for (let i = 0; i < symbols.length; i++) {
+            let s = symbols[i];
+            if (s.getType() == type) {
+              return true;
+            }
+          }
+          return false;
+        }
+        /**
+         * Returns true if the array contains a symbol of the specified symbol type
+         * @param {type} array of symbols
+         * @param {type} type desired type
+         * @return true if array contains a symbol of the specified type
+         */
+        intersectsTypes(symbols, types) {
+          for (let i = 0; i < symbols.length; i++) {
+            let s = symbols[i];
+            for (let j = 0; j < types.length; j++) {
+              let type = types[j];
+              if (s.getType() == type) {
+                return true;
+              }
+            }
+          }
+          return false;
+        }
+        /**
+         * Returns true if the array contains at least one symbol, and
+         * only symbols of the specified symbol type.
+         * 
+         * @param {type} array of symbols
+         * @param {type} type desired type
+         * @return true if array contains a symbol of the specified type
+         */
+        isType(symbols, type) {
+          for (let i = 0; i < symbols.length; i++) {
+            let s = symbols[i];
+            if (s.getType() != type) {
+              return false;
+            }
+          }
+          return symbols.length > 0;
+        }
+        /**
+         * Extracts the first symbol which has one of the types
+         * @param {type} array of symbols
+         * @param {type} types selection of types
+         * @return a symbol or null
+         */
+        extractSymbol(symbols, types) {
+          for (let i = 0; i < symbols.length; i++) {
+            let s = symbols[i];
+            if (types[s.getType()] != null) {
+console.log('extractSymbol:'+s+" "+symbols+" types:"+types);          
+              return s;
+            }
+          }
+console.log('extractSymbol:'+null+" "+symbols+" types:"+types);          
+          return null;
+        }
+
+        /**
+         * Parses a Statement.
+         * 
+         * @param {Tokenizer} t
+         * @param {Node} parent
+         * @returns {unresolved} the parsed statement
+         * @throws parse exception
+         */
+        parseStatement(t, parent) {
+          let ntn = this.notation;
+          let Sym = Notation.Symbol;
+          let Stx = Notation.Syntax;
+
+          // Fetch the next token.
+          if (t.nextToken() != Tokenizer.TT_KEYWORD) {
+            throw new ParseException("Statement: \"" + t.getStringValue() + "\" is a " + t.getTokenType() + " but not a keyword.", t.getStartPosition(), t.getEndPosition());
+          }
+          let symbols = t.getSymbolValue();
+
+          // Evaluate: Macro
+          if (symbols.length == 0) {
+            throw new ParseException("Statement: Unknown statement " + t.sval, t.getStartPosition(), t.getEndPosition());
+          }
+
+          // Is it a Macro?
+          if (this.containsType(symbols, Sym.MACRO)) {
+            t.pushBack();
+            return this.parseMacro(t, parent);
+          }
+
+          // Is it a Move?
+          if (this.containsType(symbols, Sym.MOVE)) {
+            t.pushBack();
+            return this.parseMove(t, parent);
+          }
+
+          // Is it a NOP?
+          if (this.containsType(symbols, Sym.NOP)) {
+            t.pushBack();
+            return this.parseNOP(t, parent);
+          }
+
+
+          // Is it a Permutation token? Parse a permutation.
+          let sign = this.extractSymbol(symbols, [Sym.PERMUTATION_PLUS,
+            Sym.PERMUTATION_MINUS,
+            Sym.PERMUTATION_PLUSPLUS]);
+          if (ntn.isSyntax(Sym.PERMUTATION, Notation.Syntax.PREFIX)
+              && this.isSuperType(symbols,Sym.PERMUTATION) != null) {
+            let startpos = t.getStartPosition();
+            t.pushBack();
+            if (t.nextToken() != StreamTokenizer.TT_KEYWORD) {
+              throw new ParseException(
+                  "Permutation: Unexpected token - expected a keyword.", t.getStartPosition(), t.getEndPosition());
+            }
+            symbols = t.getSymbolValue();
+            if (!this.containsType(symbols, Sym.PERMUTATION_BEGIN)) {
+              throw new ParseException(
+                  "Permutation: Unexpected token - expected permutation begin.", t.getStartPosition(), t.getEndPosition());
+            }
+
+            let pnode = this.parsePermutation(t, parent, startpos, sign);
+            return pnode;
+          }
+          // Okay, it's not a move and not a permutation sign.
+          // Since we allow for some ambiguity of the
+          // tokens used by the grouping, conjugation, commutation and permutation
+          // statement it gets a little bit complicated here.
+          // Create a bit mask with a bit for each expected statement.
+          let expressionMask
+              = ((this.containsType(symbols, Sym.GROUPING_BEGIN)) ? GROUPING_MASK : UNKNOWN_MASK) | //
+              ((ntn.isSyntax(Sym.CONJUGATION, Stx.PRECIRCUMFIX) && this.containsType(symbol, Sym.CONJUGATION_BEGIN)) ? CONJUGATION_MASK : UNKNOWN_MASK) | //
+              ((ntn.isSyntax(Sym.COMMUTATION, Stx.PRECIRCUMFIX) && this.containsType(symbols, Sym.COMMUTATION_BEGIN)) ? COMMUTATION_MASK : UNKNOWN_MASK) | //
+              ((ntn.isSyntax(Sym.ROTATION, Stx.PRECIRCUMFIX) && this.containsType(symbols, Sym.ROTATION_BEGIN)) ? ROTATION_MASK : UNKNOWN_MASK) | //
+              ((ntn.isSyntax(Sym.INVERSION, Stx.CIRCUMFIX) && this.containsType(symbols, Sym.INVERSION_BEGIN)) ? INVERSION_MASK : UNKNOWN_MASK) | //
+              ((ntn.isSyntax(Sym.REFLECTION, Stx.CIRCUMFIX) && this.containsType(symbols, Sym.REFLECTION_BEGIN)) ? REFLECTION_MASK : UNKNOWN_MASK) | //
+              ((ntn.isSupported(Sym.PERMUTATION) && this.containsType(symbols, Sym.PERMUTATION_BEGIN)) ? PERMUTATION_MASK : UNKNOWN_MASK);
+
+          // Is it a Permutation Begin token without any ambiguity?
+          if (expressionMask == PERMUTATION_MASK) {
+            return this.parsePermutation(t, parent, p, null);
+          }
+
+          // Is it an ambiguous permutation begin token?
+          if ((expressionMask & PERMUTATION_MASK) == PERMUTATION_MASK) {
+            let startPos = t.getStartPosition();
+            // Look ahead
+            if (t.nextToken() != Tokenizer.TT_KEYWORD) {
+              throw new ParseException("Statement: keyword expected.", t.getStartPosition(), t.getEndPosition());
+            }
+            symbols = t.getSymbolValue();
+            t.pushBack();
+            if (symbols != null && this.intersectsTypes(symbols, Sym.PERMUTATION.getSubSymbols())) {
+              return this.parsePermutation(t, parent, startPos);
+            } else {
+              return this.parseCompoundStatement(t, parent, startPos, expressionMask ^ PERMUTATION_MASK);
+            }
+          }
+
+          // Is it one of the other Begin tokens?
+          if (expressionMask != UNKNOWN_MASK) {
+            return this.parseCompoundStatement(t, parent, expressionMask);
+          }
+
+          throw new ParseException("Statement: Invalid Statement " + t.sval, t.getStartPosition(), t.getEndPosition());
+        }
+
+        /** Parses the remainder of a permutation statement after its PERMUTATION_BEGIN token has been consumed. 
+         * 
+         * @param {Tokenizer} t
+         * @param {Node} parent
+         * @param {int} startPos the start position of the PERMUTATION_BEGIN begin token
+         * @returns {unresolved} the parsed permutation
+         * @throws parse exception
+         */
+        parsePermutation(t, parent, startPos) {
+          throw new ParseException("Permutation: Not implemented " + t.sval, t.getStartPosition(), t.getEndPosition());
+        }
+        /** Parses a compound statement after its XXX_BEGIN token has been consumed. 
+         * 
+         * @param {Tokenizer} t
+         * @param {Node} parent
+         * @param {int} startPos the start position of the XXX_BEGIN begin token
+         * @param {int} beginTypeMask the mask indicating which XXX_BEGIN token was consumed
+         * @returns {unresolved} the parsed compound statement
+         * @throws parse exception
+         */
+        parseCompoundStatement(t, parent, startPos, beginTypeMask) {
+          let ntn = this.notation;
+          let Sym = Notation.Symbol;
+          let Stx = Notation.Syntax;
+
+          let seq1 = new AST.SequenceNode();
+          seq1.setStartPosition(startPos);
+          parent.add(seq1);
+          let seq2 = null;
+          let grouping = seq1;
+
+          // The final type mask reflects the final type that we have determined
+          // after parsing all of the grouping.
+          let finalTypeMask = beginTypeMask & (GROUPING_MASK | CONJUGATION_MASK | COMMUTATION_MASK | ROTATION_MASK | REFLECTION_MASK | INVERSION_MASK);
+
+          // Evaluate: {Statement} , (GROUPING_END | COMMUTATION_END | CONJUGATION_END | ROTATION_END) ;
+          TheGrouping:
+              while (true) {
+            switch (t.nextToken()) {
+              case Tokenizer.TT_KEYWORD:
+                let symbols = t.getSymbolValue();
+                // Look ahead the nextElement token.
+
+                let endTypeMask
+                    = ((this.containsType(symbols, Sym.GROUPING_END)) ? GROUPING_MASK : UNKNOWN_MASK) | //
+                    ((ntn.isSyntax(Sym.CONJUGATION, Stx.PRECIRCUMFIX) && this.containsType(symbols, Sym.CONJUGATION_END)) ? CONJUGATION_MASK : UNKNOWN_MASK) | //
+                    ((ntn.isSyntax(Sym.COMMUTATION, Stx.PRECIRCUMFIX) && this.containsType(symbols, Sym.COMMUTATION_END)) ? COMMUTATION_MASK : UNKNOWN_MASK) | //
+                    ((ntn.isSyntax(Sym.INVERSION, Stx.CIRCUMFIX) && this.containsType(symbols, Sym.INVERSION_END)) ? INVERSION_MASK : UNKNOWN_MASK) | //
+                    ((ntn.isSyntax(Sym.REFLECTION, Stx.CIRCUMFIX) && this.containsType(symbols, Sym.REFLECTION_END)) ? REFLECTION_MASK : UNKNOWN_MASK) | //
+                    ((ntn.isSyntax(Sym.ROTATION, Stx.PRECIRCUMFIX) && this.containsType(symbols, Sym.ROTATION_END)) ? ROTATION_MASK : UNKNOWN_MASK);
+                let delimiterTypeMask
+                    = ((ntn.isSyntax(Sym.CONJUGATION, Stx.PRECIRCUMFIX) && this.containsType(symbols, Sym.CONJUGATION_DELIMITER)) ? CONJUGATION_MASK : 0)
+                    | ((ntn.isSyntax(Sym.COMMUTATION, Stx.PRECIRCUMFIX) && this.containsType(symbols, Sym.COMMUTATION_DELIMITER)) ? COMMUTATION_MASK : 0)
+                    | ((ntn.isSyntax(Sym.ROTATION, Stx.PRECIRCUMFIX) && this.containsType(symbols, Sym.ROTATION_DELIMITER)) ? ROTATION_MASK : 0);
+
+                if (endTypeMask != 0) {
+                  finalTypeMask &= endTypeMask;
+                  grouping.setEndPosition(t.getEndPosition());
+                  break TheGrouping;
+
+                } else if (delimiterTypeMask != 0) {
+                  finalTypeMask &= delimiterTypeMask;
+                  if (finalTypeMask == 0) {
+                    throw new ParseException("Grouping: Invalid delimiter.", t.getStartPosition(), t.getEndPosition());
+                  }
+                  if (seq2 == null) {
+                    seq1.setEndPosition(t.getStartPosition());
+                    seq2 = new SequenceNode(notation.getLayerCount());
+                    seq2.setStartPosition(t.getEndPosition());
+                    parent.add(seq2);
+                    grouping = seq2;
+                  } else {
+                    throw new ParseException("Grouping: Delimiter must occur only once", t.getStartPosition(), t.getEndPosition());
+                  }
+
+                } else {
+                  t.pushBack();
+                  this.parseExpression(t, grouping);
+                }
+                break;
+              case Tokenizer.TT_EOF:
+                throw new ParseException(
+                    "Grouping: End missing.", t.getStartPosition(), t.getEndPosition());
+              default:
+                throw new ParseException(
+                    "Grouping: Internal error.", t.getStartPosition(), t.getEndPosition());
+            }
+          }
+
+          seq1.removeFromParent();
+          if (seq2 == null) {
             // There is no second sequence. 
             // The compound statement can only be a grouping.
             finalTypeMask &= GROUPING_MASK;
-        } else {
+          } else {
             // There is a second sequence. Remove it from its parent, because we
             // will integrate it into the compound statement.
             seq2.removeFromParent();
 
             // The compound statement can not be a grouping.
             finalTypeMask &= -1 ^ GROUPING_MASK;
-        }
-      
-        switch (finalTypeMask) {
+          }
+
+          switch (finalTypeMask) {
             case GROUPING_MASK:
-                if (seq2 != null) {
-                    throw new ParseException(
-                            "Grouping: Invalid Grouping.", startPos, t.getEndPosition());
-                } else {
-                    grouping = new AST.GroupingNode(ntn.getLayerCount(), startPos, t.getEndPosition());
-                    while (seq1.getChildCount() > 0) {
-                        grouping.add(seq1.getChildAt(0));
-                    }
+              if (seq2 != null) {
+                throw new ParseException(
+                    "Grouping: Invalid Grouping.", startPos, t.getEndPosition());
+              } else {
+                grouping = new AST.GroupingNode(ntn.getLayerCount(), startPos, t.getEndPosition());
+                while (seq1.getChildCount() > 0) {
+                  grouping.add(seq1.getChildAt(0));
                 }
-                break;
+              }
+              break;
 
             case INVERSION_MASK:
-                if (seq2 != null) {
-                    throw new ParseException(
-                            "Inversion: Invalid Inversion.", startPos, t.getEndPosition());
-                } else {
-                    grouping = new AST.InversionNode(ntn.getLayerCount(), startPos, t.getEndPosition());
-                    while (seq1.getChildCount() > 0) {
-                        grouping.add(seq1.getChildAt(0));
-                    }
+              if (seq2 != null) {
+                throw new ParseException(
+                    "Inversion: Invalid Inversion.", startPos, t.getEndPosition());
+              } else {
+                grouping = new AST.InversionNode(ntn.getLayerCount(), startPos, t.getEndPosition());
+                while (seq1.getChildCount() > 0) {
+                  grouping.add(seq1.getChildAt(0));
                 }
-                break;
+              }
+              break;
 
             case REFLECTION_MASK:
-                if (seq2 != null) {
-                    throw new ParseException(
-                            "Reflection: Invalid Reflection.", startPos, t.getEndPosition());
-                } else {
-                    grouping = new AST.ReflectionNode(notation.getLayerCount(), startPos, t.getEndPosition());
-                    while (seq1.getChildCount() > 0) {
-                        grouping.add(seq1.getChildAt(0));
-                    }
+              if (seq2 != null) {
+                throw new ParseException(
+                    "Reflection: Invalid Reflection.", startPos, t.getEndPosition());
+              } else {
+                grouping = new AST.ReflectionNode(notation.getLayerCount(), startPos, t.getEndPosition());
+                while (seq1.getChildCount() > 0) {
+                  grouping.add(seq1.getChildAt(0));
                 }
-                break;
+              }
+              break;
 
             case CONJUGATION_MASK:
-                if (seq2 == null) {
-                    throw new ParseException(
-                            "Conjugation: Conjugate missing.", startPos, t.getEndPosition());
-                } else {
-                    grouping = new AST.ConjugationNode(notation.getLayerCount(), seq1, seq2, startPos, t.getEndPosition());
-                }
-                break;
+              if (seq2 == null) {
+                throw new ParseException(
+                    "Conjugation: Conjugate missing.", startPos, t.getEndPosition());
+              } else {
+                grouping = new AST.ConjugationNode(notation.getLayerCount(), seq1, seq2, startPos, t.getEndPosition());
+              }
+              break;
 
             case COMMUTATION_MASK:
-                if (seq2 == null) {
-                    if (seq1.getChildCount() == 2 && seq1.getSymbol() == Symbol.SEQUENCE) {
-                        grouping = new AST.CommutationNode(notation.getLayerCount(), seq1.getChildAt(0), seq1.getChildAt(1), startPos, t.getEndPosition());
-                    } else {
-                        throw new ParseException(
-                                "Commutation: Commutee missing.", startPos, t.getEndPosition());
-                    }
+              if (seq2 == null) {
+                if (seq1.getChildCount() == 2 && seq1.getSymbol() == Sym.SEQUENCE) {
+                  grouping = new AST.CommutationNode(notation.getLayerCount(), seq1.getChildAt(0), seq1.getChildAt(1), startPos, t.getEndPosition());
                 } else {
-                    grouping = new AST.CommutationNode(notation.getLayerCount(), seq1, seq2, startPos, t.getEndPosition());
+                  throw new ParseException(
+                      "Commutation: Commutee missing.", startPos, t.getEndPosition());
                 }
-                break;
+              } else {
+                grouping = new AST.CommutationNode(notation.getLayerCount(), seq1, seq2, startPos, t.getEndPosition());
+              }
+              break;
 
             case ROTATION_MASK:
-                if (seq2 == null) {
-                    throw new ParseException(
-                            "Rotation: Rotatee missing.", startPos, t.getEndPosition());
-                } else {
-                    grouping = new AST.RotationNode(notation.getLayerCount(), seq1, seq2, startPos, t.getEndPosition());
-                }
-                break;
+              if (seq2 == null) {
+                throw new ParseException(
+                    "Rotation: Rotatee missing.", startPos, t.getEndPosition());
+              } else {
+                grouping = new AST.RotationNode(notation.getLayerCount(), seq1, seq2, startPos, t.getEndPosition());
+              }
+              break;
 
             default:
-                let ambiguous = '';
-                if ((finalTypeMask & GROUPING_MASK) != 0) {
-                    ambiguous+=("Grouping");
+              let ambiguous = '';
+              if ((finalTypeMask & GROUPING_MASK) != 0) {
+                ambiguous += ("Grouping");
+              }
+              if ((finalTypeMask & INVERSION_MASK) != 0) {
+                if (ambiguous.length != 0) {
+                  ambiguous += (" or ");
                 }
-                if ((finalTypeMask & INVERSION_MASK) != 0) {
-                    if (ambiguous.length != 0) {
-                        ambiguous+=(" or ");
-                    }
-                    ambiguous+=("Inversion");
+                ambiguous += ("Inversion");
+              }
+              if ((finalTypeMask & REFLECTION_MASK) != 0) {
+                if (ambiguous.length != 0) {
+                  ambiguous += (" or ");
                 }
-                if ((finalTypeMask & REFLECTION_MASK) != 0) {
-                    if (ambiguous.length != 0) {
-                        ambiguous+=(" or ");
-                    }
-                    ambiguous+=("Reflection");
+                ambiguous += ("Reflection");
+              }
+              if ((finalTypeMask & CONJUGATION_MASK) != 0) {
+                if (ambiguous.length != 0) {
+                  ambiguous += (" or ");
                 }
-                if ((finalTypeMask & CONJUGATION_MASK) != 0) {
-                    if (ambiguous.length != 0) {
-                        ambiguous+=(" or ");
-                    }
-                    ambiguous.append("Conjugation");
+                ambiguous.append("Conjugation");
+              }
+              if ((finalTypeMask & COMMUTATION_MASK) != 0) {
+                if (ambiguous.length() != 0) {
+                  ambiguous += (" or ");
                 }
-                if ((finalTypeMask & COMMUTATION_MASK) != 0) {
-                    if (ambiguous.length() != 0) {
-                        ambiguous+=(" or ");
-                    }
-                    ambiguous+=("Commutation");
+                ambiguous += ("Commutation");
+              }
+              if ((finalTypeMask & ROTATION_MASK) != 0) {
+                if (ambiguous.length() != 0) {
+                  ambiguous += (" or ");
                 }
-                if ((finalTypeMask & ROTATION_MASK) != 0) {
-                    if (ambiguous.length() != 0) {
-                        ambiguous+=(" or ");
-                    }
-                    ambiguous+=("Rotation");
-                }
-                throw new ParseException(
-                        "Compound Statement: Ambiguous compound statement, possibilities are " + ambiguous + ".", startPos, t.getEndPosition());
+                ambiguous += ("Rotation");
+              }
+              throw new ParseException(
+                  "Compound Statement: Ambiguous compound statement, possibilities are " + ambiguous + ".", startPos, t.getEndPosition());
+          }
+
+          parent.add(grouping);
+          return grouping;
         }
+        /** Parses an expression. 
+         * 
+         * @param {Tokenizer} t
+         * @param {Node} parent
+         * @returns {unresolved} the parsed macro
+         * @throws parse exception
+         */
+        parseExpression(t, parent) {
+          let ntn = this.notation;
+          let Sym = Notation.Symbol;
+          let Stx = Notation.Syntax;
 
-        parent.add(grouping);
-        return grouping;
-    }
-    /** Parses an expression. 
-     * 
-     * @param {Tokenizer} t
-     * @param {Node} parent
-     * @returns {unresolved} the parsed macro
-     * @throws parse exception
-     */
-    parseExpression(t, parent) {
-        let expression = this.parseConstruct(t, parent);
-      
-      throw new ParseException("Expression: Not implemented " + t.sval, t.getStartPosition(), t.getEndPosition());
-    }
-    /** Parses a construct 
-     * 
-     * @param {Tokenizer} t
-     * @param {Node} parent
-     * @returns {unresolved} the parsed macro
-     * @throws parse exception
-     */
-    parseConstruct(t, parent) {
-      let ntn = this.notation;
-      let Sym = Notation.Symbol;
-      let Stx = Notation.Syntax;
+          let expression = this.parseConstruct(t, parent);
 
-      let statement=null;
-      
-      let ttype=t.nextToken();
-      let symbols=t.getSymbolValue();
-      
-        if (ttype == Tokenizer.TT_KEYWORD
-                &&  this.containsType(symbols, Sym.DELIMITER)) {
+          let ttype = t.nextToken();
+          if (ttype == Tokenizer.TT_KEYWORD) {
+            let symbols = t.getSymbolValue();
+            if (ntn.isSyntax(Sym.COMMUTATION, Stx.PREINFIX)
+                && this.containsType(symbols, Sym.COMMUTATION_DELIMITER)) {
+              let exp2 = this.parseExpression(t, parent);
+              expression = new AST.CommutationNode(ntn.getLayerCount(), expression, exp2, expression.getStartPosition(), exp2.getEndPosition());
+            } else if (ntn.isSyntax(Sym.CONJUGATION, Stx.PREINFIX)
+                && this.containsType(symbols, Sym.CONJUGATION_DELIMITER)) {
+              let exp2 = this.parseExpression(t, parent);
+              expression = new AST.ConjugationNode(ntn.getLayerCount(), expression, exp2, expression.getStartPosition(), exp2.getEndPosition());
+
+            } else if (ntn.isSyntax(Sym.ROTATION, Stx.PREINFIX)
+                && this.containsType(symbols, Sym.ROTATION_DELIMITER)) {
+              let exp2 = parseExpression(t, parent);
+              expression = new AST.RotationNode(ntn.getLayerCount(), expression, exp2, expression.getStartPosition(), exp2.getEndPosition());
+
+            } else if (ntn.isSyntax(Sym.COMMUTATION, Stx.POSTINFIX)
+                && this.containsType(symbols, Sym.COMMUTATION_DELIMITER)) {
+              let exp2 = parseExpression(t, parent);
+              expression = new AST.CommutationNode(ntn.getLayerCount(), exp2, expression, expression.getStartPosition(), exp2.getEndPosition());
+            } else if (ntn.isSyntax(Sym.CONJUGATION, Stx.POSTINFIX)
+                && this.containsType(symbols, Sym.CONJUGATION_DELIMITER)) {
+              let exp2 = parseExpression(t, parent);
+              expression = new AST.ConjugationNode(ntn.getLayerCount(), exp2, expression, expression.getStartPosition(), exp2.getEndPosition());
+
+            } else if (ntn.isSyntax(Sym.ROTATION, Stx.POSTINFIX)
+                && this.containsType(symbols, Sym.ROTATION_DELIMITER)) {
+              let exp2 = parseExpression(t, parent);
+              expression = new RotationNode(ntn.getLayerCount(), exp2, expression, expression.getStartPosition(), exp2.getEndPosition());
+            } else {
+              t.pushBack();
+            }
+          } else {
+            t.pushBack();
+          }
+
+          parent.add(expression);
+          return expression;
+        }
+        /** Parses a construct 
+         * 
+         * @param {Tokenizer} t
+         * @param {Node} parent
+         * @returns {unresolved} the parsed macro
+         * @throws parse exception
+         */
+        parseConstruct(t, parent) {
+          let ntn = this.notation;
+          let Sym = Notation.Symbol;
+          let Stx = Notation.Syntax;
+
+          let statement = null;
+
+          let ttype = t.nextToken();
+          let symbols = t.getSymbolValue();
+
+          if (ttype == Tokenizer.TT_KEYWORD
+              && this.containsType(symbols, Sym.DELIMITER)) {
             // Evaluate: StmtDelimiter
             // -----------------------
 
             // We discard StmtDelimiter's
             statement = null;
-        }      else {
+          } else {
             statement = new AST.StatementNode(ntn.getLayerCount());
             parent.add(statement);
             statement.setStartPosition(t.getStartPosition());
@@ -614,7 +658,7 @@ function (Notation, AST, Tokenizer) {
             let prefix = statement;
             let lastPrefix = statement;
             while ((prefix = this.parsePrefix(t, prefix)) != null) {
-                lastPrefix = prefix;
+              lastPrefix = prefix;
             }
 
             // Evaluate: Statement
@@ -625,201 +669,371 @@ function (Notation, AST, Tokenizer) {
             let child = statement.getChildAt(0);
             let suffix = statement;
             while ((suffix = this.parseSuffix(t, statement)) != null) {
-                suffix.add(child);
-                child = suffix;
-                statement.setEndPosition(suffix.getEndPosition());
+              suffix.add(child);
+              child = suffix;
+              statement.setEndPosition(suffix.getEndPosition());
             }
+          }
+          return statement;
         }
-        return statement;
-    }
-    /** Parses a prefix. 
-     * 
-     * @param {Tokenizer} t
-     * @param {Node} parent
-     * @returns {unresolved} the parsed macro
-     * @throws parse exception
-     */
-    parsePrefix(t, parent) {
-      let ntn = this.notation;
-      let Sym = Notation.Symbol;
-      let Stx = Notation.Syntax;
+        /** Parses a prefix. 
+         * 
+         * @param {Tokenizer} t
+         * @param {Node} parent
+         * @returns {unresolved} the parsed macro
+         * @throws parse exception
+         */
+        parsePrefix(t, parent) {
+          let ntn = this.notation;
+          let Sym = Notation.Symbol;
+          let Stx = Notation.Syntax;
 
-      let ttype=t.nextToken();
-      if (ttype==Tokenizer.TT_EOF) {
-        return null;
-      }
-      let numericToken=null;
-      if (ttype==Tokenizer.TT_NUMBER) {
-        t.pushBack();
-        // If the token is numeric, we have encountered
-        // a repetition prefix.
-            if (ntn.isSyntax(Symbol.REPETITION,Stx.PREFIX)) {
-                return this.parseRepetitor(t, parent);
+          let ttype = t.nextToken();
+          if (ttype == Tokenizer.TT_EOF) {
+            return null;
+          }
+          let numericToken = null;
+          if (ttype == Tokenizer.TT_NUMBER) {
+            t.pushBack();
+            // If the token is numeric, we have encountered
+            // a repetition prefix.
+            if (ntn.isSyntax(Sym.REPETITION, Stx.PREFIX)) {
+              return this.parseRepetitor(t, parent);
             } else {
-                return null;
+              return null;
             }
-        }
-      // the prefix must be a keyword, or it is not a prefix at all  
-      if (ttype!=Tokenizer.TT_KEYWORD) {
-        t.pushBack();
-        return null;
-      }
-      let symbols=t.getSymbolValue();
-      t.pushBack();
-      
-        // Is it a commutator?
-        if (ntn.isSyntax(Symbol.COMMUTATION, Stx.PREFIX)
-                && this.containsType(symbols, Sym.COMMUTATION_BEGIN)) {
+          }
+          // the prefix must be a keyword, or it is not a prefix at all  
+          if (ttype != Tokenizer.TT_KEYWORD) {
+            t.pushBack();
+            return null;
+          }
+          let symbols = t.getSymbolValue();
+          // We push back, because we do just decisions in this production
+          t.pushBack();
+
+          // Is it a commutator?
+          if (ntn.isSyntax(Sym.COMMUTATION, Stx.PREFIX)
+              && this.containsType(symbols, Sym.COMMUTATION_BEGIN)) {
             return this.parseExpressionAffix(t, parent);
+          }
+
+          // Is it a conjugator?
+          if (ntn.isSyntax(Sym.CONJUGATION, Stx.PREFIX)
+              && this.containsType(symbols, Sym.CONJUGATION_BEGIN)) {
+            return this.parseExpressionAffix(t, parent);
+          }
+
+          // Is it a rotator?
+          if (ntn.isSyntax(Sym.ROTATION, Stx.PREFIX)
+              && this.containsType(symbols, Sym.ROTATION_BEGIN)) {
+            return this.parseExpressionAffix(t, parent);
+          }
+
+          // Is it an Inversion?
+          if (ntn.isSyntax(Sym.INVERSION, Stx.PREFIX)
+              && this.containsType(symbols, Sym.INVERTOR)) {
+            return this.parseInvertor(t, parent);
+          }
+
+          // Is it a repetition?
+          if (ntn.isSyntax(Sym.REPETITION, Stx.PREFIX)
+              && this.containsType(symbols, Sym.REPETITION_BEGIN)) {
+            return this.parseRepetitor(t, parent);
+          }
+
+          // Is it a reflection?
+          if (ntn.isSyntax(Sym.REFLECTION, Stx.PREFIX)
+              && this.containsType(symbols, Sym, Sym.REFLECTOR)) {
+            return this.parseReflector(t, parent);
+          }
+
+          // Or is it no prefix at all?
+          return null;
+        }
+        /** Parses a suffix. 
+         * 
+         * @param {Tokenizer} t
+         * @param {Node} parent
+         * @returns {unresolved} the parsed macro
+         * @throws parse exception
+         */
+        parseSuffix(t, parent) {
+          let ntn = this.notation;
+          let Sym = Notation.Symbol;
+          let Stx = Notation.Syntax;
+
+          let ttype = t.nextToken();
+          if (ttype == Tokenizer.TT_EOF) {
+            return null;
+          }
+          let numericToken = null;
+          if (ttype == Tokenizer.TT_NUMBER) {
+            t.pushBack();
+            // If the token is numeric, we have encountered
+            // a repetition prefix.
+            if (ntn.isSyntax(Sym.REPETITION, Stx.SUFFIX)) {
+              return this.parseRepetitor(t, parent);
+            } else {
+              return null;
+            }
+          }
+          // the prefix must be a keyword, or it is not a prefix at all  
+          if (ttype != Tokenizer.TT_KEYWORD) {
+            t.pushBack();
+            return null;
+          }
+          let symbols = t.getSymbolValue();
+          // We push back, because we do just decisions in this production
+          t.pushBack();
+
+          // Is it a commutator?
+          if (ntn.isSyntax(Sym.COMMUTATION, Stx.SUFFIX)
+              && this.containsType(symbols, Sym.COMMUTATION_BEGIN)) {
+            return this.parseExpressionAffix(t, parent);
+          }
+
+          // Is it a conjugator?
+          if (ntn.isSyntax(Sym.CONJUGATION, Stx.SUFFIX)
+              && this.containsType(symbols, Sym.CONJUGATION_BEGIN)) {
+            return this.parseExpressionAffix(t, parent);
+          }
+
+          // Is it a rotator?
+          if (ntn.isSyntax(Sym.ROTATION, Stx.SUFFIX)
+              && this.containsType(symbols, Sym.ROTATION_BEGIN)) {
+            return this.parseExpressionAffix(t, parent);
+          }
+
+          // Is it an Inversion?
+          if (ntn.isSyntax(Sym.INVERSION, Stx.SUFFIX)
+              && this.containsType(symbols, Sym.INVERTOR)) {
+            return this.parseInvertor(t, parent);
+          }
+
+          // Is it a repetition?
+          if (ntn.isSyntax(Sym.REPETITION, Stx.SUFFIX)
+              && this.containsType(symbols, Sym.REPETITION_BEGIN)) {
+            return this.parseRepetitor(t, parent);
+          }
+
+          // Is it a reflection?
+          if (ntn.isSyntax(Sym.REFLECTION, Stx.SUFFIX)
+              && this.containsType(symbols, Sym, Sym.REFLECTOR)) {
+            return this.parseReflector(t, parent);
+          }
+
+          // Or is it no suffix at all?
+          return null;
+        }
+        /** Parses a macro. 
+         * 
+         * @param {Tokenizer} t
+         * @param {Node} parent
+         * @returns {unresolved} the parsed macro
+         * @throws parse exception
+         */
+        parseMacro(t, parent) {
+          throw new ParseException("Macro: Not implemented " + t.sval, t.getStartPosition(), t.getEndPosition());
+        }
+        /** Parses a repetitor 
+         * 
+         * @param {Tokenizer} t
+         * @param {Node} parent
+         * @returns {unresolved} the parsed repetitor
+         * @throws parse exception
+         */
+        parseRepetitor(t, parent) {
+          const ntn = this.notation;
+          const Sym = Notation.Symbol;
+
+          // Only parse if supported
+          if (!ntn.isSupported(Sym.REPETITION)) {
+            return null;
+          }
+
+          let repetition = new AST.RepetitionNode(ntn.getLayerCount());
+          parent.add(repetition);
+          repetition.setStartPosition(t.getStartPosition());
+
+          // Evaluate [RptrBegin] token.
+          // ---------------------------
+          // Only word tokens are legit.
+          // Fetch the next token.
+          if (t.nextToken() != Tokenizer.TT_KEYWORD
+              && t.getTokenType() != Tokenizer.TT_NUMBER) {
+            throw new ParseException("Rotator: Invalid begin.", t.getStartPosition(), t.getEndPosition());
+          }
+
+          // Is it a [RptrBegin] token? Consume it.
+          let symbols = t.getSymbolValue();
+          if (symbols!=null&&this.isType(symbols, Sym.REPETITION_BEGIN)) {
+            //consume
+          } else {
+            t.pushBack();
+          }
+          // The [RptrBegin] token is now done.
+
+          // Evaluate Integer token.
+          // ---------------------------
+          // Only number tokens are legit.
+          if (t.nextToken() != Tokenizer.TT_NUMBER) {
+            throw new ParseException("Repetitor: Repeat count missing.", t.getStartPosition(), t.getEndPosition());
+          }
+          let intValue = t.getNumericValue();
+          if (intValue < 1) {
+            throw new ParseException("Repetitor: Invalid repeat count " + intValue, t.getStartPosition(), t.getEndPosition());
+          }
+          repetition.setRepeatCount(intValue);
+          repetition.setEndPosition(t.getStartPosition() + numericToken.length() - 1);
+          // The Integer token is now done.
+
+          // Evaluate [RptrEnd] token.
+          // ---------------------------
+          // Only keyword tokens are of interest.
+          if (t.nextToken() != Tokenizer.TT_KEYWORD) {
+            t.pushBack();
+            return repetition;
+          }
+
+          // Is it a [RptrEnd] token? Consume it.
+          symbols = t.getSymbolValue();
+          if (this.isType(symbols, Sym.REPETITION_END)) {
+            //consume
+          } else {
+            t.pushBack();
+          }
+          return repetition;
+        }
+        /** Parses an invertor 
+         * 
+         * @param {Tokenizer} t
+         * @param {Node} parent
+         * @returns {unresolved} the parsed macro
+         * @throws parse exception
+         */
+        parseInvertor(t, parent) {
+          const ntn = this.notation;
+          const Sym = Notation.Symbol;
+
+          const inversion = new AST.InversionNode(ntn.getLayerCount());
+          parent.add(inversion);
+          inversion.setStartPosition(t.getStartPosition());
+
+          // Fetch the next token.
+          if (t.nextToken() != Tokenizer.TT_KEYWORD) {
+            throw new ParseException("Invertor: Invalid begin.", t.getStartPosition(), t.getEndPosition());
+          }
+          let symbols = t.getSymbolValue();
+
+          if (this.isType(symbols, Sym.INVERTOR)) {
+            inversion.setEndPosition(t.getEndPosition());
+            return inversion;
+          }
+
+          // Or else?
+          throw new ParseException("Invertor: Invalid invertor " + t.sval, t.getStartPosition(), t.getEndPosition());
         }
 
-        // Is it a conjugator?
-        if (ntn.isSyntax(Symbol.CONJUGATION, Stx.PREFIX)
-                &&  this.containsType(symbols, Sym.CONJUGATION_BEGIN)) {
-            return parseExpressionAffix(t, parent);
+        /** Parses a NOP. 
+         * 
+         * @param {Tokenizer} t
+         * @param {Node} parent
+         * @returns {unresolved} the parsed NOP
+         * @throws parse exception
+         */
+        parseNOP(t, parent) {
+          const ntn = this.notation;
+          const Sym = Notation.Symbol;
+
+          if (t.nextToken() != Tokenizer.TT_KEYWORD) {
+            throw new ParseException("NOP: \"" + t.getStringValue() + "\" is a " + t.getTokenType() + " but not a keyword.", t.getStartPosition(), t.getEndPosition());
+          }
+          let symbols = t.getSymbolValue();
+          if (!this.containsType(symbols, Sym.NOP)) {
+            throw new ParseException("Move: \"" + t.getStringValue() + "\" is not a NOP", t.getStartPosition(), t.getEndPosition());
+          }
+
+          module.log('parseNOP: "' + t.getStringValue() + '".');
+          let nop = new AST.NOPNode(ntn.getLayerCount(), t.getStartPosition(), t.getEndPosition());
+          parent.add(nop);
+          return nop;
         }
 
-        // Is it a rotator?
-        if (ntn.isSyntax(Symbol.ROTATION, Stx.PREFIX)
-                && this.containsType(symbols, Sym.ROTATION_BEGIN)) {
-            return parseExpressionAffix(t, parent);
-        }
-      
-        // Is it an Inversion?
-        if (ntn.isSyntax(Symbol.INVERSION, Stx.PREFIX)
-                &&  this.containsType(symbols, Sym.INVERTOR)) {
-            return parseInvertor(t, parent);
+        /**
+         * Parses a move.
+         * 
+         * @param {Tokenizer} t
+         * @param {Node} parent
+         * @returns {unresolved} the parsed move
+         * @throws parse exception
+         */
+        parseMove(t, parent) {
+          const ntn = this.notation;
+          
+          let move = new AST.MoveNode(ntn.getLayerCount());
+          parent.add(move);
+
+          if (t.nextToken() != Tokenizer.TT_KEYWORD) {
+            throw new ParseException("Move: \"" + t.getStringValue() + "\" is a " + t.getTokenType() + " but not a keyword.", t.getStartPosition(), t.getEndPosition());
+          }
+          let symbols = t.getSymbolValue();
+          let symbol = null;
+          for (let i = 0; i < symbols.length; i++) {
+            if (symbols[i].getType() == Notation.Symbol.MOVE) {
+              symbol = symbols[i];
+              break;
+            }
+          }
+          if (symbol == null) {
+            throw new ParseException("Move: \"" + t.getStringValue() + "\" is not a Move", t.getStartPosition(), t.getEndPosition());
+          }
+
+          module.log('parseMove: "' + t.getStringValue() + '".');
+          move.setStartPosition(t.getStartPosition());
+          move.setEndPosition(t.getEndPosition());
+          move.setAxis(symbol.getAxis());
+          move.setAngle(symbol.getAngle());
+          move.setLayerMask(symbol.getLayerMask());
+          return move;
         }
 
-        // Is it a repetition?
-        if (ntn.isSyntax(Symbol.REPETITION, Stx.PREFIX)
-                &&  this.containsType(symbols, Sym.REPETITION_BEGIN)) {
-            return parseRepetitor(t, parent);
-        }
-
-        // Is it a reflection?
-        if (ntn.isSyntax(Symbol.REFLECTION, Stx.PREFIX)
-                &&  this.containsType(symbols, Sym, Symbol.REFLECTOR)) {
-            return parseReflector(t, parent);
-        }
-
-        // Or is it no prefix at all?
-        return null;
-    }
-    /** Parses a suffix. 
-     * 
-     * @param {Tokenizer} t
-     * @param {Node} parent
-     * @returns {unresolved} the parsed macro
-     * @throws parse exception
-     */
-    parseSuffix(t, parent) {
-      throw new ParseException("Suffix: Not implemented " + t.sval, t.getStartPosition(), t.getEndPosition());
-    }
-    /** Parses a macro. 
-     * 
-     * @param {Tokenizer} t
-     * @param {Node} parent
-     * @returns {unresolved} the parsed macro
-     * @throws parse exception
-     */
-    parseMacro(t, parent) {
-      throw new ParseException("Macro: Not implemented " + t.sval, t.getStartPosition(), t.getEndPosition());
-    }
-    /** Parses a NOP. 
-     * 
-     * @param {Tokenizer} t
-     * @param {Node} parent
-     * @returns {unresolved} the parsed NOP
-     * @throws parse exception
-     */
-    parseNOP(t, parent) {
-      if (t.nextToken() != Tokenizer.TT_KEYWORD) {
-        throw new ParseException("NOP: \"" + t.getStringValue() + "\" is a " + t.getTokenType() + " but not a keyword.", t.getStartPosition(), t.getEndPosition());
       }
-      let symbols = t.getSymbolValue();
-      if (!this.containsType(symbols, Notation.Symbol.NOP)) {
-        throw new ParseException("Move: \"" + t.getStringValue() + "\" is not a NOP", t.getStartPosition(), t.getEndPosition());
-      }
 
-      module.log('parsing NOP: "' + t.getStringValue() + '".');
-      let nop = new AST.NOPNode(t.getStartPosition(), t.getEndPosition());
-      parent.add(nop);
-      return nop;
-    }
+      /** Returns an array of script nodes. */
+      let createRandomScript = function (layerCount, scrambleCount, scrambleMinCount) {
+        if (scrambleCount == null)
+          scrambleCount = 21;
+        if (scrambleMinCount == null)
+          scrambleMinCount = 6;
 
-    /**
-     * Parses a move.
-     * 
-     * @param {Tokenizer} t
-     * @param {Node} parent
-     * @returns {unresolved} the parsed move
-     * @throws parse exception
-     */
-    parseMove(t, parent) {
-      let move = new AST.MoveNode(this.notation.getLayerCount());
-      parent.add(move);
+        var scrambler = new Array(Math.floor(Math.random() * scrambleCount - scrambleMinCount) + scrambleMinCount);
 
-      if (t.nextToken() != Tokenizer.TT_KEYWORD) {
-        throw new ParseException("Move: \"" + t.getStringValue() + "\" is a " + t.getTokenType() + " but not a keyword.", t.getStartPosition(), t.getEndPosition());
-      }
-      let symbols = t.getSymbolValue();
-      let symbol = null;
-      for (let i = 0; i < symbols.length; i++) {
-        if (symbols[i].getType() == Notation.Symbol.MOVE) {
-          symbol = symbols[i];
-          break;
-        }
-      }
-      if (symbol == null) {
-        throw new ParseException("Move: \"" + t.getStringValue() + "\" is not a Move", t.getStartPosition(), t.getEndPosition());
-      }
-
-      module.log('parsing Move: "' + t.getStringValue() + '".');
-      move.setStartPosition(t.getStartPosition());
-      move.setEndPosition(t.getEndPosition());
-      move.setAxis(symbol.getAxis());
-      move.setAngle(symbol.getAngle());
-      move.setLayerMask(symbol.getLayerMask());
-      return move;
-    }
-
-  }
-
-  /** Returns an array of script nodes. */
-  let createRandomScript = function (layerCount, scrambleCount, scrambleMinCount) {
-    if (scrambleCount == null)
-      scrambleCount = 21;
-    if (scrambleMinCount == null)
-      scrambleMinCount = 6;
-
-    var scrambler = new Array(Math.floor(Math.random() * scrambleCount - scrambleMinCount) + scrambleMinCount);
-
-    // Keep track of previous axis, to avoid two subsequent moves on
-    // the same axis.
-    var prevAxis = -1;
-    var axis, layerMask, angle;
-    for (var i = 0; i < scrambleCount; i++) {
-      while ((axis = Math.floor(Math.random() * 3)) == prevAxis) {
-      }
-      prevAxis = axis;
+        // Keep track of previous axis, to avoid two subsequent moves on
+        // the same axis.
+        var prevAxis = -1;
+        var axis, layerMask, angle;
+        for (var i = 0; i < scrambleCount; i++) {
+          while ((axis = Math.floor(Math.random() * 3)) == prevAxis) {
+          }
+          prevAxis = axis;
 //    while ((layerMask = Math.floor(Math.random()*(1 << this.layerCount))) == 0) {}
-      layerMask = 1 << Math.floor(Math.random() * layerCount);
-      while ((angle = Math.floor(Math.random() * 5) - 2) == 0) {
-      }
-      scrambler[i] = new AST.MoveNode(layerCount, axis, layerMask, angle);
-    }
+          layerMask = 1 << Math.floor(Math.random() * layerCount);
+          while ((angle = Math.floor(Math.random() * 5) - 2) == 0) {
+          }
+          scrambler[i] = new AST.MoveNode(layerCount, axis, layerMask, angle);
+        }
 
-    return scrambler;
-  }
+        return scrambler;
+      }
 
 // ------------------
 // MODULE API    
 // ------------------
-  return {
-    ParseException: ParseException,
-    ScriptParser: ScriptParser,
-    createRandomScript: createRandomScript,
-    newTwistNode: (axis, layerMask, angle) => new AST.MoveNode(3, axis, layerMask, angle)
-  };
-});
+      return {
+        ParseException: ParseException,
+        ScriptParser: ScriptParser,
+        createRandomScript: createRandomScript,
+        newTwistNode: (axis, layerMask, angle) => new AST.MoveNode(3, axis, layerMask, angle)
+      };
+    });
