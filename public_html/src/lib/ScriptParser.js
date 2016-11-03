@@ -153,6 +153,8 @@ function (Notation, AST, Tokenizer) {
         /*
          tt.addSpecials(this.notation.getSpecials());
          tt.addKeywords(this.notation.getKeywords());*/
+        //tt.setSlashStarComment(...
+        //tt.setSlashSlashComment(..,
         this.tokenizer = tt;
       }
       return this.tokenizer;
@@ -171,7 +173,7 @@ function (Notation, AST, Tokenizer) {
       let i = 0;
       while (tt.nextToken() != Tokenizer.TT_EOF) {
         tt.pushBack();
-        this.parseStatement(tt, root);
+        this.parseExpression(tt, root);
         i++;
         if (i > 1000)
           throw "too many iterations! " + tt.getTokenType() + " pos:" + tt.pos;
@@ -564,6 +566,155 @@ function (Notation, AST, Tokenizer) {
 
         parent.add(grouping);
         return grouping;
+    }
+    /** Parses an expression. 
+     * 
+     * @param {Tokenizer} t
+     * @param {Node} parent
+     * @returns {unresolved} the parsed macro
+     * @throws parse exception
+     */
+    parseExpression(t, parent) {
+        let expression = this.parseConstruct(t, parent);
+      
+      throw new ParseException("Expression: Not implemented " + t.sval, t.getStartPosition(), t.getEndPosition());
+    }
+    /** Parses a construct 
+     * 
+     * @param {Tokenizer} t
+     * @param {Node} parent
+     * @returns {unresolved} the parsed macro
+     * @throws parse exception
+     */
+    parseConstruct(t, parent) {
+      let ntn = this.notation;
+      let Sym = Notation.Symbol;
+      let Stx = Notation.Syntax;
+
+      let statement=null;
+      
+      let ttype=t.nextToken();
+      let symbols=t.getSymbolValue();
+      
+        if (ttype == Tokenizer.TT_KEYWORD
+                &&  this.containsType(symbols, Sym.DELIMITER)) {
+            // Evaluate: StmtDelimiter
+            // -----------------------
+
+            // We discard StmtDelimiter's
+            statement = null;
+        }      else {
+            statement = new AST.StatementNode(ntn.getLayerCount());
+            parent.add(statement);
+            statement.setStartPosition(t.getStartPosition());
+
+            t.pushBack();
+
+            // Evaluate: {Prefix}
+            let prefix = statement;
+            let lastPrefix = statement;
+            while ((prefix = this.parsePrefix(t, prefix)) != null) {
+                lastPrefix = prefix;
+            }
+
+            // Evaluate: Statement
+            let innerStatement = this.parseStatement(t, lastPrefix);
+            statement.setEndPosition(innerStatement.getEndPosition());
+
+            // Evaluate: {Suffix}
+            let child = statement.getChildAt(0);
+            let suffix = statement;
+            while ((suffix = this.parseSuffix(t, statement)) != null) {
+                suffix.add(child);
+                child = suffix;
+                statement.setEndPosition(suffix.getEndPosition());
+            }
+        }
+        return statement;
+    }
+    /** Parses a prefix. 
+     * 
+     * @param {Tokenizer} t
+     * @param {Node} parent
+     * @returns {unresolved} the parsed macro
+     * @throws parse exception
+     */
+    parsePrefix(t, parent) {
+      let ntn = this.notation;
+      let Sym = Notation.Symbol;
+      let Stx = Notation.Syntax;
+
+      let ttype=t.nextToken();
+      if (ttype==Tokenizer.TT_EOF) {
+        return null;
+      }
+      let numericToken=null;
+      if (ttype==Tokenizer.TT_NUMBER) {
+        t.pushBack();
+        // If the token is numeric, we have encountered
+        // a repetition prefix.
+            if (ntn.isSyntax(Symbol.REPETITION,Stx.PREFIX)) {
+                return this.parseRepetitor(t, parent);
+            } else {
+                return null;
+            }
+        }
+      // the prefix must be a keyword, or it is not a prefix at all  
+      if (ttype!=Tokenizer.TT_KEYWORD) {
+        t.pushBack();
+        return null;
+      }
+      let symbols=t.getSymbolValue();
+      t.pushBack();
+      
+        // Is it a commutator?
+        if (ntn.isSyntax(Symbol.COMMUTATION, Stx.PREFIX)
+                && this.containsType(symbols, Sym.COMMUTATION_BEGIN)) {
+            return this.parseExpressionAffix(t, parent);
+        }
+
+        // Is it a conjugator?
+        if (ntn.isSyntax(Symbol.CONJUGATION, Stx.PREFIX)
+                &&  this.containsType(symbols, Sym.CONJUGATION_BEGIN)) {
+            return parseExpressionAffix(t, parent);
+        }
+
+        // Is it a rotator?
+        if (ntn.isSyntax(Symbol.ROTATION, Stx.PREFIX)
+                && this.containsType(symbols, Sym.ROTATION_BEGIN)) {
+            return parseExpressionAffix(t, parent);
+        }
+      
+        // Is it an Inversion?
+        if (ntn.isSyntax(Symbol.INVERSION, Stx.PREFIX)
+                &&  this.containsType(symbols, Sym.INVERTOR)) {
+            return parseInvertor(t, parent);
+        }
+
+        // Is it a repetition?
+        if (ntn.isSyntax(Symbol.REPETITION, Stx.PREFIX)
+                &&  this.containsType(symbols, Sym.REPETITION_BEGIN)) {
+            return parseRepetitor(t, parent);
+        }
+
+        // Is it a reflection?
+        if (ntn.isSyntax(Symbol.REFLECTION, Stx.PREFIX)
+                &&  this.containsType(symbols, Sym, Symbol.REFLECTOR)) {
+            return parseReflector(t, parent);
+        }
+
+        // Or is it no prefix at all?
+        return null;
+    }
+    /** Parses a suffix. 
+     * 
+     * @param {Tokenizer} t
+     * @param {Node} parent
+     * @returns {unresolved} the parsed macro
+     * @throws parse exception
+     */
+    parseSuffix(t, parent) {
+      throw new ParseException("Suffix: Not implemented " + t.sval, t.getStartPosition(), t.getEndPosition());
     }
     /** Parses a macro. 
      * 

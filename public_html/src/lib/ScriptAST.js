@@ -60,6 +60,13 @@ function () {
         this.endPosition=newValue;
       }
       
+      getStartPosition() {
+       return this.startPosition;
+      }
+      getEndPosition() {
+        return this.endPosition;
+      }
+      
       applyTo(cube) {
         for (let i=0;i<this.children.length;i++) {
           this.children[i].applyTo(cube);
@@ -70,6 +77,12 @@ function () {
   class SequenceNode extends Node {
       constructor() {
         super();
+      }
+  }
+ class StatementNode extends Node {
+      constructor(layerCount) {
+        super();
+        this.layerCount=layerCount;
       }
   }
 
@@ -147,8 +160,9 @@ function () {
 // ------------------
   return {
     Node: Node,
-    SequenceNode: SequenceNode,
     MoveNode: MoveNode,
-    NOPNode: NOPNode
+    NOPNode: NOPNode,
+    SequenceNode: SequenceNode,
+    StatementNode: StatementNode,
   };
 });
