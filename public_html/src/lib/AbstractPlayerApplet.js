@@ -1055,7 +1055,7 @@ PocketCubeS5Cube3D
       // parse faceIndices from faces
       if (p.faces != null) {
         module.log('.readParameters faces:' + p.faces);
-        console.warning('the parameter "faces" is deprecated, please use "faceList" instead.');
+        module.warning('the parameter "faces" is deprecated, please use "faceList" instead.');
         let parsedIndices = parseWordList(p.faces);
         for (let i in parsedIndices) {
           faceIndices[deprecatedFaceIndices[i]] = parsedIndices[i];
