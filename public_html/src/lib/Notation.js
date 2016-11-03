@@ -82,27 +82,63 @@ function () {
   };
 
   class Symbol {
+    constructor(name) {
+      this.name=name;
+    }
     getType() {
       return this;
     }
+    getSubSymbols() {
+      return [];
+    }
+    isTerminalSymbol() {
+      return true;
+    }
+    isSubSymbol(s) {
+      return false;
+    }
+    toString() {
+      return this.name;
+    }
+    getName() {
+      return this.name;
+    }
   }
 
-  /** Defines a symbol. */
-  class RegularSymbol extends Symbol {
+  /** Defines a terminal symbol. */
+  class TerminalSymbol extends Symbol {
     /**
      * 
      * @param {String} name
      * @param {String} alternativeName
-     * @param {Array<Symbol>} terminalSymbols
      */
-    constructor(name, alternativeName, terminalSymbols) {
-      super();
-      this.name = name;
+    constructor(name, alternativeName) {
+      super(name);
       this.alternativeName = alternativeName;
-      this.subSymbols = terminalSymbols;
+    }
+
+    getAlternativeName() {
+      return this.alternativeName;
+    }
+
+  }
+  /** Defines a compound symbol. */
+  class CompoundSymbol extends Symbol {
+    /**
+     * 
+     * @param {String} name
+     * @param {String} alternativeName
+     * @param {Array<Symbol>} subSymbols
+     */
+    constructor(name, subSymbols) {
+      super(name);
+      this.subSymbols=subSymbols;
+    }
+    getSubSymbols() {
+      return this.subSymbols;// XXX should return a clone
     }
     isTerminalSymbol() {
-      return this.subSymbols == null;
+      return false;
     }
     isSubSymbol(s) {
       if (this.subSymbols != null) {
@@ -115,90 +151,74 @@ function () {
         return s == this;
       }
     }
-    getSubSymbols() {
-      return this.subSymbols;// XXX should return a clone
-    }
-
-    getName() {
-      return this.name;
-    }
-
-    getAlternativeName() {
-      return this.alternativeName;
-    }
-
-    toString() {
-      return this.name;
-    }
   }
-
 
   /**
    * Terminal symbols.
    */
-  Symbol.NOP = new RegularSymbol("NOP");
-  Symbol.MOVE = new RegularSymbol("move", "twist");
-  Symbol.FACE_R = new RegularSymbol("permR");
-  Symbol.FACE_U = new RegularSymbol("permU");
-  Symbol.FACE_F = new RegularSymbol("permF");
-  Symbol.FACE_L = new RegularSymbol("permL");
-  Symbol.FACE_D = new RegularSymbol("permD");
-  Symbol.FACE_B = new RegularSymbol("permB");
-  Symbol.PERMUTATION_PLUS = new RegularSymbol("permPlus");
-  Symbol.PERMUTATION_MINUS = new RegularSymbol("permMinus");
-  Symbol.PERMUTATION_PLUSPLUS = new RegularSymbol("permPlusPlus");
-  Symbol.PERMUTATION_BEGIN = new RegularSymbol("permBegin", "permutationBegin");
-  Symbol.PERMUTATION_END = new RegularSymbol("permEnd", "permutationEnd");
-  Symbol.PERMUTATION_DELIMITER = new RegularSymbol("permDelim", "permutationDelimiter");
-  Symbol.DELIMITER = new RegularSymbol("delimiter", "statementDelimiter");
-  Symbol.INVERSION_BEGIN = new RegularSymbol("inversionBegin");
-  Symbol.INVERSION_END = new RegularSymbol("inversionEnd");
-  Symbol.INVERSION_DELIMITER = new RegularSymbol("inversionDelim");
-  Symbol.INVERTOR = new RegularSymbol("invertor");
-  Symbol.REFLECTION_BEGIN = new RegularSymbol("reflectionBegin");
-  Symbol.REFLECTION_END = new RegularSymbol("reflectionEnd");
-  Symbol.REFLECTION_DELIMITER = new RegularSymbol("reflectionDelim");
-  Symbol.REFLECTOR = new RegularSymbol("reflector");
-  Symbol.GROUPING_BEGIN = new RegularSymbol("groupingBegin", "sequenceBegin");
-  Symbol.GROUPING_END = new RegularSymbol("groupingEnd", "sequenceEnd");
-  Symbol.REPETITION_BEGIN = new RegularSymbol("repetitionBegin", "repetitorBegin");
-  Symbol.REPETITION_END = new RegularSymbol("repetitionEnd", "repetitorEnd");
-  Symbol.REPETITION_DELIMITER = new RegularSymbol("repetitionDelim", "repetitorDelimiter");
-  Symbol.COMMUTATION_BEGIN = new RegularSymbol("commutationBegin", "commutatorBegin");
-  Symbol.COMMUTATION_END = new RegularSymbol("commutationEnd", "commutatorEnd");
-  Symbol.COMMUTATION_DELIMITER = new RegularSymbol("commutationDelim", "commutatorDelimiter");
-  Symbol.CONJUGATION_BEGIN = new RegularSymbol("conjugationBegin", "conjugatorBegin");
-  Symbol.CONJUGATION_END = new RegularSymbol("conjugationEnd", "conjugatorEnd");
-  Symbol.CONJUGATION_DELIMITER = new RegularSymbol("conjugationDelim", "conjugatorDelimiter");
-  Symbol.ROTATION_BEGIN = new RegularSymbol("rotationBegin", "rotatorBegin");
-  Symbol.ROTATION_END = new RegularSymbol("rotationEnd", "rotatorEnd");
-  Symbol.ROTATION_DELIMITER = new RegularSymbol("rotationDelim", "rotatorDelimiter");
-  Symbol.MACRO = new RegularSymbol("macro");
-  Symbol.MULTILINE_COMMENT_BEGIN = new RegularSymbol("commentMultiLineBegin", "slashStarCommentBegin");
-  Symbol.MULTILINE_COMMENT_END = new RegularSymbol("commentMultiLineEnd", "slashStarCommentEnd");
-  Symbol.SINGLELINE_COMMENT_BEGIN = new RegularSymbol("commentSingleLineBegin", "slashSlashComment");
+  Symbol.NOP = new TerminalSymbol("NOP");
+  Symbol.MOVE = new TerminalSymbol("move", "twist");
+  Symbol.FACE_R = new TerminalSymbol("permR");
+  Symbol.FACE_U = new TerminalSymbol("permU");
+  Symbol.FACE_F = new TerminalSymbol("permF");
+  Symbol.FACE_L = new TerminalSymbol("permL");
+  Symbol.FACE_D = new TerminalSymbol("permD");
+  Symbol.FACE_B = new TerminalSymbol("permB");
+  Symbol.PERMUTATION_PLUS = new TerminalSymbol("permPlus");
+  Symbol.PERMUTATION_MINUS = new TerminalSymbol("permMinus");
+  Symbol.PERMUTATION_PLUSPLUS = new TerminalSymbol("permPlusPlus");
+  Symbol.PERMUTATION_BEGIN = new TerminalSymbol("permBegin", "permutationBegin");
+  Symbol.PERMUTATION_END = new TerminalSymbol("permEnd", "permutationEnd");
+  Symbol.PERMUTATION_DELIMITER = new TerminalSymbol("permDelim", "permutationDelimiter");
+  Symbol.DELIMITER = new TerminalSymbol("delimiter", "statementDelimiter");
+  Symbol.INVERSION_BEGIN = new TerminalSymbol("inversionBegin");
+  Symbol.INVERSION_END = new TerminalSymbol("inversionEnd");
+  Symbol.INVERSION_DELIMITER = new TerminalSymbol("inversionDelim");
+  Symbol.INVERTOR = new TerminalSymbol("invertor");
+  Symbol.REFLECTION_BEGIN = new TerminalSymbol("reflectionBegin");
+  Symbol.REFLECTION_END = new TerminalSymbol("reflectionEnd");
+  Symbol.REFLECTION_DELIMITER = new TerminalSymbol("reflectionDelim");
+  Symbol.REFLECTOR = new TerminalSymbol("reflector");
+  Symbol.GROUPING_BEGIN = new TerminalSymbol("groupingBegin", "sequenceBegin");
+  Symbol.GROUPING_END = new TerminalSymbol("groupingEnd", "sequenceEnd");
+  Symbol.REPETITION_BEGIN = new TerminalSymbol("repetitionBegin", "repetitorBegin");
+  Symbol.REPETITION_END = new TerminalSymbol("repetitionEnd", "repetitorEnd");
+  Symbol.REPETITION_DELIMITER = new TerminalSymbol("repetitionDelim", "repetitorDelimiter");
+  Symbol.COMMUTATION_BEGIN = new TerminalSymbol("commutationBegin", "commutatorBegin");
+  Symbol.COMMUTATION_END = new TerminalSymbol("commutationEnd", "commutatorEnd");
+  Symbol.COMMUTATION_DELIMITER = new TerminalSymbol("commutationDelim", "commutatorDelimiter");
+  Symbol.CONJUGATION_BEGIN = new TerminalSymbol("conjugationBegin", "conjugatorBegin");
+  Symbol.CONJUGATION_END = new TerminalSymbol("conjugationEnd", "conjugatorEnd");
+  Symbol.CONJUGATION_DELIMITER = new TerminalSymbol("conjugationDelim", "conjugatorDelimiter");
+  Symbol.ROTATION_BEGIN = new TerminalSymbol("rotationBegin", "rotatorBegin");
+  Symbol.ROTATION_END = new TerminalSymbol("rotationEnd", "rotatorEnd");
+  Symbol.ROTATION_DELIMITER = new TerminalSymbol("rotationDelim", "rotatorDelimiter");
+  Symbol.MACRO = new TerminalSymbol("macro");
+  Symbol.MULTILINE_COMMENT_BEGIN = new TerminalSymbol("commentMultiLineBegin", "slashStarCommentBegin");
+  Symbol.MULTILINE_COMMENT_END = new TerminalSymbol("commentMultiLineEnd", "slashStarCommentEnd");
+  Symbol.SINGLELINE_COMMENT_BEGIN = new TerminalSymbol("commentSingleLineBegin", "slashSlashComment");
 
-  Symbol.COMMUTATION = new RegularSymbol("commutation", [
+  Symbol.COMMUTATION = new CompoundSymbol("commutation", [
     Symbol.COMMUTATION_BEGIN,
     Symbol.COMMUTATION_END,
     Symbol.COMMUTATION_DELIMITER
   ]);
-  Symbol.CONJUGATION = new RegularSymbol("conjugation", [
+  Symbol.CONJUGATION = new CompoundSymbol("conjugation", [
     Symbol.CONJUGATION_BEGIN,
     Symbol.CONJUGATION_END,
     Symbol.CONJUGATION_DELIMITER
   ]);
-  Symbol.GROUPING = new RegularSymbol("grouping", [
+  Symbol.GROUPING = new CompoundSymbol("grouping", [
     Symbol.GROUPING_BEGIN,
     Symbol.GROUPING_END
   ]);
-  Symbol.INVERSION = new RegularSymbol("inversion", [
+  Symbol.INVERSION = new CompoundSymbol("inversion", [
     Symbol.INVERSION_BEGIN,
     Symbol.INVERSION_END,
     Symbol.INVERSION_DELIMITER,
     Symbol.INVERTOR
   ]);
-  Symbol.PERMUTATION = new RegularSymbol("permutation", [
+  Symbol.PERMUTATION = new CompoundSymbol("permutation", [
     Symbol.FACE_R,
     Symbol.FACE_U,
     Symbol.FACE_F,
@@ -212,28 +232,28 @@ function () {
     Symbol.PERMUTATION_END,
     Symbol.PERMUTATION_DELIMITER
   ]);
-  Symbol.REFLECTION = new RegularSymbol("reflection", [
+  Symbol.REFLECTION = new CompoundSymbol("reflection", [
     Symbol.REFLECTION_BEGIN,
     Symbol.REFLECTION_END,
     Symbol.REFLECTION_DELIMITER,
     Symbol.REFLECTOR
   ]);
-  Symbol.REPETITION = new RegularSymbol("repetition", [
+  Symbol.REPETITION = new CompoundSymbol("repetition", [
     Symbol.REPETITION_BEGIN,
     Symbol.REPETITION_END,
     Symbol.REPETITION_DELIMITER
   ]);
-  Symbol.ROTATION = new RegularSymbol("rotation", [
+  Symbol.ROTATION = new CompoundSymbol("rotation", [
     Symbol.ROTATION_BEGIN,
     Symbol.ROTATION_END,
     Symbol.ROTATION_DELIMITER
   ]);
-  Symbol.COMMENT = new RegularSymbol("comment", [
+  Symbol.COMMENT = new CompoundSymbol("comment", [
     Symbol.MULTILINE_COMMENT_BEGIN,
     Symbol.MULTILINE_COMMENT_END,
     Symbol.SINGLELINE_COMMENT_BEGIN
   ]);
-  Symbol.STATEMENT = new RegularSymbol("statement", [
+  Symbol.STATEMENT = new CompoundSymbol("statement", [
     Symbol.NOP,
     Symbol.MOVE,
     Symbol.GROUPING,
@@ -246,7 +266,7 @@ function () {
     Symbol.DELIMITER,
     Symbol.REPETITION
   ]);
-  Symbol.SEQUENCE = new RegularSymbol("sequence", [
+  Symbol.SEQUENCE = new CompoundSymbol("sequence", [
     Symbol.STATEMENT,
     Symbol.COMMENT
   ]);
@@ -386,9 +406,10 @@ function () {
         this.tokenToSymbolMap[token] = symbols;
       }
       symbols.push(symbol);
+      /*
       if (Symbol.PERMUTATION.isSubSymbol(symbol)) {
         symbols.add(Symbol.PERMUTATION);
-      }
+      }*/
     }
 
     getTokenToSymbolMap() {
@@ -396,6 +417,9 @@ function () {
     }
     isSyntax(symbol,syntax) {
       return this.symbolToSyntaxMap[symbol]==syntax;
+    }
+    isSupported(symbol) {
+      return this.symbolToSyntaxMap[symbol]!=null||this.symbolToTokenMap[symbol]!=null;
     }
   }
   /** Defines a default notation that works for 3x3 and 2x2 cubes. */

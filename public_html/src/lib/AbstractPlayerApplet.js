@@ -40,29 +40,29 @@ PocketCubeS5Cube3D
 
   let module = {
     log: (true) // Enable or disable logging for this module.
-    ? function (msg,args) {
-      if (args===undefined)
-      console.log('AbstractPlayerApplet.js ' + msg);
+    ? function (msg, args) {
+      if (args === undefined)
+        console.log('AbstractPlayerApplet.js ' + msg);
       else
-      console.log('AbstractPlayerApplet.js ' + msg,args);
+        console.log('AbstractPlayerApplet.js ' + msg, args);
     }
     : function () {},
 
     warning: (true) // Enable or disable logging for this module.
-    ? function (msg,args) {
-      if (args===undefined)
-      console.log('AbstractPlayerApplet.js WARNING ' + msg);
+    ? function (msg, args) {
+      if (args === undefined)
+        console.log('AbstractPlayerApplet.js WARNING ' + msg);
       else
-      console.log('AbstractPlayerApplet.js WARNING ' + msg,args);
+        console.log('AbstractPlayerApplet.js WARNING ' + msg, args);
     }
     : function () {},
 
     error: (true) // Enable or disable logging for this module.
-    ? function (msg,args) {
-      if (args===undefined)
-      console.log('AbstractPlayerApplet.js ERROR ' + msg);
+    ? function (msg, args) {
+      if (args === undefined)
+        console.log('AbstractPlayerApplet.js ERROR ' + msg);
       else
-      console.log('AbstractPlayerApplet.js ERROR ' + msg,args);
+        console.log('AbstractPlayerApplet.js ERROR ' + msg, args);
     }
     : function () {}
   }
@@ -175,10 +175,11 @@ PocketCubeS5Cube3D
     do {
       t.skipWhitespace();
       let quote = t.read();
-      if (quote == null) break;
+      if (quote == null)
+        break;
       let id = '';
       if (/\w/.test(quote)) {// => identifier is not quoted
-        id=quote;
+        id = quote;
         for (let ch = t.read(); ch != null && ch != '='; ch = t.read()) {
           id = id + ch;
         }
@@ -199,7 +200,7 @@ PocketCubeS5Cube3D
         throw new ScriptParser.ParseException("quote around value expected, ch:" + ch, t.getPosition() - 1, t.getPosition())
       let value = '';
       if (/\w/.test(quote)) {// => value is not quoted
-        value=quote;
+        value = quote;
         for (let ch = t.read(); ch != null && ch != ','; ch = t.read()) {
           value = value + ch;
         }
@@ -1176,8 +1177,8 @@ PocketCubeS5Cube3D
         module.log('.readParameters scriptmacros:' + p.scriptmacros);
         try {
           this.macros = parserMacroDefinitions(p.scriptmacros);
-            module.log('.readParameters scriptmacros: %o', this.macros);
-          } catch (e) {
+          module.log('.readParameters scriptmacros: %o', this.macros);
+        } catch (e) {
           console.log(e);
           module.error("illegal scriptmacros:\"" + p.scriptmacros + '"');
         }

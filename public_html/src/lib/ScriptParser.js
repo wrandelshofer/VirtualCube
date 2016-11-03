@@ -14,16 +14,32 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
 function (Notation, AST, Tokenizer) {
   let module = {
     log: (true) // Enable or disable logging for this module.
-    ? function (msg) {
-      console.log('ScriptParser.js ' + msg);
+    ? function (msg, args) {
+      if (args === undefined)
+        console.log('ScriptParser.js ' + msg);
+      else
+        console.log('ScriptParser.js ' + msg, args);
     }
     : function () {},
+
+    warning: (true) // Enable or disable logging for this module.
+    ? function (msg, args) {
+      if (args === undefined)
+        console.log('ScriptParser.js WARNING ' + msg);
+      else
+        console.log('ScriptParser.js WARNING ' + msg, args);
+    }
+    : function () {},
+
     error: (true) // Enable or disable logging for this module.
-    ? function (msg) {
-      console.log('ScriptParser.js ERROR ' + msg);
+    ? function (msg, args) {
+      if (args === undefined)
+        console.log('ScriptParser.js ERROR ' + msg);
+      else
+        console.log('ScriptParser.js ERROR ' + msg, args);
     }
     : function () {}
-  }
+  };
 
   class ParseException {
     constructor(msg, start, end) {
@@ -164,7 +180,7 @@ function (Notation, AST, Tokenizer) {
     }
 
     /**
-     * Returns true if the array contains a symbol of the specified symbol tpye
+     * Returns true if the array contains a symbol of the specified symbol type
      * @param {type} array of symbols
      * @param {type} type desired type
      * @return true if array contains a symbol of the specified type
@@ -177,6 +193,40 @@ function (Notation, AST, Tokenizer) {
         }
       }
       return false;
+    }
+    /**
+     * Returns true if the array contains a symbol of the specified symbol type
+     * @param {type} array of symbols
+     * @param {type} type desired type
+     * @return true if array contains a symbol of the specified type
+     */
+    intersectsTypes(symbols, types) {
+      for (let i = 0; i < symbols.length; i++) {
+        let s = symbols[i];
+      for (let j = 0; j < types.length; j++) {
+        let type=types[j];
+        if (s.getType() == type) {
+          return true;
+        }}
+      }
+      return false;
+    }
+    /**
+     * Returns true if the array contains at least one symbol, and
+     * only symbols of the specified symbol type.
+     * 
+     * @param {type} array of symbols
+     * @param {type} type desired type
+     * @return true if array contains a symbol of the specified type
+     */
+    isType(symbols, type) {
+      for (let i = 0; i < symbols.length; i++) {
+        let s = symbols[i];
+        if (s.getType() != type) {
+          return false;
+        }
+      }
+      return symbols.length > 0;
     }
     /**
      * Extracts the first symbol which has one of the types
@@ -203,6 +253,9 @@ function (Notation, AST, Tokenizer) {
      * @throws parse exception
      */
     parseStatement(t, parent) {
+      let ntn = this.notation;
+      let Sym = Notation.Symbol;
+
       // Fetch the next token.
       if (t.nextToken() != Tokenizer.TT_KEYWORD) {
         throw new ParseException("Statement: \"" + t.getStringValue() + "\" is a " + t.getTokenType() + " but not a keyword.", t.getStartPosition(), t.getEndPosition());
@@ -215,30 +268,29 @@ function (Notation, AST, Tokenizer) {
       }
 
       // Is it a Macro?
-      if (this.containsType(symbols, Notation.Symbol.MACRO)) {
+      if (this.containsType(symbols, Sym.MACRO)) {
         t.pushBack();
         return this.parseMacro(t, parent);
       }
 
       // Is it a Move?
-      if (this.containsType(symbols, Notation.Symbol.MOVE)) {
+      if (this.containsType(symbols, Sym.MOVE)) {
         t.pushBack();
         return this.parseMove(t, parent);
       }
 
       // Is it a NOP?
-      if (this.containsType(symbols, Notation.Symbol.NOP)) {
+      if (this.containsType(symbols, Sym.NOP)) {
         t.pushBack();
         return this.parseNOP(t, parent);
       }
 
 
-
       // Is it a Permutation sign token? Parse a permutation.
-      let sign = this.extractSymbol(symbols, [Notation.Symbol.PERMUTATION_PLUS,
-        Notation.Symbol.PERMUTATION_MINUS,
-        Notation.Symbol.PERMUTATION_PLUSPLUS]);
-      if (this.notation.isSyntax(Notation.Symbol.PERMUTATION, Notation.Syntax.PREFIX)
+      let sign = this.extractSymbol(symbols, [Sym.PERMUTATION_PLUS,
+        Sym.PERMUTATION_MINUS,
+        Sym.PERMUTATION_PLUSPLUS]);
+      if (ntn.isSyntax(Sym.PERMUTATION, Notation.Syntax.PREFIX)
       && sign != null) {
         let startpos = t.getStartPosition();
         t.pushBack();
@@ -247,7 +299,7 @@ function (Notation, AST, Tokenizer) {
           "Permutation: Unexpected token - expected a keyword.", t.getStartPosition(), t.getEndPosition());
         }
         symbols = t.getSymbolValue();
-        if (!this.containsType(symbols, Notation.Symbol.PERMUTATION_BEGIN)) {
+        if (!this.containsType(symbols, Sym.PERMUTATION_BEGIN)) {
           throw new ParseException(
           "Permutation: Unexpected token - expected permutation begin.", t.getStartPosition(), t.getEndPosition());
         }
@@ -255,54 +307,45 @@ function (Notation, AST, Tokenizer) {
         let pnode = this.parsePermutation(t, parent, startpos, sign);
         return pnode;
       }
-      /* 
-       // Okay, it's not a move and not a permutation sign.
-       // Since we allow for some ambiguity of the
-       // tokens used by the grouping, conjugation, commutation and permutation
-       // statement it gets a little bit complicated here.
-       // Create a bit mask with a bit for each expected statement.
-       int expressionMask
-       = ((notation.isTokenFor(token, Symbol.GROUPING_BEGIN)) ? GROUPING_MASK : UNKNOWN_MASK) | //
-       ((notation.getSyntax(Symbol.CONJUGATION) == Syntax.PRECIRCUMFIX && notation.isTokenFor(token, Symbol.CONJUGATION_BEGIN)) ? CONJUGATION_MASK : UNKNOWN_MASK) | //
-       ((notation.getSyntax(Symbol.COMMUTATION) == Syntax.PRECIRCUMFIX && notation.isTokenFor(token, Symbol.COMMUTATION_BEGIN)) ? COMMUTATION_MASK : UNKNOWN_MASK) | //
-       ((notation.getSyntax(Symbol.ROTATION) == Syntax.PRECIRCUMFIX && notation.isTokenFor(token, Symbol.ROTATION_BEGIN)) ? ROTATION_MASK : UNKNOWN_MASK) | //
-       ((notation.getSyntax(Symbol.INVERSION) == Syntax.CIRCUMFIX && notation.isTokenFor(token, Symbol.INVERSION_BEGIN)) ? INVERSION_MASK : UNKNOWN_MASK) | //
-       ((notation.getSyntax(Symbol.REFLECTION) == Syntax.CIRCUMFIX && notation.isTokenFor(token, Symbol.REFLECTION_BEGIN)) ? REFLECTION_MASK : UNKNOWN_MASK) | //
-       ((notation.isSupported(Symbol.PERMUTATION) && notation.isTokenFor(token, Symbol.PERMUTATION_BEGIN)) ? PERMUTATION_MASK : UNKNOWN_MASK);
-       
-       // Is it a Permutation Begin token without any ambiguity?
-       if (expressionMask == PERMUTATION_MASK) {
-       int p = t.getStartPosition();
-       t.consumeGreedy(token);
-       return parsePermutation(t, parent, p, null);
-       
-       // Is it an ambiguous permutation begin token?
-       } else if ((expressionMask & PERMUTATION_MASK) == PERMUTATION_MASK) {
-       int p = t.getStartPosition();
-       t.consumeGreedy(token);
-       
-       // Look ahead
-       if (t.nextToken() != StreamPosTokenizer.TT_WORD) {
-       throw new ParseException("Statement: Word missing.", t.getStartPosition(), t.getEndPosition());
-       }
-       // Lets be greedy.
-       token = fetchGreedy(t.sval);
-       t.pushBack();
-       if (token != null
-       && notation.isTokenFor(token, Symbol.PERMUTATION)
-       && !notation.isTokenFor(token, Symbol.GROUPING_BEGIN)) {
-       return parsePermutation(t, parent, p, null);
-       } else {
-       return parseCompoundStatement(t, parent, p, expressionMask);
-       }
-       
+      // Okay, it's not a move and not a permutation sign.
+      // Since we allow for some ambiguity of the
+      // tokens used by the grouping, conjugation, commutation and permutation
+      // statement it gets a little bit complicated here.
+      // Create a bit mask with a bit for each expected statement.
+      let expressionMask
+      = ((this.containsType(symbols, Sym.GROUPING_BEGIN)) ? GROUPING_MASK : UNKNOWN_MASK) | //
+      ((ntn.isSyntax(Sym.CONJUGATION, Notation.Syntax.PRECIRCUMFIX) && this.containsType(symbol, Sym.CONJUGATION_BEGIN)) ? CONJUGATION_MASK : UNKNOWN_MASK) | //
+      ((ntn.isSyntax(Sym.COMMUTATION, Notation.Syntax.PRECIRCUMFIX) && this.containsType(symbols, Sym.COMMUTATION_BEGIN)) ? COMMUTATION_MASK : UNKNOWN_MASK) | //
+      ((ntn.isSyntax(Sym.ROTATION, Notation.Syntax.PRECIRCUMFIX) && this.containsType(symbols, Sym.ROTATION_BEGIN)) ? ROTATION_MASK : UNKNOWN_MASK) | //
+      ((ntn.isSyntax(Sym.INVERSION, Notation.Syntax.CIRCUMFIX) && this.containsType(symbols, Sym.INVERSION_BEGIN)) ? INVERSION_MASK : UNKNOWN_MASK) | //
+      ((ntn.isSyntax(Sym.REFLECTION, Notation.Syntax.CIRCUMFIX) && this.containsType(symbols, Sym.REFLECTION_BEGIN)) ? REFLECTION_MASK : UNKNOWN_MASK) | //
+      ((ntn.isSupported(Sym.PERMUTATION) && this.containsType(symbols, Sym.PERMUTATION_BEGIN)) ? PERMUTATION_MASK : UNKNOWN_MASK);
+
+      // Is it a Permutation Begin token without any ambiguity?
+      if (expressionMask == PERMUTATION_MASK) {
+        return parsePermutation(t, parent, p, null);
+      }
+
+      // Is it an ambiguous permutation begin token?
+      if ((expressionMask & PERMUTATION_MASK) == PERMUTATION_MASK) {
+        // Look ahead
+        if (t.nextToken() != Tokenizer.TT_KEYWORD) {
+          throw new ParseException("Statement: keyword expected.", t.getStartPosition(), t.getEndPosition());
+        }
+        symbols = t.getSymbolValue();
+        t.pushBack();
+        if (symbols != null && this.intersectsTypes(symbols, Sym.PERMUTATION.getSubSymbols())) {
+          return this.parsePermutation(t, parent);
+        } else {
+          return this.parseCompoundStatement(t, parent, expressionMask^PERMUTATION_MASK);
+        }
+      }
+      
        // Is it one of the other Begin tokens?
-       } else if (expressionMask != UNKNOWN_MASK) {
-       int p = t.getStartPosition();
-       t.consumeGreedy(token);
+      if (expressionMask != UNKNOWN_MASK) {
        return parseCompoundStatement(t, parent, p, expressionMask);
        }
-       */
+
       throw new ParseException("Statement: Invalid Statement " + t.sval, t.getStartPosition(), t.getEndPosition());
     }
 
@@ -328,7 +371,7 @@ function (Notation, AST, Tokenizer) {
         throw new ParseException("NOP: \"" + t.getStringValue() + "\" is a " + t.getTokenType() + " but not a keyword.", t.getStartPosition(), t.getEndPosition());
       }
       let symbols = t.getSymbolValue();
-      if (! containsType(symbols, Notation.Symbol.NOP)) {
+      if (!containsType(symbols, Notation.Symbol.NOP)) {
         throw new ParseException("Move: \"" + t.getStringValue() + "\" is not a NOP", t.getStartPosition(), t.getEndPosition());
       }
 
