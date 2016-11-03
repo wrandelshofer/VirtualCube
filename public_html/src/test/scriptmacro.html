@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <script src="../lib/virtualcube.js"></script>
+    <link href="virtualcube.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <h1>Test of the <kbd>scriptmacro</kbd> parameter</h1>
+
+    <section class="test">
+      <div class="virtualcube small" 
+           ></div>
+      <p>Default value.</p>
+    </section>
+
+    <section class="test">
+      <div class="virtualcube small" 
+           scriptmacro="´A´=´TR R'´, ´B´=´U2´"
+           script="A B A'"
+           ></div>
+      <p><kbd> scriptmacro="´A´=´TR R'´, ´B´=´U2´"
+           script="A B A'"</kbd> (default)</p>
+    </section>
+
+  </body>
+</html>

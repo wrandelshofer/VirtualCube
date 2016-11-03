@@ -64,6 +64,7 @@
         <tr><td><kbd>faceList</kbd></td> <td><kbd>name, ...</kbd></td>  <td>Maps colors from the color map to the faces of the cube; 6 integer values or color names; r, u, f, l, d, b. Default: "0,1,2,3,4,5"<td></tr>
         <tr><td><kbd>kind</kbd></td> <td><kbd>name</kbd></td>  <td>Specifies the desired cube model: <kbd>RubiksCube</kbd> or <kbd>PocketCube</kbd>. Default: <kbd>"RubiksCube"</kbd><td></tr>
         <tr><td><kbd>script</kbd></td> <td><kbd>string</kbd></td>  <td>Script. Default value: "".<td></tr>
+        <tr><td><kbd>initScript</kbd></td> <td><kbd>string</kbd></td>  <td>This script is used to initialize the cube, and when the reset button is pressed. If you don't specify this parameter, no script is used.<td></tr>
         <tr><td><kbd>partList</kbd></td> <td><kbd>name, ...</kbd></td>  <td>List of visible parts. Default: "urf,dfr,ubr,drb,ulb,dbl,ufl,dlf,ru,rf,rd,...,center"<td></tr>
       </table>
     </section>
@@ -71,11 +72,12 @@
       <h2>Unsupported Attributes</h2>
       <p>The following attributes are not supported:</p>
       <table>
+        <tr><td><kbd>scriptMacro</kbd></td> <td><kbd>´id´=´script´, ...</kbd></td>  <td>Defines macros for use in <kbd>script</kbd> and <kbd>initscript</kbd>. The identifier of the macro and the script assigned to the macro must be put into quotes. 
+            Since a script notation may make use of quotes, you can use a quote character of your choice.  Default value: "".<td></tr>
         <tr><td><kbd>autoPlay</kbd></td> <td><kbd>boolean</kbd></td>  <td>Set this to true, to start the player automatically. Default: "false"<td></tr>
         <tr><td><kbd>cube</kbd></td> <td><kbd>string</kbd></td>  <td>Name of a cube in the resource file. If you don't specify this parameter, the default cube of the resource file is used.<td></tr>
         <tr><td><kbd>debug</kbd></td> <td><kbd>boolean</kbd></td>  <td>Set this to 'true' to print debug informations on the console. Default: false.<td></tr>
         <tr><td><kbd>displayLines</kbd></td> <td><kbd>int</kbd></td>  <td>Number of lines of the Script display: set to 0 to switch the display off. Default: 1<td></tr>
-        <tr><td><kbd>initScript</kbd></td> <td><kbd>string</kbd></td>  <td>This script is used to initialize the cube, and when the reset button is pressed. If you don't specify this parameter, no script is used.<td></tr>
         <tr><td><kbd>locale</kbd></td> <td><kbd>language</kbd></td>  <td>Locale, for example "en", "de", "fr".<td></tr>
         <tr><td><kbd>notation</kbd></td> <td><kbd>string</kbd></td>  <td>Name of a notation in the resource file. If you don't specify this parameter, the default notation of the resource file is used.<td></tr>
         <tr><td><kbd>resourceFile</kbd></td> <td><kbd>URL</kbd></td>  <td>Address of a Cube Markup XML resource file. This file can be Zip-compressed to improve the startup time of the applet. The file extension must be .xml or .zip.<td></tr>

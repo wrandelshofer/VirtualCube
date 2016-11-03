@@ -375,6 +375,29 @@ function () {
     }
   }
 
+/** A simple push back reader. */
+class PushBackReader {
+  constructor(str) {
+    this.str=str;
+    this.pos=0;
+    this.ch=null;
+    this.pushedBack=false;
+  }
+  read() {
+    if (this.pushedBack) {
+      this.pushedBack=false;
+      return ch;
+    }
+    if (this.pos<this.str.length) {
+      return this.ch= this.str.charAt(this.pos++);
+    }
+    return null;
+  }
+  pushBack() {
+    this.pushedBack=true;
+  }
+}
+
 // ------------------
 // MODULE API    
 // ------------------
@@ -385,6 +408,7 @@ function () {
     TT_EOF: TT_EOF,
     TT_NUMBER: TT_NUMBER,
     TT_COMMENT: TT_COMMENT,
-    Tokenizer: Tokenizer
+    Tokenizer: Tokenizer,
+    PushBackReader:PushBackReader
   };
 });
