@@ -82,7 +82,7 @@ function () {
   };
 
   class Symbol {
-    getSymbol() {
+    getType() {
       return this;
     }
   }
@@ -304,7 +304,10 @@ function () {
     toString() {
       return "Move axis=" + this.axis + " mask=" + this.layerMask + " angle=" + this.angle;
     }
-    getSymbol() {
+    /** Gets the type of the symbol. 
+     * (Actually this is like requesting the class of the symbol.
+     */
+    getType() {
       return Symbol.MOVE;
     }
   }
@@ -390,6 +393,9 @@ function () {
 
     getTokenToSymbolMap() {
       return this.tokenToSymbolMap;
+    }
+    isSyntax(symbol,syntax) {
+      return this.symbolToSyntaxMap[symbol]==syntax;
     }
   }
   /** Defines a default notation that works for 3x3 and 2x2 cubes. */

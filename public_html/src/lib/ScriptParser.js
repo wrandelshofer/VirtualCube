@@ -32,7 +32,7 @@ function (Notation, AST, Tokenizer) {
       this.end = end;
     }
     toString() {
-      return this.msg+" at:"+this.start+".."+this.end;
+      return this.msg + " at:" + this.start + ".." + this.end;
     }
   }
 
@@ -162,6 +162,38 @@ function (Notation, AST, Tokenizer) {
       }
       return root;
     }
+
+    /**
+     * Returns true if the array contains a symbol of the specified symbol tpye
+     * @param {type} array of symbols
+     * @param {type} type desired type
+     * @return true if array contains a symbol of the specified type
+     */
+    containsType(symbols, type) {
+      for (let i = 0; i < symbols.length; i++) {
+        let s = symbols[i];
+        if (s.getType() == type) {
+          return true;
+        }
+      }
+      return false;
+    }
+    /**
+     * Extracts the first symbol which has one of the types
+     * @param {type} array of symbols
+     * @param {type} types selection of types
+     * @return a symbol or null
+     */
+    extractSymbol(symbols, types) {
+      for (let i = 0; i < symbols.length; i++) {
+        let s = symbols[i];
+        if (types[s.getType()] != null) {
+          return s;
+        }
+      }
+      return null;
+    }
+
     /**
      * Parses a Statement.
      * 
@@ -183,56 +215,47 @@ function (Notation, AST, Tokenizer) {
       }
 
       // Is it a Macro?
-      for (let i = 0; i < symbols.length; i++) {
-        let s = symbols[i];
-        if (s.getSymbol() == Notation.Symbol.MACRO) {
-          t.pushBack();
-          return this.parseMacro(t, parent);
-        }
+      if (this.containsType(symbols, Notation.Symbol.MACRO)) {
+        t.pushBack();
+        return this.parseMacro(t, parent);
       }
 
       // Is it a Move?
-      for (let i = 0; i < symbols.length; i++) {
-        let s = symbols[i];
-        if (s.getSymbol() == Notation.Symbol.MOVE) {
-          t.pushBack();
-          return this.parseMove(t, parent);
-        }
+      if (this.containsType(symbols, Notation.Symbol.MOVE)) {
+        t.pushBack();
+        return this.parseMove(t, parent);
       }
 
       // Is it a NOP?
-      for (let i = 0; i < symbols.length; i++) {
-        let s = symbols[i];
-        if (s.getSymbol() == Notation.Symbol.NOP) {
-          t.pushBack();
-          return this.parseNOP(t, parent);
-        }
+      if (this.containsType(symbols, Notation.Symbol.NOP)) {
+        t.pushBack();
+        return this.parseNOP(t, parent);
       }
 
-      /*
-       
-       // Is it a Permutation sign token? Parse a permutation.
-       if (notation.getSyntax(Symbol.PERMUTATION) == Syntax.PREFIX && (notation.isTokenFor(token, Symbol.PERMUTATION_PLUS) || notation.isTokenFor(token, Symbol.PERMUTATION_MINUS) || notation.isTokenFor(token, Symbol.PERMUTATION_PLUSPLUS))) {
-       int startpos = t.getStartPosition();
-       t.pushBack();
-       Symbol sign = parsePermutationSign(t, parent);
-       if (sign != null) {
-       if (t.nextToken() != StreamTokenizer.TT_WORD) {
-       throw new ParseException(
-       "Permutation: Unexpected token - expected a word.", t.getStartPosition(), t.getEndPosition());
-       }
-       token = fetchGreedy(t.sval);
-       if (!notation.isTokenFor(token, Symbol.PERMUTATION_BEGIN)) {
-       throw new ParseException(
-       "Permutation: Unexpected token - expected permutation begin.", t.getStartPosition(), t.getEndPosition());
-       }
-       t.consumeGreedy(token);
-       
-       PermutationNode pnode = (PermutationNode) parsePermutation(t, parent, startpos, sign);
-       return pnode;
-       }
-       }
-       
+
+
+      // Is it a Permutation sign token? Parse a permutation.
+      let sign = this.extractSymbol(symbols, [Notation.Symbol.PERMUTATION_PLUS,
+        Notation.Symbol.PERMUTATION_MINUS,
+        Notation.Symbol.PERMUTATION_PLUSPLUS]);
+      if (this.notation.isSyntax(Notation.Symbol.PERMUTATION, Notation.Syntax.PREFIX)
+      && sign != null) {
+        let startpos = t.getStartPosition();
+        t.pushBack();
+        if (t.nextToken() != StreamTokenizer.TT_KEYWORD) {
+          throw new ParseException(
+          "Permutation: Unexpected token - expected a keyword.", t.getStartPosition(), t.getEndPosition());
+        }
+        symbols = t.getSymbolValue();
+        if (!this.containsType(symbols, Notation.Symbol.PERMUTATION_BEGIN)) {
+          throw new ParseException(
+          "Permutation: Unexpected token - expected permutation begin.", t.getStartPosition(), t.getEndPosition());
+        }
+
+        let pnode = this.parsePermutation(t, parent, startpos, sign);
+        return pnode;
+      }
+      /* 
        // Okay, it's not a move and not a permutation sign.
        // Since we allow for some ambiguity of the
        // tokens used by the grouping, conjugation, commutation and permutation
@@ -283,6 +306,16 @@ function (Notation, AST, Tokenizer) {
       throw new ParseException("Statement: Invalid Statement " + t.sval, t.getStartPosition(), t.getEndPosition());
     }
 
+    /** Parses a macro. 
+     * 
+     * @param {Tokenizer} t
+     * @param {Node} parent
+     * @returns {unresolved} the parsed move
+     * @throws parse exception
+     */
+    parseMacro(t, parent) {
+      throw new ParseException("Macro: Not implemented " + t.sval, t.getStartPosition(), t.getEndPosition());
+    }
     /** Parses a NOP. 
      * 
      * @param {Tokenizer} t
@@ -295,14 +328,7 @@ function (Notation, AST, Tokenizer) {
         throw new ParseException("NOP: \"" + t.getStringValue() + "\" is a " + t.getTokenType() + " but not a keyword.", t.getStartPosition(), t.getEndPosition());
       }
       let symbols = t.getSymbolValue();
-      let symbol = null;
-      for (let i = 0; i < symbols.length; i++) {
-        if (symbols[i].getSymbol() == Notation.Symbol.NOP) {
-          symbol = symbols[i];
-          break;
-        }
-      }
-      if (symbol == null) {
+      if (! containsType(symbols, Notation.Symbol.NOP)) {
         throw new ParseException("Move: \"" + t.getStringValue() + "\" is not a NOP", t.getStartPosition(), t.getEndPosition());
       }
 
@@ -330,7 +356,7 @@ function (Notation, AST, Tokenizer) {
       let symbols = t.getSymbolValue();
       let symbol = null;
       for (let i = 0; i < symbols.length; i++) {
-        if (symbols[i].getSymbol() == Notation.Symbol.MOVE) {
+        if (symbols[i].getType() == Notation.Symbol.MOVE) {
           symbol = symbols[i];
           break;
         }
@@ -381,7 +407,7 @@ function (Notation, AST, Tokenizer) {
 // MODULE API    
 // ------------------
   return {
-    ParseException:ParseException,
+    ParseException: ParseException,
     ScriptParser: ScriptParser,
     createRandomScript: createRandomScript,
     newTwistNode: (axis, layerMask, angle) => new AST.MoveNode(3, axis, layerMask, angle)
