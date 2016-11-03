@@ -203,11 +203,12 @@ function (Notation, AST, Tokenizer) {
     intersectsTypes(symbols, types) {
       for (let i = 0; i < symbols.length; i++) {
         let s = symbols[i];
-      for (let j = 0; j < types.length; j++) {
-        let type=types[j];
-        if (s.getType() == type) {
-          return true;
-        }}
+        for (let j = 0; j < types.length; j++) {
+          let type = types[j];
+          if (s.getType() == type) {
+            return true;
+          }
+        }
       }
       return false;
     }
@@ -255,6 +256,7 @@ function (Notation, AST, Tokenizer) {
     parseStatement(t, parent) {
       let ntn = this.notation;
       let Sym = Notation.Symbol;
+      let Stx = Notation.Syntax;
 
       // Fetch the next token.
       if (t.nextToken() != Tokenizer.TT_KEYWORD) {
@@ -314,11 +316,11 @@ function (Notation, AST, Tokenizer) {
       // Create a bit mask with a bit for each expected statement.
       let expressionMask
       = ((this.containsType(symbols, Sym.GROUPING_BEGIN)) ? GROUPING_MASK : UNKNOWN_MASK) | //
-      ((ntn.isSyntax(Sym.CONJUGATION, Notation.Syntax.PRECIRCUMFIX) && this.containsType(symbol, Sym.CONJUGATION_BEGIN)) ? CONJUGATION_MASK : UNKNOWN_MASK) | //
-      ((ntn.isSyntax(Sym.COMMUTATION, Notation.Syntax.PRECIRCUMFIX) && this.containsType(symbols, Sym.COMMUTATION_BEGIN)) ? COMMUTATION_MASK : UNKNOWN_MASK) | //
-      ((ntn.isSyntax(Sym.ROTATION, Notation.Syntax.PRECIRCUMFIX) && this.containsType(symbols, Sym.ROTATION_BEGIN)) ? ROTATION_MASK : UNKNOWN_MASK) | //
-      ((ntn.isSyntax(Sym.INVERSION, Notation.Syntax.CIRCUMFIX) && this.containsType(symbols, Sym.INVERSION_BEGIN)) ? INVERSION_MASK : UNKNOWN_MASK) | //
-      ((ntn.isSyntax(Sym.REFLECTION, Notation.Syntax.CIRCUMFIX) && this.containsType(symbols, Sym.REFLECTION_BEGIN)) ? REFLECTION_MASK : UNKNOWN_MASK) | //
+      ((ntn.isSyntax(Sym.CONJUGATION, Stx.PRECIRCUMFIX) && this.containsType(symbol, Sym.CONJUGATION_BEGIN)) ? CONJUGATION_MASK : UNKNOWN_MASK) | //
+      ((ntn.isSyntax(Sym.COMMUTATION, Stx.PRECIRCUMFIX) && this.containsType(symbols, Sym.COMMUTATION_BEGIN)) ? COMMUTATION_MASK : UNKNOWN_MASK) | //
+      ((ntn.isSyntax(Sym.ROTATION, Stx.PRECIRCUMFIX) && this.containsType(symbols, Sym.ROTATION_BEGIN)) ? ROTATION_MASK : UNKNOWN_MASK) | //
+      ((ntn.isSyntax(Sym.INVERSION, Stx.CIRCUMFIX) && this.containsType(symbols, Sym.INVERSION_BEGIN)) ? INVERSION_MASK : UNKNOWN_MASK) | //
+      ((ntn.isSyntax(Sym.REFLECTION, Stx.CIRCUMFIX) && this.containsType(symbols, Sym.REFLECTION_BEGIN)) ? REFLECTION_MASK : UNKNOWN_MASK) | //
       ((ntn.isSupported(Sym.PERMUTATION) && this.containsType(symbols, Sym.PERMUTATION_BEGIN)) ? PERMUTATION_MASK : UNKNOWN_MASK);
 
       // Is it a Permutation Begin token without any ambiguity?
@@ -328,6 +330,7 @@ function (Notation, AST, Tokenizer) {
 
       // Is it an ambiguous permutation begin token?
       if ((expressionMask & PERMUTATION_MASK) == PERMUTATION_MASK) {
+        let startPos = t.getStartPosition();
         // Look ahead
         if (t.nextToken() != Tokenizer.TT_KEYWORD) {
           throw new ParseException("Statement: keyword expected.", t.getStartPosition(), t.getEndPosition());
@@ -335,25 +338,238 @@ function (Notation, AST, Tokenizer) {
         symbols = t.getSymbolValue();
         t.pushBack();
         if (symbols != null && this.intersectsTypes(symbols, Sym.PERMUTATION.getSubSymbols())) {
-          return this.parsePermutation(t, parent);
+          return this.parsePermutation(t, parent, startPos);
         } else {
-          return this.parseCompoundStatement(t, parent, expressionMask^PERMUTATION_MASK);
+          return this.parseCompoundStatement(t, parent, startPos,expressionMask ^ PERMUTATION_MASK);
         }
       }
-      
-       // Is it one of the other Begin tokens?
+
+      // Is it one of the other Begin tokens?
       if (expressionMask != UNKNOWN_MASK) {
-       return parseCompoundStatement(t, parent, p, expressionMask);
-       }
+        return parseCompoundStatement(t, parent, expressionMask);
+      }
 
       throw new ParseException("Statement: Invalid Statement " + t.sval, t.getStartPosition(), t.getEndPosition());
     }
 
+    /** Parses the remainder of a permutation statement after its PERMUTATION_BEGIN token has been consumed. 
+     * 
+     * @param {Tokenizer} t
+     * @param {Node} parent
+     * @param {int} startPos the start position of the PERMUTATION_BEGIN begin token
+     * @returns {unresolved} the parsed permutation
+     * @throws parse exception
+     */
+    parsePermutation(t, parent, startPos) {
+      throw new ParseException("Permutation: Not implemented " + t.sval, t.getStartPosition(), t.getEndPosition());
+    }
+    /** Parses a compound statement after its XXX_BEGIN token has been consumed. 
+     * 
+     * @param {Tokenizer} t
+     * @param {Node} parent
+     * @param {int} startPos the start position of the XXX_BEGIN begin token
+     * @param {int} beginTypeMask the mask indicating which XXX_BEGIN token was consumed
+     * @returns {unresolved} the parsed compound statement
+     * @throws parse exception
+     */
+    parseCompoundStatement(t, parent, startPos, beginTypeMask) {
+      let ntn = this.notation;
+      let Sym = Notation.Symbol;
+      let Stx = Notation.Syntax;
+      
+      let seq1 = new AST.SequenceNode();
+      seq1.setStartPosition(startPos);
+      parent.add(seq1);
+      let seq2 = null;
+      let grouping = seq1;
+
+        // The final type mask reflects the final type that we have determined
+        // after parsing all of the grouping.
+        let finalTypeMask = beginTypeMask & (GROUPING_MASK | CONJUGATION_MASK | COMMUTATION_MASK | ROTATION_MASK | REFLECTION_MASK | INVERSION_MASK);
+      
+        // Evaluate: {Statement} , (GROUPING_END | COMMUTATION_END | CONJUGATION_END | ROTATION_END) ;
+        TheGrouping:
+        while (true) {
+            switch (t.nextToken()) {
+                case Tokenizer.TT_KEYWORD:
+                  let symbols = t.getSymbolValue();
+                    // Look ahead the nextElement token.
+
+                    let endTypeMask
+                            = ((this.containsType(symbols, Sym.GROUPING_END)) ? GROUPING_MASK : UNKNOWN_MASK) | //
+                            ((ntn.isSyntax(Sym.CONJUGATION, Stx.PRECIRCUMFIX) && this.containsType(symbols, Sym.CONJUGATION_END)) ? CONJUGATION_MASK : UNKNOWN_MASK) | //
+                            ((ntn.isSyntax(Sym.COMMUTATION, Stx.PRECIRCUMFIX) && this.containsType(symbols, Sym.COMMUTATION_END)) ? COMMUTATION_MASK : UNKNOWN_MASK) | //
+                            ((ntn.isSyntax(Sym.INVERSION, Stx.CIRCUMFIX) && this.containsType(symbols, Sym.INVERSION_END)) ? INVERSION_MASK : UNKNOWN_MASK) | //
+                            ((ntn.isSyntax(Sym.REFLECTION, Stx.CIRCUMFIX) && this.containsType(symbols, Sym.REFLECTION_END)) ? REFLECTION_MASK : UNKNOWN_MASK) | //
+                            ((ntn.isSyntax(Sym.ROTATION, Stx.PRECIRCUMFIX) && this.containsType(symbols, Sym.ROTATION_END)) ? ROTATION_MASK : UNKNOWN_MASK);
+                    let delimiterTypeMask
+                            = ((ntn.isSyntax(Symbol.CONJUGATION, Stx.PRECIRCUMFIX) && this.containsType(symbols, Sym.CONJUGATION_DELIMITER)) ? CONJUGATION_MASK : 0) 
+                            | ((ntn.isSyntax(Sym.COMMUTATION, Stx.PRECIRCUMFIX) && this.containsType(symbols, Sym.COMMUTATION_DELIMITER)) ? COMMUTATION_MASK : 0) 
+                            | ((ntn.isSyntax(Sym.ROTATION, Stx.PRECIRCUMFIX) && this.containsType(symbols, Sym.ROTATION_DELIMITER)) ? ROTATION_MASK : 0);
+
+                    if (endTypeMask != 0) {
+                        finalTypeMask &= endTypeMask;
+                        grouping.setEndPosition(t.getEndPosition());
+                        break TheGrouping;
+
+                    } else if (delimiterTypeMask != 0) {
+                        finalTypeMask &= delimiterTypeMask;
+                        if (finalTypeMask == 0) {
+                            throw new ParseException("Grouping: Invalid delimiter.", t.getStartPosition(), t.getEndPosition());
+                        }
+                        if (seq2 == null) {
+                            seq1.setEndPosition(t.getStartPosition());
+                            seq2 = new SequenceNode(notation.getLayerCount());
+                            seq2.setStartPosition(t.getEndPosition());
+                            parent.add(seq2);
+                            grouping = seq2;
+                        } else {
+                            throw new ParseException("Grouping: Delimiter must occur only once", t.getStartPosition(), t.getEndPosition());
+                        }
+ 
+                    } else {
+                        t.pushBack();
+                        this.parseExpression(t, grouping);
+                    }
+                    break;
+                case StreamPosTokenizer.TT_EOF:
+                    throw new ParseException(
+                            "Grouping: End missing.", t.getStartPosition(), t.getEndPosition());
+                default:
+                    throw new ParseException(
+                            "Grouping: Internal error.", t.getStartPosition(), t.getEndPosition());
+            }
+        }
+      
+        seq1.removeFromParent();
+        if (seq2 == null) {
+            // There is no second sequence. 
+            // The compound statement can only be a grouping.
+            finalTypeMask &= GROUPING_MASK;
+        } else {
+            // There is a second sequence. Remove it from its parent, because we
+            // will integrate it into the compound statement.
+            seq2.removeFromParent();
+
+            // The compound statement can not be a grouping.
+            finalTypeMask &= -1 ^ GROUPING_MASK;
+        }
+      
+        switch (finalTypeMask) {
+            case GROUPING_MASK:
+                if (seq2 != null) {
+                    throw new ParseException(
+                            "Grouping: Invalid Grouping.", startPos, t.getEndPosition());
+                } else {
+                    grouping = new AST.GroupingNode(ntn.getLayerCount(), startPos, t.getEndPosition());
+                    while (seq1.getChildCount() > 0) {
+                        grouping.add(seq1.getChildAt(0));
+                    }
+                }
+                break;
+
+            case INVERSION_MASK:
+                if (seq2 != null) {
+                    throw new ParseException(
+                            "Inversion: Invalid Inversion.", startPos, t.getEndPosition());
+                } else {
+                    grouping = new AST.InversionNode(ntn.getLayerCount(), startPos, t.getEndPosition());
+                    while (seq1.getChildCount() > 0) {
+                        grouping.add(seq1.getChildAt(0));
+                    }
+                }
+                break;
+
+            case REFLECTION_MASK:
+                if (seq2 != null) {
+                    throw new ParseException(
+                            "Reflection: Invalid Reflection.", startPos, t.getEndPosition());
+                } else {
+                    grouping = new AST.ReflectionNode(notation.getLayerCount(), startPos, t.getEndPosition());
+                    while (seq1.getChildCount() > 0) {
+                        grouping.add(seq1.getChildAt(0));
+                    }
+                }
+                break;
+
+            case CONJUGATION_MASK:
+                if (seq2 == null) {
+                    throw new ParseException(
+                            "Conjugation: Conjugate missing.", startPos, t.getEndPosition());
+                } else {
+                    grouping = new AST.ConjugationNode(notation.getLayerCount(), seq1, seq2, startPos, t.getEndPosition());
+                }
+                break;
+
+            case COMMUTATION_MASK:
+                if (seq2 == null) {
+                    if (seq1.getChildCount() == 2 && seq1.getSymbol() == Symbol.SEQUENCE) {
+                        grouping = new AST.CommutationNode(notation.getLayerCount(), seq1.getChildAt(0), seq1.getChildAt(1), startPos, t.getEndPosition());
+                    } else {
+                        throw new ParseException(
+                                "Commutation: Commutee missing.", startPos, t.getEndPosition());
+                    }
+                } else {
+                    grouping = new AST.CommutationNode(notation.getLayerCount(), seq1, seq2, startPos, t.getEndPosition());
+                }
+                break;
+
+            case ROTATION_MASK:
+                if (seq2 == null) {
+                    throw new ParseException(
+                            "Rotation: Rotatee missing.", startPos, t.getEndPosition());
+                } else {
+                    grouping = new AST.RotationNode(notation.getLayerCount(), seq1, seq2, startPos, t.getEndPosition());
+                }
+                break;
+
+            default:
+                let ambiguous = '';
+                if ((finalTypeMask & GROUPING_MASK) != 0) {
+                    ambiguous+=("Grouping");
+                }
+                if ((finalTypeMask & INVERSION_MASK) != 0) {
+                    if (ambiguous.length != 0) {
+                        ambiguous+=(" or ");
+                    }
+                    ambiguous+=("Inversion");
+                }
+                if ((finalTypeMask & REFLECTION_MASK) != 0) {
+                    if (ambiguous.length != 0) {
+                        ambiguous+=(" or ");
+                    }
+                    ambiguous+=("Reflection");
+                }
+                if ((finalTypeMask & CONJUGATION_MASK) != 0) {
+                    if (ambiguous.length != 0) {
+                        ambiguous+=(" or ");
+                    }
+                    ambiguous.append("Conjugation");
+                }
+                if ((finalTypeMask & COMMUTATION_MASK) != 0) {
+                    if (ambiguous.length() != 0) {
+                        ambiguous+=(" or ");
+                    }
+                    ambiguous+=("Commutation");
+                }
+                if ((finalTypeMask & ROTATION_MASK) != 0) {
+                    if (ambiguous.length() != 0) {
+                        ambiguous+=(" or ");
+                    }
+                    ambiguous+=("Rotation");
+                }
+                throw new ParseException(
+                        "Compound Statement: Ambiguous compound statement, possibilities are " + ambiguous + ".", startPos, t.getEndPosition());
+        }
+
+        parent.add(grouping);
+        return grouping;
+    }
     /** Parses a macro. 
      * 
      * @param {Tokenizer} t
      * @param {Node} parent
-     * @returns {unresolved} the parsed move
+     * @returns {unresolved} the parsed macro
      * @throws parse exception
      */
     parseMacro(t, parent) {
@@ -363,7 +579,7 @@ function (Notation, AST, Tokenizer) {
      * 
      * @param {Tokenizer} t
      * @param {Node} parent
-     * @returns {unresolved} the parsed move
+     * @returns {unresolved} the parsed NOP
      * @throws parse exception
      */
     parseNOP(t, parent) {
@@ -371,7 +587,7 @@ function (Notation, AST, Tokenizer) {
         throw new ParseException("NOP: \"" + t.getStringValue() + "\" is a " + t.getTokenType() + " but not a keyword.", t.getStartPosition(), t.getEndPosition());
       }
       let symbols = t.getSymbolValue();
-      if (!containsType(symbols, Notation.Symbol.NOP)) {
+      if (!this.containsType(symbols, Notation.Symbol.NOP)) {
         throw new ParseException("Move: \"" + t.getStringValue() + "\" is not a NOP", t.getStartPosition(), t.getEndPosition());
       }
 

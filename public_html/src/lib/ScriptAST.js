@@ -21,10 +21,36 @@ function () {
         this.children=[];
         this.startPosition=-1;
         this.endPosition=-1;
+        this.parent=null;
       }
       
       add(child) {
+        if (child.parent!=null) {
+          child.removeFromParent();
+        }
+        child.parent=this;
         this.children.push(child);
+      }
+      remove(child) {
+        if (child.parent==this) {
+          let index=this.children.indexOf(this);
+          if (index != -1) {
+            this.children.splice(index,);
+          }
+          child.parent=null;
+        }
+      }
+      
+      removeFromParent() {
+        if (this.parent!=null) {
+          parent.remove(this);
+        }
+      }
+      getChildCount() {
+        return this.children.length;
+      }
+      getChildAt(index) {
+        return this.children[index];
       }
       
       setStartPosition(newValue) {
