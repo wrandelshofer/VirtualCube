@@ -17,7 +17,8 @@
 // --------------
 // require.js
 // --------------
-define("AbstractPlayerApplet", ["AbstractCanvas", "Node3D", "J3DI", "J3DIMath", "Notation", "ScriptAST", "ScriptParser",
+define("AbstractPlayerApplet", ["AbstractCanvas", "Node3D", "J3DI", "J3DIMath", "Notation",
+  "ScriptAST", "ScriptParser", "Tokenizer",
 
   "RubiksCubeS1Cube3D",
   "RubiksCubeS4Cube3D",
@@ -27,7 +28,8 @@ define("AbstractPlayerApplet", ["AbstractCanvas", "Node3D", "J3DI", "J3DIMath", 
   "PocketCubeS4Cube3D",
   "PocketCubeS5Cube3D"
 ],
-function (AbstractCanvas, Node3D, J3DI, J3DIMath, Notation, AST, ScriptParser,
+function (AbstractCanvas, Node3D, J3DI, J3DIMath, Notation,
+AST, ScriptParser, Tokenizer,
 RubiksCubeS1Cube3D,
 RubiksCubeS4Cube3D,
 RubiksCubeS5Cube3D,
@@ -37,21 +39,30 @@ PocketCubeS5Cube3D
 ) {
 
   let module = {
-    log: (false) // Enable or disable logging for this module.
-    ? function (msg) {
+    log: (true) // Enable or disable logging for this module.
+    ? function (msg,args) {
+      if (args===undefined)
       console.log('AbstractPlayerApplet.js ' + msg);
+      else
+      console.log('AbstractPlayerApplet.js ' + msg,args);
     }
     : function () {},
 
     warning: (true) // Enable or disable logging for this module.
-    ? function (msg) {
+    ? function (msg,args) {
+      if (args===undefined)
       console.log('AbstractPlayerApplet.js WARNING ' + msg);
+      else
+      console.log('AbstractPlayerApplet.js WARNING ' + msg,args);
     }
     : function () {},
 
     error: (true) // Enable or disable logging for this module.
-    ? function (msg) {
+    ? function (msg,args) {
+      if (args===undefined)
       console.log('AbstractPlayerApplet.js ERROR ' + msg);
+      else
+      console.log('AbstractPlayerApplet.js ERROR ' + msg,args);
     }
     : function () {}
   }
@@ -149,7 +160,66 @@ PocketCubeS5Cube3D
     }
     return map;
   }
+  /** Parses a list of script macro definitions.
+   *
+   * EBNF: (|)=choice, []=optional, {}=zero or more, (* *)=comment
+   * 
+   *  definitions = {' '}, entry, { {' '}, [','] , {' '} , entry } ;
+   *  entry = optionallyQuotedId , {' '},  '=', {' '} , optionallyQuotedValue ;
+   *  optionallyQuotedId = (* words *) | (* quote *), (* characters *), (* quote *) ;
+   *  optionallyQuotedValue = (* words *) | (* quote *), (* characters *), (* quote *) ;
+   */
+  let parserMacroDefinitions = function (str) {
+    const t = new Tokenizer.PushBackReader(str);
+    let defs = {};
+    do {
+      t.skipWhitespace();
+      let quote = t.read();
+      if (quote == null) break;
+      let id = '';
+      if (/\w/.test(quote)) {// => identifier is not quoted
+        id=quote;
+        for (let ch = t.read(); ch != null && ch != '='; ch = t.read()) {
+          id = id + ch;
+        }
+        id = id.trim();
+        t.pushBack();
+      } else {// => identifier is quoted
+        for (let ch = t.read(); ch != null && ch != quote; ch = t.read()) {
+          id = id + ch;
+        }
+      }
+      t.skipWhitespace();
+      let equal = t.read();
+      if (equal != '=')
+        throw new ScriptParser.ParseException("= expected, ch:" + equal, t.getPosition() - 1, t.getPosition())
+      t.skipWhitespace();
+      quote = t.read();
+      if (quote == null)
+        throw new ScriptParser.ParseException("quote around value expected, ch:" + ch, t.getPosition() - 1, t.getPosition())
+      let value = '';
+      if (/\w/.test(quote)) {// => value is not quoted
+        value=quote;
+        for (let ch = t.read(); ch != null && ch != ','; ch = t.read()) {
+          value = value + ch;
+        }
+        value = value.trim();
+        t.pushBack();
+      } else {
+        for (let ch = t.read(); ch != null && ch != quote; ch = t.read()) {
+          value = value + ch;
+        }
+      }
+      t.skipWhitespace();
+      let comma = t.read();
+      if (comma != ',') {
+        t.pushBack();
+      }
 
+      defs[id] = value;
+    } while (t.getChar() != null);
+    return defs;
+  }
 
 
 // ===============================
@@ -322,7 +392,7 @@ PocketCubeS5Cube3D
       this.viewportMatrix = new J3DIMatrix4();
 
       this.forceColorUpdate = false;
-      
+
       this.reset();
     }
 
@@ -606,7 +676,7 @@ PocketCubeS5Cube3D
         }
         // remove repainter needed for animation
         self.cube3d.repainter = null;
-        
+
         // Reset cube
         self.cube.reset();
         if (self.initscript != null) {
@@ -1096,11 +1166,26 @@ PocketCubeS5Cube3D
         // FIXME implement me
       }
 
+      // FIXME parse notation
+      // ----------
+      let notation = new Notation.DefaultNotation();
+
+      // parse scriptmacros
+      // --------------
+      if (p.scriptmacros != null) {
+        module.log('.readParameters scriptmacros:' + p.scriptmacros);
+        try {
+          this.macros = parserMacroDefinitions(p.scriptmacros);
+            module.log('.readParameters scriptmacros: %o', this.macros);
+          } catch (e) {
+          console.log(e);
+          module.error("illegal scriptmacros:\"" + p.scriptmacros + '"');
+        }
+      }
       // parse script
       // --------------
       if (p.script != null) {
         module.log('.readParameters script:' + p.script);
-        let notation = new Notation.DefaultNotation();
         let parser = new ScriptParser.ScriptParser(notation);
         try {
           this.script = parser.parse(p.script);
@@ -1196,7 +1281,7 @@ PocketCubeS5Cube3D
       this.mousePrevY = undefined;
       this.mousePrevTimestamp = undefined;
     }
-    
+
     /**
      * Touch handler for the canvas object.
      * Forwards everything to the mouse handler.

@@ -31,6 +31,9 @@ function (Notation, AST, Tokenizer) {
       this.start = start;
       this.end = end;
     }
+    toString() {
+      return this.msg+" at:"+this.start+".."+this.end;
+    }
   }
 
   /**
@@ -378,6 +381,7 @@ function (Notation, AST, Tokenizer) {
 // MODULE API    
 // ------------------
   return {
+    ParseException:ParseException,
     ScriptParser: ScriptParser,
     createRandomScript: createRandomScript,
     newTwistNode: (axis, layerMask, angle) => new AST.MoveNode(3, axis, layerMask, angle)

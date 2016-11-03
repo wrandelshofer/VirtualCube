@@ -386,15 +386,30 @@ class PushBackReader {
   read() {
     if (this.pushedBack) {
       this.pushedBack=false;
-      return ch;
+      return this.ch;
     }
     if (this.pos<this.str.length) {
-      return this.ch= this.str.charAt(this.pos++);
+      this.ch= this.str.charAt(this.pos++);
+    }else{
+      this.ch=null;
     }
-    return null;
+    return this.ch;
   }
   pushBack() {
     this.pushedBack=true;
+  }
+  skipWhitespace() {
+    let c = this.read();
+    while (c==' '||c=='\n'||c=='\t') {
+      c=this.read();
+    }
+    this.pushBack();
+  }
+  getChar() {
+    return this.ch;
+  }
+  getPosition() {
+    return this.pos;
   }
 }
 
