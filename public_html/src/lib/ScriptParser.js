@@ -241,11 +241,11 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
           for (let i = 0; i < symbols.length; i++) {
             let s = symbols[i];
             if (types[s.getType()] != null) {
-console.log('extractSymbol:'+s+" "+symbols+" types:"+types);          
+              console.log('extractSymbol:' + s + " " + symbols + " types:" + types);
               return s;
             }
           }
-console.log('extractSymbol:'+null+" "+symbols+" types:"+types);          
+          console.log('extractSymbol:' + null + " " + symbols + " types:" + types);
           return null;
         }
 
@@ -297,7 +297,7 @@ console.log('extractSymbol:'+null+" "+symbols+" types:"+types);
             Sym.PERMUTATION_MINUS,
             Sym.PERMUTATION_PLUSPLUS]);
           if (ntn.isSyntax(Sym.PERMUTATION, Notation.Syntax.PREFIX)
-              && this.isSuperType(symbols,Sym.PERMUTATION) != null) {
+              && this.isSuperType(symbols, Sym.PERMUTATION) != null) {
             let startpos = t.getStartPosition();
             t.pushBack();
             if (t.nextToken() != StreamTokenizer.TT_KEYWORD) {
@@ -867,7 +867,7 @@ console.log('extractSymbol:'+null+" "+symbols+" types:"+types);
 
           // Is it a [RptrBegin] token? Consume it.
           let symbols = t.getSymbolValue();
-          if (symbols!=null&&this.isType(symbols, Sym.REPETITION_BEGIN)) {
+          if (symbols != null && this.isType(symbols, Sym.REPETITION_BEGIN)) {
             //consume
           } else {
             t.pushBack();
@@ -905,6 +905,7 @@ console.log('extractSymbol:'+null+" "+symbols+" types:"+types);
           }
           return repetition;
         }
+
         /** Parses an invertor 
          * 
          * @param {Tokenizer} t
@@ -927,7 +928,7 @@ console.log('extractSymbol:'+null+" "+symbols+" types:"+types);
           let symbols = t.getSymbolValue();
 
           if (this.isType(symbols, Sym.INVERTOR)) {
-            module.log('parseInvertor: "%s".',t.getStringValue());
+            module.log('parseInvertor: "%s".', t.getStringValue());
             inversion.setEndPosition(t.getEndPosition());
             return inversion;
           }
@@ -971,7 +972,7 @@ console.log('extractSymbol:'+null+" "+symbols+" types:"+types);
          */
         parseMove(t, parent) {
           const ntn = this.notation;
-          
+
           let move = new AST.MoveNode(ntn.getLayerCount());
           parent.add(move);
 
@@ -990,7 +991,7 @@ console.log('extractSymbol:'+null+" "+symbols+" types:"+types);
             throw new ParseException("Move: \"" + t.getStringValue() + "\" is not a Move", t.getStartPosition(), t.getEndPosition());
           }
 
-            module.log('parseMove: "%s".',t.getStringValue());
+          module.log('parseMove: "%s".', t.getStringValue());
           move.setStartPosition(t.getStartPosition());
           move.setEndPosition(t.getEndPosition());
           move.setAxis(symbol.getAxis());
