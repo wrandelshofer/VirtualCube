@@ -4,7 +4,6 @@
  * You may only use this software in accordance with the license terms.
  */
 "use strict";
-
 // --------------
 // require.js
 // --------------
@@ -19,7 +18,6 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
                 console.log('ScriptParser.js ' + msg, args);
             }
         : function () {},
-
         warning: (true) // Enable or disable logging for this module.
             ? function (msg, args) {
               if (args === undefined)
@@ -28,7 +26,6 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
                 console.log('ScriptParser.js WARNING ' + msg, args);
             }
         : function () {},
-
         error: (true) // Enable or disable logging for this module.
             ? function (msg, args) {
               if (args === undefined)
@@ -38,7 +35,6 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
             }
         : function () {}
       };
-
       class ParseException {
         constructor(msg, start, end) {
           this.msg = msg;
@@ -111,8 +107,6 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
       const PERMUTATION_MASK = 16;
       const INVERSION_MASK = 32;
       const REFLECTION_MASK = 64;
-
-
       /**
        * Implements a parser for a specific notation..
        */
@@ -126,7 +120,6 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
           this.notation = notation;
           this.macros = [];
           this.tokenizer = null;
-
           if (localMacros != null) {
             for (let macro in localMacros) {
               macros.push(macro);
@@ -143,7 +136,6 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
             let tt = new Tokenizer.Tokenizer();
             tt.skipWhitespace();
             tt.addNumbers();
-
             let tokenToSymbolMap = this.notation.getTokenToSymbolMap();
             for (let i in tokenToSymbolMap) {
               tt.addKeyword(i, tokenToSymbolMap[i]);
@@ -172,15 +164,18 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
           while (tt.nextToken() != Tokenizer.TT_EOF) {
             tt.pushBack();
             this.parseExpression(tt, root);
-            if (guard-- < 0)
+            guard = guard - 1;
+            if (guard < 0) {
               throw "too many iterations! " + tt.getTokenType() + " pos:" + tt.pos;
+            }
           }
           return root;
         }
 
         /**
          * Returns true if the array contains a symbol of the specified symbol type
-         * @param {type} array of symbols
+         * @param {
+         type} array of symbols
          * @param {type} type desired type
          * @return true if array contains a symbol of the specified type
          */
@@ -193,9 +188,11 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
           }
           return false;
         }
+
         /**
          * Returns true if the array contains a symbol of the specified symbol type
-         * @param {type} array of symbols
+         * @param {
+         type} array of symbols
          * @param {type} type desired type
          * @return true if array contains a symbol of the specified type
          */
@@ -215,7 +212,8 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
          * Returns true if the array contains at least one symbol, and
          * only symbols of the specified symbol type.
          * 
-         * @param {type} array of symbols
+         * @param {
+         type} array of symbols
          * @param {type} type desired type
          * @return true if array contains a symbol of the specified type
          */
@@ -230,7 +228,8 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
         }
         /**
          * Extracts the first symbol which has one of the types
-         * @param {type} array of symbols
+         * @param {
+         type} array of symbols
          * @param {type} types selection of types
          * @return a symbol or null
          */
@@ -238,18 +237,17 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
           for (let i = 0; i < symbols.length; i++) {
             let s = symbols[i];
             if (types[s.getType()] != null) {
-              console.log('extractSymbol(' + symbols + " types:" + types+')'+s);
               return s;
             }
           }
-          console.log('extractSymbol('  + symbols + " types:" + types+'):null');
           return null;
         }
 
         /**
          * Parses a Statement.
          * 
-         * @param {Tokenizer} t
+         * @param {
+         Tokenizer} t
          * @param {Node} parent
          * @returns {unresolved} the parsed statement
          * @throws parse exception
@@ -258,38 +256,36 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
           let ntn = this.notation;
           let Sym = Notation.Symbol;
           let Stx = Notation.Syntax;
-
           // Fetch the next token.
           if (t.nextToken() != Tokenizer.TT_KEYWORD) {
             throw new ParseException("Statement: \"" + t.getStringValue() + "\" is a " + t.getTokenType() + " but not a keyword.", t.getStartPosition(), t.getEndPosition());
           }
           let symbols = t.getSymbolValue();
-
-          // Evaluate: Macro
+// Evaluate: Macro
           if (symbols.length == 0) {
             throw new ParseException("Statement: Unknown statement " + t.sval, t.getStartPosition(), t.getEndPosition());
           }
 
-          // Is it a Macro?
+// Is it a Macro?
           if (this.containsType(symbols, Sym.MACRO)) {
             t.pushBack();
             return this.parseMacro(t, parent);
           }
 
-          // Is it a Move?
+// Is it a Move?
           if (this.containsType(symbols, Sym.MOVE)) {
             t.pushBack();
             return this.parseMove(t, parent);
           }
 
-          // Is it a NOP?
+// Is it a NOP?
           if (this.containsType(symbols, Sym.NOP)) {
             t.pushBack();
             return this.parseNOP(t, parent);
           }
 
 
-          // Is it a Permutation token? Parse a permutation.
+// Is it a Permutation token? Parse a permutation.
           let sign = this.extractSymbol(symbols, [Sym.PERMUTATION_PLUS,
             Sym.PERMUTATION_MINUS,
             Sym.PERMUTATION_PLUSPLUS]);
@@ -310,11 +306,11 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
             let pnode = this.parsePermutation(t, parent, startpos, sign);
             return pnode;
           }
-          // Okay, it's not a move and not a permutation sign.
-          // Since we allow for some ambiguity of the
-          // tokens used by the grouping, conjugation, commutation and permutation
-          // statement it gets a little bit complicated here.
-          // Create a bit mask with a bit for each expected statement.
+// Okay, it's not a move and not a permutation sign.
+// Since we allow for some ambiguity of the
+// tokens used by the grouping, conjugation, commutation and permutation
+// statement it gets a little bit complicated here.
+// Create a bit mask with a bit for each expected statement.
           let expressionMask
               = ((this.containsType(symbols, Sym.GROUPING_BEGIN)) ? GROUPING_MASK : UNKNOWN_MASK) | //
               ((ntn.isSyntax(Sym.CONJUGATION, Stx.PRECIRCUMFIX) && this.containsType(symbol, Sym.CONJUGATION_BEGIN)) ? CONJUGATION_MASK : UNKNOWN_MASK) | //
@@ -323,13 +319,12 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
               ((ntn.isSyntax(Sym.INVERSION, Stx.CIRCUMFIX) && this.containsType(symbols, Sym.INVERSION_BEGIN)) ? INVERSION_MASK : UNKNOWN_MASK) | //
               ((ntn.isSyntax(Sym.REFLECTION, Stx.CIRCUMFIX) && this.containsType(symbols, Sym.REFLECTION_BEGIN)) ? REFLECTION_MASK : UNKNOWN_MASK) | //
               ((ntn.isSupported(Sym.PERMUTATION) && this.containsType(symbols, Sym.PERMUTATION_BEGIN)) ? PERMUTATION_MASK : UNKNOWN_MASK);
-
-          // Is it a Permutation Begin token without any ambiguity?
+// Is it a Permutation Begin token without any ambiguity?
           if (expressionMask == PERMUTATION_MASK) {
             return this.parsePermutation(t, parent, p, null);
           }
 
-          // Is it an ambiguous permutation begin token?
+// Is it an ambiguous permutation begin token?
           if ((expressionMask & PERMUTATION_MASK) == PERMUTATION_MASK) {
             let startPos = t.getStartPosition();
             // Look ahead
@@ -345,17 +340,18 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
             }
           }
 
-          // Is it one of the other Begin tokens?
+// Is it one of the other Begin tokens?
           if (expressionMask != UNKNOWN_MASK) {
             return this.parseCompoundStatement(t, parent, expressionMask);
           }
 
-          throw new ParseException("Statement: Invalid Statement " + t.sval, t.getStartPosition(), t.getEndPosition());
+          throw new ParseException("Statement: illegal Statement " + t.sval, t.getStartPosition(), t.getEndPosition());
         }
 
         /** Parses the remainder of a permutation statement after its PERMUTATION_BEGIN token has been consumed. 
          * 
-         * @param {Tokenizer} t
+         * @param {
+         Tokenizer} t
          * @param {Node} parent
          * @param {int} startPos the start position of the PERMUTATION_BEGIN begin token
          * @returns {unresolved} the parsed permutation
@@ -377,23 +373,23 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
           let ntn = this.notation;
           let Sym = Notation.Symbol;
           let Stx = Notation.Syntax;
-
           let seq1 = new AST.SequenceNode();
           seq1.setStartPosition(startPos);
           parent.add(seq1);
           let seq2 = null;
           let grouping = seq1;
-
           // The final type mask reflects the final type that we have determined
           // after parsing all of the grouping.
           let finalTypeMask = beginTypeMask & (GROUPING_MASK | CONJUGATION_MASK | COMMUTATION_MASK | ROTATION_MASK | REFLECTION_MASK | INVERSION_MASK);
-
           // Evaluate: {Statement} , (GROUPING_END | COMMUTATION_END | CONJUGATION_END | ROTATION_END) ;
-          let guard=t.getInputLength();
+          let guard = t.getInputLength();
           TheGrouping:
               while (true) {
-             if (guard-- < 0) throw "too many iterations"   
-              
+            guard = guard - 1;
+            if (guard < 0) {
+              throw "too many iterations"
+            }
+
             switch (t.nextToken()) {
               case Tokenizer.TT_KEYWORD:
                 let symbols = t.getSymbolValue();
@@ -409,17 +405,16 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
                 let delimiterTypeMask
                     = ((ntn.isSyntax(Sym.CONJUGATION, Stx.PRECIRCUMFIX) && this.containsType(symbols, Sym.CONJUGATION_DELIMITER)) ? CONJUGATION_MASK : 0)
                     | ((ntn.isSyntax(Sym.COMMUTATION, Stx.PRECIRCUMFIX) && this.containsType(symbols, Sym.COMMUTATION_DELIMITER)) ? COMMUTATION_MASK : 0)
-                    | ((ntn.isSyntax(Sym.ROTATION, Stx.PRECIRCUMFIX) && this.containsType(symbols, Sym.ROTATION_DELIMITER)) ? ROTATION_MASK : 0);
-
+                    | ((ntn.isSyntax(Sym.ROTATION, Stx.PRECIRCUMFIX) && this.containsType(symbols, Sym.ROTATION_DELIMITER)) ? ROTATION_MASK :
+                        0);
                 if (endTypeMask != 0) {
                   finalTypeMask &= endTypeMask;
                   grouping.setEndPosition(t.getEndPosition());
                   break TheGrouping;
-
                 } else if (delimiterTypeMask != 0) {
                   finalTypeMask &= delimiterTypeMask;
                   if (finalTypeMask == 0) {
-                    throw new ParseException("Grouping: Invalid delimiter.", t.getStartPosition(), t.getEndPosition());
+                    throw new ParseException("Grouping: illegal delimiter.", t.getStartPosition(), t.getEndPosition());
                   }
                   if (seq2 == null) {
                     seq1.setEndPosition(t.getStartPosition());
@@ -454,7 +449,6 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
             // There is a second sequence. Remove it from its parent, because we
             // will integrate it into the compound statement.
             seq2.removeFromParent();
-
             // The compound statement can not be a grouping.
             finalTypeMask &= -1 ^ GROUPING_MASK;
           }
@@ -463,43 +457,43 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
             case GROUPING_MASK:
               if (seq2 != null) {
                 throw new ParseException(
-                    "Grouping: Invalid Grouping.", startPos, t.getEndPosition());
+                    "Grouping: illegal Grouping.", startPos, t.getEndPosition());
               } else {
                 grouping = new AST.GroupingNode(ntn.getLayerCount(), startPos, t.getEndPosition());
-                for (let i=seq1.getChildCount()-1;i>=0;i--) {
+                for (let i = seq1.getChildCount() - 1; i >= 0; i--) {
                   grouping.add(seq1.getChildAt(0));
                 }
-                if (!seq1.getChildCount()==0) throw "moving children failed";
+                if (!seq1.getChildCount() == 0)
+                  throw "moving children failed";
                 module.log('parseCompoundStatement: grouping');
               }
               break;
-
             case INVERSION_MASK:
               if (seq2 != null) {
                 throw new ParseException(
-                    "Inversion: Invalid Inversion.", startPos, t.getEndPosition());
+                    "Inversion: illegal Inversion.", startPos, t.getEndPosition());
               } else {
                 grouping = new AST.InversionNode(ntn.getLayerCount(), startPos, t.getEndPosition());
-                for (let i=seq1.getChildCount()-1;i>=0;i--) {
+                for (let i = seq1.getChildCount() - 1; i >= 0; i--) {
                   grouping.add(seq1.getChildAt(0));
                 }
-                if (!seq1.getChildCount()==0) throw "moving children failed";
+                if (!seq1.getChildCount() == 0)
+                  throw "moving children failed";
               }
               break;
-
             case REFLECTION_MASK:
               if (seq2 != null) {
                 throw new ParseException(
-                    "Reflection: Invalid Reflection.", startPos, t.getEndPosition());
+                    "Reflection: illegal Reflection.", startPos, t.getEndPosition());
               } else {
                 grouping = new AST.ReflectionNode(notation.getLayerCount(), startPos, t.getEndPosition());
-                for (let i=seq1.getChildCount()-1;i>=0;i--) {
+                for (let i = seq1.getChildCount() - 1; i >= 0; i--) {
                   grouping.add(seq1.getChildAt(0));
                 }
-                if (!seq1.getChildCount()==0) throw "moving children failed";
+                if (!seq1.getChildCount() == 0)
+                  throw "moving children failed";
               }
               break;
-
             case CONJUGATION_MASK:
               if (seq2 == null) {
                 throw new ParseException(
@@ -508,7 +502,6 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
                 grouping = new AST.ConjugationNode(notation.getLayerCount(), seq1, seq2, startPos, t.getEndPosition());
               }
               break;
-
             case COMMUTATION_MASK:
               if (seq2 == null) {
                 if (seq1.getChildCount() == 2 && seq1.getSymbol() == Sym.SEQUENCE) {
@@ -521,7 +514,6 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
                 grouping = new AST.CommutationNode(notation.getLayerCount(), seq1, seq2, startPos, t.getEndPosition());
               }
               break;
-
             case ROTATION_MASK:
               if (seq2 == null) {
                 throw new ParseException(
@@ -530,7 +522,6 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
                 grouping = new AST.RotationNode(notation.getLayerCount(), seq1, seq2, startPos, t.getEndPosition());
               }
               break;
-
             default:
               let ambiguous = '';
               if ((finalTypeMask & GROUPING_MASK) != 0) {
@@ -575,7 +566,8 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
         }
         /** Parses an expression. 
          * 
-         * @param {Tokenizer} t
+         * @param {
+         Tokenizer} t
          * @param {Node} parent
          * @returns {unresolved} the parsed macro
          * @throws parse exception
@@ -584,9 +576,7 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
           let ntn = this.notation;
           let Sym = Notation.Symbol;
           let Stx = Notation.Syntax;
-
           let expression = this.parseConstruct(t, parent);
-
           let ttype = t.nextToken();
           if (ttype == Tokenizer.TT_KEYWORD) {
             let symbols = t.getSymbolValue();
@@ -598,12 +588,10 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
                 && this.containsType(symbols, Sym.CONJUGATION_DELIMITER)) {
               let exp2 = this.parseExpression(t, parent);
               expression = new AST.ConjugationNode(ntn.getLayerCount(), expression, exp2, expression.getStartPosition(), exp2.getEndPosition());
-
             } else if (ntn.isSyntax(Sym.ROTATION, Stx.PREINFIX)
                 && this.containsType(symbols, Sym.ROTATION_DELIMITER)) {
               let exp2 = parseExpression(t, parent);
               expression = new AST.RotationNode(ntn.getLayerCount(), expression, exp2, expression.getStartPosition(), exp2.getEndPosition());
-
             } else if (ntn.isSyntax(Sym.COMMUTATION, Stx.POSTINFIX)
                 && this.containsType(symbols, Sym.COMMUTATION_DELIMITER)) {
               let exp2 = parseExpression(t, parent);
@@ -612,7 +600,6 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
                 && this.containsType(symbols, Sym.CONJUGATION_DELIMITER)) {
               let exp2 = parseExpression(t, parent);
               expression = new AST.ConjugationNode(ntn.getLayerCount(), exp2, expression, expression.getStartPosition(), exp2.getEndPosition());
-
             } else if (ntn.isSyntax(Sym.ROTATION, Stx.POSTINFIX)
                 && this.containsType(symbols, Sym.ROTATION_DELIMITER)) {
               let exp2 = parseExpression(t, parent);
@@ -629,7 +616,8 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
         }
         /** Parses a construct 
          * 
-         * @param {Tokenizer} t
+         * @param {
+         Tokenizer} t
          * @param {Node} parent
          * @returns {unresolved} the parsed macro
          * @throws parse exception
@@ -638,12 +626,9 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
           let ntn = this.notation;
           let Sym = Notation.Symbol;
           let Stx = Notation.Syntax;
-
           let statement = null;
-
           let ttype = t.nextToken();
           let symbols = t.getSymbolValue();
-
           if (ttype == Tokenizer.TT_KEYWORD
               && this.containsType(symbols, Sym.DELIMITER)) {
             // Evaluate: StmtDelimiter
@@ -655,28 +640,32 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
             statement = new AST.StatementNode(ntn.getLayerCount());
             parent.add(statement);
             statement.setStartPosition(t.getStartPosition());
-
             t.pushBack();
-
             // Evaluate: {Prefix}
             let prefix = statement;
             let lastPrefix = statement;
-            let guard=t.getInputLength();
+            let guard = t.getInputLength();
             while ((prefix = this.parsePrefix(t, prefix)) != null) {
-              if (guard-- < 0) throw "too many iterations";
+
+              guard = guard - 1;
+              if (guard < 0) {
+                throw "too many iterations";
+              }
               lastPrefix = prefix;
             }
 
-            // Evaluate: Statement
+// Evaluate: Statement
             let innerStatement = this.parseStatement(t, lastPrefix);
             statement.setEndPosition(innerStatement.getEndPosition());
-
-            // Evaluate: {Suffix}
+// Evaluate: Suffix
             let child = statement.getChildAt(0);
             let suffix = statement;
-            guard=t.getInputLength();
+            guard = t.getInputLength();
             while ((suffix = this.parseSuffix(t, statement)) != null) {
-              if (guard-- < 0) throw "too many iterations";
+              guard = guard - 1;
+              if (guard < 0) {
+                throw "too many iterations";
+              }
               suffix.add(child);
               child = suffix;
               statement.setEndPosition(suffix.getEndPosition());
@@ -686,7 +675,8 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
         }
         /** Parses a prefix. 
          * 
-         * @param {Tokenizer} t
+         * @param {
+         Tokenizer} t
          * @param {Node} parent
          * @returns {unresolved} the parsed macro
          * @throws parse exception
@@ -695,7 +685,6 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
           let ntn = this.notation;
           let Sym = Notation.Symbol;
           let Stx = Notation.Syntax;
-
           let ttype = t.nextToken();
           if (ttype == Tokenizer.TT_EOF) {
             return null;
@@ -711,57 +700,57 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
               return null;
             }
           }
-          // the prefix must be a keyword, or it is not a prefix at all  
+// the prefix must be a keyword, or it is not a prefix at all  
           if (ttype != Tokenizer.TT_KEYWORD) {
             t.pushBack();
             return null;
           }
           let symbols = t.getSymbolValue();
-          // We push back, because we do just decisions in this production
+// We push back, because we do just decisions in this production
           t.pushBack();
-
-          // Is it a commutator?
+// Is it a commutator?
           if (ntn.isSyntax(Sym.COMMUTATION, Stx.PREFIX)
               && this.containsType(symbols, Sym.COMMUTATION_BEGIN)) {
             return this.parseExpressionAffix(t, parent);
           }
 
-          // Is it a conjugator?
+// Is it a conjugator?
           if (ntn.isSyntax(Sym.CONJUGATION, Stx.PREFIX)
               && this.containsType(symbols, Sym.CONJUGATION_BEGIN)) {
             return this.parseExpressionAffix(t, parent);
           }
 
-          // Is it a rotator?
+// Is it a rotator?
           if (ntn.isSyntax(Sym.ROTATION, Stx.PREFIX)
               && this.containsType(symbols, Sym.ROTATION_BEGIN)) {
             return this.parseExpressionAffix(t, parent);
           }
 
-          // Is it an Inversion?
+// Is it an Inversion?
           if (ntn.isSyntax(Sym.INVERSION, Stx.PREFIX)
               && this.containsType(symbols, Sym.INVERTOR)) {
             return this.parseInvertor(t, parent);
           }
 
-          // Is it a repetition?
+// Is it a repetition?
           if (ntn.isSyntax(Sym.REPETITION, Stx.PREFIX)
               && this.containsType(symbols, Sym.REPETITION_BEGIN)) {
             return this.parseRepetitor(t, parent);
           }
 
-          // Is it a reflection?
+// Is it a reflection?
           if (ntn.isSyntax(Sym.REFLECTION, Stx.PREFIX)
               && this.containsType(symbols, Sym, Sym.REFLECTOR)) {
             return this.parseReflector(t, parent);
           }
 
-          // Or is it no prefix at all?
+// Or is it no prefix at all?
           return null;
         }
         /** Parses a suffix. 
          * 
-         * @param {Tokenizer} t
+         * @param {
+         Tokenizer} t
          * @param {Node} parent
          * @returns {unresolved} the parsed macro
          * @throws parse exception
@@ -770,7 +759,6 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
           let ntn = this.notation;
           let Sym = Notation.Symbol;
           let Stx = Notation.Syntax;
-
           let ttype = t.nextToken();
           if (ttype == Tokenizer.TT_EOF) {
             return null;
@@ -786,57 +774,57 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
               return null;
             }
           }
-          // the prefix must be a keyword, or it is not a prefix at all  
+// the prefix must be a keyword, or it is not a prefix at all  
           if (ttype != Tokenizer.TT_KEYWORD) {
             t.pushBack();
             return null;
           }
           let symbols = t.getSymbolValue();
-          // We push back, because we do just decisions in this production
+// We push back, because we do just decisions in this production
           t.pushBack();
-
-          // Is it a commutator?
+// Is it a commutator?
           if (ntn.isSyntax(Sym.COMMUTATION, Stx.SUFFIX)
               && this.containsType(symbols, Sym.COMMUTATION_BEGIN)) {
             return this.parseExpressionAffix(t, parent);
           }
 
-          // Is it a conjugator?
+// Is it a conjugator?
           if (ntn.isSyntax(Sym.CONJUGATION, Stx.SUFFIX)
               && this.containsType(symbols, Sym.CONJUGATION_BEGIN)) {
             return this.parseExpressionAffix(t, parent);
           }
 
-          // Is it a rotator?
+// Is it a rotator?
           if (ntn.isSyntax(Sym.ROTATION, Stx.SUFFIX)
               && this.containsType(symbols, Sym.ROTATION_BEGIN)) {
             return this.parseExpressionAffix(t, parent);
           }
 
-          // Is it an Inversion?
+// Is it an Inversion?
           if (ntn.isSyntax(Sym.INVERSION, Stx.SUFFIX)
               && this.containsType(symbols, Sym.INVERTOR)) {
             return this.parseInvertor(t, parent);
           }
 
-          // Is it a repetition?
+// Is it a repetition?
           if (ntn.isSyntax(Sym.REPETITION, Stx.SUFFIX)
               && this.containsType(symbols, Sym.REPETITION_BEGIN)) {
             return this.parseRepetitor(t, parent);
           }
 
-          // Is it a reflection?
+// Is it a reflection?
           if (ntn.isSyntax(Sym.REFLECTION, Stx.SUFFIX)
-              && this.containsType(symbols, Sym, Sym.REFLECTOR)) {
+              && this.containsType(symbols, Sym.REFLECTOR)) {
             return this.parseReflector(t, parent);
           }
 
-          // Or is it no suffix at all?
+// Or is it no suffix at all?
           return null;
         }
         /** Parses a macro. 
          * 
-         * @param {Tokenizer} t
+         * @param {
+         Tokenizer} t
          * @param {Node} parent
          * @returns {unresolved} the parsed macro
          * @throws parse exception
@@ -854,7 +842,6 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
         parseRepetitor(t, parent) {
           const ntn = this.notation;
           const Sym = Notation.Symbol;
-
           // Only parse if supported
           if (!ntn.isSupported(Sym.REPETITION)) {
             return null;
@@ -863,50 +850,48 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
           let repetition = new AST.RepetitionNode(ntn.getLayerCount());
           parent.add(repetition);
           repetition.setStartPosition(t.getStartPosition());
-
-          // Evaluate [RptrBegin] token.
-          // ---------------------------
-          // Only word tokens are legit.
-          // Fetch the next token.
+// Evaluate [RptrBegin] token.
+// ---------------------------
+// Only word tokens are legit.
+// Fetch the next token.
           if (t.nextToken() != Tokenizer.TT_KEYWORD
               && t.getTokenType() != Tokenizer.TT_NUMBER) {
-            throw new ParseException("Repetitor: Invalid begin.", t.getStartPosition(), t.getEndPosition());
+            throw new ParseException("Repetitor: illegal begin.", t.getStartPosition(), t.getEndPosition());
           }
 
-          // Is it a [RptrBegin] token? Consume it.
+// Is it a [RptrBegin] token? Consume it.
           let symbols = t.getSymbolValue();
           if (symbols != null && this.isType(symbols, Sym.REPETITION_BEGIN)) {
             //consume
           } else {
             t.pushBack();
           }
-          // The [RptrBegin] token is now done.
+// The [RptrBegin] token is now done.
 
-          // Evaluate Integer token.
-          // ---------------------------
-          // Only number tokens are legit.
+// Evaluate Integer token.
+// ---------------------------
+// Only number tokens are legit.
           if (t.nextToken() != Tokenizer.TT_NUMBER) {
             throw new ParseException("Repetitor: Repeat count missing.", t.getStartPosition(), t.getEndPosition());
           }
           let intValue = t.getNumericValue();
           if (intValue < 1) {
-            throw new ParseException("Repetitor: Invalid repeat count " + intValue, t.getStartPosition(), t.getEndPosition());
+            throw new ParseException("Repetitor: illegal repeat count " + intValue, t.getStartPosition(), t.getEndPosition());
           }
           repetition.setRepeatCount(intValue);
           repetition.setEndPosition(t.getEndPosition());
-          module.log("parseRepetitor count: "+intValue);
-          
-          // The Integer token is now done.
-          
-          // Evaluate [RptrEnd] token.
-          // ---------------------------
-          // Only keyword tokens are of interest.
+          module.log("parseRepetitor count: " + intValue);
+// The Integer token is now done.
+
+// Evaluate [RptrEnd] token.
+// ---------------------------
+// Only keyword tokens are of interest.
           if (t.nextToken() != Tokenizer.TT_KEYWORD) {
             t.pushBack();
             return repetition;
           }
 
-          // Is it a [RptrEnd] token? Consume it.
+// Is it a [RptrEnd] token? Consume it.
           symbols = t.getSymbolValue();
           if (this.isType(symbols, Sym.REPETITION_END)) {
             //consume
@@ -918,38 +903,65 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
 
         /** Parses an invertor 
          * 
-         * @param {Tokenizer} t
+         * @param {
+         Tokenizer} t
          * @param {Node} parent
-         * @returns {unresolved} the parsed macro
+         * @returns {unresolved} the parsed node
          * @throws parse exception
          */
         parseInvertor(t, parent) {
           const ntn = this.notation;
           const Sym = Notation.Symbol;
-
           const inversion = new AST.InversionNode(ntn.getLayerCount());
           parent.add(inversion);
           inversion.setStartPosition(t.getStartPosition());
-
           // Fetch the next token.
           if (t.nextToken() != Tokenizer.TT_KEYWORD) {
-            throw new ParseException("Invertor: Invalid begin.", t.getStartPosition(), t.getEndPosition());
+            throw new ParseException("Invertor: illegal begin.", t.getStartPosition(), t.getEndPosition());
           }
           let symbols = t.getSymbolValue();
-
           if (this.containsType(symbols, Sym.INVERTOR)) {
-            module.log('parseInvertor: "%s".', t.getStringValue());
+            module.log('parseInvertor: '+ t.getStringValue()+' '+t.getStartPosition()+'..'+t.getEndPosition());
             inversion.setEndPosition(t.getEndPosition());
             return inversion;
           }
 
-          // Or else?
-          throw new ParseException("Invertor: Invalid invertor " + t.sval, t.getStartPosition(), t.getEndPosition());
+// Or else?
+          throw new ParseException("Invertor: illegal invertor " + t.sval, t.getStartPosition(), t.getEndPosition());
         }
 
+        /** Parses a reflector 
+         * 
+         * @param {
+         Tokenizer} t
+         * @param {Node} parent
+         * @returns {unresolved} the parsed node
+         * @throws parse exception
+         */
+        parseReflector(t, parent) {
+          const ntn = this.notation;
+          const Sym = Notation.Symbol;
+          const reflection = new AST.ReflectionNode(ntn.getLayerCount());
+          parent.add(reflection);
+          reflection.setStartPosition(t.getStartPosition());
+          // Fetch the next token.
+          if (t.nextToken() != Tokenizer.TT_KEYWORD) {
+            throw new ParseException("Reflector: illegal begin.", t.getStartPosition(), t.getEndPosition());
+          }
+          let symbols = t.getSymbolValue();
+          if (this.containsType(symbols, Sym.REFLECTOR)) {
+            module.log('parseReflector: '+ t.getStringValue()+' '+t.getStartPosition()+'..'+t.getEndPosition());
+            reflection.setEndPosition(t.getEndPosition());
+            return reflection;
+          }
+
+// Or else?
+          throw new ParseException("Reflector: illegal reflection " + t.sval, t.getStartPosition(), t.getEndPosition());
+        }
         /** Parses a NOP. 
          * 
-         * @param {Tokenizer} t
+         * @param {
+         Tokenizer} t
          * @param {Node} parent
          * @returns {unresolved} the parsed NOP
          * @throws parse exception
@@ -957,7 +969,6 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
         parseNOP(t, parent) {
           const ntn = this.notation;
           const Sym = Notation.Symbol;
-
           if (t.nextToken() != Tokenizer.TT_KEYWORD) {
             throw new ParseException("NOP: \"" + t.getStringValue() + "\" is a " + t.getTokenType() + " but not a keyword.", t.getStartPosition(), t.getEndPosition());
           }
@@ -975,17 +986,16 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
         /**
          * Parses a move.
          * 
-         * @param {Tokenizer} t
+         * @param {
+         Tokenizer} t
          * @param {Node} parent
          * @returns {unresolved} the parsed move
          * @throws parse exception
          */
         parseMove(t, parent) {
           const ntn = this.notation;
-
           let move = new AST.MoveNode(ntn.getLayerCount());
           parent.add(move);
-
           if (t.nextToken() != Tokenizer.TT_KEYWORD) {
             throw new ParseException("Move: \"" + t.getStringValue() + "\" is a " + t.getTokenType() + " but not a keyword.", t.getStartPosition(), t.getEndPosition());
           }
@@ -1018,9 +1028,7 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
           scrambleCount = 21;
         if (scrambleMinCount == null)
           scrambleMinCount = 6;
-
         var scrambler = new Array(Math.floor(Math.random() * scrambleCount - scrambleMinCount) + scrambleMinCount);
-
         // Keep track of previous axis, to avoid two subsequent moves on
         // the same axis.
         var prevAxis = -1;
@@ -1029,7 +1037,7 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
           while ((axis = Math.floor(Math.random() * 3)) == prevAxis) {
           }
           prevAxis = axis;
-//    while ((layerMask = Math.floor(Math.random()*(1 << this.layerCount))) == 0) {}
+//    while ((layerMask = Math.floor(Math.random()*(1 << this.layerCount))) == 0) {        }
           layerMask = 1 << Math.floor(Math.random() * layerCount);
           while ((angle = Math.floor(Math.random() * 5) - 2) == 0) {
           }

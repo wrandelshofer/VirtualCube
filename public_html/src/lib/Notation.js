@@ -521,7 +521,7 @@ function () {
       this.symbolToSyntaxMap[Symbol.GROUPING] = Syntax.CIRCUMFIX;
       this.symbolToSyntaxMap[Symbol.PERMUTATION] = Syntax.PRECIRCUMFIX;
       this.symbolToSyntaxMap[Symbol.REPETITION] = Syntax.SUFFIX;
-      this.symbolToSyntaxMap[Symbol.REFLECTOR] = Syntax.SUFFIX;
+      this.symbolToSyntaxMap[Symbol.REFLECTION] = Syntax.SUFFIX;
       this.symbolToSyntaxMap[Symbol.INVERSION] = Syntax.SUFFIX;
 
     }
