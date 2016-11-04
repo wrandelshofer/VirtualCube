@@ -23,7 +23,8 @@ function () {
    * <p>
    * This class provides support for event listeners, and it defines the variables 
    * which hold the location and orientation of the cube parts.
-   * <p>
+   */
+  /** <p>
    * <b>Faces and Axes</b>
    * <p>
    * This class defines the location of the six faces of the cube, as shown below:
@@ -63,7 +64,9 @@ function () {
    * </li>
    * </ul>
    * <p>
-   * <b>Corner parts</b>
+   */ 
+   /**
+    *  <b>Corner parts</b>
    * <p>
    * This class defines the initial locations and orientations of the corner parts
    * as shown below:
@@ -122,7 +125,8 @@ function () {
    * <li>4: ulb</li><li>5: dbl</li><li>6: ufl</li><li>7: dlf</li>
    * </ul>
    * <p>
-   * <b>Edge parts</b>
+   */ 
+   /** <b>Edge parts</b>
    * <p>
    * This class defines the orientations of the edge parts and the location
    * of the first 12 edges.
@@ -211,7 +215,8 @@ function () {
    * <li> 9: fu</li><li>10: lf</li><li>11: fd</li>
    * </ul>
    * <p>
-   * <b>Side parts</b>
+   */ 
+   /** <b>Side parts</b>
    * <p>
    * This class defines the orientations of the side parts as shown below
    * (The locations of the side parts are defined by subclasses):

@@ -171,9 +171,41 @@
         <delete dir="${build.generate}/lib/models"/>
         <delete dir="${build.generate}/lib/shaders"/>
     </target>
+    <target name="build.stripcomments" depends="init,build.generate">
+      <replaceregexp 
+               match="/\*(?:.|[\r\n]){0,4000}?\*/\s*\n?"
+               replace=""
+               flags="gm"
+               encoding="UTF-8"
+      >
+            <fileset dir="${build.generate}/lib">
+                <include name="*.js"/>
+            </fileset>
+      </replaceregexp>
+      <replaceregexp 
+               match="^\s*//.*$|//[^'&quot;\n]*$"
+               replace=""
+               flags="gm"
+               encoding="UTF-8"
+      >
+            <fileset dir="${build.generate}/lib">
+                <include name="*.js"/>
+            </fileset>
+      </replaceregexp>
+      <replaceregexp 
+               match="^\s*\n"
+               replace=""
+               flags="gm"
+               encoding="UTF-8"
+      >
+            <fileset dir="${build.generate}/lib">
+                <include name="*.js"/>
+            </fileset>
+      </replaceregexp>
+    </target>
     <target name="build" depends="init,clean,build.generate,build.concat">
     </target>
-    <target name="build.concat" depends="init,build.generate">
+    <target name="build.concat" depends="init,build.generate,build.stripcomments">
       <!-- Concatenates all script files into a single file.
        -->
       <concat destfile="${build.concat}/lib/virtualcube.js">
