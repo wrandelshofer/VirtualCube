@@ -1,9 +1,7 @@
 /*
  * @(#)virtualcube.js  1.0.2  2014-01-20
- *
  * Copyright (c) 2014 Werner Randelshofer, Switzerland.
- * You may not use, copy or modify this file, except in compliance with the
- * accompanying license terms.
+ * You may only use this software in accordance with the license terms.
  */
 "use strict";
 

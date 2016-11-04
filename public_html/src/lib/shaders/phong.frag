@@ -1,12 +1,7 @@
 /*
  * @(#)phong.frag
- *
- * Copyright (c) 2011-2012 Werner Randelshofer, Immensee, Switzerland.
- * All rights reserved.
- *
- * You may not use, copy or modify this file, except in compliance with the
- * license agreement you entered into with Werner Randelshofer.
- * For details see accompanying license terms.
+ * Copyright (c) 2014 Werner Randelshofer, Switzerland.
+ * You may only use this software in accordance with the license terms.
  */
 
 // WebGL Fragment Shader

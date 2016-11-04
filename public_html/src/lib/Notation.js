@@ -1,9 +1,7 @@
 /*
  * @(#)Notation.js  0.1  2011-08-12
- *
- * Copyright (c) 2011-2012 Werner Randelshofer, Switzerland.
- * You may not use, copy or modify this file, except in compliance with the
- * accompanying license terms.
+ * Copyright (c) 2011 Werner Randelshofer, Switzerland.
+ * You may only use this software in accordance with the license terms.
  */
 "use strict";
 

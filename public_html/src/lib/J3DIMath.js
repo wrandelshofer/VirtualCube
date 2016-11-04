@@ -1,5 +1,7 @@
 /*
  * @(#)J3DIMath.js  1.1  2012-06-17
+ * Copyright (c) 2012 Werner Randelshofer, Switzerland.
+ * You may only use this software in accordance with the license terms.
  */
 /*
  * Copyright (C) 2009 Apple Inc. All Rights Reserved.
