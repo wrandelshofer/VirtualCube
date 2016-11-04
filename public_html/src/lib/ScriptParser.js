@@ -253,13 +253,15 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
          * @throws parse exception
          */
         parseStatement(t, parent) {
-          let ntn = this.notation;
-          let Sym = Notation.Symbol;
-          let Stx = Notation.Syntax;
+          const ntn = this.notation;
+          const Sym = Notation.Symbol;
+          const Stx = Notation.Syntax;
           // Fetch the next token.
           if (t.nextToken() != Tokenizer.TT_KEYWORD) {
             throw new ParseException("Statement: \"" + t.getStringValue() + "\" is a " + t.getTokenType() + " but not a keyword.", t.getStartPosition(), t.getEndPosition());
           }
+          
+          let startPos = t.getStartPosition();
           let symbols = t.getSymbolValue();
 // Evaluate: Macro
           if (symbols.length == 0) {
@@ -342,7 +344,7 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
 
 // Is it one of the other Begin tokens?
           if (expressionMask != UNKNOWN_MASK) {
-            return this.parseCompoundStatement(t, parent, expressionMask);
+            return this.parseCompoundStatement(t, parent, startPos, expressionMask);
           }
 
           throw new ParseException("Statement: illegal Statement " + t.sval, t.getStartPosition(), t.getEndPosition());
@@ -370,9 +372,11 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
          * @throws parse exception
          */
         parseCompoundStatement(t, parent, startPos, beginTypeMask) {
-          let ntn = this.notation;
-          let Sym = Notation.Symbol;
-          let Stx = Notation.Syntax;
+          if (beginTypeMask==null) {throw "illegal argument: beginTypeMask:"+beginTypeMask}
+          
+          const ntn = this.notation;
+          const Sym = Notation.Symbol;
+          const Stx = Notation.Syntax;
           let seq1 = new AST.SequenceNode();
           seq1.setStartPosition(startPos);
           parent.add(seq1);
@@ -405,8 +409,9 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
                 let delimiterTypeMask
                     = ((ntn.isSyntax(Sym.CONJUGATION, Stx.PRECIRCUMFIX) && this.containsType(symbols, Sym.CONJUGATION_DELIMITER)) ? CONJUGATION_MASK : 0)
                     | ((ntn.isSyntax(Sym.COMMUTATION, Stx.PRECIRCUMFIX) && this.containsType(symbols, Sym.COMMUTATION_DELIMITER)) ? COMMUTATION_MASK : 0)
-                    | ((ntn.isSyntax(Sym.ROTATION, Stx.PRECIRCUMFIX) && this.containsType(symbols, Sym.ROTATION_DELIMITER)) ? ROTATION_MASK :
-                        0);
+                    | ((ntn.isSyntax(Sym.ROTATION, Stx.PRECIRCUMFIX) && this.containsType(symbols, Sym.ROTATION_DELIMITER)) ? ROTATION_MASK :                        0);
+                
+module.log('parseCompoundStatement '+t.getStringValue()+' beginMask:'+beginTypeMask+', endMask:'+endTypeMask+', delimMask:'+delimiterTypeMask);                
                 if (endTypeMask != 0) {
                   finalTypeMask &= endTypeMask;
                   grouping.setEndPosition(t.getEndPosition());
@@ -414,11 +419,11 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
                 } else if (delimiterTypeMask != 0) {
                   finalTypeMask &= delimiterTypeMask;
                   if (finalTypeMask == 0) {
-                    throw new ParseException("Grouping: illegal delimiter.", t.getStartPosition(), t.getEndPosition());
+                    throw new ParseException("Grouping: illegal delimiter:"+t.getStringValue(), t.getStartPosition(), t.getEndPosition());
                   }
                   if (seq2 == null) {
                     seq1.setEndPosition(t.getStartPosition());
-                    seq2 = new SequenceNode(notation.getLayerCount());
+                    seq2 = new AST.SequenceNode(ntn.getLayerCount());
                     seq2.setStartPosition(t.getEndPosition());
                     parent.add(seq2);
                     grouping = seq2;
@@ -486,7 +491,7 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
                 throw new ParseException(
                     "Reflection: illegal Reflection.", startPos, t.getEndPosition());
               } else {
-                grouping = new AST.ReflectionNode(notation.getLayerCount(), startPos, t.getEndPosition());
+                grouping = new AST.ReflectionNode(ntn.getLayerCount(), startPos, t.getEndPosition());
                 for (let i = seq1.getChildCount() - 1; i >= 0; i--) {
                   grouping.add(seq1.getChildAt(0));
                 }
@@ -499,19 +504,19 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
                 throw new ParseException(
                     "Conjugation: Conjugate missing.", startPos, t.getEndPosition());
               } else {
-                grouping = new AST.ConjugationNode(notation.getLayerCount(), seq1, seq2, startPos, t.getEndPosition());
+                grouping = new AST.ConjugationNode(ntn.getLayerCount(), seq1, seq2, startPos, t.getEndPosition());
               }
               break;
             case COMMUTATION_MASK:
               if (seq2 == null) {
                 if (seq1.getChildCount() == 2 && seq1.getSymbol() == Sym.SEQUENCE) {
-                  grouping = new AST.CommutationNode(notation.getLayerCount(), seq1.getChildAt(0), seq1.getChildAt(1), startPos, t.getEndPosition());
+                  grouping = new AST.CommutationNode(ntn.getLayerCount(), seq1.getChildAt(0), seq1.getChildAt(1), startPos, t.getEndPosition());
                 } else {
                   throw new ParseException(
                       "Commutation: Commutee missing.", startPos, t.getEndPosition());
                 }
               } else {
-                grouping = new AST.CommutationNode(notation.getLayerCount(), seq1, seq2, startPos, t.getEndPosition());
+                grouping = new AST.CommutationNode(ntn.getLayerCount(), seq1, seq2, startPos, t.getEndPosition());
               }
               break;
             case ROTATION_MASK:
@@ -519,7 +524,7 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
                 throw new ParseException(
                     "Rotation: Rotatee missing.", startPos, t.getEndPosition());
               } else {
-                grouping = new AST.RotationNode(notation.getLayerCount(), seq1, seq2, startPos, t.getEndPosition());
+                grouping = new AST.RotationNode(ntn.getLayerCount(), seq1, seq2, startPos, t.getEndPosition());
               }
               break;
             default:

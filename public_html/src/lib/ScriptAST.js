@@ -73,15 +73,24 @@ define("ScriptAST", [],
         }
       }
 
+      class CommutationNode extends Node {
+        constructor(layerCount, startPosition, endPosition) {
+          super(layerCount, startPosition, endPosition);
+        }
+      }
+      class ConjugationNode extends Node {
+        constructor(layerCount, startPosition, endPosition) {
+          super(layerCount, startPosition, endPosition);
+        }
+      }
       class SequenceNode extends Node {
-        constructor() {
-          super();
+        constructor(layerCount, startPosition, endPosition) {
+          super(layerCount, startPosition, endPosition);
         }
       }
       class StatementNode extends Node {
         constructor(layerCount, startPosition, endPosition) {
           super(layerCount, startPosition, endPosition);
-          this.layerCount = layerCount;
         }
       }
       class GroupingNode extends Node {
@@ -182,6 +191,8 @@ define("ScriptAST", [],
 // MODULE API    
 // ------------------
       return {
+        CommutationNode: CommutationNode,
+        ConjugationNode: ConjugationNode,
         GroupingNode: GroupingNode,
         InversionNode: InversionNode,
         Node: Node,
