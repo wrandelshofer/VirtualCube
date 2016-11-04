@@ -200,6 +200,10 @@ function () {
       this.tsymbol=null;
       this.needChar = true;
     }
+    
+    getInputLength() {
+      return this.input.length;
+    }
 
     /** Returns the current token type. 
      * 

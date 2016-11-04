@@ -170,12 +170,11 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
           let tt = this.getTokenizer();
           tt.setInput(str);
           let root = new AST.SequenceNode();
-          let i = 0;
+          let guard = str.length;
           while (tt.nextToken() != Tokenizer.TT_EOF) {
             tt.pushBack();
             this.parseExpression(tt, root);
-            i++;
-            if (i > 1000)
+            if (guard-- < 0)
               throw "too many iterations! " + tt.getTokenType() + " pos:" + tt.pos;
           }
           return root;
@@ -392,8 +391,11 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
           let finalTypeMask = beginTypeMask & (GROUPING_MASK | CONJUGATION_MASK | COMMUTATION_MASK | ROTATION_MASK | REFLECTION_MASK | INVERSION_MASK);
 
           // Evaluate: {Statement} , (GROUPING_END | COMMUTATION_END | CONJUGATION_END | ROTATION_END) ;
+          let guard=t.getInputLength();
           TheGrouping:
               while (true) {
+             if (guard-- < 0) throw "too many iterations"   
+              
             switch (t.nextToken()) {
               case Tokenizer.TT_KEYWORD:
                 let symbols = t.getSymbolValue();
@@ -466,9 +468,10 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
                     "Grouping: Invalid Grouping.", startPos, t.getEndPosition());
               } else {
                 grouping = new AST.GroupingNode(ntn.getLayerCount(), startPos, t.getEndPosition());
-                while (seq1.getChildCount() > 0) {
+                for (let i=seq1.getChildCount();i>=0;i--) {
                   grouping.add(seq1.getChildAt(0));
                 }
+                if (!seq1.getChildCount()==0) throw "moving children failed";
               }
               break;
 
@@ -478,9 +481,10 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
                     "Inversion: Invalid Inversion.", startPos, t.getEndPosition());
               } else {
                 grouping = new AST.InversionNode(ntn.getLayerCount(), startPos, t.getEndPosition());
-                while (seq1.getChildCount() > 0) {
+                for (let i=seq1.getChildCount();i>=0;i--) {
                   grouping.add(seq1.getChildAt(0));
                 }
+                if (!seq1.getChildCount()==0) throw "moving children failed";
               }
               break;
 
@@ -490,9 +494,10 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
                     "Reflection: Invalid Reflection.", startPos, t.getEndPosition());
               } else {
                 grouping = new AST.ReflectionNode(notation.getLayerCount(), startPos, t.getEndPosition());
-                while (seq1.getChildCount() > 0) {
+                for (let i=seq1.getChildCount();i>=0;i--) {
                   grouping.add(seq1.getChildAt(0));
                 }
+                if (!seq1.getChildCount()==0) throw "moving children failed";
               }
               break;
 
@@ -657,7 +662,9 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
             // Evaluate: {Prefix}
             let prefix = statement;
             let lastPrefix = statement;
+            let guard=t.getInputLength();
             while ((prefix = this.parsePrefix(t, prefix)) != null) {
+              if (guard-- < 0) throw "too many iterations";
               lastPrefix = prefix;
             }
 
@@ -668,7 +675,9 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
             // Evaluate: {Suffix}
             let child = statement.getChildAt(0);
             let suffix = statement;
+            guard=t.getInputLength();
             while ((suffix = this.parseSuffix(t, statement)) != null) {
+              if (guard-- < 0) throw "too many iterations";
               suffix.add(child);
               child = suffix;
               statement.setEndPosition(suffix.getEndPosition());
@@ -862,7 +871,7 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
           // Fetch the next token.
           if (t.nextToken() != Tokenizer.TT_KEYWORD
               && t.getTokenType() != Tokenizer.TT_NUMBER) {
-            throw new ParseException("Rotator: Invalid begin.", t.getStartPosition(), t.getEndPosition());
+            throw new ParseException("Repetitor: Invalid begin.", t.getStartPosition(), t.getEndPosition());
           }
 
           // Is it a [RptrBegin] token? Consume it.
