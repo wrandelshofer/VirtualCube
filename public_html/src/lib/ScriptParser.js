@@ -937,7 +937,7 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
           }
           let symbols = t.getSymbolValue();
 
-          if (this.isType(symbols, Sym.INVERTOR)) {
+          if (this.containsType(symbols, Sym.INVERTOR)) {
             module.log('parseInvertor: "%s".', t.getStringValue());
             inversion.setEndPosition(t.getEndPosition());
             return inversion;
