@@ -893,8 +893,10 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
           }
           repetition.setRepeatCount(intValue);
           repetition.setEndPosition(t.getEndPosition());
+          module.log("parseRepetitor count: "+intValue);
+          
           // The Integer token is now done.
-
+          
           // Evaluate [RptrEnd] token.
           // ---------------------------
           // Only keyword tokens are of interest.

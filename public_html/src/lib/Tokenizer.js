@@ -308,7 +308,7 @@ function () {
         this.tstart = start;
         this.tend = this.pos;
         this.sval = this.input.substring(start, this.pos);
-        this.nval = Number.valueOf(this.sval);
+        this.nval = parseInt(this.sval);
         this.tsymbol = null;
         return this.ttype;
       }
