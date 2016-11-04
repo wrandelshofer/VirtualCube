@@ -238,11 +238,11 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
           for (let i = 0; i < symbols.length; i++) {
             let s = symbols[i];
             if (types[s.getType()] != null) {
-              console.log('extractSymbol:' + s + " " + symbols + " types:" + types);
+              console.log('extractSymbol(' + symbols + " types:" + types+')'+s);
               return s;
             }
           }
-          console.log('extractSymbol:' + null + " " + symbols + " types:" + types);
+          console.log('extractSymbol('  + symbols + " types:" + types+'):null');
           return null;
         }
 
@@ -466,10 +466,11 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
                     "Grouping: Invalid Grouping.", startPos, t.getEndPosition());
               } else {
                 grouping = new AST.GroupingNode(ntn.getLayerCount(), startPos, t.getEndPosition());
-                for (let i=seq1.getChildCount();i>=0;i--) {
+                for (let i=seq1.getChildCount()-1;i>=0;i--) {
                   grouping.add(seq1.getChildAt(0));
                 }
                 if (!seq1.getChildCount()==0) throw "moving children failed";
+                module.log('parseCompoundStatement: grouping');
               }
               break;
 
@@ -479,7 +480,7 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
                     "Inversion: Invalid Inversion.", startPos, t.getEndPosition());
               } else {
                 grouping = new AST.InversionNode(ntn.getLayerCount(), startPos, t.getEndPosition());
-                for (let i=seq1.getChildCount();i>=0;i--) {
+                for (let i=seq1.getChildCount()-1;i>=0;i--) {
                   grouping.add(seq1.getChildAt(0));
                 }
                 if (!seq1.getChildCount()==0) throw "moving children failed";
@@ -492,7 +493,7 @@ define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
                     "Reflection: Invalid Reflection.", startPos, t.getEndPosition());
               } else {
                 grouping = new AST.ReflectionNode(notation.getLayerCount(), startPos, t.getEndPosition());
-                for (let i=seq1.getChildCount();i>=0;i--) {
+                for (let i=seq1.getChildCount()-1;i>=0;i--) {
                   grouping.add(seq1.getChildAt(0));
                 }
                 if (!seq1.getChildCount()==0) throw "moving children failed";
