@@ -10,54 +10,54 @@
 // --------------
 // require.js
 // --------------
-define("Node3D", ['J3DIMath'], 
-function(J3DIMath) { 
+define("Node3D", ['J3DIMath'], function (J3DIMath) {
 
-class Node3D {
-  constructor() {
-    /** The transformation matrix of a node. */
-    this.matrix=new J3DIMatrix4();
-    
-    /** The children of a node. */
-    this.children=[];
-    
-    /** The parent of a node. */
-    this.parent=null;
-  }
-}
+  class Node3D {
+    constructor() {
+      /** The transformation matrix of a node. */
+      this.matrix = new J3DIMatrix4();
 
-/** Applies the scene graph transformation to m. */
-Node3D.prototype.transform=function(m) {
-  if (this.parent != null) this.parent.transform(m);
-  m.multiply(this.matrix);
-}
+      /** The children of a node. */
+      this.children = [];
 
-/** Adds a child. */
-Node3D.prototype.add=function(child) {
-  if (child.parent != null) {
-    child.parent.remove(child);
-  }
-  this.children[this.children.length]=child;
-  child.parent=this;
-}
-
-/** Removes a child. */
-Node3D.prototype.remove=function(child) {
-  if (child.parent == this) {
-    for (var i=0;i<this.children.length;i++) {
-      if (this.children[i]==child) {
-        this.children=this.children.slice(0,i)+this.children.slice(i+1);
-        break;
-      }
+      /** The parent of a node. */
+      this.parent = null;
     }
-    child.parent = null;
   }
-}
+
+  /** Applies the scene graph transformation to m. */
+  Node3D.prototype.transform = function (m) {
+    if (this.parent != null)
+      this.parent.transform(m);
+    m.multiply(this.matrix);
+  }
+
+  /** Adds a child. */
+  Node3D.prototype.add = function (child) {
+    if (child.parent != null) {
+      child.parent.remove(child);
+    }
+    this.children[this.children.length] = child;
+    child.parent = this;
+  }
+
+  /** Removes a child. */
+  Node3D.prototype.remove = function (child) {
+    if (child.parent == this) {
+      for (var i = 0; i < this.children.length; i++) {
+        if (this.children[i] == child) {
+          this.children = this.children.slice(0, i) + this.children.slice(i + 1);
+          break;
+        }
+      }
+      child.parent = null;
+    }
+  }
 
 // ------------------
 // MODULE API    
 // ------------------
-return {
-    Node3D : Node3D,
-};
+  return {
+    Node3D: Node3D,
+  };
 });

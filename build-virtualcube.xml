@@ -214,6 +214,7 @@
         * You may not use, copy or modify this file, except in compliance with the
         * accompanying license terms.
         */
+        "use strict"
       {
       </header>
       <footer trimleading="yes">
