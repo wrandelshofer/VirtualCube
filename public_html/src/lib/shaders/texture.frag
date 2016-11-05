@@ -42,5 +42,3 @@ void main() {
   gl_FragColor=vec4(color.rgb*(diffuse+ambient)+specular*vec3(1,1,1), color.a);
   //gl_FragColor=vec4(n.x,n.y,n.z, color.a);
 }
- 
- 

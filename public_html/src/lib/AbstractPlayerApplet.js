@@ -354,7 +354,10 @@ define("AbstractPlayerApplet", ["AbstractCanvas", "Node3D", "J3DI", "J3DIMath", 
         }
 
         if (attr.stickersImageURL) {
-          this.stickersTexture = J3DI.loadImageTexture(this.gl, attr.stickersImageURL, fRepaint);
+          J3DI.loadImageTexture(this.gl, attr.stickersImageURL, (texture)=>{
+            this.stickersTexture=texture;
+            fRepaint();
+          });
         }
         this.cube3d.validateAttributes();
 

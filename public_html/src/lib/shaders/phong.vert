@@ -5,6 +5,9 @@
  */
  
 // WebGL Vertex Shader
+#ifdef GL_ES
+    precision mediump float;
+#endif
 
 // World information
 // -----------------
@@ -35,6 +38,5 @@ void main() {
  fNormal = mvNormalMatrix * vec4(vNormal, 1);
  fColor=vColor/255.0;
  gl_Position = mvpMatrix * vPos;
- fTexture=vTexture;
 }
 

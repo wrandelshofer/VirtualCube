@@ -13,12 +13,20 @@
 define("PreloadWebglShaders", ["J3DI"], 
 function (J3DI) {
 
-J3DI.setFileData("${frag.url}",
-"${frag.obj}"
+J3DI.setFileData("${texture.frag.url}",
+"${texture.frag.obj}"
 );
 
-J3DI.setFileData("${vert.url}",
-"${vert.obj}"
+J3DI.setFileData("${texture.vert.url}",
+"${texture.vert.obj}"
+);
+
+J3DI.setFileData("${phong.frag.url}",
+"${phong.frag.obj}"
+);
+
+J3DI.setFileData("${phong.vert.url}",
+"${phong.vert.obj}"
 );
 
 // ------------------

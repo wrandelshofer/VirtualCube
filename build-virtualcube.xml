@@ -128,14 +128,18 @@
       <attribute name="file"/>
       <attribute name="shaders"/>
       <sequential>
-        <local name="texture.frag"/>
-        <local name="texture.vert"/>
-        <property name="frag.url" value="@{shaders}/texture.frag"/>
-        <property name="vert.url" value="@{shaders}/texture.vert"/>
-        <replace file="${build.generate}/${frag.url}" token="${line.separator}" value="\n"/>
-        <replace file="${build.generate}/${vert.url}" token="${line.separator}" value="\n"/>
-        <loadfile property="frag.obj" encoding="UTF-8" srcFile="${build.generate}/${frag.url}"/>
-        <loadfile property="vert.obj" encoding="UTF-8" srcFile="${build.generate}/${vert.url}"/>
+        <property name="texture.frag.url" value="@{shaders}/texture.frag"/>
+        <property name="phong.frag.url" value="@{shaders}/phong.frag"/>
+        <property name="texture.vert.url" value="@{shaders}/texture.vert"/>
+        <property name="phong.vert.url" value="@{shaders}/phong.vert"/>
+        <replace file="${build.generate}/${texture.frag.url}" token="${line.separator}" value="\n"/>
+        <replace file="${build.generate}/${phong.frag.url}" token="${line.separator}" value="\n"/>
+        <replace file="${build.generate}/${texture.vert.url}" token="${line.separator}" value="\n"/>
+        <replace file="${build.generate}/${phong.vert.url}" token="${line.separator}" value="\n"/>
+        <loadfile property="texture.frag.obj" encoding="UTF-8" srcFile="${build.generate}/${texture.frag.url}"/>
+        <loadfile property="phong.frag.obj" encoding="UTF-8" srcFile="${build.generate}/${phong.frag.url}"/>
+        <loadfile property="texture.vert.obj" encoding="UTF-8" srcFile="${build.generate}/${texture.vert.url}"/>
+        <loadfile property="phong.vert.obj" encoding="UTF-8" srcFile="${build.generate}/${phong.vert.url}"/>
         <loadfile property="file.text" encoding="UTF-8" srcFile="${build.generate}/@{file}"/>
         <propertyeval name="file.replaced" from="${file.text}"/>
         <echo file="${build.generate}/@{file}" message="${file.replaced}"/>
@@ -150,11 +154,6 @@
         <copy todir="${build.generate}">
             <fileset dir="${src}">
                 <exclude name="**/_notes/**"/>
-                <exclude name="lib/models/full*/**"/>
-                <exclude name="lib/models/simple*/**"/>
-                <exclude name="lib/models/vcube3/**"/>
-                <exclude name="lib/models/vcube3b/**"/>
-                <exclude name="lib/shaders/phong.*"/>
                 <exclude name="lib/buildconfig*"/>
                 <exclude name="lib/TwoDSolverCanvas.js"/>
                 <exclude name="lib/SolverCanvas.js"/>
@@ -172,8 +171,12 @@
         <delete dir="${build.generate}/lib/shaders"/>
     </target>
     <target name="build.stripcomments" depends="init,build.generate">
+      <!-- strip slash/star comment if the comment starts at the beginning of a line.
+      * Can not strip comments larger than 4000 characters due to limited stack size in Java.
+      * Will horribly fail with multiline strings!
+      -->
       <replaceregexp 
-               match="/\*(?:.|[\r\n]){0,4000}?\*/\s*\n?"
+               match="^\s*/\*(?:.|[\r\n]){0,4000}?\*/\n?"
                replace=""
                flags="gm"
                encoding="UTF-8"
@@ -182,6 +185,9 @@
                 <include name="*.js"/>
             </fileset>
       </replaceregexp>
+      <!-- strip slash/slash comment if the comment starts at the beginning of a line 
+      * Will horribly fail with multiline strings!
+      -->
       <replaceregexp 
                match="^\s*//.*$|//[^'&quot;\n]*$"
                replace=""
@@ -192,6 +198,9 @@
                 <include name="*.js"/>
             </fileset>
       </replaceregexp>
+      <!-- strip empty lines 
+      * Will horribly fail with multiline strings!
+      -->
       <replaceregexp 
                match="^\s*\n"
                replace=""

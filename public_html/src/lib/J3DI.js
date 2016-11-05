@@ -306,6 +306,7 @@ define("J3DI", [],
           fshader = [fshader];
         }
         files = vshader.concat(fshader);
+        module.log('loading files: %o',files);
         checkGLError(gl, 'easywebgl.initWebGL before loadFiles');
 
         loadFiles(files,
@@ -373,8 +374,8 @@ define("J3DI", [],
                 prg.uniforms = [];
                 for (let i = 0; i < uniforms.length; ++i) {
                   prg.uniforms[uniforms[i]] = gl.getUniformLocation(prg, uniforms[i]);
+module.log('.initWebGL '+prg.vshaderId+' prg.uniform['+uniforms[i]+']='+prg.uniforms[uniforms[i]] );                  
                 }
-
 
                 gl.useProgram(gl.programs[programIndex]);
                 checkGLError(gl, 'easywebgl.initWebGL useProgram ' + prg.vshaderId + ',' + prg.fshaderId);
@@ -428,7 +429,7 @@ define("J3DI", [],
         let shader = ctx.createShader(shaderType);
         checkGLError(ctx, 'easywebgl.loadShader createShader ' + shaderType);
         if (shader == null) {
-          module.log("*** Error: unable to create shader '" + shaderId + "' error:" + ctx.getError());
+          module.error("*** Error: unable to create shader '" + shaderId + "' error:" + ctx.getError());
           return null;
         }
 
@@ -443,7 +444,7 @@ define("J3DI", [],
         if (!compiled) {
           // Something went wrong during compilation; get the error
           let error = ctx.getShaderInfoLog(shader);
-          module.log("*** Error compiling shader '" + shaderId + "':" + error);
+          module.error("*** Error compiling shader '" + shaderId + "':" + error);
           ctx.deleteShader(shader);
           return null;
         }
@@ -1134,7 +1135,7 @@ define("J3DI", [],
           texture.image = new Image();
           texture.image.onload = function () {
             if (callback)
-              callback();
+              callback(texture);
           };
           texture.image.src = url;
           return texture;
@@ -1168,7 +1169,7 @@ define("J3DI", [],
         ctx.bindTexture(ctx.TEXTURE_2D, null);
 
         if (callback)
-          callback();
+          callback(texture);
       };
 
       /**
