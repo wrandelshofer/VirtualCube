@@ -992,43 +992,6 @@ module.log('.initWebGL '+prg.vshaderId+' prg.uniform['+uniforms[i]+']='+prg.unif
               indexArray.push(tempIndexArray[j]);
               currentGroup[1] += 3;
             }
-
-            if (false) {
-              if (array.length == 5) { // quad
-                if (invertFaces) {
-                  indexArray.push(tempIndexArray[2]);
-                  indexArray.push(tempIndexArray[1]);
-                  indexArray.push(tempIndexArray[0]);
-                  indexArray.push(tempIndexArray[2]);
-                  indexArray.push(tempIndexArray[0]);
-                  indexArray.push(tempIndexArray[3]);
-                  polyIndexArray.push([tempIndexArray[3], tempIndexArray[2], tempIndexArray[1], tempIndexArray[0]]);
-                } else {
-                  indexArray.push(tempIndexArray[0]);
-                  indexArray.push(tempIndexArray[1]);
-                  indexArray.push(tempIndexArray[2]);
-                  indexArray.push(tempIndexArray[0]);
-                  indexArray.push(tempIndexArray[2]);
-                  indexArray.push(tempIndexArray[3]);
-                  polyIndexArray.push([tempIndexArray[0], tempIndexArray[1], tempIndexArray[2], tempIndexArray[3]]);
-                }
-                currentGroup[1] += 6;
-
-              } else { // triangle
-                if (invertFaces) {
-                  indexArray.push(tempIndexArray[2]);
-                  indexArray.push(tempIndexArray[1]);
-                  indexArray.push(tempIndexArray[0]);
-                  polyIndexArray.push([tempIndexArray[2], tempIndexArray[1], tempIndexArray[0]]);
-                } else {
-                  indexArray.push(tempIndexArray[0]);
-                  indexArray.push(tempIndexArray[1]);
-                  indexArray.push(tempIndexArray[2]);
-                  polyIndexArray.push([tempIndexArray[0], tempIndexArray[1], tempIndexArray[2]]);
-                }
-                currentGroup[1] += 3;
-              }
-            }
           }
         }
 
