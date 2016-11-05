@@ -415,9 +415,12 @@ function () {
     }
     isSyntax(symbol,syntax) {
       if (symbol==null||syntax==null) {
-        throw "illegal arguments symbol:"+symbol+" syntax:"+syntax;
+        throw  new Error("illegal arguments symbol:"+symbol+" syntax:"+syntax);
       }
       return this.symbolToSyntaxMap[symbol]==syntax;
+    }
+    getSyntax(symbol) {
+      return this.symbolToSyntaxMap[symbol];
     }
     isSupported(symbol) {
       return this.symbolToSyntaxMap[symbol]!=null||this.symbolToTokenMap[symbol]!=null;

@@ -860,7 +860,7 @@ function (Cube) {
           }
         }
         if (cube == 12) {
-          throw ("Invalid edge cube " + i);
+          throw new Error("Invalid edge cube " + i);
         }
 
         tempEdgeLoc[i] = cube;
@@ -869,7 +869,7 @@ function (Cube) {
       for (i = 0; i < 11; i++) {
         for (j = i + 1; j < 12; j++) {
           if (tempEdgeLoc[i] == tempEdgeLoc[j]) {
-            throw "Duplicate edge cubes tempEdgeLoc[" + i + "]=" + tempEdgeLoc[i] + " tempEdgeLoc[" + j + "]=" + tempEdgeLoc[j];
+            throw new Error("Duplicate edge cubes tempEdgeLoc[" + i + "]=" + tempEdgeLoc[i] + " tempEdgeLoc[" + j + "]=" + tempEdgeLoc[j]);
           }
         }
       }
@@ -900,7 +900,7 @@ function (Cube) {
           }
         }
         if (cube == 8) {
-          throw "Invalid corner cube " + i;
+          throw new Error("Invalid corner cube " + i);
         }
         tempCornerLoc[i] = cube;
       }
@@ -908,7 +908,7 @@ function (Cube) {
       for (i = 0; i < 7; i++) {
         for (j = i + 1; j < 8; j++) {
           if (tempCornerLoc[i] == tempCornerLoc[j]) {
-            throw "Duplicate corner cubes tempCornerLoc[" + i + "]=" + tempCornerLoc[i] + " tempCornerLoc[" + j + "]=" + tempCornerLoc[j];
+            throw new Error("Duplicate corner cubes tempCornerLoc[" + i + "]=" + tempCornerLoc[i] + " tempCornerLoc[" + j + "]=" + tempCornerLoc[j]);
           }
         }
       }

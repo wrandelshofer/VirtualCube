@@ -471,7 +471,7 @@ function (Cube) {
      * Second dimension: sticker index on the faces.
      */
     toStickers() {
-      throw "Not supported yet.";
+      throw new Error("Not supported yet.");
     }
 
     /**
@@ -485,7 +485,7 @@ function (Cube) {
      *                 left, down, back.
      */
     setToStickers(stickers) {
-      throw "Not supported yet.";
+      throw new Error("Not supported yet.");
     }
 
     clone() {
