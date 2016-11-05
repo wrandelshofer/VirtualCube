@@ -162,6 +162,11 @@
                 <exclude name="**/.*"/>
             </fileset>
         </copy>
+        <copy todir="${build.generate}/lib">
+            <fileset dir="${lib}">
+                <include name="almond.js*"/>
+            </fileset>
+        </copy>
         <generatepreloader2x2 file="lib/PreloadPocketCubeS1.js" model="lib/models/pocketcubes1"/>
         <generatepreloader2x2 file="lib/PreloadPocketCubeS4.js" model="lib/models/pocketcubes4"/>
         <generatepreloader3x3 file="lib/PreloadRubiksCubeS1.js" model="lib/models/rubikscubes1"/>
@@ -229,10 +234,11 @@
       <footer trimleading="yes">
       }
       </footer>    
-      <fileset file="${lib}/almond.js"/>
+      <fileset file="${build.generate}/lib/almond.js"/>
          <fileset dir="${build.generate}/lib">
            <include name="*.js"/>
            <exclude name="virtualcube.js"/>
+           <exclude name="almond.js"/>
          </fileset> 
       </concat>
         <copy todir="${build.concat}">
