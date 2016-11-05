@@ -1,5 +1,5 @@
 /*
- * @(#)Notation.js  0.1  2011-08-12
+ * @(#)ScriptNotation.js  0.1  2011-08-12
  * Copyright (c) 2011 Werner Randelshofer, Switzerland.
  * You may only use this software in accordance with the license terms.
  */
@@ -8,7 +8,7 @@
 // --------------
 // require.js
 // --------------
-define("Notation", [],
+define("ScriptNotation", [],
 function () {
 
   let Syntax = {

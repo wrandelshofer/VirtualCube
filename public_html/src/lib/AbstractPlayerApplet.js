@@ -15,7 +15,7 @@
 // --------------
 // require.js
 // --------------
-define("AbstractPlayerApplet", ["AbstractCanvas", "Node3D", "J3DI", "J3DIMath", "Notation",
+define("AbstractPlayerApplet", ["AbstractCanvas", "Node3D", "J3DI", "J3DIMath", "ScriptNotation",
   "ScriptAST", "ScriptParser", "Tokenizer",
 
   "RubiksCubeS1Cube3D",

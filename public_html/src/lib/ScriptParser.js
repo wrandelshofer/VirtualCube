@@ -7,7 +7,7 @@
 // --------------
 // require.js
 // --------------
-define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
+define("ScriptParser", ["ScriptNotation", "ScriptAST", "Tokenizer"],
     function (Notation, AST, Tokenizer) {
       
     let module = {
