@@ -34,7 +34,7 @@ TokenizerTest.prototype.testUnconfiguredTokenizer=()=>{
     let expected=data[i][1];
   
   
-    let tt = new Tokenizer.GreedyTokenizer();
+    let tt = new Tokenizer.Tokenizer();
     tt.setInput(input);
     let actual=[];
     while (tt.next()!=Tokenizer.TT_EOF) {
@@ -67,7 +67,7 @@ TokenizerTest.prototype.testSkipWhitespace=()=>{
     let expected=data[i][1];
   
   
-    let tt = new Tokenizer.GreedyTokenizer();
+    let tt = new Tokenizer.Tokenizer();
     tt.skipWhitespaceTokens();
     tt.setInput(input);
     let actual=[];
@@ -106,7 +106,7 @@ TokenizerTest.prototype.testKeyword=()=>{
     let expected=data[i][1];
   
   
-    let tt = new Tokenizer.GreedyTokenizer();
+    let tt = new Tokenizer.Tokenizer();
     tt.skipWhitespaceTokens();
     tt.addKeyword("world");
     tt.setInput(input);
@@ -140,7 +140,7 @@ TokenizerTest.prototype.testDigits=()=>{
     let expected=data[i][1];
   
   
-    let tt = new Tokenizer.GreedyTokenizer();
+    let tt = new Tokenizer.Tokenizer();
     tt.addDigits();
     tt.setInput(input);
     

@@ -1,0 +1,8 @@
+<#if licenseFirst??>
+${licenseFirst}
+</#if>
+${licensePrefix}Copyright (c) ${year} Werner Randelshofer, Switzerland.
+${licensePrefix}You may only use this software in accordance with the license terms.
+<#if licenseLast??>
+${licenseLast}
+</#if>
