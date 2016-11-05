@@ -15,7 +15,7 @@ define("WebglPlayerApplet", ["AbstractPlayerApplet", "Node3D", "J3DI", "PreloadW
   function (AbstractPlayerApplet, Node3D, J3DI, PreloadWebglShaders) {
 
     let module = {
-      log: (true) ? console.log : () => {
+      log: (false) ? console.log : () => {
       },
       info: (true) ? console.info : () => {
       },
