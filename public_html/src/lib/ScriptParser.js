@@ -1022,7 +1022,7 @@ module.log('parseCompoundStatement '+t.getStringValue()+' beginMask:'+beginTypeM
             throw new ParseException("Affix: Invalid end symbol " + t.sval, t.getStartPosition(), t.getEndPosition());
         }
         affix.setStartPosition(startPosition);
-        affix.setEndPosition(t.getStartPosition() + token.length() - 1);
+        affix.setEndPosition(t.getEndPosition());
         parent.add(affix);
         return affix;
     }
