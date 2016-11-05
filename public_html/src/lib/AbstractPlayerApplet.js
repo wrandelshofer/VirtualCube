@@ -1171,7 +1171,7 @@ define("AbstractPlayerApplet", ["AbstractCanvas", "Node3D", "J3DI", "J3DIMath", 
             this.script = parser.parse(p.script);
           } catch (e) {
             module.error(e);
-            module.error("illegal script:\"" + p.script + '"');
+            module.error("illegal script:%s" , p.script);
           }
         }
         // parse initscript

@@ -945,6 +945,88 @@ module.log('parseCompoundStatement '+t.getStringValue()+' beginMask:'+beginTypeM
 // Or else?
           throw new ParseException("Reflector: illegal reflection " + t.sval, t.getStartPosition(), t.getEndPosition());
         }
+        
+    /**
+     * Parses an affix which consists of an expression surrounded by a begin
+     * token and an end token. Either the begin or the end token is mandatory.
+     */
+    parseExpressionAffix( t,  parent) {
+          const ntn = this.notation;
+          const Sym = Notation.Symbol;
+          const Stx= Notation.Syntax;
+          
+        const startPosition = t.getStartPosition();
+
+        // Fetch the next token.
+        if (t.nextToken() != Tokenizer.TT_KEYWORD) {
+            throw new ParseException("Affix: Invalid begin.", t.getStartPosition(), t.getEndPosition());
+        }
+        let symbols = t.getSymbolValue();
+
+        // Parse the BEGIN token and collect all potential end nodes
+        const endSymbols = [];
+        if (this.containsType(symbols, Sym.CONJUGATION_BEGIN)
+                && (ntn.isSyntax(Sym.CONJUGATION,Stx.PREFIX)
+                || ntn.isSyntax(Sym.CONJUGATION,Stx.SUFFIX))) {
+            endSymbols.push(Sym.CONJUGATION_END);
+        }
+        if (this.containsType(symbols, Sym.COMMUTATION_BEGIN)
+                && (ntn.isSyntax(Sym.COMMUTATION,Stx.PREFIX)
+                || ntn.isSyntax(Sym.COMMUTATION,Stx.SUFFIX))) {
+            endSymbols.push(Sym.COMMUTATION_END);
+        }
+        if (this.containsType(symbols, Sym.ROTATION_BEGIN)
+                && (ntn.isSyntax(Sym.ROTATION,Stx.PREFIX)
+                || ntn.isSyntax(Sym.ROTATION,Stx.SUFFIX))) {
+            endSymbols.push(Sym.ROTATION_END);
+        }
+        if (endSymbols.length==0) {
+            // Or else?
+            throw new ParseException("Affix: Invalid begin " + t.sval, t.getStartPosition(), t.getEndPosition());
+        }
+
+        // Is it a CngrBegin Statement {Statement} CngrEnd thingy?
+        let operator = new AST.SequenceNode(ntn.getLayerCount());
+        let endSymbol = null;
+        Loop:
+        do {
+            this.parseExpression(t, operator);
+            if (t.nextToken() != Tokenizer.TT_KEYWORD) {
+                throw new ParseException("Affix: Statement missing.", t.getStartPosition(), t.getEndPosition());
+            }
+            symbols = t.getSymbolValue();
+            for (let i = 0; i < endSymbols.length; i++) {
+                endSymbol = endSymbols[i];
+                if (this.containsType(symbols, endSymbol)) {
+                    break Loop;
+                }
+            }
+            t.pushBack();
+        } while (token != null);
+        //t.nextToken();
+
+        let affix = null;
+        if (endSymbol == Sym.CONJUGATION_END) {
+            let cNode = new AST.ConjugationNode(ntn.getLayerCount());
+            cNode.setConjugator(operator);
+            affix = cNode;
+        } else if (endSymbol == Sym.COMMUTATION_END) {
+            let cNode = new AST.CommutationNode(ntn.getLayerCount());
+            cNode.setCommutator(operator);
+            affix = cNode;
+        } else if (endSymbol == Sym.ROTATION_END) {
+            let cNode = new AST.RotationNode(ntn.getLayerCount());
+            cNode.setRotator(operator);
+            affix = cNode;
+        } else {
+            throw new ParseException("Affix: Invalid end symbol " + t.sval, t.getStartPosition(), t.getEndPosition());
+        }
+        affix.setStartPosition(startPosition);
+        affix.setEndPosition(t.getStartPosition() + token.length() - 1);
+        parent.add(affix);
+        return affix;
+    }
+        
         /** Parses a NOP. 
          * 
          * @param {
