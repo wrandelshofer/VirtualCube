@@ -9,32 +9,14 @@
 // --------------
 define("ScriptParser", ["Notation", "ScriptAST", "Tokenizer"],
     function (Notation, AST, Tokenizer) {
-      let module = {
-        log: (true) // Enable or disable logging for this module.
-            ? function (msg, args) {
-              if (args === undefined)
-                console.log('ScriptParser.js ' + msg);
-              else
-                console.log('ScriptParser.js ' + msg, args);
-            }
-        : function () {},
-        warning: (true) // Enable or disable logging for this module.
-            ? function (msg, args) {
-              if (args === undefined)
-                console.log('ScriptParser.js WARNING ' + msg);
-              else
-                console.log('ScriptParser.js WARNING ' + msg, args);
-            }
-        : function () {},
-        error: (true) // Enable or disable logging for this module.
-            ? function (msg, args) {
-              if (args === undefined)
-                console.log('ScriptParser.js ERROR ' + msg);
-              else
-                console.log('ScriptParser.js ERROR ' + msg, args);
-            }
-        : function () {}
-      };
+      
+    let module = {
+      log: (false) ? console.log : ()=>{},
+      info: (true) ? console.info : ()=>{},
+      warning: (true) ? console.warning : ()=>{},
+      error: (true) ? console.error : ()=>{}
+    }
+    
       class ParseException {
         constructor(msg, start, end) {
           this.msg = msg;

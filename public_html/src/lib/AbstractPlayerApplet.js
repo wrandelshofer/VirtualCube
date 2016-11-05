@@ -37,32 +37,10 @@ define("AbstractPlayerApplet", ["AbstractCanvas", "Node3D", "J3DI", "J3DIMath", 
     ) {
 
     let module = {
-      log: (false) // Enable or disable logging for this module.
-        ? function (msg, args) {
-          if (args === undefined)
-            console.log('AbstractPlayerApplet.js ' + msg);
-          else
-            console.log('AbstractPlayerApplet.js ' + msg, args);
-        }
-      : function () {},
-
-      warning: (true) // Enable or disable logging for this module.
-        ? function (msg, args) {
-          if (args === undefined)
-            console.log('AbstractPlayerApplet.js WARNING ' + msg);
-          else
-            console.log('AbstractPlayerApplet.js WARNING ' + msg, args);
-        }
-      : function () {},
-
-      error: (true) // Enable or disable logging for this module.
-        ? function (msg, args) {
-          if (args === undefined)
-            console.log('AbstractPlayerApplet.js ERROR ' + msg);
-          else
-            console.log('AbstractPlayerApplet.js ERROR ' + msg, args);
-        }
-      : function () {}
+      log: (false) ? console.log : ()=>{},
+      info: (true) ? console.info : ()=>{},
+      warning: (true) ? console.warning : ()=>{},
+      error: (true) ? console.error : ()=>{}
     }
 // 
 // ===============================
@@ -1177,7 +1155,7 @@ define("AbstractPlayerApplet", ["AbstractCanvas", "Node3D", "J3DI", "J3DIMath", 
             this.macros = parserMacroDefinitions(p.scriptmacros);
             module.log('.readParameters scriptmacros: %o', this.macros);
           } catch (e) {
-            console.log(e);
+            module.error(e);
             module.error("illegal scriptmacros:\"" + p.scriptmacros + '"');
           }
         }
@@ -1189,7 +1167,7 @@ define("AbstractPlayerApplet", ["AbstractCanvas", "Node3D", "J3DI", "J3DIMath", 
           try {
             this.script = parser.parse(p.script);
           } catch (e) {
-            console.log(e);
+            module.error(e);
             module.error("illegal script:\"" + p.script + '"');
           }
         }

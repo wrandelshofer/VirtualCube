@@ -10,13 +10,13 @@
 // --------------
 define("PocketCubeS5Cube3D", ["AbstractRubiksCubeCube3D","CubeAttributes","PreloadRubiksCubeS4", 'J3DIMath'], 
 function(AbstractRubiksCubeCube3D,CubeAttributes,PreloadRubiksCubeS4,J3DIMath) { 
-  let module = {
-    log: (true) // Enable or disable logging for this module.
-    ? function (msg) {
-      console.log('PocketCubeS5Cube3D.js ' + msg);
+  
+    let module = {
+      log: (false) ? console.log : ()=>{},
+      info: (true) ? console.info : ()=>{},
+      warning: (true) ? console.warning : ()=>{},
+      error: (true) ? console.error : ()=>{}
     }
-    : function () {}
-  }
 
 class PocketCubeS5Cube3D extends AbstractRubiksCubeCube3D.AbstractRubiksCubeCube3D {
   /** Constructor

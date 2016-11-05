@@ -14,19 +14,12 @@
 define("VirtualCubeMain", ["WebglPlayerApplet", "TwoDPlayerApplet"],
 function (WebglPlayerApplet, TwoDPlayerApplet) {
 
-  let module = {
-    log: (false) // Enable or disable logging for this module.
-    ? function (msg) {
-      console.log('VirtualCubeMain.js ' + msg);
+    let module = {
+      log: (false) ? console.log : ()=>{},
+      info: (true) ? console.info : ()=>{},
+      warning: (true) ? console.warning : ()=>{},
+      error: (true) ? console.error : ()=>{}
     }
-    : function () {},
-  
-    error: (true) // Enable or disable error logging for this module.
-    ? function (msg) {
-      console.log('VirtualCubeMain.js ERROR ' + msg);
-    }
-    : function () {}
-  }
 
   var nextId = 0;
 

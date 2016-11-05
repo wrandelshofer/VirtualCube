@@ -10,13 +10,13 @@
 // --------------
 define("Cube", [],
 function () {
-  let module = {
-    log: (false) // Enable or disable logging for this module.
-    ? function (msg) {
-      console.log('Cube.js ' + msg);
+  
+    let module = {
+      log: (false) ? console.log : ()=>{},
+      info: (true) ? console.info : ()=>{},
+      warning: (true) ? console.warning : ()=>{},
+      error: (true) ? console.error : ()=>{}
     }
-    : function () {}
-  }
 
   /**
    * Base class for classes which implement a Rubik's Cube like puzzle.
@@ -1281,7 +1281,6 @@ function () {
         prevAxis = axis;
 //    while ((layerMask = Math.floor(Math.random()*(1 << this.layerCount))) == 0) {}
         layerMask = 1 << Math.floor(Math.random() * this.layerCount);
-        console.log(layerMask);
         while ((angle = Math.floor(Math.random() * 5) - 2) == 0) {
         }
         this.transform(axis, layerMask, angle);

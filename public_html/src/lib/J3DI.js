@@ -76,18 +76,12 @@
 define("J3DI", [],
     function () {
 
-      let module = {
-        log: (false) // Enable or disable logging for this module.
-            ? function (msg) {
-              console.log('J3DI.js ' + msg);
-            }
-        : function () {},
-        error: (true) // Enable or disable logging for this module.
-            ? function (msg) {
-              console.log('J3DI.js  ERROR ' + msg);
-            }
-        : function () {}
-      }
+    let module = {
+      log: (false) ? console.log : ()=>{},
+      info: (true) ? console.info : ()=>{},
+      warning: (true) ? console.warning : ()=>{},
+      error: (true) ? console.error : ()=>{}
+    }
 
       /**
        * Provides requestAnimationFrame in a cross browser way.

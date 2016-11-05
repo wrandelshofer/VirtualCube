@@ -14,11 +14,12 @@
 define("WebglPlayerApplet",["AbstractPlayerApplet","Node3D","J3DI","PreloadWebglShaders"], 
 function (AbstractPlayerApplet,Node3D,J3DI,PreloadWebglShaders) {
   
-let module = {
-  log: (false) // Enable or disable logging for this module.
-    ? function(msg) { console.log('WebglPlayerApplet.js '+msg); }
-    : function() {}
-}
+    let module = {
+      log: (false) ? console.log : ()=>{},
+      info: (true) ? console.info : ()=>{},
+      warning: (true) ? console.warning : ()=>{},
+      error: (true) ? console.error : ()=>{}
+    }
 
 // ===============================
 //

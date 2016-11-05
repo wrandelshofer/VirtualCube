@@ -10,13 +10,13 @@
 // --------------
 define("RubiksCube", ["Cube"],
 function (Cube) {
-  let module = {
-    log: (false) // Enable or disable logging for this module.
-    ? function (msg) {
-      console.log('RubiksCube.js ' + msg);
+
+    let module = {
+      log: (false) ? console.log : ()=>{},
+      info: (true) ? console.info : ()=>{},
+      warning: (true) ? console.warning : ()=>{},
+      error: (true) ? console.error : ()=>{}
     }
-    : function () {}
-  }
 
   /**
    * Represents the state of a 3-times sliced cube (Rubik's Cube) by the location 
@@ -261,9 +261,7 @@ function (Cube) {
      *               2=180 degrees
      */
     transform0(axis, layerMask, angle) {
-      if (this.DEBUG) {
-        window.console.log("RubiksCube#" + (this) + ".transform(ax=" + axis + ",msk=" + layerMask + ",ang:" + angle + ")");
-      }
+      module.log("RubiksCube#" + (this) + ".transform(ax=" + axis + ",msk=" + layerMask + ",ang:" + angle + ")");
       {
         if (axis < 0 || axis > 2) {
           throw ("axis: " + axis);
@@ -797,7 +795,7 @@ function (Cube) {
        }
        System.out.prvar(stickers[i][j]);
        }
-       window.console.log();
+       module.log();
        }*/
 
       return stickers;

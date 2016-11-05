@@ -10,13 +10,13 @@
 // --------------
 define("PocketCubeS4Cube3D", ["AbstractPocketCubeCube3D","CubeAttributes","PreloadPocketCubeS4"], 
 function(AbstractPocketCubeCube3D,CubeAttributes,PreloadPocketCubeS4) { 
-  let module = {
-    log: (false) // Enable or disable logging for this module.
-    ? function (msg) {
-      console.log('PocketCubeS4Cube3D.js ' + msg);
+
+    let module = {
+      log: (false) ? console.log : ()=>{},
+      info: (true) ? console.info : ()=>{},
+      warning: (true) ? console.warning : ()=>{},
+      error: (true) ? console.error : ()=>{}
     }
-    : function () {}
-  }
 
 /** Constructor
  * Creates the 3D geometry of a Rubik's Cube.

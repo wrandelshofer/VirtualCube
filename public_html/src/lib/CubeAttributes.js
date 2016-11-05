@@ -11,11 +11,12 @@
 define("CubeAttributes", [], 
 function() { 
 
-let module = {
-  log: (false) // Enable or disable logging for this module.
-    ? function(msg) { console.log('CubeAttributes.js '+msg); }
-    : function() {}
-}
+    let module = {
+      log: (false) ? console.log : ()=>{},
+      info: (true) ? console.info : ()=>{},
+      warning: (true) ? console.warning : ()=>{},
+      error: (true) ? console.error : ()=>{}
+    }
 
 /** 
  * Holds the attributes of a Rubik's Cube like puzzle.

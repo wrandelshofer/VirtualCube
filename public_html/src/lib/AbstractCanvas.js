@@ -13,14 +13,12 @@
 define("AbstractCanvas", ["J3DI", "J3DIMath", "Node3D"],
 function (J3DI, J3DIMath, Node3D
 ) {
-
-  let module = {
-    log: (false) // Enable or disable logging for this module.
-    ? function (msg) {
-      console.log('AbstractCanvas.js ' + msg);
+    let module = {
+      log: (false) ? console.log : ()=>{},
+      info: (true) ? console.info : ()=>{},
+      warning: (true) ? console.warning : ()=>{},
+      error: (true) ? console.error : ()=>{}
     }
-    : function () {}
-  }
 
 // ===============================
 //
@@ -151,7 +149,7 @@ function (J3DI, J3DIMath, Node3D
           // draw the cube
           self.draw();
           var end = new Date().getTime();
-          //console.log('AbstractCanvas.draw elapsed:'+(end-start)+' m:'+(middle-start)+' cbs:'+callbacks.length+' new:'+self.repaintCallbacks.length);
+          //module.log('AbstractCanvas.draw elapsed:'+(end-start)+' m:'+(middle-start)+' cbs:'+callbacks.length+' new:'+self.repaintCallbacks.length);
         };
         J3DI.requestAnimFrame(f, this.canvas);
       }
