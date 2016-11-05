@@ -213,22 +213,6 @@ define("ScriptParser", ["ScriptNotation", "ScriptAST", "Tokenizer"],
         }
         return symbols.length > 0;
       }
-      /**
-       * Extracts the first symbol which has one of the types
-       * @param {
-       type} array of symbols
-       * @param {type} types selection of types
-       * @return a symbol or null
-       */
-      extractSymbol(symbols, types) {
-        for (let i = 0; i < symbols.length; i++) {
-          let s = symbols[i];
-          if (types[s.getType()] != null) {
-            return s;
-          }
-        }
-        return null;
-      }
 
       /**
        * Parses a Statement.
@@ -275,17 +259,14 @@ define("ScriptParser", ["ScriptNotation", "ScriptAST", "Tokenizer"],
 
 
 // Is it a Permutation token? Parse a permutation.
-        let sign = this.extractSymbol(symbols, [Sym.PERMUTATION_PLUS,
-          Sym.PERMUTATION_MINUS,
-          Sym.PERMUTATION_PLUSPLUS]);
-        if (ntn.isSyntax(Sym.PERMUTATION, Notation.Syntax.PREFIX)
-          && sign.length != 0) {
+        if ((ntn.isSyntax(Sym.PERMUTATION, Notation.Syntax.PREFIX)
+          ||ntn.isSyntax(Sym.PERMUTATION, Notation.Syntax.PRECIRCUMFIX) // ??really??
+          )
+          &&  this.intersectsTypes(symbols, 
+        [Sym.PERMUTATION_PLUS,  Sym.PERMUTATION_MINUS,  Sym.PERMUTATION_PLUSPLUS])) {
           let startpos = t.getStartPosition();
-          t.pushBack();
-          if (t.nextToken() != StreamTokenizer.TT_KEYWORD) {
-            throw new ParseException(
-              "Permutation: Unexpected token - expected a keyword.", t.getStartPosition(), t.getEndPosition());
-          }
+          let sign=symbols;
+          t.nextToken();
           symbols = t.getSymbolValue();
           if (!this.containsType(symbols, Sym.PERMUTATION_BEGIN)) {
             throw new ParseException(
