@@ -32,6 +32,7 @@ function (J3DI, J3DIMath, Node3D
       this.canvas = null;
       this.willRepaint = false;
       this.repaintCallbacks = [];
+      this.textureImages = [];
 
       this.handler = {
         onTouchStart: function (event) {},
@@ -221,7 +222,7 @@ function (J3DI, J3DIMath, Node3D
             }
             t.loadPoly(
             mvp,
-            obj.textureArray, obj.hasTexture ? this.stickersTexture : null,
+            obj.textureArray, obj.hasTexture && this.textureImages.length>0? this.textureImages[0] : null,
             poly);
             this.applyFillStyle(t, mv.normal(i1, i2, i3), this.lightNormal, this.observerNormal, phong, color);
           }

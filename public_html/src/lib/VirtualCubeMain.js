@@ -216,7 +216,7 @@ function (WebglPlayerApplet, TwoDPlayerApplet) {
       this.canvas3d = new WebglPlayerApplet.WebglPlayerApplet();
     }
     for (var k in this.parameters) {
-      this.canvas3d.parameters[k] = this.parameters[k]
+      this.canvas3d.parameters[k] = this.parameters[k];
     }
     var s = this.canvas3d.setCanvas(this.canvas);
     if (!s) {
@@ -225,6 +225,9 @@ function (WebglPlayerApplet, TwoDPlayerApplet) {
         this.canvas3d.parameters[k] = this.parameters[k]
       }
       this.canvas3d = new TwoDPlayerApplet.TwoDPlayerApplet();
+      for (var k in this.parameters) {
+        this.canvas3d.parameters[k] = this.parameters[k];
+      }
       s = this.canvas3d.setCanvas(this.canvas);
     }
   }

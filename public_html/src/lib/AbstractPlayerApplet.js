@@ -224,6 +224,7 @@ define("AbstractPlayerApplet", ["AbstractCanvas", "Node3D", "J3DI", "J3DIMath", 
         this.moves = [];
         this.undoList = [];
         this.redoIndex = 0;
+        this.textureImages = [ null ];
 
         // applet parameters
         // FIXME some parameters are read from here, and others are read
@@ -355,7 +356,7 @@ define("AbstractPlayerApplet", ["AbstractCanvas", "Node3D", "J3DI", "J3DIMath", 
 
         if (attr.stickersImageURL) {
           J3DI.loadImageTexture(this.gl, attr.stickersImageURL, (texture)=>{
-            this.stickersTexture=texture;
+            self.textureImages[0]=texture;
             fRepaint();
           });
         }
