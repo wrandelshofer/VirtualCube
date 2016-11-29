@@ -343,7 +343,7 @@ define("ScriptParser", ["ScriptNotation", "ScriptAST", "Tokenizer"],
         ThePermutation:
         while (true) {
             switch (t.nextToken()) {
-                case Tokenizer.TT_WORD:
+                case Tokenizer.TT_KEYWORD:
 
                     // Evaluate PermEnd
                     let symbols = t.getSymbolValue();
@@ -354,7 +354,7 @@ define("ScriptParser", ["ScriptNotation", "ScriptAST", "Tokenizer"],
                     } else {
                         t.pushBack();
                         this.parsePermutationItem(t, permutation);
-                        if (t.nextToken() == Tokenizer.TT_WORD) {
+                        if (t.nextToken() == Tokenizer.TT_KEYWORD) {
                             symbols = t.getSymbolValue();
                             if (this.containsType(symbols, Sym.PERMUTATION_DELIMITER)) {
 
@@ -389,7 +389,7 @@ define("ScriptParser", ["ScriptNotation", "ScriptAST", "Tokenizer"],
                             "Permutation: End missing.", t.getStartPosition(), t.getEndPosition());
                 default:
                     throw new ParseException(
-                            "Permutation: Internal error.", t.getStartPosition(), t.getEndPosition());
+                            "Permutation: Internal error. "+t.getTokenType(), t.getStartPosition(), t.getEndPosition());
             }
         }
 
@@ -421,7 +421,35 @@ define("ScriptParser", ["ScriptNotation", "ScriptAST", "Tokenizer"],
 
         return permutation;
       }
-      /** Parses a compound statement after its XXX_BEGIN token has been consumed. 
+      
+    /**
+     * Parses a permutation sign and returns null or one of the three sign
+     * symbols.
+     */
+    parsePermutationSign( t,  parent)  {
+        const ntn = this.notation;
+        const Sym = Notation.Symbol;
+        const Syntax = Notation.Syntax;
+
+        let sign = null;
+        if (t.nextToken() != Tokenizer.TT_KEYWORD) {
+            t.pushBack();
+            sign = null;
+        } else {
+            let symbols = t.getSymbolValue();
+            if (this.containsType(symbols, Sym.PERMUTATION_PLUS) 
+                    || this.containsType(symbols, Sym.PERMUTATION_PLUSPLUS)
+                    || this.containsType(symbols, Sym.PERMUTATION_MINUS)) {
+                sign = symbols;
+            } else {
+                sign = null;
+                t.pushBack();
+            }
+        }
+        return sign;
+    }
+      
+      /** Parses a compound statement after its BEGIN token has been consumed. 
        * 
        * @param {Tokenizer} t
        * @param {Node} parent
