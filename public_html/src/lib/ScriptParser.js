@@ -320,15 +320,106 @@ define("ScriptParser", ["ScriptNotation", "ScriptAST", "Tokenizer"],
 
       /** Parses the remainder of a permutation statement after its PERMUTATION_BEGIN token has been consumed. 
        * 
-       * @param {
-       Tokenizer} t
+       * @param {Tokenizer} t
        * @param {Node} parent
        * @param {int} startPos the start position of the PERMUTATION_BEGIN begin token
        * @returns {unresolved} the parsed permutation
        * @throws parse exception
        */
-      parsePermutation(t, parent, startPos) {
-        throw new ParseException("Permutation: Not implemented " + t.sval, t.getStartPosition(), t.getEndPosition());
+      parsePermutation(t, parent, startPos, sign) {
+        const ntn = this.notation;
+        const Sym = Notation.Symbol;
+        const Symbol = Notation.Symbol;
+        const Syntax = Notation.Syntax;
+
+        const permutation = new AST.PermutationNode(ntn.getLayerCount(), startPos, null);
+        parent.add(permutation);
+        permutation.setStartPosition(startPos);
+
+        if (ntn.isSyntax(Symbol.PERMUTATION, Syntax.PRECIRCUMFIX)) {
+            sign = this.parsePermutationSign(t, parent);
+        }
+
+        ThePermutation:
+        while (true) {
+            switch (t.nextToken()) {
+                case Tokenizer.TT_WORD:
+
+                    // Evaluate PermEnd
+                    let symbols = t.getSymbolValue();
+                    if (this.containsType(symbols, Sym.PERMUTATION_END)) {
+                        permutation.setEndPosition(t.getEndPosition());
+                        break ThePermutation;
+
+                    } else {
+                        t.pushBack();
+                        this.parsePermutationItem(t, permutation);
+                        if (t.nextToken() == Tokenizer.TT_WORD) {
+                            symbols = t.getSymbolValue();
+                            if (this.containsType(symbols, Sym.PERMUTATION_DELIMITER)) {
+
+                            } else if (ntn.isSyntax(Symbol.PERMUTATION, Syntax.POSTCIRCUMFIX) 
+                                    && (this.containsType(symbols, Symbol.PERMUTATION_PLUS) 
+                                    || this.containsType(symbols, Symbol.PERMUTATION_MINUS) 
+                                    || this.containsType(symbols, Symbol.PERMUTATION_PLUSPLUS))) {
+                                t.pushBack();
+                                sign = this.parsePermutationSign(t, parent);
+                                if (t.nextToken() != Tokenizer.TT_WORD) {
+                                    throw new ParseException(
+                                            "Permutation: End expected.", t.getStartPosition(), t.getEndPosition());
+                                }
+                                token = fetchGreedy(t.sval);
+                                if (this.containsType(symbols,Symbol.PERMUTATION_END)) {
+                                    permutation.setEndPosition(t.getEndPosition());
+                                    break ThePermutation;
+                                } else {
+                                    throw new ParseException(
+                                            "Permutation: End expected.", t.getStartPosition(), t.getEndPosition());
+                                }
+                            } else {
+                                t.pushBack();
+                            }
+                        } else {
+                            t.pushBack();
+                        }
+                    }
+                    break;
+                case Tokenizer.TT_EOF:
+                    throw new ParseException(
+                            "Permutation: End missing.", t.getStartPosition(), t.getEndPosition());
+                default:
+                    throw new ParseException(
+                            "Permutation: Internal error.", t.getStartPosition(), t.getEndPosition());
+            }
+        }
+
+        if (ntn.isSyntax(Symbol.PERMUTATION, Syntax.SUFFIX)) {
+            sign = this.parsePermutationSign(t, parent);
+        }
+
+        if (sign != null) {
+            switch (permutation.getType()) {
+                case 1:
+                    break;
+                case 2:
+                    if (sign == Symbol.PERMUTATION_PLUSPLUS 
+                            || sign == Symbol.PERMUTATION_MINUS) {
+                        throw new ParseException(
+                                "Permutation: Illegal sign.", t.getStartPosition(), t.getEndPosition());
+                    }
+                    break;
+                case 3:
+                    if (sign == Symbol.PERMUTATION_PLUSPLUS) {
+                        throw new ParseException(
+                                "Permutation: Illegal sign.", t.getStartPosition(), t.getEndPosition());
+                    }
+                    break;
+            }
+            permutation.setPermutationSign(sign);
+            permutation.setEndPosition(t.getEndPosition());
+        }
+
+        return permutation;
       }
       /** Parses a compound statement after its XXX_BEGIN token has been consumed. 
        * 

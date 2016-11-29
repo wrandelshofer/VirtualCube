@@ -122,6 +122,12 @@ define("ScriptAST", [],
       }
     }
 
+    class PermutationNode extends Node {
+      constructor(layerCount, startPosition, endPosition) {
+        super(layerCount, startPosition, endPosition);
+      }
+    }
+
     class ReflectionNode extends Node {
       constructor(layerCount, startPosition, endPosition) {
         super(layerCount, startPosition, endPosition);
@@ -218,5 +224,6 @@ define("ScriptAST", [],
       RepetitionNode: RepetitionNode,
       SequenceNode: SequenceNode,
       StatementNode: StatementNode,
+      PermutationNode: PermutationNode,
     };
   });
