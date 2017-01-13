@@ -270,14 +270,10 @@
         <mkdir dir="${dist}"/>
         <zip file="${dist}/${distname}-${version}-src.zip">
             <fileset dir=".">
-                <include name="nbproject/**"/>
-                <include name="lib/**"/>
-                <include name="${src}/**"/>
-                <include name="public_html/index.html"/>
-                <include name="build.xml"/>
-                <include name="build-virtualcube.xml"/>
+                <exclude name="dist/**"/>
+                <exclude name="test/lib/**"/>
+                <exclude name="public_html/build/**"/>
                 <exclude name="**/.*"/>
-                <exclude name="**/_notes/**"/>
             </fileset>
         </zip>
     </target>
