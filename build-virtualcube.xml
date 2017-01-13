@@ -9,8 +9,18 @@
         <property name="build.generate" value="${build}/generate"/>
         <property name="buildInv" value=".."/>
         <property name="author" value="Werner Randelshofer"/>
-        <property name="version" value="1.0.7"/>
-        <property name="date" value="2015-09-29"/>
+        
+        <tstamp>
+          <format property="date" pattern="yyyy-MM-dd" />
+        </tstamp>
+          <exec executable="git" outputproperty="git.revision" failifexecutionfails="false" errorproperty="">
+              <arg value="show"/>
+              <arg value="-s"/>
+              <arg value="--date=format:%Y-%m-%d"/>
+              <arg value="--format=%cd_%h"/>
+          </exec>
+        <property name="version" value="${git.revision}"/>
+    
         <property name="dist" value="dist"/>
         <property name="lib" value="lib"/>
         <property name="dist.bundle" value="${dist}/${name}"/>
@@ -181,7 +191,7 @@
       * Will horribly fail with multiline strings!
       -->
       <replaceregexp 
-               match="^\s*/\*(?:.|[\r\n]){0,4000}?\*/\n?"
+               match="^\s*/\*(?:.|[\r\n]){0,2000}?\*/\n?"
                replace=""
                flags="gm"
                encoding="UTF-8"
