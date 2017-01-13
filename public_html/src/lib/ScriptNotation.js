@@ -150,18 +150,48 @@ function () {
       }
     }
   }
+  /**
+   * Symbol for a face.
+   * Instances of this class are immutable.
+   * <p>
+   * This class must be Java 1.1 compliant.
+   *
+   * @author Werner Randelshofer.
+   * @version 2.0 2007-06-16 Renamed from Twist to Move.
+   * <br>1.0 May 1, 2006 Created.
+   */
+  class FaceSymbol extends Symbol {
+    constructor(name, face) {
+      super();
+      this.face = face;
+    }
+
+    getFace() {
+      return this.face;
+    }
+
+    toString() {
+      return "Face face=" + this.face;
+    }
+    /** Gets the type of the symbol. 
+     * (Actually this is like requesting the class of the symbol.
+     */
+    getType() {
+      return Symbol.FACE;
+    }
+  }
 
   /**
    * Terminal symbols.
    */
   Symbol.NOP = new TerminalSymbol("NOP");
   Symbol.MOVE = new TerminalSymbol("move", "twist");
-  Symbol.FACE_R = new TerminalSymbol("permR");
-  Symbol.FACE_U = new TerminalSymbol("permU");
-  Symbol.FACE_F = new TerminalSymbol("permF");
-  Symbol.FACE_L = new TerminalSymbol("permL");
-  Symbol.FACE_D = new TerminalSymbol("permD");
-  Symbol.FACE_B = new TerminalSymbol("permB");
+  Symbol.FACE_R = new FaceSymbol("r",0);
+  Symbol.FACE_U = new FaceSymbol("u",1);
+  Symbol.FACE_F = new FaceSymbol("f",2);
+  Symbol.FACE_L = new FaceSymbol("l",3);
+  Symbol.FACE_D = new FaceSymbol("d",4);
+  Symbol.FACE_B = new FaceSymbol("b",5);
   Symbol.PERMUTATION_PLUS = new TerminalSymbol("permPlus");
   Symbol.PERMUTATION_MINUS = new TerminalSymbol("permMinus");
   Symbol.PERMUTATION_PLUSPLUS = new TerminalSymbol("permPlusPlus");
@@ -229,6 +259,14 @@ function () {
     Symbol.PERMUTATION_BEGIN,
     Symbol.PERMUTATION_END,
     Symbol.PERMUTATION_DELIMITER
+  ]);
+  Symbol.FACE = new CompoundSymbol("face", [
+    Symbol.FACE_R,
+    Symbol.FACE_U,
+    Symbol.FACE_F,
+    Symbol.FACE_L,
+    Symbol.FACE_D,
+    Symbol.FACE_B
   ]);
   Symbol.REFLECTION = new CompoundSymbol("reflection", [
     Symbol.REFLECTION_BEGIN,

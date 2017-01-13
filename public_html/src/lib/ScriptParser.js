@@ -161,8 +161,7 @@ define("ScriptParser", ["ScriptNotation", "ScriptAST", "Tokenizer"],
 
       /**
        * Returns true if the array contains a symbol of the specified symbol type
-       * @param {
-       type} array of symbols
+       * @param {type} array of symbols
        * @param {type} type desired type
        * @return true if array contains a symbol of the specified type
        */
@@ -178,8 +177,7 @@ define("ScriptParser", ["ScriptNotation", "ScriptAST", "Tokenizer"],
 
       /**
        * Returns true if the array contains a symbol of the specified symbol type
-       * @param {
-       type} array of symbols
+       * @param {type} array of symbols
        * @param {type} type desired type
        * @return true if array contains a symbol of the specified type
        */
@@ -195,12 +193,30 @@ define("ScriptParser", ["ScriptNotation", "ScriptAST", "Tokenizer"],
         }
         return false;
       }
+      
+     /**
+       * Returns true if the array contains a symbol of the specified symbol type
+       * @param {type} array of symbols
+       * @param {type} type desired type
+       * @return true if array contains a symbol of the specified type
+       */
+      getFirstIntersectingType(symbols, types) {
+        for (let i = 0; i < symbols.length; i++) {
+          let s = symbols[i];
+          for (let j = 0; j < types.length; j++) {
+            let type = types[j];
+            if (s.getType() == type) {
+              return s;
+            }
+          }
+        }
+        return null;
+      }      
       /**
        * Returns true if the array contains at least one symbol, and
        * only symbols of the specified symbol type.
        * 
-       * @param {
-       type} array of symbols
+       * @param {type} array of symbols
        * @param {type} type desired type
        * @return true if array contains a symbol of the specified type
        */
@@ -447,6 +463,166 @@ define("ScriptParser", ["ScriptNotation", "ScriptAST", "Tokenizer"],
             }
         }
         return sign;
+    }
+    
+    /**
+     * Parses a permutation item.
+     * 
+       * @param {Tokenizer} t
+       * @param {PermutationNode} parent
+     */
+    parsePermutationItem( t, parent) {
+        const ntn = this.notation;
+        const Sym = Notation.Symbol;
+        const Symbol = Notation.Symbol;
+        const Syntax = Notation.Syntax;
+
+        const startpos = t.getStartPosition();
+        let sign = null;
+        let leadingSignStartPos = -1, leadingSignEndPos = -1;
+         let partName = '';
+
+        // Evaluate [sign]
+        let syntax = ntn.getSyntax(Symbol.PERMUTATION);
+        if (syntax == Syntax.PRECIRCUMFIX
+                || syntax == Syntax.PREFIX
+                || syntax == Syntax.POSTCIRCUMFIX) {
+            leadingSignStartPos = t.getStartPosition();
+            leadingSignEndPos = t.getEndPosition();
+            sign = this.parsePermutationSign(t, parent);
+        }
+        // Evaluate PermFace [PermFace] [PermFace]
+        let faceSymbols = new Array(3);
+        let type = 0;
+
+        while (type < 3) {
+            if (t.nextToken() != Tokenizer.TT_KEYWORD) {
+                throw new ParseException("PermutationItem: Face token missing.", t.getStartPosition(), t.getEndPosition());
+            }
+            let symbols = t.getSymbolValue();
+            if (!this.containsType(symbols, Symbol.PERMUTATION)) {
+                t.pushBack();
+                break;
+            }
+            let symbol = this.getFirstIntersectingType(symbols, Symbol.PERMUTATION_FACE.getSubSymbols());
+            if (symbol != null) {
+                module.log("permutationItem Face:" + t.getStringValue());
+                partName = partName + t.getStringValue();
+                faceSymbols[type++] = symbol;
+                t.consumeGreedy(token);
+            } else {
+                t.pushBack();
+                break;
+            }
+        }
+
+        if (ntn.getLayerCount() < 3 && type < 3) {
+            throw new ParseException("PermutationItem: The 2x2 cube does not have a \"" + partName.toString() + "\" part.", startpos, t.getEndPosition());
+        }
+
+        if (type != 1 && sign != null && (syntax == Syntax.SUFFIX)) {
+            throw new ParseException("PermutationItem: Unexpected sign", leadingSignStartPos, leadingSignEndPos);
+        }
+
+        // Evaluate [Integer]
+        let partNumber = 0;
+        if (t.nextToken() == Tokenizer.TT_WORD
+                && (token = fetchGreedyNumber(t.sval)) != null) {
+            if (type == 3) {
+                throw new ParseException("PermutationItem: Corner parts must not have a number " + partNumber, t.getStartPosition(), t.getEndPosition());
+            }
+
+            try {
+                partNumber = Integer.parseInt(token);
+            } catch ( e) {
+                throw new ParseException("PermutationItem: Internal Error " + e.getMessage(), t.getStartPosition(), t.getEndPosition());
+            }
+            t.consumeGreedy(token);
+        } else {
+            t.pushBack();
+        }
+        switch (type) {
+            case 3:
+                if (partNumber != 0) {
+                    throw new ParseException("PermutationItem: Invalid corner part number: " + partNumber, t.getStartPosition(), t.getEndPosition());
+                }
+                break;
+            case 2:
+                switch (ntn.getLayerCount()) {
+                    case 4:
+                        if (partNumber < 1 || partNumber > 2) {
+                            throw new ParseException("PermutationItem: Invalid edge part number for 4x4 cube: " + partNumber, t.getStartPosition(), t.getEndPosition());
+                        }
+                        partNumber -= 1;
+                        break;
+                    case 5:
+                        if (partNumber < 0 || partNumber > 2) {
+                            throw new ParseException("PermutationItem: Invalid edge part number for 5x5 cube: " + partNumber, t.getStartPosition(), t.getEndPosition());
+                        }
+                        break;
+                    case 6:
+                        if (partNumber < 1 || partNumber > 4) {
+                            throw new ParseException("PermutationItem: Invalid edge part number for 6x6 cube: " + partNumber, t.getStartPosition(), t.getEndPosition());
+                        }
+                        partNumber -= 1;
+                        break;
+                    case 7:
+                        if (partNumber < 0 || partNumber > 4) {
+                            throw new ParseException("PermutationItem: Invalid edge part number for 7x7 cube: " + partNumber, t.getStartPosition(), t.getEndPosition());
+                        }
+                        break;
+                    default:
+                        if (partNumber != 0) {
+                            throw new ParseException("PermutationItem: Invalid edge part number for 3x3 cube: " + partNumber, t.getStartPosition(), t.getEndPosition());
+                        }
+                        break;
+                }
+                break;
+            case 1:
+                switch (ntn.getLayerCount()) {
+                    case 4:
+                        if (partNumber < 1 || partNumber > 4) {
+                            throw new ParseException("PermutationItem: Invalid side part number for 4x4 cube: " + partNumber, t.getStartPosition(), t.getEndPosition());
+                        }
+                        partNumber -= 1;
+                        break;
+                    case 5:
+                        if (partNumber < 0 || partNumber > 8) {
+                            throw new ParseException("PermutationItem: Invalid side part number for 5x5 cube: " + partNumber, t.getStartPosition(), t.getEndPosition());
+                        }
+                        break;
+                    case 6:
+                        if (partNumber < 1 || partNumber > 16) {
+                            throw new ParseException("PermutationItem: Invalid side part number for 6x6 cube: " + partNumber, t.getStartPosition(), t.getEndPosition());
+                        }
+                        partNumber -= 1;
+                        break;
+                    case 7:
+                        if (partNumber < 0 || partNumber > 24) {
+                            throw new ParseException("PermutationItem: Invalid side part number for 7x7 cube: " + partNumber, t.getStartPosition(), t.getEndPosition());
+                        }
+                        break;
+                    default:
+                        if (partNumber != 0) {
+                            throw new ParseException("PermutationItem: Invalid side part number for 3x3 cube: " + partNumber, t.getStartPosition(), t.getEndPosition());
+                        }
+                        break;
+                }
+                break;
+        }
+        // The Integer token is now done.
+
+        // Evaluate [sign]
+        if (syntax == Syntax.SUFFIX && type == PermutationNode.SIDE_PERMUTATION) {
+            sign = parsePermutationSign(t, parent);
+        }
+
+        try {
+            parent.addPermItem(type, sign, faceSymbols, partNumber, ntn.getLayerCount());
+        } catch ( e) {
+            let pe = new ParseException(e, startpos, t.getEndPosition());
+            throw pe;
+        }
     }
       
       /** Parses a compound statement after its BEGIN token has been consumed. 

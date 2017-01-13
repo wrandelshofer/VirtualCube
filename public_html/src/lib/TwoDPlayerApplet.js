@@ -72,14 +72,20 @@ TwoDPlayerApplet.prototype.closeCanvas = function() {
  */
 TwoDPlayerApplet.prototype.reshape = function() {
     var canvas = this.canvas;
-    if (canvas.clientWidth == this.width && canvas.clientHeight == this.height)
+    
+      // support high dpi/retina displays:
+      var devicePixelRatio = window.devicePixelRatio || 1;
+      this.drawingBufferWidth = canvas.clientWidth*devicePixelRatio;
+      this.drawingBufferHeight = canvas.clientHeight*devicePixelRatio;
+      if (this.drawingBufferWidth == this.width && this.drawingBufferHeight == this.height) {
         return;
- 
-    canvas.width = canvas.clientWidth;
-    canvas.height = canvas.clientHeight;
-    this.width = canvas.width;
-    this.height = canvas.height;
- 
+      }
+
+      canvas.width = this.drawingBufferWidth;
+      canvas.height = this.drawingBufferHeight;
+      this.width = canvas.clientWidth;
+      this.height = canvas.clientHeight;
+     
    // gl.viewport(0, 0, this.width, this.height);
     this.viewportMatrix = new J3DIMatrix4();
     this.viewportMatrix.scale(this.canvas.width*0.5,this.canvas.height*0.5);

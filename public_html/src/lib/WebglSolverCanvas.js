@@ -205,9 +205,9 @@ WebGLSolverCanvas.prototype.drawObject = function(obj, mvMatrix, color, phong, f
   gl.uniformMatrix4fv(prg.uniforms["mvNormalMatrix"], false, this.mvNormalMatrix.getAsFloat32Array());
 	this.checkGLError('mvNormalMatrix');
 	
-	var prg=gl.programs[0];
-	if (this.stickersTexture != null) {
-	  if (prg.uniforms['mTexture']) {
+    var prg=gl.programs[0];
+    if (this.stickersTexture != null) {
+        if (prg.uniforms['mTexture']) {
       gl.activeTexture(gl.TEXTURE0);
       gl.bindTexture(gl.TEXTURE_2D, this.stickersTexture);
       gl.uniform1i(prg.uniforms['mTexture'], 0);
