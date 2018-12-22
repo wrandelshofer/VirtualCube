@@ -59,10 +59,37 @@
   height:460px;
 }
 
+/* system tests */
 section.test { 
   float: left; 
   width:220px; 
   height:340px;
   word-wrap:break-word;
   padding:10px;
+}
+
+/* unit tests */
+section.unittest { 
+}
+section.unittest h1 {
+    margin: 1px 0 0 0;
+}
+section.unittest.fail .actual { 
+    background: lightcoral;
+}
+section.unittest.pass .actual { 
+    background: lightgreen;
+}
+p.input, p.expected, p.actual {
+    margin: 0;
+}
+
+p.input:before {
+    content: "input: ";
+}
+p.expected:before {
+    content: "expected: ";
+}
+p.actual:before {
+    content: "actual: ";
 }

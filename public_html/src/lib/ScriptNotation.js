@@ -490,6 +490,7 @@ function () {
       //addToken(Symbol.INVERSION_DELIMITER ,"");
       this.addToken(Symbol.INVERTOR, "'");
       this.addToken(Symbol.INVERTOR, "-");
+      this.addToken(Symbol.INVERTOR, "'");
       //addToken(Symbol.REFLECTION_BEGIN ,"(");
       //addToken(Symbol.REFLECTION_END ,")");
       //addToken(Symbol.REFLECTION_DELIMITER ,"");

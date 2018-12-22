@@ -10,14 +10,10 @@ define("ScriptParser", ["ScriptNotation", "ScriptAST", "Tokenizer"],
   function (Notation, AST, Tokenizer) {
 
     let module = {
-      log: (false) ? console.log : () => {
-      },
-      info: (true) ? console.info : () => {
-      },
-      warning: (true) ? console.warning : () => {
-      },
-      error: (true) ? console.error : () => {
-      }
+      log: (false && console != null && console.log != null) ? console.log : ()=>{},
+      info: (true && console != null && console.info != null) ? console.info : ()=>{},
+      warning: (true && console != null && console.warn != null) ? console.warn : ()=>{},
+      error: (true && console != null && console.error != null) ? console.error : ()=>{}
     }
 
     class ParseException extends Error {
@@ -34,40 +30,40 @@ define("ScriptParser", ["ScriptNotation", "ScriptAST", "Tokenizer"],
 
     /**
      * Represents an Abstract Syntax Tree Node
-     */
+     * /
     class Node {
 
     }
 
     class TwistNode extends Node {
 
-      /** Script nodes. */
+      /** Script nodes. * /
       constructor(axis, layerMask, angle) {
         this.axis = axis;
         this.angle = angle;
         this.layerMask = layerMask;
       }
 
-      /** Applies the node to the specified cube. */
+      /** Applies the node to the specified cube. * /
       applyTo(cube) {
         if (!this.doesNothing()) {
           cube.transform(this.axis, this.layerMask, this.angle);
         }
       }
-      /** Applies the inverse of the node to the specified cube. */
+      /** Applies the inverse of the node to the specified cube. * /
       applyInverseTo(cube) {
         if (!this.doesNothing()) {
           cube.transform(this.axis, this.layerMask, -this.angle);
         }
       }
-      /** Returns true if this node does nothing. */
+      /** Returns true if this node does nothing. * /
       doesNothing() {
         return this.angle == 0 || this.layerMask == 0;
       }
       /** Tries to consume the given TwistNode. 
        * Returns true if successful.
        * This TwistNode may return true for doesNothing afterwards!);
-       */
+       * /
       consume(that) {
         if (that.axis == this.axis
           && that.layerMask == this.layerMask) {
@@ -84,7 +80,7 @@ define("ScriptParser", ["ScriptNotation", "ScriptAST", "Tokenizer"],
         return 'TwistNode{ax:' + this.axis + ' an:' + this.angle + ' lm:' + this.layerMask + '}';
       }
     }
-
+*/
     const UNKNOWN_MASK = 0;
     const GROUPING_MASK = 1;
     const CONJUGATION_MASK = 2;

@@ -277,6 +277,8 @@
             </fileset>
         </zip>
     </target>
+    <target name="test" depends="init">
+    </target>
 
     <target name="all" depends="dist,dist-src">
     </target>
