@@ -15,10 +15,10 @@ define("VirtualCubeMain", ["WebglPlayerApplet", "TwoDPlayerApplet"],
 function (WebglPlayerApplet, TwoDPlayerApplet) {
 
     let module = {
-      log: (false) ? console.log : ()=>{},
-      info: (true) ? console.info : ()=>{},
-      warning: (true) ? console.warning : ()=>{},
-      error: (true) ? console.error : ()=>{}
+      log: (false && console != null && console.log != null) ? console.log : ()=>{},
+      info: (true && console != null && console.info != null) ? console.info : ()=>{},
+      warning: (true && console != null && console.warn != null) ? console.warn : ()=>{},
+      error: (true && console != null && console.error != null) ? console.error : ()=>{}
     }
 
   var nextId = 0;

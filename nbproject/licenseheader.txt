@@ -1,8 +1,7 @@
 <#if licenseFirst??>
 ${licenseFirst} @(#)${name}
 </#if>
-${licensePrefix}Copyright (c) ${date?date?string("yyyy")} Werner Randelshofer, Switzerland.
-${licensePrefix}You may only use this software in accordance with the license terms.
+${licensePrefix}Copyright (c) ${date?date?string("yyyy")} Werner Randelshofer, Switzerland. MIT License.
 <#if licenseLast??>
 ${licenseLast}
 </#if>
