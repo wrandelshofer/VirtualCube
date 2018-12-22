@@ -1,7 +1,6 @@
 /*
  * @(#)Cube.js  1.0.2  2014-01-17
- * Copyright (c) 2011 Werner Randelshofer, Switzerland.
- * You may only use this software in accordance with the license terms.
+ * Copyright (c) 2011 Werner Randelshofer, Switzerland. MIT License.
  */
 "use strict";
 

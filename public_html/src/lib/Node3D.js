@@ -1,7 +1,6 @@
 /*
  * @(#)Node3D.js  2.0  2014-01-225
- * Copyright (c) 2011 Werner Randelshofer, Switzerland.
- * You may only use this software in accordance with the license terms.
+ * Copyright (c) 2011 Werner Randelshofer, Switzerland. MIT License.
  */
 "use strict";
 

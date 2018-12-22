@@ -1,7 +1,6 @@
 /*
  * @(#)AbstractPlayerApplet.js  3.0  2016-09-16
- * Copyright (c) 2013 Werner Randelshofer, Switzerland.
- * You may only use this software in accordance with the license terms.
+ * Copyright (c) 2013 Werner Randelshofer, Switzerland. MIT License.
  */
 "use strict";
 

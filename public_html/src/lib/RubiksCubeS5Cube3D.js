@@ -1,7 +1,6 @@
 /*
  * @(#)RubiksCubeS5Cube3D.js 
- * Copyright (c) 2015 Werner Randelshofer, Switzerland.
- * You may only use this software in accordance with the license terms.
+ * Copyright (c) 2015 Werner Randelshofer, Switzerland. MIT License.
  */
 "use strict";
 

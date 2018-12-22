@@ -1,7 +1,6 @@
 /*
  * @(#)WebglPlayerApplet.js  2.0  2014-01-05
- * Copyright (c) 2013 Werner Randelshofer, Switzerland.
- * You may only use this software in accordance with the license terms.
+ * Copyright (c) 2013 Werner Randelshofer, Switzerland. MIT License.
  */
 "use strict";
 
