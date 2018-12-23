@@ -9,13 +9,13 @@
 // --------------
 define("Cube", [],
 function () {
-  
-    let module = {
-      log: (false) ? console.log : ()=>{},
-      info: (true) ? console.info : ()=>{},
-      warning: (true) ? console.warning : ()=>{},
-      error: (true) ? console.error : ()=>{}
-    }
+
+  let module = {
+    log: (false && console != null && console.log != null) ? console.log : ()=>{},
+    info: (true && console != null && console.info != null) ? console.info : ()=>{},
+    warning: (true && console != null && console.warn != null) ? console.warn : ()=>{},
+    error: (true && console != null && console.error != null) ? console.error : ()=>{}
+  }
 
   /**
    * Base class for classes which implement a Rubik's Cube like puzzle.
@@ -307,9 +307,9 @@ function () {
   class Cube {
     /**
      * Creates a new instance.
-     * @param this.layerCount number of layers on the x, y and z axis.
+     * @param layerCount number of layers on the x, y and z axis.
      *
-     * @throws IllegalArgumentException if the layour count is smaller than 2.
+     * @throws IllegalArgumentException if the layer count is smaller than 2.
      */
     constructor(layerCount) {
       if (layerCount < 2) {

@@ -577,7 +577,7 @@ define("ScriptAST", ["ScriptNotation"],
               return false;
           }
           toString() {
-              return 'MOV{ax:' + this.axis + ' an:' + this.angle + ' lm:' + this.layerMask + '}';
+              return 'MOV{ax:' + this.axis +' lm:' + this.layerMask  + ' an:' + this.angle + '}';
           }
       }
 
