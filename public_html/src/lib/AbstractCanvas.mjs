@@ -1,5 +1,5 @@
 /*
- * @(#)AbstractCanvas.js  1.0  2014-02-24
+ * @(#)AbstractCanvas.mjs  1.0  2014-02-24
  * Copyright (c) 2014 Werner Randelshofer, Switzerland. MIT License.
  */
 "use strict";

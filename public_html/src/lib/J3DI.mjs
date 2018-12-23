@@ -1,5 +1,5 @@
 /*
- * @(#)J3DI.js  2.0  2013-12-31
+ * @(#)J3DI.mjs  2.0  2013-12-31
  * Copyright (c) 2011 Werner Randelshofer, Switzerland. MIT License.
  *
  * Portions of this script (as marked) have been taken from the following sources:

@@ -1,5 +1,5 @@
 /*
- * @(#)WebglSolverCanvas.js  1.0  2014-01-08
+ * @(#)WebglSolverCanvas.mjs  1.0  2014-01-08
  * Copyright (c) 2014 Werner Randelshofer, Switzerland. MIT License.
  */
 "use strict";

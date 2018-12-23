@@ -1,5 +1,5 @@
 /*
- * @(#)PocketCubeS1Cube3D.js  1.0  2015-03-30
+ * @(#)PocketCubeS1Cube3D.mjs  1.0  2015-03-30
  * Copyright (c) 2015 Werner Randelshofer, Switzerland. MIT License.
  */
 "use strict";

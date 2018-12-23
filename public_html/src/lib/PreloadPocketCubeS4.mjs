@@ -1,5 +1,5 @@
 /*
- * @(#)PreloadPocketCubeS4.js  1.0  2015-03-30
+ * @(#)PreloadPocketCubeS4.mjs  1.0  2015-03-30
  * Copyright (c) 2014 Werner Randelshofer, Switzerland. MIT License.
  */
 "use strict";

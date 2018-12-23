@@ -1,14 +1,6 @@
-/*
- * @(#)Tokenizer.js  1.0  2016-10-29
+/* @(#)Tokenizer.mjs  1.0  2016-10-29
  * Copyright (c) 2011 Werner Randelshofer, Switzerland. MIT License.
  */
-"use strict";
-
-// --------------
-// require.js
-// --------------
-define("Tokenizer", [],
-function () {
 
 // ttypes for Tokenizer
 // ----------------------
@@ -418,7 +410,7 @@ class PushBackReader {
 // ------------------
 // MODULE API    
 // ------------------
-  return {
+export default {
     TT_WORD: TT_WORD,
     TT_KEYWORD: TT_KEYWORD,
     TT_SKIP: TT_SKIP,
@@ -428,4 +420,4 @@ class PushBackReader {
     Tokenizer: Tokenizer,
     PushBackReader:PushBackReader
   };
-});
+

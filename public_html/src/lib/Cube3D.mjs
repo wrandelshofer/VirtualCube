@@ -1,5 +1,5 @@
 /*
- * @(#)Cube3D.js  1.1  2014-02-02
+ * @(#)Cube3D.mjs  1.1  2014-02-02
  * Copyright (c) 2011 Werner Randelshofer, Switzerland. MIT License.
  */
 "use strict";

@@ -1,5 +1,5 @@
 /*
- * @(#)CubeAttributes.js  1.0  2011-06-23
+ * @(#)CubeAttributes.mjs  1.0  2011-06-23
  * Copyright (c) 2011 Werner Randelshofer, Switzerland. MIT License.
  */
 "use strict";

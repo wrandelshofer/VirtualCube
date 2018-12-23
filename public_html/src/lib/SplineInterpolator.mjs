@@ -1,5 +1,5 @@
 /*
- * @(#)SplineInterpolator.js  1.0  2011-06-24
+ * @(#)SplineInterpolator.mjs  1.0  2011-06-24
  * Copyright (c) 2011 Werner Randelshofer, Switzerland. MIT License.
  */
 "use strict";

@@ -1,5 +1,5 @@
 /*
- * @(#)WebglPlayerApplet.js  2.0  2014-01-05
+ * @(#)WebglPlayerApplet.mjs  2.0  2014-01-05
  * Copyright (c) 2013 Werner Randelshofer, Switzerland. MIT License.
  */
 "use strict";

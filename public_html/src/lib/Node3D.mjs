@@ -1,5 +1,5 @@
 /*
- * @(#)Node3D.js  2.0  2014-01-225
+ * @(#)Node3D.mjs  2.0  2014-01-225
  * Copyright (c) 2011 Werner Randelshofer, Switzerland. MIT License.
  */
 "use strict";

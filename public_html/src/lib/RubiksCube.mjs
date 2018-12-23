@@ -1,5 +1,5 @@
 /*
- * @(#)RubiksCube.js  1.0.2  2014-01-17
+ * @(#)RubiksCube.mjs  1.0.2  2014-01-17
  * Copyright (c) 2011 Werner Randelshofer, Switzerland. MIT License.
  */
 "use strict";

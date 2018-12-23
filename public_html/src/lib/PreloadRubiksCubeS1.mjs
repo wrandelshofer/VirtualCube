@@ -1,5 +1,5 @@
 /*
- * @(#)PreloadRubiksCubeS1.js  1.0  2014-01-17
+ * @(#)PreloadRubiksCubeS1.mjs  1.0  2014-01-17
  * Copyright (c) 2014 Werner Randelshofer, Switzerland. MIT License.
  */
 "use strict";

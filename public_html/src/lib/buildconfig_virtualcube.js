@@ -1,5 +1,5 @@
 /*
- * @(#)buildconfig_virtualcube.js  1.0  2014-01-11
+ * @(#)buildconfig_virtualcube.mjs  1.0  2014-01-11
  * Copyright (c) 2014 Werner Randelshofer, Switzerland. MIT License.
  */
 

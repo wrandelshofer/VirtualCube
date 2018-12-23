@@ -1,5 +1,5 @@
 /*
- * @(#)virtualcube.js  1.0.2  2014-01-20
+ * @(#)virtualcube.mjs  1.0.2  2014-01-20
  * Copyright (c) 2014 Werner Randelshofer, Switzerland. MIT License.
  */
 "use strict";

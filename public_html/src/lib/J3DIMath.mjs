@@ -1,5 +1,5 @@
 /*
- * @(#)J3DIMath.js  1.1  2012-06-17
+ * @(#)J3DIMath.mjs  1.1  2012-06-17
  * Copyright (c) 2012 Werner Randelshofer, Switzerland. MIT License.
  */
 /*

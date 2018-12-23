@@ -1,5 +1,5 @@
 /*
- * @(#)AbstractPlayerApplet.js  3.0  2016-09-16
+ * @(#)AbstractPlayerApplet.mjs  3.0  2016-09-16
  * Copyright (c) 2013 Werner Randelshofer, Switzerland. MIT License.
  */
 "use strict";

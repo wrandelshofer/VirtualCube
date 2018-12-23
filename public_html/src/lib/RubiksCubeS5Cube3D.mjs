@@ -1,5 +1,5 @@
 /*
- * @(#)RubiksCubeS5Cube3D.js 
+ * @(#)RubiksCubeS5Cube3D.mjs 
  * Copyright (c) 2015 Werner Randelshofer, Switzerland. MIT License.
  */
 "use strict";

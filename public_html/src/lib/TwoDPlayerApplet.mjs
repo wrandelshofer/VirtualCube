@@ -1,5 +1,5 @@
 /*
- * @(#)TwoDPlayerApplet.js  1.0  2013-12-30
+ * @(#)TwoDPlayerApplet.mjs  1.0  2013-12-30
  * Copyright (c) 2013 Werner Randelshofer, Switzerland. MIT License.
  */
 "use strict";
