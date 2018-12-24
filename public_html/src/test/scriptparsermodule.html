@@ -31,9 +31,11 @@
     </script>
     <link href="virtualcube.css" rel="stylesheet" type="text/css">
   </head>
-  <body>
-    <h1>Test of ScriptParser.parse() methods.</h1>
+  <body class="tests">
+    <h1>Tests for the <kbd>ScriptParser.parse()</kbd> methods in the <kbd>ScriptParser</kbd> module.</h1>
 
+    <article class="testseries">
+      <h1>Simple Move Statements</h1>
     <section class="unittest">
       <p class="input">R</p>
       <p class="expected">SEQ{ STMT{ MOV{ax:0 lm:4 an:1} } }</p>
@@ -64,8 +66,10 @@
       <p class="expected">SEQ{ STMT{ MOV{ax:2 lm:1 an:-1} } }</p>
       <p class="actual"></p>
     </section>
+    </article>
 
-    <hr/>
+    <article class="testseries">
+      <h1>Inverted Move Statements</h1>
     <section class="unittest">
       <p class="input">R'</p>
       <p class="expected">SEQ{ STMT{ INV{ MOV{ax:0 lm:4 an:1} } } }</p>
@@ -96,8 +100,9 @@
       <p class="expected">SEQ{ STMT{ INV{ MOV{ax:2 lm:1 an:-1} } } }</p>
       <p class="actual"></p>
     </section>
-
-    <hr/>
+    </article>
+    <article class="testseries">
+      <h1>Repeated Move Statements</h1>
     <section class="unittest">
       <p class="input">R2</p>
       <p class="expected">SEQ{ STMT{ REP{ 2 MOV{ax:0 lm:4 an:1} } } }</p>
@@ -128,6 +133,7 @@
       <p class="expected">SEQ{ STMT{ REP{ 2 MOV{ax:2 lm:1 an:-1} } } }</p>
       <p class="actual"></p>
     </section>
+    </article>
 
   </body>
 </html>
