@@ -24,7 +24,7 @@ import PocketCubeS5Cube3D from './PocketCubeS5Cube3D.mjs';
 
 
 let logger = {
-    log: (false) ? console.log : () => {
+    log: (true) ? console.log : () => {
     },
     info: (true) ? console.info : () => {
     },
@@ -363,9 +363,15 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
         flip.multiply(this.cameraMatrix);
         this.cameraMatrix.load(flip);
         this.perspectiveMatrix.makeIdentity();
+
         this.perspectiveMatrix.perspective(30, this.width / this.height, 1, 12);
         this.perspectiveMatrix.multiply(this.cameraMatrix);
-        //    this.perspectiveMatrix.scale(1,1,1);
+        if (this.width < this.height) {
+            let factor = this.width / this.height;
+            this.perspectiveMatrix.scale(factor, factor, 1);
+        }
+        logger.log('updateMatrix w:' + this.width + " h:" + this.height);
+        logger.log('updateMatrix w:' + this.width + " h:" + this.height);
 
         this.invCameraMatrix.load(this.cameraMatrix);
         this.invCameraMatrix.invert();
@@ -411,14 +417,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
         }
     }
     drawSinglePass(cube3d) {
-        //this.clearGLError('draw...');
-
-        //if (!this.camPos) return;
-
-        //   this.reshape();
-        //   this.updateMatrices();
         let self = this;
-        //  this.clearCanvas();
 
         //let cube3d=this.cube3d;
         cube3d.repainter = this;
@@ -426,6 +425,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
         cube3d.updateAttributes();
         // model view transformation
         let mvMatrix = this.mvMatrix;
+
         // draw center parts
         for (let i = 0; i < cube3d.centerCount; i++) {
             if (!attr.isPartVisible(cube3d.centerOffset + i))
@@ -483,8 +483,6 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
         }
         this.flushCanvas();
         this.forceColorUpdate = false;
-        //this.checkGLError('...draw');
-
     }
 
     /** Draws the scene. */
@@ -1318,26 +1316,26 @@ class Cube3DHandler extends AbstractCanvas.AbstractHandler {
         this.isMouseDrag = false;
     }
     onMouseUp(event) {
-        logger.log('AbstractPlayerApplet.onMouseUp '+event);
+        logger.log('AbstractPlayerApplet.onMouseUp ' + event);
         this.isMouseDrag = false;
         this.isCubeSwipe = false;
-        
-        let dx=this.mouseDownX-event.clientX;
-        let dy=this.mouseDownY-event.clientY;
-        let magnitude=dx*dx+dy*dy;
-        
-        if (magnitude>4) {
+
+        let dx = this.mouseDownX - event.clientX;
+        let dy = this.mouseDownY - event.clientY;
+        let magnitude = dx * dx + dy * dy;
+
+        if (magnitude > 4) {
             // the mouse has been moved too far between mouse down and mouse up
             return;
         }
 
         let cube3d = this.canvas.cube3d;
         if (cube3d != null && cube3d.isTwisting) {
-            cube3d.isTwisting=false;
+            cube3d.isTwisting = false;
         }
 
         let isect = this.canvas.mouseIntersectionTest(event);
-        logger.log('AbstractPlayerApplet.onMouseUp '+event+' isect: '+isect);
+        logger.log('AbstractPlayerApplet.onMouseUp ' + event + ' isect: ' + isect);
         if (isect != null) {
             if (event.altKey || event.ctrlKey) {
                 isect.angle *= -1;

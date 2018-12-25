@@ -8,8 +8,8 @@
 import WebglPlayerApplet from './WebglPlayerApplet.mjs';
 import TwoDPlayerApplet from './TwoDPlayerApplet.mjs';
 
-let module = {
-    log: (true && console != null && console.log != null) ? console.log : () => {
+let logger = {
+    log: (false && console != null && console.log != null) ? console.log : () => {
     },
     info: (true && console != null && console.info != null) ? console.info : () => {
     },
@@ -46,6 +46,7 @@ let nextId = 0;
  *               object is added to it as the property virtualcube.
  */
 function attachVirtualCube(parameters, divOrCanvas) {
+    logger.log("attaching virtual cube")
     if (parameters == null) {
         parameters = [];
     }
@@ -56,7 +57,7 @@ function attachVirtualCube(parameters, divOrCanvas) {
         try {
             htmlCollection = document.getElementsByClassName("virtualcube");
             if (htmlCollection.length == 0) {
-                module.error('no canvas or div element with class name "virtualcube" found.');
+                logger.error('no canvas or div element with class name "virtualcube" found.');
                 return;
             }
         } catch (err) {
@@ -88,7 +89,7 @@ function attachVirtualCube(parameters, divOrCanvas) {
             for (let i = 0; i < divOrCanvas.attributes.length; i++) {
                 let attr = divOrCanvas.attributes[i];
                 if (attr.name != "id" && attr.name != "class") {
-                    module.log('.attachVirtualCube copying attribute attr.name:' + attr.name + ' attr.value:' + attr.value);
+                    logger.log('.attachVirtualCube copying attribute attr.name:' + attr.name + ' attr.value:' + attr.value);
                     canvasElem.setAttribute(attr.name, attr.value);
                 }
             }
@@ -98,7 +99,7 @@ function attachVirtualCube(parameters, divOrCanvas) {
             if (!divOrCanvas.hasAttribute("debug")) {
                 canvasElem.setAttribute("debug", "");
             }
-            //
+
             divOrCanvas.appendChild(canvasElem);
 
             let toolbarElem = document.createElement("div");
@@ -142,7 +143,7 @@ function attachVirtualCube(parameters, divOrCanvas) {
              toolbarElem.appendChild(buttonElem);
              */
         } else {
-            module.error('element ' + divOrCanvas + ' is not a canvas or a div. tagName=' + divOrCanvas.tagName);
+            logger.error('element ' + divOrCanvas + ' is not a canvas or a div. tagName=' + divOrCanvas.tagName);
             return;
         }
         let vr = new VirtualCube(canvasElem);
@@ -153,7 +154,7 @@ function attachVirtualCube(parameters, divOrCanvas) {
         for (let i = 0; i < divOrCanvas.attributes.length; i++) {
             let attr = divOrCanvas.attributes[i];
             if (attr.name != "id" && attr.name != "class") {
-                module.log('.attachVirtualCube copying parameter attr.name:' + attr.name + ' attr.value:' + attr.value);
+                logger.log('.attachVirtualCube copying parameter attr.name:' + attr.name + ' attr.value:' + attr.value);
                 vr.parameters[attr.name] = attr.value;
             }
         }
@@ -177,13 +178,13 @@ class VirtualCube {
     /** Initializes the virtual cube. */
     init() {
         let rendercontext = this.parameters.rendercontext;
-        module.log('reading parameter rendercontext:' + rendercontext);
+        logger.log('reading parameter rendercontext:' + rendercontext);
         if (rendercontext == "2d") {
             this.canvas3d = new TwoDPlayerApplet.TwoDPlayerApplet();
         } else if (rendercontext == null || rendercontext == "webgl") {
             this.canvas3d = new WebglPlayerApplet.WebglPlayerApplet();
         } else {
-            module.error('illegal rendercontext:' + rendercontext);
+            logger.error('illegal rendercontext:' + rendercontext);
             this.canvas3d = new WebglPlayerApplet.WebglPlayerApplet();
         }
         for (let k in this.parameters) {
@@ -191,7 +192,7 @@ class VirtualCube {
         }
         let s = this.canvas3d.setCanvas(this.canvas);
         if (!s) {
-            module.log("Could not instantiate WebGL Context, falling back to 2D Context");
+            logger.log("Could not instantiate WebGL Context, falling back to 2D Context");
             for (let k in this.parameters) {
                 this.canvas3d.parameters[k] = this.parameters[k]
             }

@@ -23,19 +23,14 @@
 */
 
 .virtualcube {
-  display:inline-block;
-  width:220px;
-  height:244px;
+  display: block;
 }
 .virtualcube .cube-canvas {
-  width:220px;
-  height:220px;
-  object-fit:contain;
+  width: 22vw;
+  height: 22vw;
   border:1px solid #ccc;
 }
 .virtualcube .button-toolbar {
-  width:220px;
-  height:54px;
 }
 .virtualcube .button-toolbar button {
 }
@@ -77,27 +72,23 @@ article {
     article {
       width: 48%;
     }
+    .virtualcube .cube-canvas {
+      width: 44vw;
+      height: 44vw;
+    }
 }
-/* On screens that are 600px wide or less, make the columns stack on top of each other instead of next to each other */
-@media screen and (max-width: 400px) {
-  article {
-    width: 98%;
-  }
+/* On screens that are 420px wide or less, make the columns stack on top of each other instead of next to each other */
+@media screen and (max-width: 420px) {
+    article {
+      width: 98%;
+    }
+    .virtualcube .cube-canvas {
+      width: 88vw;
+      height: 88vw;
+    }
 }
 
 /* system tests */
-section.test { 
-  float: left; 
-  width:220px; 
-  height:340px;
-  word-wrap:break-word;
-  padding:10px;
-}
-
-
-section.unittest { 
-    margin: 1em 0 0 0;
-}
 section.unittest.fail .actual { 
     background: lightcoral;
 }
