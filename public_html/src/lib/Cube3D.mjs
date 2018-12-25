@@ -327,6 +327,11 @@ class Cube3D extends Node3D.Node3D {
     getCube() {
         return this.cube;
     }
+    
+     /* Immediately completes the current twisting animation. */
+     finishTwisting() {
+        // subclasses can override this methods
+     }
 }
 
 // ------------------

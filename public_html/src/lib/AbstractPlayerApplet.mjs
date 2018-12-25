@@ -6,12 +6,6 @@
  using one of its contexts (3D or 2D context). And which can handle
  input events and forward them to the Cube3D.
  */
-/** Renders a Cube3D into an HTML 5 canvas 
- using its WebGL 3D context. 
- */
-// --------------
-// require.js
-// --------------
 
 import AbstractCanvas from './AbstractCanvas.mjs';
 import Node3D from './Node3D.mjs';
@@ -29,8 +23,8 @@ import PocketCubeS4Cube3D from './PocketCubeS4Cube3D.mjs';
 import PocketCubeS5Cube3D from './PocketCubeS5Cube3D.mjs';
 
 
-let module = {
-    log: (false) ? console.log : () => {
+let logger = {
+    log: (true) ? console.log : () => {
     },
     info: (true) ? console.info : () => {
     },
@@ -67,7 +61,7 @@ let parseColorMap = function (str) {
         if (i < tokens.length - 1 && tokens[i + 1].indexOf('=') != -1) {
             // found a key
             if (!tokens[i].match(/^\w+$/)) {
-                module.error('illegal key:"' + key + '" in map:"' + str + '"');
+                logger.error('illegal key:"' + key + '" in map:"' + str + '"');
                 break;
             } else {
                 key = tokens[i];
@@ -96,7 +90,7 @@ let parseColorMap = function (str) {
             // found a separator
             i++; // consume separator
         } else {
-            module.error('illegal token:"' + tokens[i] + '" in map:"' + str + '"');
+            logger.error('illegal token:"' + tokens[i] + '" in map:"' + str + '"');
             break;
         }
     }
@@ -274,7 +268,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
                 c3d = new PocketCubeS5Cube3D.Cube3D();
                 break;
             default :
-                module.error('illegal cube attribute :' + cname);
+                logger.error('illegal cube attribute :' + cname);
                 if (this.useFullModel) {
                     c3d = new RubiksCubeS4Cube3D.Cube3D();
                 } else {
@@ -1005,8 +999,8 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
         //       we use the RubikPlayerApplet definition
 
         if (p.colortable != null) {
-            module.log('.readParameters colortable:' + p.colortable);
-            module.warning('the parameter "colorTable" is deprecated, use "colorList" instead.');
+            logger.log('.readParameters colortable:' + p.colortable);
+            logger.warning('the parameter "colorTable" is deprecated, use "colorList" instead.');
             let parsedColorMap = parseColorMap(p.colortable);
             for (let k in parsedColorMap) {
                 if (0 <= k && k < deprecatedFaceIndices.length) {
@@ -1020,7 +1014,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
 
         // parse colorMap from parameter "colorList"
         if (p.colorlist != null) {
-            module.log('.readParameters colorlist:' + p.colorlist);
+            logger.log('.readParameters colorlist:' + p.colorlist);
             colorMap = parseColorMap(this.parameters.colorlist);
             deprecatedColorMap = colorMap;
         }
@@ -1035,8 +1029,8 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
 
         // parse faceIndices from faces
         if (p.faces != null) {
-            module.log('.readParameters faces:' + p.faces);
-            module.warning('the parameter "faces" is deprecated, please use "faceList" instead.');
+            logger.log('.readParameters faces:' + p.faces);
+            logger.warning('the parameter "faces" is deprecated, please use "faceList" instead.');
             let parsedIndices = parseWordList(p.faces);
             for (let i in parsedIndices) {
                 faceIndices[deprecatedFaceIndices[i]] = parsedIndices[i];
@@ -1045,7 +1039,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
         }
         // parse faceIndices from faceList
         if (p.facelist != null) {
-            module.log('.readParameters facelist:' + p.facelist);
+            logger.log('.readParameters facelist:' + p.facelist);
             faceIndices = parseWordList(p.facelist);
         }
 
@@ -1072,7 +1066,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
         // parse resourceFile
         // --------------
         if (p.resourcefile != null) {
-            module.log('.readParameters resourcefile:' + p.resourcefile);
+            logger.log('.readParameters resourcefile:' + p.resourcefile);
             // FIXME implement me
         }
 
@@ -1082,38 +1076,38 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
         // parse scriptmacros
         // --------------
         if (p.scriptmacros != null) {
-            module.log('.readParameters scriptmacros:' + p.scriptmacros);
+            logger.log('.readParameters scriptmacros:' + p.scriptmacros);
             try {
                 this.macros = parserMacroDefinitions(p.scriptmacros);
-                module.log('.readParameters scriptmacros: %o', this.macros);
+                logger.log('.readParameters scriptmacros: %o', this.macros);
             } catch (e) {
-                module.error(e);
-                module.error("illegal scriptmacros:\"" + p.scriptmacros + '"');
+                logger.error(e);
+                logger.error("illegal scriptmacros:\"" + p.scriptmacros + '"');
             }
         }
         // parse script
         // --------------
         if (p.script != null) {
-            module.log('.readParameters script:' + p.script);
+            logger.log('.readParameters script:' + p.script);
             let parser = new ScriptParser.ScriptParser(notation);
             try {
                 this.script = parser.parse(p.script);
             } catch (e) {
-                module.error(e);
-                module.error("illegal script:%s", p.script);
+                logger.error(e);
+                logger.error("illegal script:%s", p.script);
             }
         }
         // parse initscript
         // --------------
         if (p.initscript != null) {
-            module.log('.readParameters initscript:' + p.initscript);
+            logger.log('.readParameters initscript:' + p.initscript);
             let notation = new ScriptNotation.DefaultNotation();
             let parser = new ScriptParser.ScriptParser(notation);
             try {
                 this.initscript = parser.parse(p.initscript);
             } catch (e) {
-                module.error(e);
-                module.error("illegal initscript:\"" + p.initscript + '"');
+                logger.error(e);
+                logger.error("illegal initscript:\"" + p.initscript + '"');
             }
         }
     }
@@ -1129,11 +1123,11 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
         // parse alpha and beta
         // --------------
         if (p.alpha != null) {
-            module.log('.readParameters alpha:' + p.alpha);
+            logger.log('.readParameters alpha:' + p.alpha);
             cube3d.attributes.xRot = parseFloat(p.alpha);
         }
         if (p.beta != null) {
-            module.log('.readParameters beta:' + p.beta);
+            logger.log('.readParameters beta:' + p.beta);
             cube3d.attributes.yRot = -parseFloat(p.beta);
         }
     }
@@ -1149,7 +1143,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
         // parse alpha and beta
         // --------------
         if (p.partlist != null) {
-            module.log('.readParameters partlist:' + p.partlist);
+            logger.log('.readParameters partlist:' + p.partlist);
             let str = p.partlist;
             let tokens = str.split(/[ ,\n]+/);
             for (let i = 0; i < a.getPartCount(); i++) {
@@ -1162,13 +1156,13 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
                 let partName = tokens[i];
                 let partIndex = cube.NAME_PART_MAP[partName];
                 if (partIndex == null) {
-                    module.error('illegal part:"' + partName + '" in partlist');
+                    logger.error('illegal part:"' + partName + '" in partlist');
                     isError = true;
                 }
                 a.setPartVisible(partIndex, true);
             }
             if (isError) {
-                module.error("illegal partlist:\"" + p.partlist + '"');
+                logger.error("illegal partlist:\"" + p.partlist + '"');
             }
         }
     }
@@ -1232,13 +1226,13 @@ class Cube3DHandler extends AbstractCanvas.AbstractHandler {
             let y = event.clientY;
             let dx2d = (this.mousePrevY - y);
             let dy2d = (this.mousePrevX - x);
-            let dx = dx2d * (360 / this.canvas.width);
-            let dy = dy2d * (360 / this.canvas.height);
+            let dx = dx2d * (360 / Math.min(this.canvas.width, this.canvas.height));
+            let dy = dy2d * (360 / Math.min(this.canvas.width, this.canvas.height));
             let mouseTimestep = (event.timeStamp - this.mousePrevTimeStamp) / 1000;
             if (this.isCubeSwipe) {
                 let cube3d = this.canvas.cube3d;
                 let sqrDist = dx2d * dx2d + dy2d * dy2d;
-                if (!cube3d.isTwisting && sqrDist > 16) { // min swipe-distance: 4 pixels
+                if (/*!cube3d.isTwisting &&*/ sqrDist > 16) { // min swipe-distance: 4 pixels
                     let isect = this.canvas.mouseIntersectionTest(event);
                     if (isect != null && isect.face == this.mouseDownIsect.face) {
 
@@ -1324,19 +1318,26 @@ class Cube3DHandler extends AbstractCanvas.AbstractHandler {
         this.isMouseDrag = false;
     }
     onMouseUp(event) {
+        logger.log('AbstractPlayerApplet.onMouseUp '+event);
         this.isMouseDrag = false;
         this.isCubeSwipe = false;
-        if (this.mouseDownX != event.clientX || this.mouseDownY != event.clientY) {
-            // the mouse has been moved between mouse down and mouse up
+        
+        let dx=this.mouseDownX-event.clientX;
+        let dy=this.mouseDownY-event.clientY;
+        let magnitude=dx*dx+dy*dy;
+        
+        if (magnitude>4) {
+            // the mouse has been moved too far between mouse down and mouse up
             return;
         }
 
         let cube3d = this.canvas.cube3d;
         if (cube3d != null && cube3d.isTwisting) {
-            return;
+            cube3d.isTwisting=false;
         }
 
         let isect = this.canvas.mouseIntersectionTest(event);
+        logger.log('AbstractPlayerApplet.onMouseUp '+event+' isect: '+isect);
         if (isect != null) {
             if (event.altKey || event.ctrlKey) {
                 isect.angle *= -1;

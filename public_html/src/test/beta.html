@@ -2,45 +2,48 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <script src="../lib/virtualcube.js"></script>
+    <title>beta</title>
+    <script src="../lib/virtualcube.mjs" type="module"></script>
     <link href="virtualcube.css" rel="stylesheet" type="text/css">
   </head>
   <body>
     <h1>Test of the <kbd>beta</kbd> parameter</h1>
+    
+    <article>
+      <section class="test">
+        <div class="virtualcube small"></div>
+        <p>Default value.</p>
+      </section>
 
-    <section class="test">
-      <p><div class="virtualcube small" 
-              ></div></p>
-              <p>Default value.</p>
-  </section>
+      <section class="test">
+        <div class="virtualcube small" 
+             beta="45"
+             ></div>
+        <p><kbd>beta="45"</kbd> (default)</p>
+      </section>
+    </article>
 
-  <section class="test">
-    <div class="virtualcube small" 
-         beta="45"
-         ></div>
-    <p><kbd>beta="45"</kbd> (default)</p>
-  </section>
+    <article>
+      <section class="test">
+        <div class="virtualcube small" 
+             beta="0"
+             ></div>
+        <p><kbd>beta="0"</kbd></p>
+      </section>
 
-  <section class="test">
-    <div class="virtualcube small" 
-         beta="0"
-         ></div>
-    <p><kbd>beta="0"</kbd></p>
-  </section>
+      <section class="test">
+        <div class="virtualcube small" 
+             beta="60"
+             ></div>
+        <p><kbd>beta="60"</kbd></p>
+      </section>
 
-  <section class="test">
-    <div class="virtualcube small" 
-         beta="60"
-         ></div>
-    <p><kbd>beta="60"</kbd></p>
-  </section>
-
-  <section class="test">
-    <div class="virtualcube small" 
-         beta="-40"
-         ></div>
-    <p><kbd>beta="-40"</kbd></p>
-  </section>
-
-</body>
+      <section class="test">
+        <div class="virtualcube small" 
+             beta="-40"
+             ></div>
+        <p><kbd>beta="-40"</kbd></p>
+      </section>
+    </article>
+  </body>
 </html>

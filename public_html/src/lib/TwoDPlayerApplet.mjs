@@ -66,11 +66,14 @@ class TwoDPlayerApplet extends AbstractPlayerApplet.AbstractPlayerApplet {
 
         // support high dpi/retina displays:
         let devicePixelRatio = window.devicePixelRatio || 1;
-        this.drawingBufferWidth = canvas.clientWidth * devicePixelRatio;
-        this.drawingBufferHeight = canvas.clientHeight * devicePixelRatio;
+        this.drawingBufferWidth = canvas.offsetWidth * devicePixelRatio;
+        this.drawingBufferHeight = canvas.offsetHeight * devicePixelRatio;
         if (this.drawingBufferWidth == this.width && this.drawingBufferHeight == this.height) {
             return;
         }
+
+       canvas.width = canvas.offsetWidth;
+       canvas.height = canvas.offsetHeight;
 
         this.width = canvas.clientWidth;
         this.height = canvas.clientHeight;

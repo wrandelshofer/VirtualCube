@@ -92,12 +92,8 @@ function attachVirtualCube(parameters, divOrCanvas) {
                     canvasElem.setAttribute(attr.name, attr.value);
                 }
             }
-            if (!divOrCanvas.hasAttribute("width")) {
-                canvasElem.setAttribute("width", "220");
-            }
-            if (!divOrCanvas.hasAttribute("height")) {
-                canvasElem.setAttribute("height", "220");
-            }
+            canvasElem.style.width="100%";
+            canvasElem.style.height="100%";
             if (!divOrCanvas.hasAttribute("kind")) {
                 canvasElem.setAttribute("kind", divOrCanvas.getAttribute("kind"));
             }

@@ -377,8 +377,14 @@ class AbstractPocketCubeCube3D extends Cube3D.Cube3D {
         let interpolator = new SplineInterpolator.SplineInterpolator(0, 0, 1, 1);
         let start = new Date().getTime();
         let duration = this.attributes.twistDuration * Math.abs(angle);
-        this.isTwisting = true;
+        let token=new Object();
+        this.isTwisting = token;
         let f = function () {
+            if (!self.isTwisting==token) {
+                // Twisting was aborted. Complete this twisting animation.
+                self.validateTwist(partIndices, locations, orientations, finalCount, axis, angle, 1.0);
+                return;
+            }
             let now = new Date().getTime();
             let elapsed = now - start;
             let value = elapsed / duration;
@@ -387,12 +393,21 @@ class AbstractPocketCubeCube3D extends Cube3D.Cube3D {
                 self.repainter.repaint(f);
             } else {
                 self.validateTwist(partIndices, locations, orientations, finalCount, axis, angle, 1.0);
-                self.isTwisting = false;
+                self.isTwisting = null;
             }
         };
         this.repainter.repaint(f);
     }
+    
+    /* Immediately completes the current twisting animation. */
+     finishTwisting() {
+       this.isTwisting=null;
+     }
+
 }
+
+
+
 
 /** Maps stickers to cube parts.
  * <p>
