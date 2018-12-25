@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Cubes module</title>
+    <link href="virtualcube.css" rel="stylesheet" type="text/css">
+    <script type="module">
+      import RubiksCube from '../lib/RubiksCube.mjs';
+      import Cubes from '../lib/Cubes.mjs';
+      import ScriptNotation from '../lib/ScriptNotation.mjs';
+      import ScriptParser from '../lib/ScriptParser.mjs';
+
+      let tests = document.getElementsByClassName("unittest");
+      let inputs = document.getElementsByClassName("input");
+      let expecteds = document.getElementsByClassName("expected");
+      let actuals = document.getElementsByClassName("actual");
+
+      let cube = new RubiksCube.RubiksCube();
+
+      for (let i = 0; i < tests.length; i++) {
+        let input = inputs[i].innerText.split(/\s*,\s/);
+        let inputScript = input[0];
+        let inputFormat = input[1];
+        let inputSyntax = input[2];
+        let expected = expecteds[i].innerText;
+
+        try {
+          let notation = new ScriptNotation.DefaultNotation();
+          switch (inputSyntax) {
+            case 'PRECIRCUMFIX':
+              notation.symbolToSyntaxMap[ScriptNotation.Symbol.PERMUTATION] = ScriptNotation.Syntax.PRECIRCUMFIX;
+              break;
+            case 'PREFIX':
+              notation.symbolToSyntaxMap[ScriptNotation.Symbol.PERMUTATION] = ScriptNotation.Syntax.PREFIX;
+              break;
+            case 'SUFFIX':
+              notation.symbolToSyntaxMap[ScriptNotation.Symbol.PERMUTATION] = ScriptNotation.Syntax.SUFFIX;
+              break;
+            case 'POSTCIRCUMFIX':
+              notation.symbolToSyntaxMap[ScriptNotation.Symbol.PERMUTATION] = ScriptNotation.Syntax.POSTCIRCUMFIX;
+              break;
+          }
+          
+          let parser = new ScriptParser.ScriptParser(notation)
+          let ast = parser.parse(inputScript);
+          cube.reset();
+          ast.applyTo(cube, notation);
+          
+          let actual = Cubes.toPermutationString(cube, notation).replace(/\s+/g,' ');
+          actuals[i].innerText = actual;
+          tests[i].classList.add(actual == expected ? "pass" : "fail");
+        } catch (err) {
+          actuals[i].innerText = err;
+          tests[i].classList.add("fail");
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <h1>Tests <kbd>Cubes</kbd> module.</h1>
+
+    <article>
+      <h1><kbd>Permutation, Precircumfix</kbd></h1>
+      <section class="unittest">
+        <p class="input">., Permutation, PRECIRCUMFIX</p>
+        <p class="expected">()</p>
+        <p class="actual"></p>
+      </section>
+      <section class="unittest">
+        <p class="input">R, Permutation, PRECIRCUMFIX</p>
+        <p class="expected">(ubr,bdr,dfr,fur) (ur,br,dr,fr) (+r)</p>
+        <p class="actual"></p>
+      </section>
+    </article>
+    
+    <article>
+      <h1><kbd>Permutation, Prefix</kbd></h1>
+      <section class="unittest">
+        <p class="input">., Permutation, PREFIX</p>
+        <p class="expected">()</p>
+        <p class="actual"></p>
+      </section>
+      <section class="unittest">
+        <p class="input">R, Permutation, PREFIX</p>
+        <p class="expected">(ubr,bdr,dfr,fur) (ur,br,dr,fr) +(r)</p>
+        <p class="actual"></p>
+      </section>
+    </article>
+    
+    <article>
+      <h1><kbd>Permutation, Suffix</kbd></h1>
+      <section class="unittest">
+        <p class="input">., Permutation, SUFFIX</p>
+        <p class="expected">()</p>
+        <p class="actual"></p>
+      </section>
+      <section class="unittest">
+        <p class="input">R, Permutation, SUFFIX</p>
+        <p class="expected">(ubr,bdr,dfr,fur) (ur,br,dr,fr) (r)+</p>
+        <p class="actual"></p>
+      </section>
+    </article>
+    
+    <article>
+      <h1><kbd>Permutation, Postcircumfix</kbd></h1>
+      <section class="unittest">
+        <p class="input">., Permutation, POSTCIRCUMFIX</p>
+        <p class="expected">()</p>
+        <p class="actual"></p>
+      </section>
+      <section class="unittest">
+        <p class="input">R, Permutation, POSTCIRCUMFIX</p>
+        <p class="expected">(ubr,bdr,dfr,fur) (ur,br,dr,fr) (r+)</p>
+        <p class="actual"></p>
+      </section>
+    </article>
+  </body>
+</html>

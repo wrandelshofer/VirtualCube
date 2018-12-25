@@ -59,6 +59,32 @@
   height:460px;
 }
 
+/* general layout */
+body {
+    
+}
+body>h1 {
+    padding: 1%;
+}
+/* Create four equal columns that floats next to each other */
+article {
+  padding: 1%;
+  float: left;
+  width: 23%;
+}
+/* On screens that are 992px wide or less, go from four columns to two columns */
+@media screen and (max-width: 800px) {
+    article {
+      width: 48%;
+    }
+}
+/* On screens that are 600px wide or less, make the columns stack on top of each other instead of next to each other */
+@media screen and (max-width: 400px) {
+  article {
+    width: 98%;
+  }
+}
+
 /* system tests */
 section.test { 
   float: left; 
@@ -68,38 +94,7 @@ section.test {
   padding:10px;
 }
 
-/* unit tests */
-body.tests {
-    
-}
 
-body.tests>h1 {
-    padding: 1%;
-}
-/* Create four equal columns that floats next to each other */
-article.testseries {
-  padding: 1%;
-  float: left;
-  width: 23%;
-}
-
-/* On screens that are 992px wide or less, go from four columns to two columns */
-@media screen and (max-width: 800px) {
-    article.testseries {
-      width: 48%;
-    }
-}
-
-/* On screens that are 600px wide or less, make the columns stack on top of each other instead of next to each other */
-@media screen and (max-width: 400px) {
-  article.testseries {
-    width: 98%;
-  }
-}
-
-article.testseries {
-    
-}
 section.unittest { 
     margin: 1em 0 0 0;
 }
