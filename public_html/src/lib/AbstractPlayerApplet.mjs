@@ -24,7 +24,7 @@ import PocketCubeS5Cube3D from './PocketCubeS5Cube3D.mjs';
 
 
 let logger = {
-    log: (true) ? console.log : () => {
+    log: (false) ? console.log : () => {
     },
     info: (true) ? console.info : () => {
     },
