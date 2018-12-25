@@ -2,31 +2,35 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <script src="../lib/virtualcube.js"></script>
+    <title>stickersimage</title>
+    <script type="module" src="../lib/virtualcube.mjs"></script>
     <link href="virtualcube.css" rel="stylesheet" type="text/css">
   </head>
   <body>
     <h1>Test of the <kbd>stickersimage</kbd>  parameter</h1>
-
-    <section class="test">
-      <div class="virtualcube small" 
-           ></div>
-      <p>Default value.</p>
-    </section>
-
-    <section class="test">
-      <div class="virtualcube small" 
-           stickersimage="../img/RubiksCube_512.gif"
-           ></div>
-      <p><kbd>stickersimage="../img/RubiksCube_512.gif"</kbd>)</p>
-    </section>
-    
-    <section class="test">
-      <div class="virtualcube small" 
-           stickersimage="../img/RubiksCube_512.gif"
-           rendercontext="2d"
-           ></div>
-      <p><kbd>stickersimage="../img/RubiksCube_512.gif" rendercontext="2d"</kbd>)</p>
-    </section>
-      </body>
+    <article>
+      <section class="test">
+        <div class="virtualcube small" 
+             ></div>
+        <p>Default value.</p>
+      </section>
+    </article>
+    <article>
+      <section class="test">
+        <div class="virtualcube small" 
+             stickersimage="../img/RubiksCube_512.gif"
+             ></div>
+        <p><kbd>stickersimage="../img/RubiksCube_512.gif"</kbd>)</p>
+      </section>
+    </article>
+    <article>
+      <section class="test">
+        <div class="virtualcube small" 
+             stickersimage="../img/RubiksCube_512.gif"
+             rendercontext="2d"
+             ></div>
+        <p><kbd>stickersimage="../img/RubiksCube_512.gif" rendercontext="2d"</kbd>)</p>
+      </section>
+    </article>
+  </body>
 </html>

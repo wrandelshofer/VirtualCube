@@ -2,25 +2,28 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <script src="../lib/virtualcube.js"></script>
+    <title>partlist</title>
+    <script type="module" src="../lib/virtualcube.mjs"></script>
     <link href="virtualcube.css" rel="stylesheet" type="text/css">
   </head>
   <body>
     <h1>Test of the <kbd>partlist</kbd>  parameter</h1>
-
+    <article>
     <section class="test">
       <div class="virtualcube small" 
            ></div>
       <p>Default value.</p>
     </section>
-
+    </article>
+    <article>
     <section class="test">
       <div class="virtualcube small" 
            partlist="urf,dfr,ubr,drb,ulb,dbl,ufl,dlf, ur,rf,dr,bu,rb,bd,ul,lb,dl,fu,lf,fd, r,u,f,l,d,b, center"
            ></div>
       <p><kbd>partlist="urf,dfr,ubr,drb,ulb,dbl,ufl,dlf, ur,rf,dr,bu,rb,bd,ul,lb,dl,fu,lf,fd, r,u,f,l,d,b, center"</kbd> (default)</p>
     </section>
-
+    </article>
+    <article>
     <section class="test">
       <div class="virtualcube small" 
            kind="RubiksCube"
@@ -29,7 +32,8 @@
            ></div>
       <p><kbd>rendercontext="webgl" partlist="l,r,u,f,d,b,center"</kbd></p>
     </section>
-    
+    </article>
+    <article>
     <section class="test">
       <div class="virtualcube small" 
            kind="RubiksCube"
@@ -38,7 +42,8 @@
            ></div>
       <p><kbd>partlist="l,r,u,f,d,b,df,db,dl,dr,drb,drf,dlb,dlf,center"</kbd></p>
     </section>
-    
+    </article>
+    <article>
     <section class="test">
       <div class="virtualcube small" 
            partlist="dfr,dlf,drb,dlb,rub,center"
@@ -46,6 +51,6 @@
            ></div>
       <p><kbd>kind="PocketCube" partlist="dfr,dlf,drb,dlb,rub,center"</kbd></p>
     </section>
-    
+    </article>
   </body>
 </html>

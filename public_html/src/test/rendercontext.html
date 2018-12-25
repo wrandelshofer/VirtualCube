@@ -2,30 +2,34 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <script src="../lib/virtualcube.js"></script>
+    <title>rendercontext</title>
+    <script type="module" src="../lib/virtualcube.mjs"></script>
     <link href="virtualcube.css" rel="stylesheet" type="text/css">
   </head>
   <body>
     <h1>Test of the <kbd>rendercontext</kbd>  parameter</h1>
-
+    <article>
     <section class="test">
       <div class="virtualcube small" 
            ></div>
       <p>Default value.</p>
     </section>
-
+    </article>
+    <article>
     <section class="test">
       <div class="virtualcube small" 
            rendercontext="webgl"
            ></div>
       <p><kbd>rendercontext="webgl"</kbd> (default)</p>
     </section>
-
+    </article>
+    <article>
     <section class="test">
       <div class="virtualcube small" 
            rendercontext="2d"
            ></div>
       <p><kbd>rendercontext="2d"</kbd></p>
     </section>
+    </article>
   </body>
 </html>

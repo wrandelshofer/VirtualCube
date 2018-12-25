@@ -56,14 +56,15 @@
 
 /* general layout */
 body {
-    
+    word-break: break-word;
 }
-body>h1 {
-    padding: 1%;
+body>h1,
+body>p {
+    padding: 0.5vw;
 }
 /* Create four equal columns that floats next to each other */
 article {
-  padding: 1%;
+  padding: 0.5vw;
   float: left;
   width: 23%;
 }

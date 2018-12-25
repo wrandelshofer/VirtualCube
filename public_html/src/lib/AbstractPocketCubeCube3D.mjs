@@ -11,6 +11,7 @@ import PocketCube from './PocketCube.mjs';
 import CubeAttributes from './CubeAttributes.mjs';
 import SplineInterpolator from './SplineInterpolator.mjs';
 import J3DI from './J3DI.mjs';
+import J3DIMath from './J3DIMath.mjs';
 import Node3D from './Node3D.mjs';
 
 
@@ -33,7 +34,7 @@ class AbstractPocketCubeCube3D extends Cube3D.Cube3D {
         this.centerOffset = 8;
         this.stickerCount = 4 * 6;
 
-        this.cube = PocketCube.newPocketCube();
+        this.cube = new PocketCube.PocketCube();
         this.cube.addCubeListener(this);
         this.attributes = this.createAttributes();
 
@@ -151,7 +152,7 @@ class AbstractPocketCubeCube3D extends Cube3D.Cube3D {
         // stickers
         this.stickerObjs = new Array(this.stickerCount);
         for (let i = 0; i < this.stickerObjs.length; i++) {
-            this.stickerObjs[i] = J3DI.newJ3DIObj();
+            this.stickerObjs[i] = new J3DI.J3DIObj();
         }
         this.corner_rObj = J3DI.loadObj(null, modelUrl + "corner_r.obj", function () {
             self.initAbstractPocketCubeCube3D_corner_r();
@@ -179,7 +180,7 @@ class AbstractPocketCubeCube3D extends Cube3D.Cube3D {
 
     initAbstractPocketCubeCube3D_corner_r() {
         let s = this.corner_rObj;
-        let s180 = new J3DIMath.J3DI.J3DIObj();
+        let s180 = new J3DI.J3DIObj();
         s180.setTo(s);
         s180.rotateTexture(180);
 
@@ -196,7 +197,7 @@ class AbstractPocketCubeCube3D extends Cube3D.Cube3D {
     }
     initAbstractPocketCubeCube3D_corner_f() {
         let s = this.corner_fObj;
-        let s180 = new J3DIMath.J3DI.J3DIObj();
+        let s180 = new J3DI.J3DIObj();
         s180.setTo(s);
         s180.rotateTexture(180);
 
@@ -213,13 +214,13 @@ class AbstractPocketCubeCube3D extends Cube3D.Cube3D {
     }
     initAbstractPocketCubeCube3D_corner_u() {
         let s = this.corner_uObj;
-        let s90 = new J3DIMath.J3DI.J3DIObj();
+        let s90 = new J3DI.J3DIObj();
         s90.setTo(s);
         s90.rotateTexture(90);
-        let s180 = new J3DIMath.J3DI.J3DIObj();
+        let s180 = new J3DI.J3DIObj();
         s180.setTo(s);
         s180.rotateTexture(180);
-        let s270 = new J3DIMath.J3DI.J3DIObj();
+        let s270 = new J3DI.J3DIObj();
         s270.setTo(s);
         s270.rotateTexture(270);
 

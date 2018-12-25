@@ -2,31 +2,35 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <script src="../lib/virtualcube.js"></script>
+    <title>kind</title>
+    <script type="module" src="../lib/virtualcube.mjs"></script>
     <link href="virtualcube.css" rel="stylesheet" type="text/css">
   </head>
   <body>
     <h1>Test of the <kbd>kind</kbd>  parameter</h1>
-
-    <section class="test">
-      <div class="virtualcube small" 
-           kind="RubiksCube"
-           ></div>
-      <p>Default value.</p>
-    </section>
-
-    <section class="test">
-      <div class="virtualcube small" 
-           kind="RubiksCube"
-           ></div>
-      <p><kbd>kind="RubiksCube"</kbd> (default)</p>
-    </section>
-
-    <section class="test">
-      <div class="virtualcube small" 
-           kind="PocketCube"
-           ></div>
-      <p><kbd>kind="PocketCube"</kbd></p>
-    </section>
+    <article>
+      <section class="test">
+        <div class="virtualcube small" 
+             kind="RubiksCube"
+             ></div>
+        <p>Default value.</p>
+      </section>
+    </article>
+    <article>
+      <section class="test">
+        <div class="virtualcube small" 
+             kind="RubiksCube"
+             ></div>
+        <p><kbd>kind="RubiksCube"</kbd> (default)</p>
+      </section>
+    </article>
+    <article>
+      <section class="test">
+        <div class="virtualcube small" 
+             kind="PocketCube"
+             ></div>
+        <p><kbd>kind="PocketCube"</kbd></p>
+      </section>
+    </article>
   </body>
 </html>

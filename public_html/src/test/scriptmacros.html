@@ -2,18 +2,20 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <script src="../lib/virtualcube.js"></script>
+    <title>scriptmacros</title>
+    <script type="module" src="../lib/virtualcube.mjs"></script>
     <link href="virtualcube.css" rel="stylesheet" type="text/css">
   </head>
   <body>
     <h1>Test of the <kbd>scriptmacros</kbd> parameter</h1>
-
+    <article>
     <section class="test">
       <div class="virtualcube small" 
            ></div>
       <p>Default value.</p>
     </section>
-
+    </article>
+    <article>
     <section class="test">
       <div class="virtualcube small" 
            scriptmacros=""
@@ -22,7 +24,8 @@
       <p><kbd> scriptmacros=""
            script="A B A'"</kbd> (default)</p>
     </section>
-
+    </article>
+    <article>
     <section class="test">
       <div class="virtualcube small" 
            scriptmacros="´A´=´TR R'´, ´B´=´U2´"
@@ -31,7 +34,8 @@
       <p><kbd> scriptmacros="´A´=´TR R'´, ´B´=´U2´"
            script="A B A'"</kbd></p>
     </section>
-
+    </article>
+    <article>
     <section class="test">
       <div class="virtualcube small" 
            scriptmacros="A=TR R', B=U2"
@@ -40,6 +44,6 @@
       <p><kbd> scriptmacros="A=TR R', B=U2"
            script="A B A'"</kbd></p>
     </section>
-
+    </article>
   </body>
 </html>

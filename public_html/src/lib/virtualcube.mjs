@@ -15,7 +15,7 @@
   <html>
   <head>
   <meta charset="utf-8">
-  <script type="module" src="lib/virtualcube.mjs"></script>
+  <script type="module" src="lib/virtualcube.mjs"/>
   </head>
   <body>
   <div class="virtualcube" kind="..." stickersImage="..."></div>
@@ -69,7 +69,7 @@ let baseUrl='lib';
 
 let parameters = {
     baseurl: baseUrl,
-    rendercontext: "webgl" // supported values: "2d", "webgl".
 };
+console.log('hello');
 VirtualCubeMain.attachVirtualCube(parameters);
 
