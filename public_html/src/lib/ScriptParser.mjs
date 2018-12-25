@@ -1363,12 +1363,12 @@ let createRandomScript = function (layerCount, scrambleCount, scrambleMinCount) 
     scrambleCount = 21;
   if (scrambleMinCount == null)
     scrambleMinCount = 6;
-  var scrambler = new Array(Math.floor(Math.random() * scrambleCount - scrambleMinCount) + scrambleMinCount);
+  let scrambler = new Array(Math.floor(Math.random() * scrambleCount - scrambleMinCount) + scrambleMinCount);
   // Keep track of previous axis, to avoid two subsequent moves on
   // the same axis.
-  var prevAxis = -1;
-  var axis, layerMask, angle;
-  for (var i = 0; i < scrambleCount; i++) {
+  let prevAxis = -1;
+  let axis, layerMask, angle;
+  for (let i = 0; i < scrambleCount; i++) {
     while ((axis = Math.floor(Math.random() * 3)) == prevAxis) {
     }
     prevAxis = axis;
