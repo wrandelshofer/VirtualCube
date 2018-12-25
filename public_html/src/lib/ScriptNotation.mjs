@@ -4,143 +4,143 @@
 
 
 let Syntax = {
-  /**
-   * Binary prefix syntax: The affix is placed between begin and end before
-   * the root.
-   * <pre>
-   * Binary Prefix ::= Begin , Affix , End , Root ;
-   * </pre>
-   *
-   * Unary prefix syntax: The affix is placed before the root.
-   * <pre>
-   * Unary Prefix ::= Affix , Root ;
-   * </pre>
-   */
-  PREFIX: "prefix",
-  /**
-   * Binary suffix syntax: The affix is placed between begin and end after
-   * the root.
-   * <pre>
-   * Binary Suffix ::= Root , Begin , Affix , End ;
-   * </pre>
-   *
-   * Unary suffix syntax: The affix is placed after the root.
-   * <pre>
-   * Suffix ::= Root, Affix ;
-   * </pre>
-   */
-  SUFFIX: "suffix",
-  /**
-   * Circumfix syntax: The root is placed between begin and end.
-   * <pre>
-   * Circumfix ::= Begin , Root , End ;
-   * </pre>
-   */
-  CIRCUMFIX: "circumfix",
-  /**
-   * Pre-Circumfix syntax: The affix is placed before the root.
-   * Begin, delimiter and end tokens are placed around them.
-   * <pre>
-   * Precircumfix ::= Begin , Affix , Delimiter , Root , End ;
-   * </pre>
-   */
-  PRECIRCUMFIX: "precircumfix",
-  /**
-   * Post-Circumfix syntax: The affix is placed after the root.
-   * Begin, delimiter and end tokens are placed around them.
-   * <pre>
-   * Postcircumfix ::= Begin , Root , Delimiter , Affix , End ;
-   * </pre>
-   */
-  POSTCIRCUMFIX: "postcircumfix",
-  /**
-   * Binary Pre-Infix syntax: The affix is placed between pre-root and post-root.
-   * <pre>
-   * Infix ::= Pre-Root , Affix, Post-Root;
-   * </pre>
-   */
-  PREINFIX: "preinfix",
-  /**
-   * Binary Post-Infix syntax: The affix is placed between post-root and pre-root.
-   * <pre>
-   * Infix ::= Post-Root , Affix , Pre-Root;
-   * </pre>
-   */
-  POSTINFIX: "postinfix"
+    /**
+     * Binary prefix syntax: The affix is placed between begin and end before
+     * the root.
+     * <pre>
+     * Binary Prefix ::= Begin , Affix , End , Root ;
+     * </pre>
+     *
+     * Unary prefix syntax: The affix is placed before the root.
+     * <pre>
+     * Unary Prefix ::= Affix , Root ;
+     * </pre>
+     */
+    PREFIX: "prefix",
+    /**
+     * Binary suffix syntax: The affix is placed between begin and end after
+     * the root.
+     * <pre>
+     * Binary Suffix ::= Root , Begin , Affix , End ;
+     * </pre>
+     *
+     * Unary suffix syntax: The affix is placed after the root.
+     * <pre>
+     * Suffix ::= Root, Affix ;
+     * </pre>
+     */
+    SUFFIX: "suffix",
+    /**
+     * Circumfix syntax: The root is placed between begin and end.
+     * <pre>
+     * Circumfix ::= Begin , Root , End ;
+     * </pre>
+     */
+    CIRCUMFIX: "circumfix",
+    /**
+     * Pre-Circumfix syntax: The affix is placed before the root.
+     * Begin, delimiter and end tokens are placed around them.
+     * <pre>
+     * Precircumfix ::= Begin , Affix , Delimiter , Root , End ;
+     * </pre>
+     */
+    PRECIRCUMFIX: "precircumfix",
+    /**
+     * Post-Circumfix syntax: The affix is placed after the root.
+     * Begin, delimiter and end tokens are placed around them.
+     * <pre>
+     * Postcircumfix ::= Begin , Root , Delimiter , Affix , End ;
+     * </pre>
+     */
+    POSTCIRCUMFIX: "postcircumfix",
+    /**
+     * Binary Pre-Infix syntax: The affix is placed between pre-root and post-root.
+     * <pre>
+     * Infix ::= Pre-Root , Affix, Post-Root;
+     * </pre>
+     */
+    PREINFIX: "preinfix",
+    /**
+     * Binary Post-Infix syntax: The affix is placed between post-root and pre-root.
+     * <pre>
+     * Infix ::= Post-Root , Affix , Pre-Root;
+     * </pre>
+     */
+    POSTINFIX: "postinfix"
 
 
 };
 
 class Symbol {
-  constructor(name) {
-    this.name=name;
-  }
-  getType() {
-    return this;
-  }
-  getSubSymbols() {
-    return [];
-  }
-  isTerminalSymbol() {
-    return true;
-  }
-  isSubSymbol(s) {
-    return false;
-  }
-  toString() {
-    return this.name;
-  }
-  getName() {
-    return this.name;
-  }
+    constructor(name) {
+        this.name = name;
+    }
+    getType() {
+        return this;
+    }
+    getSubSymbols() {
+        return [];
+    }
+    isTerminalSymbol() {
+        return true;
+    }
+    isSubSymbol(s) {
+        return false;
+    }
+    toString() {
+        return this.name;
+    }
+    getName() {
+        return this.name;
+    }
 }
 
 /** Defines a terminal symbol. */
 class TerminalSymbol extends Symbol {
-  /**
-   * 
-   * @param {String} name
-   * @param {String} alternativeName
-   */
-  constructor(name, alternativeName) {
-    super(name);
-    this.alternativeName = alternativeName;
-  }
+    /**
+     * 
+     * @param {String} name
+     * @param {String} alternativeName
+     */
+    constructor(name, alternativeName) {
+        super(name);
+        this.alternativeName = alternativeName;
+    }
 
-  getAlternativeName() {
-    return this.alternativeName;
-  }
+    getAlternativeName() {
+        return this.alternativeName;
+    }
 
 }
 /** Defines a compound symbol. */
 class CompoundSymbol extends Symbol {
-  /**
-   * 
-   * @param {String} name
-   * @param {String} alternativeName
-   * @param {Array<Symbol>} subSymbols
-   */
-  constructor(name, subSymbols) {
-    super(name);
-    this.subSymbols=subSymbols;
-  }
-  getSubSymbols() {
-    return this.subSymbols;// XXX should return a clone
-  }
-  isTerminalSymbol() {
-    return false;
-  }
-  isSubSymbol(s) {
-    if (this.subSymbols != null) {
-      for (let i = 0; i < this.subSymbols.length; i++) {
-        if (s == this.subSymbols[i])
-          return true;
-      }
-      return false;
-    } else {
-      return s == this;
+    /**
+     * 
+     * @param {String} name
+     * @param {String} alternativeName
+     * @param {Array<Symbol>} subSymbols
+     */
+    constructor(name, subSymbols) {
+        super(name);
+        this.subSymbols = subSymbols;
     }
-  }
+    getSubSymbols() {
+        return this.subSymbols;// XXX should return a clone
+    }
+    isTerminalSymbol() {
+        return false;
+    }
+    isSubSymbol(s) {
+        if (this.subSymbols != null) {
+            for (let i = 0; i < this.subSymbols.length; i++) {
+                if (s == this.subSymbols[i])
+                    return true;
+            }
+            return false;
+        } else {
+            return s == this;
+        }
+    }
 }
 /**
  * Symbol for a face.
@@ -153,24 +153,24 @@ class CompoundSymbol extends Symbol {
  * <br>1.0 May 1, 2006 Created.
  */
 class FaceSymbol extends Symbol {
-  constructor(name, face) {
-    super();
-    this.face = face;
-  }
+    constructor(name, face) {
+        super();
+        this.face = face;
+    }
 
-  getFace() {
-    return this.face;
-  }
+    getFace() {
+        return this.face;
+    }
 
-  toString() {
-    return "Face face=" + this.face;
-  }
-  /** Gets the type of the symbol. 
-   * (Actually this is like requesting the class of the symbol.
-   */
-  getType() {
-    return Symbol.FACE;
-  }
+    toString() {
+        return "Face face=" + this.face;
+    }
+    /** Gets the type of the symbol. 
+     * (Actually this is like requesting the class of the symbol.
+     */
+    getType() {
+        return Symbol.FACE;
+    }
 }
 
 /**
@@ -178,12 +178,12 @@ class FaceSymbol extends Symbol {
  */
 Symbol.NOP = new TerminalSymbol("NOP");
 Symbol.MOVE = new TerminalSymbol("move", "twist");
-Symbol.FACE_R = new FaceSymbol("r",0);
-Symbol.FACE_U = new FaceSymbol("u",1);
-Symbol.FACE_F = new FaceSymbol("f",2);
-Symbol.FACE_L = new FaceSymbol("l",3);
-Symbol.FACE_D = new FaceSymbol("d",4);
-Symbol.FACE_B = new FaceSymbol("b",5);
+Symbol.FACE_R = new FaceSymbol("r", 0);
+Symbol.FACE_U = new FaceSymbol("u", 1);
+Symbol.FACE_F = new FaceSymbol("f", 2);
+Symbol.FACE_L = new FaceSymbol("l", 3);
+Symbol.FACE_D = new FaceSymbol("d", 4);
+Symbol.FACE_B = new FaceSymbol("b", 5);
 Symbol.PERMUTATION_PLUS = new TerminalSymbol("permPlus");
 Symbol.PERMUTATION_MINUS = new TerminalSymbol("permMinus");
 Symbol.PERMUTATION_PLUSPLUS = new TerminalSymbol("permPlusPlus");
@@ -219,84 +219,84 @@ Symbol.MULTILINE_COMMENT_END = new TerminalSymbol("commentMultiLineEnd", "slashS
 Symbol.SINGLELINE_COMMENT_BEGIN = new TerminalSymbol("commentSingleLineBegin", "slashSlashComment");
 
 Symbol.COMMUTATION = new CompoundSymbol("commutation", [
-  Symbol.COMMUTATION_BEGIN,
-  Symbol.COMMUTATION_END,
-  Symbol.COMMUTATION_DELIMITER
+    Symbol.COMMUTATION_BEGIN,
+    Symbol.COMMUTATION_END,
+    Symbol.COMMUTATION_DELIMITER
 ]);
 Symbol.CONJUGATION = new CompoundSymbol("conjugation", [
-  Symbol.CONJUGATION_BEGIN,
-  Symbol.CONJUGATION_END,
-  Symbol.CONJUGATION_DELIMITER
+    Symbol.CONJUGATION_BEGIN,
+    Symbol.CONJUGATION_END,
+    Symbol.CONJUGATION_DELIMITER
 ]);
 Symbol.GROUPING = new CompoundSymbol("grouping", [
-  Symbol.GROUPING_BEGIN,
-  Symbol.GROUPING_END
+    Symbol.GROUPING_BEGIN,
+    Symbol.GROUPING_END
 ]);
 Symbol.INVERSION = new CompoundSymbol("inversion", [
-  Symbol.INVERSION_BEGIN,
-  Symbol.INVERSION_END,
-  Symbol.INVERSION_DELIMITER,
-  Symbol.INVERTOR
+    Symbol.INVERSION_BEGIN,
+    Symbol.INVERSION_END,
+    Symbol.INVERSION_DELIMITER,
+    Symbol.INVERTOR
 ]);
 Symbol.PERMUTATION = new CompoundSymbol("permutation", [
-  Symbol.FACE_R,
-  Symbol.FACE_U,
-  Symbol.FACE_F,
-  Symbol.FACE_L,
-  Symbol.FACE_D,
-  Symbol.FACE_B,
-  Symbol.PERMUTATION_PLUS,
-  Symbol.PERMUTATION_MINUS,
-  Symbol.PERMUTATION_PLUSPLUS,
-  Symbol.PERMUTATION_BEGIN,
-  Symbol.PERMUTATION_END,
-  Symbol.PERMUTATION_DELIMITER
+    Symbol.FACE_R,
+    Symbol.FACE_U,
+    Symbol.FACE_F,
+    Symbol.FACE_L,
+    Symbol.FACE_D,
+    Symbol.FACE_B,
+    Symbol.PERMUTATION_PLUS,
+    Symbol.PERMUTATION_MINUS,
+    Symbol.PERMUTATION_PLUSPLUS,
+    Symbol.PERMUTATION_BEGIN,
+    Symbol.PERMUTATION_END,
+    Symbol.PERMUTATION_DELIMITER
 ]);
 Symbol.FACE = new CompoundSymbol("face", [
-  Symbol.FACE_R,
-  Symbol.FACE_U,
-  Symbol.FACE_F,
-  Symbol.FACE_L,
-  Symbol.FACE_D,
-  Symbol.FACE_B
+    Symbol.FACE_R,
+    Symbol.FACE_U,
+    Symbol.FACE_F,
+    Symbol.FACE_L,
+    Symbol.FACE_D,
+    Symbol.FACE_B
 ]);
 Symbol.REFLECTION = new CompoundSymbol("reflection", [
-  Symbol.REFLECTION_BEGIN,
-  Symbol.REFLECTION_END,
-  Symbol.REFLECTION_DELIMITER,
-  Symbol.REFLECTOR
+    Symbol.REFLECTION_BEGIN,
+    Symbol.REFLECTION_END,
+    Symbol.REFLECTION_DELIMITER,
+    Symbol.REFLECTOR
 ]);
 Symbol.REPETITION = new CompoundSymbol("repetition", [
-  Symbol.REPETITION_BEGIN,
-  Symbol.REPETITION_END,
-  Symbol.REPETITION_DELIMITER
+    Symbol.REPETITION_BEGIN,
+    Symbol.REPETITION_END,
+    Symbol.REPETITION_DELIMITER
 ]);
 Symbol.ROTATION = new CompoundSymbol("rotation", [
-  Symbol.ROTATION_BEGIN,
-  Symbol.ROTATION_END,
-  Symbol.ROTATION_DELIMITER
+    Symbol.ROTATION_BEGIN,
+    Symbol.ROTATION_END,
+    Symbol.ROTATION_DELIMITER
 ]);
 Symbol.COMMENT = new CompoundSymbol("comment", [
-  Symbol.MULTILINE_COMMENT_BEGIN,
-  Symbol.MULTILINE_COMMENT_END,
-  Symbol.SINGLELINE_COMMENT_BEGIN
+    Symbol.MULTILINE_COMMENT_BEGIN,
+    Symbol.MULTILINE_COMMENT_END,
+    Symbol.SINGLELINE_COMMENT_BEGIN
 ]);
 Symbol.STATEMENT = new CompoundSymbol("statement", [
-  Symbol.NOP,
-  Symbol.MOVE,
-  Symbol.GROUPING,
-  Symbol.INVERSION,
-  Symbol.REFLECTION,
-  Symbol.CONJUGATION,
-  Symbol.COMMUTATION,
-  Symbol.ROTATION,
-  Symbol.PERMUTATION,
-  Symbol.DELIMITER,
-  Symbol.REPETITION
+    Symbol.NOP,
+    Symbol.MOVE,
+    Symbol.GROUPING,
+    Symbol.INVERSION,
+    Symbol.REFLECTION,
+    Symbol.CONJUGATION,
+    Symbol.COMMUTATION,
+    Symbol.ROTATION,
+    Symbol.PERMUTATION,
+    Symbol.DELIMITER,
+    Symbol.REPETITION
 ]);
 Symbol.SEQUENCE = new CompoundSymbol("sequence", [
-  Symbol.STATEMENT,
-  Symbol.COMMENT
+    Symbol.STATEMENT,
+    Symbol.COMMENT
 ]);
 
 /**
@@ -310,54 +310,54 @@ Symbol.SEQUENCE = new CompoundSymbol("sequence", [
  * <br>1.0 May 1, 2006 Created.
  */
 class MoveSymbol extends Symbol {
-  constructor(axis, layerMask, angle) {
-    super();
-    this.axis = axis;
-    this.layerMask = layerMask;
-    this.angle = angle;
-  }
-
-  /**
-   * Returns an inverse Move of this Move.
-   */
-  toInverse() {
-    return new MoveSymbol(this.axis, this.layerMask, -this.angle);
-  }
-
-  getAxis() {
-    return this.axis;
-  }
-
-  getAngle() {
-    return this.angle;
-  }
-
-  getLayerMask() {
-    return this.layerMask;
-  }
-
-  getLayerList() {
-    let buf = "";
-    for (let i = 0; i < 8; i++) {
-      if ((this.layerMask & (1 << i)) != 0) {
-        if (buf.length() > 0) {
-          buf += ',';
-        }
-        buf += (i + 1);
-      }
+    constructor(axis, layerMask, angle) {
+        super();
+        this.axis = axis;
+        this.layerMask = layerMask;
+        this.angle = angle;
     }
-    return buf;
-  }
 
-  toString() {
-    return "Move axis=" + this.axis + " mask=" + this.layerMask + " angle=" + this.angle;
-  }
-  /** Gets the type of the symbol. 
-   * (Actually this is like requesting the class of the symbol.
-   */
-  getType() {
-    return Symbol.MOVE;
-  }
+    /**
+     * Returns an inverse Move of this Move.
+     */
+    toInverse() {
+        return new MoveSymbol(this.axis, this.layerMask, -this.angle);
+    }
+
+    getAxis() {
+        return this.axis;
+    }
+
+    getAngle() {
+        return this.angle;
+    }
+
+    getLayerMask() {
+        return this.layerMask;
+    }
+
+    getLayerList() {
+        let buf = "";
+        for (let i = 0; i < 8; i++) {
+            if ((this.layerMask & (1 << i)) != 0) {
+                if (buf.length() > 0) {
+                    buf += ',';
+                }
+                buf += (i + 1);
+            }
+        }
+        return buf;
+    }
+
+    toString() {
+        return "Move axis=" + this.axis + " mask=" + this.layerMask + " angle=" + this.angle;
+    }
+    /** Gets the type of the symbol. 
+     * (Actually this is like requesting the class of the symbol.
+     */
+    getType() {
+        return Symbol.MOVE;
+    }
 }
 Symbol.R = new MoveSymbol(0, 4, 1);
 Symbol.L = new MoveSymbol(0, 1, -1);
@@ -392,173 +392,175 @@ Symbol.CB2 = new MoveSymbol(2, 7, 2);
 
 /** Defines a notation. */
 class Notation {
-  constructor() {
-    this.macros = [];
-    this.keywords = [];
-    this.specials = [];
+    constructor() {
+        this.macros = [];
+        this.keywords = [];
+        this.specials = [];
 
-    this.layerCount = 3;
-    this.symbolToTokenMap = {};
-    this.tokenToSymbolMap = {};
-    this.moveToTokenMap = {};
-    this.tokenToMoveMap = {};
-    this.symbolToSyntaxMap = {};
-  }
-
-  /**
-   * Returns the macros defined by this notation.
-   * @returns {Array<MacroNode>} macros;
-   */
-  getMacros() {
-    return this.macros;
-  }
-  getKeywords() {
-    return this.keywords;
-  }
-  getSpecials() {
-    return this.specials;
-  }
-  getLayerCount() {
-    return this.layerCount;
-  }
-  addToken(symbol, token) {
-    // Add to symbolToTokenMap
-    if (null == this.symbolToTokenMap[symbol]) {
-      this.symbolToTokenMap[symbol] = token;
+        this.layerCount = 3;
+        this.symbolToTokenMap = {};
+        this.tokenToSymbolMap = {};
+        this.moveToTokenMap = {};
+        this.tokenToMoveMap = {};
+        this.symbolToSyntaxMap = {};
     }
 
-    // Add to tokenToSymbolMap
-    let symbols = this.tokenToSymbolMap[token];
-    if (symbols == null) {
-      symbols = [];
-      this.tokenToSymbolMap[token] = symbols;
+    /**
+     * Returns the macros defined by this notation.
+     * @returns {Array<MacroNode>} macros;
+     */
+    getMacros() {
+        return this.macros;
     }
-    symbols.push(symbol);
-    /*
-    if (Symbol.PERMUTATION.isSubSymbol(symbol)) {
-      symbols.add(Symbol.PERMUTATION);
-    }*/
-  }
+    getKeywords() {
+        return this.keywords;
+    }
+    getSpecials() {
+        return this.specials;
+    }
+    getLayerCount() {
+        return this.layerCount;
+    }
+    addToken(symbol, token) {
+        // Add to symbolToTokenMap
+        if (null == this.symbolToTokenMap[symbol]) {
+            this.symbolToTokenMap[symbol] = token;
+        }
 
-  getTokenToSymbolMap() {
-    return this.tokenToSymbolMap;
-  }
-  isSyntax(symbol,syntax) {
-    if (symbol==null||syntax==null) {
-      throw  new Error("illegal arguments symbol:"+symbol+" syntax:"+syntax);
+        // Add to tokenToSymbolMap
+        let symbols = this.tokenToSymbolMap[token];
+        if (symbols == null) {
+            symbols = [];
+            this.tokenToSymbolMap[token] = symbols;
+        }
+        symbols.push(symbol);
+        /*
+         if (Symbol.PERMUTATION.isSubSymbol(symbol)) {
+         symbols.add(Symbol.PERMUTATION);
+         }*/
     }
-    return this.symbolToSyntaxMap[symbol]==syntax;
-  }
-  getSyntax(symbol) {
-    return this.symbolToSyntaxMap[symbol];
-  }
-  isSupported(symbol) {
-    return this.symbolToSyntaxMap[symbol]!=null||this.symbolToTokenMap[symbol]!=null;
-  }
+
+    getTokenToSymbolMap() {
+        return this.tokenToSymbolMap;
+    }
+    isSyntax(symbol, syntax) {
+        if (symbol == null || syntax == null) {
+            throw  new Error("illegal arguments symbol:" + symbol + " syntax:" + syntax);
+        }
+        return this.symbolToSyntaxMap[symbol] == syntax;
+    }
+    getSyntax(symbol) {
+        return this.symbolToSyntaxMap[symbol];
+    }
+    isSupported(symbol) {
+        return this.symbolToSyntaxMap[symbol] != null || this.symbolToTokenMap[symbol] != null;
+    }
 }
 /** Defines a default notation that works for 3x3 and 2x2 cubes. */
 class DefaultNotation extends Notation {
-  constructor(layerCount) {
-    super();
+    constructor(layerCount) {
+        super();
 
-    this.layerCount = layerCount == null ? 3 : layerCount;
+        this.layerCount = layerCount == null ? 3 : layerCount;
 
-    this.addToken(Symbol.NOP, "·");
-    this.addToken(Symbol.NOP, ".");
-    this.addToken(Symbol.FACE_R, "r");
-    this.addToken(Symbol.FACE_U, "u");
-    this.addToken(Symbol.FACE_F, "f");
-    this.addToken(Symbol.FACE_L, "l");
-    this.addToken(Symbol.FACE_D, "d");
-    this.addToken(Symbol.FACE_B, "b");
-    this.addToken(Symbol.PERMUTATION_PLUS, "+");
-    this.addToken(Symbol.PERMUTATION_MINUS, "-");
-    this.addToken(Symbol.PERMUTATION_PLUSPLUS, "++");
-    this.addToken(Symbol.PERMUTATION_BEGIN, "(");
-    this.addToken(Symbol.PERMUTATION_END, ")");
-    this.addToken(Symbol.PERMUTATION_DELIMITER, ",");
-    //addToken(Symbol.DELIMITER ,"");
-    //addToken(Symbol.INVERSION_BEGIN ,"(");
-    //addToken(Symbol.INVERSION_END ,")");
-    //addToken(Symbol.INVERSION_DELIMITER ,"");
-    this.addToken(Symbol.INVERTOR, "'");
-    this.addToken(Symbol.INVERTOR, "-");
-    this.addToken(Symbol.INVERTOR, "'");
-    //addToken(Symbol.REFLECTION_BEGIN ,"(");
-    //addToken(Symbol.REFLECTION_END ,")");
-    //addToken(Symbol.REFLECTION_DELIMITER ,"");
-    this.addToken(Symbol.REFLECTOR, "*");
-    this.addToken(Symbol.GROUPING_BEGIN, "(");
-    this.addToken(Symbol.GROUPING_END, ")");
-    //addToken(Symbol.REPETITION_BEGIN ,"");
-    //addToken(Symbol.REPETITION_END ,"");
-    //addToken(Symbol.REPETITION_DELIMITER ,"");
-    this.addToken(Symbol.COMMUTATION_BEGIN, "[");
-    this.addToken(Symbol.COMMUTATION_END, "]");
-    this.addToken(Symbol.COMMUTATION_DELIMITER, ",");
-    this.addToken(Symbol.CONJUGATION_BEGIN, "<");
-    this.addToken(Symbol.CONJUGATION_END, ">");
-    //addToken(Symbol.CONJUGATION_DELIMITER ,":");
-    this.addToken(Symbol.ROTATION_BEGIN, "<");
-    this.addToken(Symbol.ROTATION_END, ">'");
-    //addToken(Symbol.ROTATION_DELIMITER ,"::");
-    // addToken(Symbol.MACRO ,"");
-    this.addToken(Symbol.MULTILINE_COMMENT_BEGIN, "/*");
-    this.addToken(Symbol.MULTILINE_COMMENT_END, "*/");
-    this.addToken(Symbol.SINGLELINE_COMMENT_BEGIN, "//");
+        this.addToken(Symbol.NOP, "·");
+        this.addToken(Symbol.NOP, ".");
+        this.addToken(Symbol.FACE_R, "r");
+        this.addToken(Symbol.FACE_U, "u");
+        this.addToken(Symbol.FACE_F, "f");
+        this.addToken(Symbol.FACE_L, "l");
+        this.addToken(Symbol.FACE_D, "d");
+        this.addToken(Symbol.FACE_B, "b");
+        this.addToken(Symbol.PERMUTATION_PLUS, "+");
+        this.addToken(Symbol.PERMUTATION_MINUS, "-");
+        this.addToken(Symbol.PERMUTATION_PLUSPLUS, "++");
+        this.addToken(Symbol.PERMUTATION_BEGIN, "(");
+        this.addToken(Symbol.PERMUTATION_END, ")");
+        this.addToken(Symbol.PERMUTATION_DELIMITER, ",");
+        //addToken(Symbol.DELIMITER ,"");
+        //addToken(Symbol.INVERSION_BEGIN ,"(");
+        //addToken(Symbol.INVERSION_END ,")");
+        //addToken(Symbol.INVERSION_DELIMITER ,"");
+        this.addToken(Symbol.INVERTOR, "'");
+        this.addToken(Symbol.INVERTOR, "-");
+        this.addToken(Symbol.INVERTOR, "'");
+        //addToken(Symbol.REFLECTION_BEGIN ,"(");
+        //addToken(Symbol.REFLECTION_END ,")");
+        //addToken(Symbol.REFLECTION_DELIMITER ,"");
+        this.addToken(Symbol.REFLECTOR, "*");
+        this.addToken(Symbol.GROUPING_BEGIN, "(");
+        this.addToken(Symbol.GROUPING_END, ")");
+        //addToken(Symbol.REPETITION_BEGIN ,"");
+        //addToken(Symbol.REPETITION_END ,"");
+        //addToken(Symbol.REPETITION_DELIMITER ,"");
+        this.addToken(Symbol.COMMUTATION_BEGIN, "[");
+        this.addToken(Symbol.COMMUTATION_END, "]");
+        this.addToken(Symbol.COMMUTATION_DELIMITER, ",");
+        this.addToken(Symbol.CONJUGATION_BEGIN, "<");
+        this.addToken(Symbol.CONJUGATION_END, ">");
+        //addToken(Symbol.CONJUGATION_DELIMITER ,":");
+        this.addToken(Symbol.ROTATION_BEGIN, "<");
+        this.addToken(Symbol.ROTATION_END, ">'");
+        //addToken(Symbol.ROTATION_DELIMITER ,"::");
+        // addToken(Symbol.MACRO ,"");
+        this.addToken(Symbol.MULTILINE_COMMENT_BEGIN, "/*");
+        this.addToken(Symbol.MULTILINE_COMMENT_END, "*/");
+        this.addToken(Symbol.SINGLELINE_COMMENT_BEGIN, "//");
 
-    // Layer masks
-    let inner = 1;
-    let middle = 1 << (this.layerCount / 2);
-    let outer = 1 << (this.layerCount - 1);
-    let all = inner | middle | outer;
+        // Layer masks
+        let inner = 1;
+        let middle = 1 << (this.layerCount / 2);
+        let outer = 1 << (this.layerCount - 1);
+        let all = inner | middle | outer;
 
-    this.addToken(new MoveSymbol(0, outer, 1), "R");
-    this.addToken(new MoveSymbol(1, outer, 1), "U");
-    this.addToken(new MoveSymbol(2, outer, 1), "F");
-    this.addToken(new MoveSymbol(0, inner, -1), "L");
-    this.addToken(new MoveSymbol(1, inner, -1), "D");
-    this.addToken(new MoveSymbol(2, inner, -1), "B");
+        for (let i = 1; i <= 2; i++) {
+            let suffix = i == 1 ? "" : "2";
+            this.addToken(new MoveSymbol(0, outer, 1 * i), "R" + suffix);
+            this.addToken(new MoveSymbol(1, outer, 1 * i), "U" + suffix);
+            this.addToken(new MoveSymbol(2, outer, 1 * i), "F" + suffix);
+            this.addToken(new MoveSymbol(0, inner, -1 * i), "L" + suffix);
+            this.addToken(new MoveSymbol(1, inner, -1 * i), "D" + suffix);
+            this.addToken(new MoveSymbol(2, inner, -1 * i), "B" + suffix);
 
-    this.addToken(new MoveSymbol(0, outer|inner, 1), "SR");
-    this.addToken(new MoveSymbol(1, outer|inner, 1), "SU");
-    this.addToken(new MoveSymbol(2, outer|inner, 1), "SF");
-    this.addToken(new MoveSymbol(0, outer|inner, -1), "SL");
-    this.addToken(new MoveSymbol(1, outer|inner, -1), "SD");
-    this.addToken(new MoveSymbol(2, outer|inner, -1), "SB");
+            this.addToken(new MoveSymbol(0, outer | inner, 1 * i), "SR" + suffix);
+            this.addToken(new MoveSymbol(1, outer | inner, 1 * i), "SU" + suffix);
+            this.addToken(new MoveSymbol(2, outer | inner, 1 * i), "SF" + suffix);
+            this.addToken(new MoveSymbol(0, outer | inner, -1 * i), "SL" + suffix);
+            this.addToken(new MoveSymbol(1, outer | inner, -1 * i), "SD" + suffix);
+            this.addToken(new MoveSymbol(2, outer | inner, -1 * i), "SB" + suffix);
 
-    this.addToken(new MoveSymbol(0, middle|outer, 1), "TR");
-    this.addToken(new MoveSymbol(1, middle|outer, 1), "TU");
-    this.addToken(new MoveSymbol(2, middle|outer, 1), "TF");
-    this.addToken(new MoveSymbol(0, middle|inner, -1), "TL");
-    this.addToken(new MoveSymbol(1, middle|inner, -1), "TD");
-    this.addToken(new MoveSymbol(2, middle|inner, -1), "TB");
+            this.addToken(new MoveSymbol(0, middle | outer, 1 * i), "TR" + suffix);
+            this.addToken(new MoveSymbol(1, middle | outer, 1 * i), "TU" + suffix);
+            this.addToken(new MoveSymbol(2, middle | outer, 1 * i), "TF" + suffix);
+            this.addToken(new MoveSymbol(0, middle | inner, -1 * i), "TL" + suffix);
+            this.addToken(new MoveSymbol(1, middle | inner, -1 * i), "TD" + suffix);
+            this.addToken(new MoveSymbol(2, middle | inner, -1 * i), "TB" + suffix);
 
-    this.addToken(new MoveSymbol(0, middle, 1), "MR");
-    this.addToken(new MoveSymbol(1, middle, 1), "MU");
-    this.addToken(new MoveSymbol(2, middle, 1), "MF");
-    this.addToken(new MoveSymbol(0, middle, -1), "ML");
-    this.addToken(new MoveSymbol(1, middle, -1), "MD");
-    this.addToken(new MoveSymbol(2, middle, -1), "MB");
+            this.addToken(new MoveSymbol(0, middle, 1 * i), "MR" + suffix);
+            this.addToken(new MoveSymbol(1, middle, 1 * i), "MU" + suffix);
+            this.addToken(new MoveSymbol(2, middle, 1 * i), "MF" + suffix);
+            this.addToken(new MoveSymbol(0, middle, -1 * i), "ML" + suffix);
+            this.addToken(new MoveSymbol(1, middle, -1 * i), "MD" + suffix);
+            this.addToken(new MoveSymbol(2, middle, -1 * i), "MB" + suffix);
 
-    this.addToken(new MoveSymbol(0, all, 1), "CR");
-    this.addToken(new MoveSymbol(1, all, 1), "CU");
-    this.addToken(new MoveSymbol(2, all, 1), "CF");
-    this.addToken(new MoveSymbol(0, all, -1), "CL");
-    this.addToken(new MoveSymbol(1, all, -1), "CD");
-    this.addToken(new MoveSymbol(2, all, -1), "CB");
+            this.addToken(new MoveSymbol(0, all, 1 * i), "CR" + suffix);
+            this.addToken(new MoveSymbol(1, all, 1 * i), "CU" + suffix);
+            this.addToken(new MoveSymbol(2, all, 1 * i), "CF" + suffix);
+            this.addToken(new MoveSymbol(0, all, -1 * i), "CL" + suffix);
+            this.addToken(new MoveSymbol(1, all, -1 * i), "CD" + suffix);
+            this.addToken(new MoveSymbol(2, all, -1 * i), "CB" + suffix);
+        }
 
+        this.symbolToSyntaxMap[Symbol.COMMUTATION] = Syntax.PRECIRCUMFIX;
+        this.symbolToSyntaxMap[Symbol.CONJUGATION] = Syntax.PREFIX;
+        this.symbolToSyntaxMap[Symbol.ROTATION] = Syntax.PREFIX;
+        this.symbolToSyntaxMap[Symbol.GROUPING] = Syntax.CIRCUMFIX;
+        this.symbolToSyntaxMap[Symbol.PERMUTATION] = Syntax.PRECIRCUMFIX;
+        this.symbolToSyntaxMap[Symbol.REPETITION] = Syntax.SUFFIX;
+        this.symbolToSyntaxMap[Symbol.REFLECTION] = Syntax.SUFFIX;
+        this.symbolToSyntaxMap[Symbol.INVERSION] = Syntax.SUFFIX;
 
-    this.symbolToSyntaxMap[Symbol.COMMUTATION] = Syntax.PRECIRCUMFIX;
-    this.symbolToSyntaxMap[Symbol.CONJUGATION] = Syntax.PREFIX;
-    this.symbolToSyntaxMap[Symbol.ROTATION] = Syntax.PREFIX;
-    this.symbolToSyntaxMap[Symbol.GROUPING] = Syntax.CIRCUMFIX;
-    this.symbolToSyntaxMap[Symbol.PERMUTATION] = Syntax.PRECIRCUMFIX;
-    this.symbolToSyntaxMap[Symbol.REPETITION] = Syntax.SUFFIX;
-    this.symbolToSyntaxMap[Symbol.REFLECTION] = Syntax.SUFFIX;
-    this.symbolToSyntaxMap[Symbol.INVERSION] = Syntax.SUFFIX;
-
-  }
+    }
 }
 
 

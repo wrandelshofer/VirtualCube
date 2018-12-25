@@ -74,7 +74,50 @@ class Node {
             this.children[i].applyInverseTo(cube);
         }
     }
+    /**
+     * Gets the layer turn count of the subtree starting at this node.
+     */
+    getLayerTurnCount() {
+        let count = 0;
+        for (let i in this.children) {
+            count += this.children[i].getLayerTurnCount();
+        }
+        return count;
+    }
 
+    /**
+     * Gets the block turn count of the subtree starting at this node.
+     */
+    getBlockTurnCount() {
+        let count = 0;
+        for (let i in this.children) {
+            count += this.children[i].getBlockTurnCount();
+        }
+        return count;
+    }
+
+    /**
+     * Gets the face turn count of the subtree starting at this node.
+     */
+    getFaceTurnCount() {
+        let count = 0;
+        for (let i in this.children) {
+            count += this.children[i].getFaceTurnCount();
+        }
+        return count;
+    }
+
+    /**
+     * Gets the quarter turn count of the subtree starting at this node.
+     */
+    getQuarterTurnCount() {
+        let count = 0;
+        for (let i in this.children) {
+            count += this.children[i].getQuarterTurnCount();
+        }
+        return count;
+    }
+    
     toString() {
         return "Node";
     }
@@ -498,6 +541,34 @@ class RepetitionNode extends Node {
             super.applyInverseTo(cube);
           }
     }
+    /**
+     * Gets the layer turn count of the subtree starting at this node.
+     */
+    getLayerTurnCount() {
+        return super.getLayerTurnCount() * this.repeatCount;
+    }
+
+    /**
+     * Gets the block turn count of the subtree starting at this node.
+     */
+    getBlockTurnCount() {
+        return super.getBlockTurnCount() * this.repeatCount;
+    }
+
+    /**
+     * Gets the face turn count of the subtree starting at this node.
+     */
+    getFaceTurnCount() {
+        return super.getFaceTurnCount() * this.repeatCount;
+    }
+
+    /**
+     * Gets the quarter turn count of the subtree starting at this node.
+     */
+    getQuarterTurnCount() {
+        return super.getQuarterTurnCount() * this.repeatCount;
+    }
+    
     toString() {
         const buf = [];
         buf.push("REP{");
@@ -574,6 +645,73 @@ class MoveNode extends Node {
         }
         return false;
     }
+    /**
+     * Gets the layer turn count of the subtree starting at this node.
+     */
+    getLayerTurnCount() {
+        if (this.angle == 0) {
+            return 0;
+        } else {
+            let count = 0;
+            for (let i = 0; i < this.layerCount; i++) {
+                if (((this.layerMask >>> i) & 1) == 1) {
+                    count++;
+                }
+            }
+            return Math.min(count, this.layerCount - count);
+        }
+        
+        let count = 0;
+        for (let i in this.children) {
+            count += this.children[i].getLayerTurnCount();
+        }
+        return count;
+    }
+
+    /**
+     * Gets the block turn count of the subtree starting at this node.
+     */
+    getBlockTurnCount() {
+        if (this.angle == 0) {
+            return 0;
+        } else {
+            let previousTurnedLayer = 0;
+            let countTurned = 0;
+            let previousImmobileLayer = 1;
+            let countImmobile = 0;
+            for (let i = 0; i < this.layerCount; i++) {
+                let currentLayer = (this.layerMask >>> i) & 1;
+                if (currentLayer == 1 && currentLayer != previousTurnedLayer) {
+                    countTurned++;
+                }
+                if (currentLayer == 0 && currentLayer != previousImmobileLayer) {
+                    countImmobile++;
+                }
+                previousTurnedLayer = previousImmobileLayer = currentLayer;
+            }
+            return Math.min(countTurned, countImmobile);
+        }
+    }
+
+    /**
+     * Gets the face turn count of the subtree starting at this node.
+     */
+    getFaceTurnCount() {
+        let count = this.getBlockTurnCount();
+        if (count != 0 && ((this.layerMask & (1 | (1 << (this.layerCount - 1)))) == 0
+                || (this.layerMask & (1 | (1 << (this.layerCount - 1)))) == (1 | (1 << (this.layerCount - 1))))) {
+            count++;
+        }
+        return count;
+    }
+
+    /**
+     * Gets the quarter turn count of the subtree starting at this node.
+     */
+    getQuarterTurnCount() {
+        return this.getFaceTurnCount() * Math.abs(this.angle%4%3);
+    }
+    
     toString() {
         return 'MOV{ax:' + this.axis +' lm:' + this.layerMask  + ' an:' + this.angle + '}';
     }
