@@ -68,7 +68,8 @@ let baseUrl='lib';
 
 
 let parameters = {
-    baseurl: baseUrl
+    baseurl: baseUrl,
+    rendercontext: "2d"
 };
 VirtualCubeMain.attachVirtualCube(parameters);
 

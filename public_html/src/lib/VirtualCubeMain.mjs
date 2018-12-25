@@ -9,7 +9,7 @@ import WebglPlayerApplet from './WebglPlayerApplet.mjs';
 import TwoDPlayerApplet from './TwoDPlayerApplet.mjs';
 
 let module = {
-    log: (false && console != null && console.log != null) ? console.log : () => {
+    log: (true && console != null && console.log != null) ? console.log : () => {
     },
     info: (true && console != null && console.info != null) ? console.info : () => {
     },
@@ -179,63 +179,63 @@ class VirtualCube {
         this.canvas = canvas;
         this.parameters = {baseurl: 'lib'};
     }
-}
-/** Initializes the virtual cube. */
-VirtualCube.prototype.init = function () {
-    let rendercontext = this.parameters.rendercontext;
-    module.log('reading parameter rendercontext:' + rendercontext);
-    if (rendercontext == "2d") {
-        this.canvas3d = new TwoDPlayerApplet.TwoDPlayerApplet();
-    } else if (rendercontext == null || rendercontext == "webgl") {
-        this.canvas3d = new WebglPlayerApplet.WebglPlayerApplet();
-    } else {
-        module.error('illegal rendercontext:' + rendercontext);
-        this.canvas3d = new WebglPlayerApplet.WebglPlayerApplet();
-    }
-    for (let k in this.parameters) {
-        this.canvas3d.parameters[k] = this.parameters[k];
-    }
-    let s = this.canvas3d.setCanvas(this.canvas);
-    if (!s) {
-        module.log("Could not instantiate WebGL Context, falling back to 2D Context");
-        for (let k in this.parameters) {
-            this.canvas3d.parameters[k] = this.parameters[k]
+
+    /** Initializes the virtual cube. */
+    init() {
+        let rendercontext = this.parameters.rendercontext;
+        module.log('reading parameter rendercontext:' + rendercontext);
+        if (rendercontext == "2d") {
+            this.canvas3d = new TwoDPlayerApplet.TwoDPlayerApplet();
+        } else if (rendercontext == null || rendercontext == "webgl") {
+            this.canvas3d = new WebglPlayerApplet.WebglPlayerApplet();
+        } else {
+            module.error('illegal rendercontext:' + rendercontext);
+            this.canvas3d = new WebglPlayerApplet.WebglPlayerApplet();
         }
-        this.canvas3d = new TwoDPlayerApplet.TwoDPlayerApplet();
         for (let k in this.parameters) {
             this.canvas3d.parameters[k] = this.parameters[k];
         }
-        s = this.canvas3d.setCanvas(this.canvas);
+        let s = this.canvas3d.setCanvas(this.canvas);
+        if (!s) {
+            module.log("Could not instantiate WebGL Context, falling back to 2D Context");
+            for (let k in this.parameters) {
+                this.canvas3d.parameters[k] = this.parameters[k]
+            }
+            this.canvas3d = new TwoDPlayerApplet.TwoDPlayerApplet();
+            for (let k in this.parameters) {
+                this.canvas3d.parameters[k] = this.parameters[k];
+            }
+            s = this.canvas3d.setCanvas(this.canvas);
+        }
+    }
+    reset() {
+        this.canvas3d.reset();
+    }
+    scramble(scrambleCount, animate) {
+        this.canvas3d.scramble(scrambleCount, animate);
+    }
+    undo() {
+        this.canvas3d.undo();
+    }
+    redo() {
+        this.canvas3d.redo();
+    }
+    play() {
+        this.canvas3d.play();
+    }
+    solveStep() {
+        this.canvas3d.solveStep();
+    }
+    wobble() {
+        this.canvas3d.wobble();
+    }
+    explode() {
+        this.canvas3d.explode();
+    }
+    setAutorotate(newValue) {
+        this.canvas3d.setAutorotate(newValue);
     }
 }
-VirtualCube.prototype.reset = function () {
-    this.canvas3d.reset();
-}
-VirtualCube.prototype.scramble = function (scrambleCount, animate) {
-    this.canvas3d.scramble(scrambleCount, animate);
-}
-VirtualCube.prototype.undo = function () {
-    this.canvas3d.undo();
-}
-VirtualCube.prototype.redo = function () {
-    this.canvas3d.redo();
-}
-VirtualCube.prototype.play = function () {
-    this.canvas3d.play();
-}
-VirtualCube.prototype.solveStep = function () {
-    this.canvas3d.solveStep();
-}
-VirtualCube.prototype.wobble = function () {
-    this.canvas3d.wobble();
-}
-VirtualCube.prototype.explode = function () {
-    this.canvas3d.explode();
-}
-VirtualCube.prototype.setAutorotate = function (newValue) {
-    this.canvas3d.setAutorotate(newValue);
-}
-
 
 // ------------------
 // MODULE API    

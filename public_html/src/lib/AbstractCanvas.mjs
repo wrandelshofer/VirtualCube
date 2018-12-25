@@ -287,7 +287,7 @@ class AbstractCanvas {
         //vec3 wi = normalize(lightPos - fPos.xyz); // direction to light source
         //vec3 wo = normalize(camPos - fPos.xyz); // direction to observer
         //vec3 n = normalize(fNormal.xyz);
-        var specular = Math.pow(Math.max(0.0, -(new J3DIVector3(wi).reflect(n).dot(wo))), phong[3]) * phong[2];
+        var specular = Math.pow(Math.max(0.0, -(new J3DIMath.J3DIVector3(wi).reflect(n).dot(wo))), phong[3]) * phong[2];
         var diffuse = Math.max(0.0, wi.dot(n)) * phong[1];
         var ambient = phong[0];
         var newColor = new Array(3);
