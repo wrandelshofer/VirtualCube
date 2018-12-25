@@ -1,14 +1,6 @@
-/*
- * @(#)Cube.mjs  1.0.2  2014-01-17
- * Copyright (c) 2011 Werner Randelshofer, Switzerland. MIT License.
+/* @(#)Cube.mjs  1.0.2  2014-01-17
+ * Copyright (c) 2018 Werner Randelshofer, Switzerland. MIT License.
  */
-"use strict";
-
-// --------------
-// require.js
-// --------------
-define("Cube", [],
-function () {
 
   let module = {
     log: (false && console != null && console.log != null) ? console.log : ()=>{},
@@ -291,7 +283,7 @@ function () {
      * parameters of this event. 
      */
     getAffectedLocations() {
-      var c1 = this.source.clone();
+      let c1 = this.source.clone();
       c1.reset();
       c1.transform(this.axis, this.layerMask, this.angle);
       return c1.getUnsolvedParts();
@@ -373,19 +365,19 @@ function () {
      */
 
     hashCode() {
-      var hash = 0;
-      var sub = 0;
-      for (var i = 0; i < this.cornerLoc.length; i++) {
+      let hash = 0;
+      let sub = 0;
+      for (let i = 0; i < this.cornerLoc.length; i++) {
         sub = sub << 1 + this.cornerLoc[i];
       }
       hash |= sub;
       sub = 0;
-      for (var i = 0; i < this.edgeLoc.length; i++) {
+      for (let i = 0; i < this.edgeLoc.length; i++) {
         sub = sub << 1 + this.edgeLoc[i];
       }
       hash |= sub;
       sub = 0;
-      for (var i = 0; i < this.sideLoc.length; i++) {
+      for (let i = 0; i < this.sideLoc.length; i++) {
         sub = sub << 1 + this.sideLoc[i];
       }
       return hash;
@@ -397,7 +389,7 @@ function () {
     reset() {
       this.transformType = this.IDENTITY_TRANSFORM;
 
-      var i;
+      let i;
       for (i = 0; i < this.cornerLoc.length; i++) {
         this.cornerLoc[i] = i;
         this.cornerOrient[i] = 0;
@@ -420,7 +412,7 @@ function () {
      * Returns true if the cube is in its ordered (solved) state.
      */
     isSolved() {
-      var i;
+      let i;
       for (i = 0; i < this.cornerLoc.length; i++) {
         if (this.cornerLoc[i] != i) {
           return false;
@@ -464,7 +456,7 @@ function () {
      * Removes a listener for CubeEvent's.
      */
     removeCubeListener(l) {
-      for (var i = 0; i < this.listenerList.length; i++) {
+      for (let i = 0; i < this.listenerList.length; i++) {
         if (this.listenerList[i] == l) {
           this.listenerList = this.listenerList.slice(0, i) + this.listenerList.slice(i + 1);
           break;
@@ -478,10 +470,10 @@ function () {
     fireCubeTwisted(event) {
       if (!this.quiet) {
         // Guaranteed to return a non-null array
-        var listeners = this.listenerList;
+        let listeners = this.listenerList;
         // Process the listeners last to first, notifying
         // those that are varerested in this event
-        for (var i = listeners.length - 1; i >= 0; i -= 1) {
+        for (let i = listeners.length - 1; i >= 0; i -= 1) {
           listeners[i].cubeTwisted(event);
         }
       }
@@ -494,10 +486,10 @@ function () {
     fireCubeChanged(event) {
       if (!this.quiet) {
         // Guaranteed to return a non-null array
-        var listeners = this.listenerList;
+        let listeners = this.listenerList;
         // Process the listeners last to first, notifying
         // those that are varerested in this event
-        for (var i = listeners.length - 1; i >= 0; i -= 1) {
+        for (let i = listeners.length - 1; i >= 0; i -= 1) {
           listeners[i].cubeChanged(event);
         }
       }
@@ -563,7 +555,7 @@ function () {
      */
 
     getCornerLocation(corner) {
-      var i;
+      let i;
       if (this.cornerLoc[corner] == corner) {
         return corner;
       }
@@ -649,7 +641,7 @@ function () {
      */
 
     getEdgeLocation(edge) {
-      var i;
+      let i;
       if (this.edgeLoc[edge] == edge) {
         return edge;
       }
@@ -718,7 +710,7 @@ function () {
      * Gets the location of the specified side part.
      */
     getSideLocation(side) {
-      var i;
+      let i;
       if (this.sideLoc[side] == side) {
         return side;
       }
@@ -850,7 +842,7 @@ function () {
      *
      * @see #getLayerCount()
      */
-// protected abstract void transform0(var axis, var layerMask, var angle);
+// protected abstract void transform0(axis, layerMask, angle);
 
     /**
      * Applies the permutation of the specified cube to this cube and fires a
@@ -862,19 +854,16 @@ function () {
      *
      * @see #getLayerCount()
      */
-
     transformFromCube(tx) {
       if (tx.getLayerCount() != this.getLayerCount()) {
         throw ("tx.layers=" + tx.getLayerCount() + " must match this.layers=" + this.getLayerCount());
       }
 
-
-
-      var taxis = 0, tangle = 0, tmask = 0;
+      let taxis = 0, tangle = 0, tmask = 0;
       {
         {
           {
-            var atx = tx;
+            let atx = tx;
             switch (atx.transformType) {
               case this.IDENTITY_TRANSFORM:
                 return; // nothing to do
@@ -888,14 +877,14 @@ function () {
 
           if (tmask == 0) {
             this.transformType = this.UNKNOWN_TRANSFORM;
-            var tempLoc;
-            var tempOrient;
+            let tempLoc;
+            let tempOrient;
 
             tempLoc = this.cornerLoc.slice(0);
             tempOrient = this.cornerOrient.slice(0);
-            var txLoc = tx.getCornerLocations();
-            var txOrient = tx.getCornerOrientations();
-            for (var i = 0; i < txLoc.length; i++) {
+            let txLoc = tx.getCornerLocations();
+            let txOrient = tx.getCornerOrientations();
+            for (let i = 0; i < txLoc.length; i++) {
               this.cornerLoc[i] = tempLoc[txLoc[i]];
               this.cornerOrient[i] = (tempOrient[txLoc[i]] + txOrient[i]) % 3;
             }
@@ -904,7 +893,7 @@ function () {
             tempOrient = this.edgeOrient.slice(0);
             txLoc = tx.getEdgeLocations();
             txOrient = tx.getEdgeOrientations();
-            for (var i = 0; i < txLoc.length; i++) {
+            for (let i = 0; i < txLoc.length; i++) {
               this.edgeLoc[i] = tempLoc[txLoc[i]];
               this.edgeOrient[i] = (tempOrient[txLoc[i]] + txOrient[i]) % 2;
             }
@@ -913,7 +902,7 @@ function () {
             tempOrient = this.sideOrient.slice(0);
             txLoc = tx.getSideLocations();
             txOrient = tx.getSideOrientations();
-            for (var i = 0; i < txLoc.length; i++) {
+            for (let i = 0; i < txLoc.length; i++) {
               this.sideLoc[i] = tempLoc[txLoc[i]];
               this.sideOrient[i] = (tempOrient[txLoc[i]] + txOrient[i]) % 4;
             }
@@ -934,7 +923,7 @@ function () {
     loc, l1, l2,
     orient, o1, o2,
     modulo) {
-      var swap;
+      let swap;
 
       swap = loc[l1];
       loc[l1] = loc[l2];
@@ -952,7 +941,7 @@ function () {
     loc, l1, l2, l3, l4,
     orient, o1, o2, o3, o4,
     modulo) {
-      var swap;
+      let swap;
 
       swap = loc[l1];
       loc[l1] = loc[l2];
@@ -1022,14 +1011,14 @@ function () {
     getPartAxis(part, orientation) {
       if (part < this.cornerLoc.length) {
         // Corner parts
-        var face = getPartFace(part, orientation);
+        let face = getPartFace(part, orientation);
         return (face) % 3;
       } else if (part < this.cornerLoc.length + this.edgeLoc.length) {
         // Edge parts
         return EDGE_TO_AXIS_MAP[getEdgeLocation(part - this.cornerLoc.length) % 12];
       } else if (part < this.cornerLoc.length + this.edgeLoc.length + this.sideLoc.length) {
         // Side parts
-        var face = getPartFace(part, orientation);
+        let face = getPartFace(part, orientation);
         return (face) % 3;
       } else {
         return -1;
@@ -1048,7 +1037,7 @@ function () {
         return EDGE_TO_ANGLE_MAP[getEdgeLocation(part - this.cornerLoc.length) % 12][(getEdgeOrientation(part - this.cornerLoc.length) + orientation) % 2];
       } else {
         // Corner parts and Side parts
-        var side = getPartFace(part, orientation);
+        let side = getPartFace(part, orientation);
         switch (side) {
           case 0:
           case 1:
@@ -1068,7 +1057,7 @@ function () {
      * Returns 0 if no mask can be determined (the center part).
      */
 
-// public abstract var getPartLayerMask(var part, var orientation);
+// public abstract let getPartLayerMask(let part, let orientation);
 
     /**
      * Returns the type of the specified part.
@@ -1145,8 +1134,8 @@ function () {
      * of the edge can be seen.
      */
     getEdgeFace(edge, orient) {
-      var loc = getEdgeLocation(edge) % 12;
-      var ori = (this.edgeOrient[loc] + orient) % 2;
+      let loc = getEdgeLocation(edge) % 12;
+      let ori = (this.edgeOrient[loc] + orient) % 2;
 
       return this.EDGE_TO_FACE_MAP[loc][ori];
     }
@@ -1156,8 +1145,8 @@ function () {
      * of the corner can be seen.
      */
     getCornerFace(corner, orient) {
-      var loc = getCornerLocation(corner);
-      var ori = (3 + orient - this.cornerOrient[loc]) % 3;
+      let loc = getCornerLocation(corner);
+      let ori = (3 + orient - this.cornerOrient[loc]) % 3;
       return this.CORNER_TO_FACE_MAP[loc][ori];
     }
 
@@ -1241,24 +1230,24 @@ function () {
      */
 
     getUnsolvedParts() {
-      var a = new Array(this.cornerLoc.length + this.edgeLoc.length + this.sideLoc.length);
-      var count = 0;
-      for (var i = 0; i < this.cornerLoc.length; i++) {
+      let a = new Array(this.cornerLoc.length + this.edgeLoc.length + this.sideLoc.length);
+      let count = 0;
+      for (let i = 0; i < this.cornerLoc.length; i++) {
         if (this.cornerLoc[i] != i || this.cornerOrient[i] != 0) {
           a[count++] = i;
         }
       }
-      for (var i = 0; i < this.edgeLoc.length; i++) {
+      for (let i = 0; i < this.edgeLoc.length; i++) {
         if (this.edgeLoc[i] != i || this.edgeOrient[i] != 0) {
           a[count++] = i + this.cornerLoc.length;
         }
       }
-      for (var i = 0; i < this.sideLoc.length; i++) {
+      for (let i = 0; i < this.sideLoc.length; i++) {
         if (this.sideLoc[i] != i || this.sideOrient[i] != 0) {
           a[count++] = i + this.cornerLoc.length + this.edgeLoc.length;
         }
       }
-      var result = new Array(count);
+      let result = new Array(count);
       result = a.slice(0, count);
       return result;
     }
@@ -1272,9 +1261,9 @@ function () {
 
       // Keep track of previous axis, to avoid two subsequent moves on
       // the same axis.
-      var prevAxis = -1;
-      var axis, layerMask, angle;
-      for (var i = 0; i < scrambleCount; i++) {
+      let prevAxis = -1;
+      let axis, layerMask, angle;
+      for (let i = 0; i < scrambleCount; i++) {
         while ((axis = Math.floor(Math.random() * 3)) == prevAxis) {
         }
         prevAxis = axis;
@@ -1302,18 +1291,18 @@ function () {
     tPlus, tPlusPlus, tMinus,
     tBegin, tEnd, tDelimiter) {
 
-      var cube = this;
-      var buf = '';
+      let cube = this;
+      let buf = '';
 
-      var corners = this.toCornerPermutationString(syntax,
+      let corners = this.toCornerPermutationString(syntax,
       tR, tU, tF, tL, tD, tB,
       tPlus, tPlusPlus, tMinus,
       tBegin, tEnd, tDelimiter);
-      var edges = this.toEdgePermutationString(syntax,
+      let edges = this.toEdgePermutationString(syntax,
       tR, tU, tF, tL, tD, tB,
       tPlus, tPlusPlus, tMinus,
       tBegin, tEnd, tDelimiter);
-      var sides = this.toSidePermutationString(syntax,
+      let sides = this.toSidePermutationString(syntax,
       tR, tU, tF, tL, tD, tB,
       tPlus, tPlusPlus, tMinus,
       tBegin, tEnd, tDelimiter);
@@ -1339,27 +1328,27 @@ function () {
     tPlus, tPlusPlus, tMinus,
     tBegin, tEnd, tDelimiter) {
 
-      var cube = this;
-      var cornerLoc = cube.cornerLoc;
-      var edgeLoc = cube.edgeLoc;
-      var sideLoc = cube.sideLoc;
-      var cornerOrient = cube.cornerOrient;
-      var edgeOrient = cube.edgeOrient;
-      var sideOrient = cube.sideOrient;
-      var cycle = Array(Math.max(Math.max(cube.getCornerCount(), cube.getEdgeCount()), cube.getSideCount()));
-      var layerCount = cube.getLayerCount();
-      var hasEvenLayerCount = layerCount % 2 == 0;
+      let cube = this;
+      let cornerLoc = cube.cornerLoc;
+      let edgeLoc = cube.edgeLoc;
+      let sideLoc = cube.sideLoc;
+      let cornerOrient = cube.cornerOrient;
+      let edgeOrient = cube.edgeOrient;
+      let sideOrient = cube.sideOrient;
+      let cycle = Array(Math.max(Math.max(cube.getCornerCount(), cube.getEdgeCount()), cube.getSideCount()));
+      let layerCount = cube.getLayerCount();
+      let hasEvenLayerCount = layerCount % 2 == 0;
 
-      var buf = '';
-      var visitedLocs = Array();
+      let buf = '';
+      let visitedLocs = Array();
 
-      var i, j, k, l, p, n;
+      let i, j, k, l, p, n;
 
-      var prevOrient;
-      var isFirst;
+      let prevOrient;
+      let isFirst;
 
       // describe the state changes of the corner parts
-      var corners = [
+      let corners = [
         [tU, tR, tF], // urf
         [tD, tF, tR], // dfr
         [tU, tB, tR], // ubr
@@ -1379,8 +1368,8 @@ function () {
           }
 
           // gather a permutation cycle
-          var cycleLength = 0;
-          var cycleStart = 0;
+          let cycleLength = 0;
+          let cycleStart = 0;
           j = i;
           while (!visitedLocs[j]) {
             visitedLocs[j] = true;
@@ -1465,27 +1454,27 @@ function () {
     tPlus, tPlusPlus, tMinus,
     tBegin, tEnd, tDelimiter) {
 
-      var cube = this;
-      var cornerLoc = cube.getCornerLocations();
-      var edgeLoc = cube.getEdgeLocations();
-      var sideLoc = cube.getSideLocations();
-      var cornerOrient = cube.getCornerOrientations();
-      var edgeOrient = cube.getEdgeOrientations();
-      var sideOrient = cube.getSideOrientations();
-      var cycle = Array(Math.max(Math.max(cube.getCornerCount(), cube.getEdgeCount()), cube.getSideCount()));
-      var layerCount = cube.getLayerCount();
-      var hasEvenLayerCount = layerCount % 2 == 0;
+      let cube = this;
+      let cornerLoc = cube.getCornerLocations();
+      let edgeLoc = cube.getEdgeLocations();
+      let sideLoc = cube.getSideLocations();
+      let cornerOrient = cube.getCornerOrientations();
+      let edgeOrient = cube.getEdgeOrientations();
+      let sideOrient = cube.getSideOrientations();
+      let cycle = Array(Math.max(Math.max(cube.getCornerCount(), cube.getEdgeCount()), cube.getSideCount()));
+      let layerCount = cube.getLayerCount();
+      let hasEvenLayerCount = layerCount % 2 == 0;
 
-      var buf = '';
-      var visitedLocs = Array();
+      let buf = '';
+      let visitedLocs = Array();
 
-      var i, j, k, l, p, n;
-      var prevOrient;
-      var isFirst;
+      let i, j, k, l, p, n;
+      let prevOrient;
+      let isFirst;
 
       // describe the state changes of the edge parts
       if (edgeLoc.length > 0) {
-        var edges = [
+        let edges = [
           [tU, tR], //"ur"
           [tR, tF], //"rf"
           [tD, tR], //"dr"
@@ -1501,7 +1490,7 @@ function () {
         ];
         visitedLocs = new Array(cube.getEdgeCount());
         isFirst = true;
-        var previousCycleStartEdge = -1;
+        let previousCycleStartEdge = -1;
         for (i = 0, n = cube.getEdgeCount(); i < n; i++) {
           if (!visitedLocs[i]) {
             if (edgeLoc[i] == i && edgeOrient[i] == 0) {
@@ -1509,8 +1498,8 @@ function () {
             }
 
             // gather a permutation cycle
-            var cycleLength = 0;
-            var cycleStart = 0;
+            let cycleLength = 0;
+            let cycleStart = 0;
             j = i;
             while (!visitedLocs[j]) {
               visitedLocs[j] = true;
@@ -1595,45 +1584,45 @@ function () {
     tPlus, tPlusPlus, tMinus,
     tBegin, tEnd, tDelimiter) {
 
-      var cube = this;
-      var cornerLoc = cube.getCornerLocations();
-      var edgeLoc = cube.getEdgeLocations();
-      var sideLoc = cube.getSideLocations();
-      var cornerOrient = cube.getCornerOrientations();
-      var edgeOrient = cube.getEdgeOrientations();
-      var sideOrient = cube.getSideOrientations();
-      var cycle = new Array(Math.max(Math.max(cube.getCornerCount(), cube.getEdgeCount()), cube.getSideCount()));
-      var layerCount = cube.getLayerCount();
-      var hasEvenLayerCount = layerCount % 2 == 0;
+      let cube = this;
+      let cornerLoc = cube.getCornerLocations();
+      let edgeLoc = cube.getEdgeLocations();
+      let sideLoc = cube.getSideLocations();
+      let cornerOrient = cube.getCornerOrientations();
+      let edgeOrient = cube.getEdgeOrientations();
+      let sideOrient = cube.getSideOrientations();
+      let cycle = new Array(Math.max(Math.max(cube.getCornerCount(), cube.getEdgeCount()), cube.getSideCount()));
+      let layerCount = cube.getLayerCount();
+      let hasEvenLayerCount = layerCount % 2 == 0;
 
-      var buf = '';
-      var visitedLocs;
+      let buf = '';
+      let visitedLocs;
 
-      var i, j, k, l, p, n;
-      var prevOrient;
-      var isFirst;
+      let i, j, k, l, p, n;
+      let prevOrient;
+      let isFirst;
 
       if (sideLoc.length > 0) { // describe the state changes of the side parts
-        var sides = [
+        let sides = [
           tR, tU, tF, tL, tD, tB // r u f l d b
         ];
-        var sideOrients = [
+        let sideOrients = [
           "", tMinus, tPlusPlus, tPlus
         ];
         visitedLocs = new Array(cube.getSideCount());
         isFirst = true;
-        var previousCycleStartSide;
+        let previousCycleStartSide;
 
         // First Pass: Only print permutation cycles which lie on a single
         // face of the cube. 
         // Second pass: Only print permutation cycles which don't lie on
         // a singe fass of the cube.
-        for (var twoPass = 0; twoPass < 2; twoPass++) {
+        for (let twoPass = 0; twoPass < 2; twoPass++) {
           for (i = 0; i < visitedLocs.length; i++)
             visitedLocs[i] = false;
-          for (var byFaces = 0, nf = 6; byFaces < nf; byFaces++) {
+          for (let byFaces = 0, nf = 6; byFaces < nf; byFaces++) {
             previousCycleStartSide = -1;
-            for (var byParts = 0, np = cube.getSideCount() / 6; byParts < np; byParts++) {
+            for (let byParts = 0, np = cube.getSideCount() / 6; byParts < np; byParts++) {
               i = byParts + byFaces * np;
               if (!visitedLocs[i]) {
                 if (sideLoc[i] == i && sideOrient[i] == 0) {
@@ -1641,9 +1630,9 @@ function () {
                 }
 
                 // gather a permutation cycle
-                var cycleLength = 0;
-                var cycleStart = 0;
-                var isOnSingleFace = true;
+                let cycleLength = 0;
+                let cycleStart = 0;
+                let isOnSingleFace = true;
                 j = i;
                 while (!visitedLocs[j]) {
                   visitedLocs[j] = true;
@@ -2167,7 +2156,6 @@ function () {
 // ------------------
 // MODULE API    
 // ------------------
-  return {
-    Cube: Cube
-  };
-});
+export default {
+  Cube: Cube
+}
