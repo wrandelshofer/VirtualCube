@@ -50,28 +50,6 @@ function attachVirtualCube(parameters, divOrCanvas) {
         parameters = [];
     }
 
-    // if we have been called before the document was loaded, we install a
-    // listener and retry.
-    if (document.body == null) {
-        let f = function () {
-            try {
-                window.removeEventListener('load', f, false);
-            } catch (err) {
-                // => IE does not support event listeners 
-                window.detachEvent('onload', f, false);
-            }
-            attachVirtualCube(parameters, divOrCanvas);
-        }
-        try {
-            window.addEventListener('load', f, false);
-        } catch (err) {
-            // => IE does not support event listeners 
-            window.attachEvent('onload', f, false);
-        }
-        return;
-    }
-
-
     if (divOrCanvas == null) {
         // => no element was provided, attach to all elements with class "virtualcube"
         let htmlCollection = [];

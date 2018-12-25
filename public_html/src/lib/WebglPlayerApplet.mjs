@@ -105,21 +105,16 @@ reshape() {
     let gl = this.gl;
     let canvas = this.canvas;
 
-    // support high dpi/retina displays:
-    let devicePixelRatio = window.devicePixelRatio || 1;
-    this.drawingBufferWidth = canvas.clientWidth * devicePixelRatio;
-    this.drawingBufferHeight = canvas.clientHeight * devicePixelRatio;
+    this.drawingBufferWidth = canvas.clientWidth;
+    this.drawingBufferHeight = canvas.clientHeight;
     if (this.drawingBufferWidth == this.width && this.drawingBufferHeight == this.height) {
         return;
     }
 
-    canvas.width = this.drawingBufferWidth;
-    canvas.height = this.drawingBufferHeight;
     this.width = canvas.clientWidth;
     this.height = canvas.clientHeight;
     gl.viewport(0, 0, this.drawingBufferWidth, this.drawingBufferHeight);
     this.checkGLError('reshape');
-
 }
 
 clearCanvas() {

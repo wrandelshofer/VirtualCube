@@ -1258,7 +1258,7 @@ class Cube3DHandler extends AbstractCanvas.AbstractHandler {
                             angle = 2 * angle;
                         }
                         let cube = cube3d.getCube();
-                        let move = new AST.MoveNode(cube.getLayerCount(), axis, layerMask, angle);
+                        let move = new ScriptAST.MoveNode(cube.getLayerCount(), axis, layerMask, angle);
                         this.canvas.pushMove(move);
                         move.applyTo(this.canvas.cube);
                         if (this.canvas.cube.isSolved()) {
@@ -1345,7 +1345,7 @@ class Cube3DHandler extends AbstractCanvas.AbstractHandler {
                 isect.angle *= 2;
             }
             let cube = cube3d.getCube();
-            let move = new AST.MoveNode(cube.getLayerCount(), isect.axis, isect.layerMask, isect.angle);
+            let move = new ScriptAST.MoveNode(cube.getLayerCount(), isect.axis, isect.layerMask, isect.angle);
             this.canvas.pushMove(move);
             move.applyTo(this.canvas.cube);
             if (this.canvas.cube.isSolved()) {
