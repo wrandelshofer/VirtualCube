@@ -1,14 +1,10 @@
-/*
- * @(#)RubiksCubeS4Cube3D.mjs  1.0  2015-01-09
- * Copyright (c) 2015 Werner Randelshofer, Switzerland. MIT License.
+/* @(#)RubiksCubeS4Cube3D.mjs
+ * Copyright (c) 2018 Werner Randelshofer, Switzerland. MIT License.
  */
-"use strict";
 
-// --------------
-// require.js
-// --------------
-define("RubiksCubeS4Cube3D", ["AbstractRubiksCubeCube3D","CubeAttributes","PreloadRubiksCubeS4"], 
-function(AbstractRubiksCubeCube3D,CubeAttributes,PreloadRubiksCubeS4) { 
+import AbstractRubiksCubeCube3D from './AbstractRubiksCubeCube3D.mjs';
+import CubeAttributes from './CubeAttributes.mjs';
+import PreloadRubiksCubeS4 from './PreloadRubiksCubeS4.mjs';
 
 class RubiksCubeS4Cube3D extends AbstractRubiksCubeCube3D.AbstractRubiksCubeCube3D {
   /** Constructor
@@ -28,15 +24,15 @@ class RubiksCubeS4Cube3D extends AbstractRubiksCubeCube3D.AbstractRubiksCubeCube
   }
   
   createAttributes() {
-    var a=CubeAttributes.newCubeAttributes(this.partCount, 6*9, [9,9,9,9,9,9]);
-    var partsPhong=[0.5,0.6,0.4,16.0];//shiny plastic [ambient, diffuse, specular, shininess]
-    for (var i=0;i<this.partCount;i++) {
+    let a=new CubeAttributes.CubeAttributes(this.partCount, 6*9, [9,9,9,9,9,9]);
+    let partsPhong=[0.5,0.6,0.4,16.0];//shiny plastic [ambient, diffuse, specular, shininess]
+    for (let i=0;i<this.partCount;i++) {
       a.partsFillColor[i]=[24,24,24,255];
       a.partsPhong[i]=partsPhong;
     }
     a.partsFillColor[this.centerOffset]=[240,240,240,255];
     
-    var faceColors=[//Right, Up, Front, Left, Down, Back
+    let faceColors=[//Right, Up, Front, Left, Down, Back
       [255, 210, 0,155], // Yellow
       [0, 51, 115,255], // Blue
       [140, 0, 15,255], // Red
@@ -45,10 +41,10 @@ class RubiksCubeS4Cube3D extends AbstractRubiksCubeCube3D.AbstractRubiksCubeCube
       [255, 70, 0,255], // Orange
     ];
     
-    var stickersPhong=[0.8,0.2,0.1,8.0];//glossy paper [ambient, diffuse, specular, shininess]
+    let stickersPhong=[0.8,0.2,0.1,8.0];//glossy paper [ambient, diffuse, specular, shininess]
    
-    for (var i=0;i<6;i++) {
-      for (var j=0;j<9;j++) {
+    for (let i=0;i<6;i++) {
+      for (let j=0;j<9;j++) {
         a.stickersFillColor[i*9+j]=faceColors[i];
         a.stickersPhong[i*9+j]=stickersPhong;
       }
@@ -68,8 +64,6 @@ RubiksCubeS4Cube3D.prototype.baseUrl = 'lib/';
 // ------------------
 // MODULE API    
 // ------------------
-return {
+export default {
   Cube3D : RubiksCubeS4Cube3D,
-  newCube3D : function () { const c = new RubiksCubeS4Cube3D(); c.loadGeometry(); return c; }
 };
-});

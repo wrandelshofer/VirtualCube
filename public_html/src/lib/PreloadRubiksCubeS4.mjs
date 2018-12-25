@@ -1,54 +1,48 @@
-/*
- * @(#)PreloadRubiksCubeS4.mjs  1.0  2014-01-17
- * Copyright (c) 2014 Werner Randelshofer, Switzerland. MIT License.
+/* @(#)PreloadRubiksCubeS4.mjs
+ * Copyright (c) 2018Werner Randelshofer, Switzerland. MIT License.
  */
-"use strict";
 
-/** Preloads the .obj files.
-*/
-// --------------
-// require.js
-// --------------
-define("PreloadRubiksCubeS4", ["J3DI"], 
-function (J3DI) {
+/** Preloads the .obj files. */
+
+import J3DI from './J3DI.mjs';
 
 J3DI.setFileData("${corner.url}",
-"${corner.obj}"
-);
+  "${corner.obj}"
+  );
 J3DI.setFileData("${corner_r.url}",
-"${corner_r.obj}"
-);
+  "${corner_r.obj}"
+  );
 J3DI.setFileData("${corner_u.url}",
-"${corner_u.obj}"
-);
+  "${corner_u.obj}"
+  );
 J3DI.setFileData("${corner_f.url}",
-"${corner_f.obj}"
-);
+  "${corner_f.obj}"
+  );
 
 J3DI.setFileData("${edge.url}",
-"${edge.obj}"
-);
+  "${edge.obj}"
+  );
 J3DI.setFileData("${edge_r.url}",
-"${edge_r.obj}"
-);
+  "${edge_r.obj}"
+  );
 J3DI.setFileData("${edge_u.url}",
-"${edge_u.obj}"
-);
+  "${edge_u.obj}"
+  );
 
 J3DI.setFileData("${side.url}",
-"${side.obj}"
-);
+  "${side.obj}"
+  );
 J3DI.setFileData("${side_r.url}",
-"${side_r.obj}"
-);
+  "${side_r.obj}"
+  );
 
 J3DI.setFileData("${center.url}",
-"${center.obj}"
-);
+  "${center.obj}"
+  );
 
 // ------------------
 // MODULE API    
 // ------------------
-return { };
-});
+export default {};
+
 

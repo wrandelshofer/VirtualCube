@@ -1,16 +1,10 @@
-/*
- * @(#)PreloadRubiksCubeS1.mjs  1.0  2014-01-17
- * Copyright (c) 2014 Werner Randelshofer, Switzerland. MIT License.
+/* @(#)PreloadRubiksCubeS1.mjs
+ * Copyright (c) 2018 Werner Randelshofer, Switzerland. MIT License.
  */
-"use strict";
 
 /** Preloads the .obj files.
 */
-// --------------
-// require.js
-// --------------
-define("PreloadRubiksCubeS1", ["J3DI"], 
-function (J3DI) {
+import J3DI from './J3DI.mjs';
 
 J3DI.setFileData("${corner.url}",
 "${corner.obj}"
@@ -49,6 +43,6 @@ J3DI.setFileData("${center.url}",
 // ------------------
 // MODULE API    
 // ------------------
-return { };
-});
+export default { };
+
 

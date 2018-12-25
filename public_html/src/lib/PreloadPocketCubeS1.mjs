@@ -1,16 +1,11 @@
-/*
- * @(#)PreloadPocketCubeS1.mjs  1.0  2014-03-30
+/* @(#)PreloadPocketCubeS1.mjs  1.0  2014-03-30
  * Copyright (c) 2014 Werner Randelshofer, Switzerland. MIT License.
  */
-"use strict";
 
 /** Preloads the .obj files.
 */
-// --------------
-// require.js
-// --------------
-define("PreloadPocketCubeS1", ["J3DI"], 
-function (J3DI) {
+
+import J3DI from './J3DI.mjs';
 
 J3DI.setFileData("${corner.url}",
 "${corner.obj}"
@@ -32,6 +27,5 @@ J3DI.setFileData("${center.url}",
 // ------------------
 // MODULE API    
 // ------------------
-return { };
-});
+export default { };
 

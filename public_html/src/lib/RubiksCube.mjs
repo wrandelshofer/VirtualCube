@@ -1,10 +1,8 @@
 /* @(#)RubiksCube.mjs
  * Copyright (c) 2018 Werner Randelshofer, Switzerland. MIT License.
  */
-"use strict";
 
 import Cube from './Cube.mjs';
-
 
 let module = {
     log: (false) ? console.log : () => {

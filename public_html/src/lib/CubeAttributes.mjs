@@ -1,14 +1,6 @@
-/*
- * @(#)CubeAttributes.mjs  1.0  2011-06-23
- * Copyright (c) 2011 Werner Randelshofer, Switzerland. MIT License.
+/* @(#)CubeAttributes.mjs
+ * Copyright (c) 2018 Werner Randelshofer, Switzerland. MIT License.
  */
-"use strict";
-
-// --------------
-// require.js
-// --------------
-define("CubeAttributes", [], 
-function() { 
 
     let module = {
       log: (false) ? console.log : ()=>{},
@@ -88,8 +80,6 @@ class CubeAttributes {
 // ------------------
 // MODULE API    
 // ------------------
-return {
+export default {
     CubeAttributes : CubeAttributes,
-    newCubeAttributes : function (partCount, stickerCount, stickerCountPerFace) { return new CubeAttributes(partCount, stickerCount, stickerCountPerFace); }
-};
-});
+}
