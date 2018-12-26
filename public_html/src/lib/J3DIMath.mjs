@@ -1224,7 +1224,7 @@ class J3DIMatrix4 {
         let twosina = aa.norm();
         let r;
 
-        let sign = function (value) {
+        function sign (value) {
             return (value < 0 ? -1 : 1);
         };
 
@@ -1567,13 +1567,13 @@ var rawZReuse2 = new J3DIVector3();
 
 // BEGIN Misc functions
 // ------------------------------------------
-let clamp = function (value, min, max) {
+function clamp (value, min, max) {
     if (value === undefined || value != value)
         return min;
     return Math.max(min, Math.min(max, value));
 }
 
-let sign = function (value) {
+function sign (value) {
     return (value < 0 ? -1 : 1);
 }
 // ------------------------------------------
@@ -1594,7 +1594,7 @@ let sign = function (value) {
  * @param lambda   amount of interpolation, lambda in [0,1]
  * @return interpolated rotation
  */
-let elerp = function (R1, R2, lambda) {
+function elerp (R1, R2, lambda) {
     let invR1 = new J3DIMatrix4(R1).transpose();
     let a = invR1.multiply(R2).loghat().multiply(lambda);
     let lerp = new J3DIMatrix4(R1);
@@ -1613,7 +1613,7 @@ let elerp = function (R1, R2, lambda) {
  * @param lambda   amount of interpolation, lambda in [0,1]
  * @return interpolated rotation
  */
-let rigidLerp = function (T1, T2, lambda) {
+function rigidLerp (T1, T2, lambda) {
     lambda = clamp(lambda, 0, 1);
     let t1 = new J3DIVector3(T1.$matrix.m41, T1.$matrix.m42, T1.$matrix.m43);
     let R1 = new J3DIMatrix4(T1);
@@ -1654,7 +1654,7 @@ let rigidLerp = function (T1, T2, lambda) {
  * Returns the intersection data: hit-point 3d coordinates and in u,v coordinates as
  *    {point:J3DIVector3, uv:J3DIVector3, t:float, face:int}
  */
-let intersectBox = function (ray, box) {
+function intersectBox (ray, box) {
     let pMin = box.pMin;
     let pMax = box.pMax;
     let t0 = 0;
@@ -1763,7 +1763,7 @@ let intersectBox = function (ray, box) {
  * Returns the intersection data: hit-point 3d coordinates and in u,v coordinates as
  *                                {point:J3DIVector3, uv:J3DIVector3, t:float}
  */
-let intersectPlane = function (ray, plane) {
+function intersectPlane (ray, plane) {
     // solve for t:
     // t = (ray.p - plane.p) * plane.n / ray.d * plane.n
     let divisor = ray.dir.dot(plane.normal);

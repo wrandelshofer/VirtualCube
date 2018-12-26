@@ -208,7 +208,7 @@
       <workItem from="1545549956103" duration="476000" />
       <workItem from="1545592966395" duration="8000" />
       <workItem from="1545593067210" duration="486000" />
-      <workItem from="1545749429226" duration="1018000" />
+      <workItem from="1545749429226" duration="1193000" />
     </task>
     <task id="LOCAL-00001" summary="Fixes issues in parser.">
       <created>1545505113015</created>
@@ -221,7 +221,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="4379000" />
+    <option name="totallyTimeSpent" value="4554000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="480" y="1175" width="1680" height="1027" extended-state="6" />
