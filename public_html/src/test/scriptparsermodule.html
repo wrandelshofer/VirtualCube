@@ -36,7 +36,7 @@
     <h1>Tests for the <kbd>ScriptParser.parse()</kbd> methods in the <kbd>ScriptParser</kbd> module.</h1>
 
     <article>
-      <h1>Face Moves</h1>
+      <h1>Face Twists</h1>
       <section class="unittest">
         <p class="input">R</p>
         <p class="expected">SEQ{ STMT{ MOV{ax:0 lm:4 an:1} } }</p>
@@ -70,7 +70,7 @@
     </article>
 
     <article>
-      <h1>Inverted Face Moves</h1>
+      <h1>Inverted Face Twists</h1>
       <section class="unittest">
         <p class="input">R'</p>
         <p class="expected">SEQ{ STMT{ INV{ MOV{ax:0 lm:4 an:1} } } }</p>
@@ -103,7 +103,7 @@
       </section>
     </article>
     <article>
-      <h1>Double Face Moves</h1>
+      <h1>Double Face Twists</h1>
       <section class="unittest">
         <p class="input">R2</p>
         <p class="expected">SEQ{ STMT{ MOV{ax:0 lm:4 an:2} } }</p>
@@ -132,6 +132,106 @@
       <section class="unittest">
         <p class="input">B2</p>
         <p class="expected">SEQ{ STMT{ MOV{ax:2 lm:1 an:-2} } }</p>
+        <p class="actual"></p>
+      </section>
+    </article>
+    <article>
+      <h1>Mid-Layer Twists</h1>
+      <section class="unittest">
+        <p class="input">MR</p>
+        <p class="expected">SEQ{ STMT{ MOV{ax:0 lm:2 an:1} } }</p>
+        <p class="actual"></p>
+      </section>
+      <section class="unittest">
+        <p class="input">MU</p>
+        <p class="expected">SEQ{ STMT{ MOV{ax:1 lm:2 an:1} } }</p>
+        <p class="actual"></p>
+      </section>
+      <section class="unittest">
+        <p class="input">MF</p>
+        <p class="expected">SEQ{ STMT{ MOV{ax:2 lm:2 an:1} } }</p>
+        <p class="actual"></p>
+      </section>
+      <section class="unittest">
+        <p class="input">ML</p>
+        <p class="expected">SEQ{ STMT{ MOV{ax:0 lm:2 an:-1} } }</p>
+        <p class="actual"></p>
+      </section>
+      <section class="unittest">
+        <p class="input">MD</p>
+        <p class="expected">SEQ{ STMT{ MOV{ax:1 lm:2 an:-1} } }</p>
+        <p class="actual"></p>
+      </section>
+      <section class="unittest">
+        <p class="input">MB</p>
+        <p class="expected">SEQ{ STMT{ MOV{ax:2 lm:2 an:-1} } }</p>
+        <p class="actual"></p>
+      </section>
+    </article>
+
+    <article>
+      <h1>Inverted Mid-Layer Twists</h1>
+      <section class="unittest">
+        <p class="input">MR'</p>
+        <p class="expected">SEQ{ STMT{ INV{ MOV{ax:0 lm:2 an:1} } } }</p>
+        <p class="actual"></p>
+      </section>
+      <section class="unittest">
+        <p class="input">MU'</p>
+        <p class="expected">SEQ{ STMT{ INV{ MOV{ax:1 lm:2 an:1} } } }</p>
+        <p class="actual"></p>
+      </section>
+      <section class="unittest">
+        <p class="input">MF'</p>
+        <p class="expected">SEQ{ STMT{ INV{ MOV{ax:2 lm:2 an:1} } } }</p>
+        <p class="actual"></p>
+      </section>
+      <section class="unittest">
+        <p class="input">ML'</p>
+        <p class="expected">SEQ{ STMT{ INV{ MOV{ax:0 lm:2 an:-1} } } }</p>
+        <p class="actual"></p>
+      </section>
+      <section class="unittest">
+        <p class="input">MD'</p>
+        <p class="expected">SEQ{ STMT{ INV{ MOV{ax:1 lm:2 an:-1} } } }</p>
+        <p class="actual"></p>
+      </section>
+      <section class="unittest">
+        <p class="input">MB'</p>
+        <p class="expected">SEQ{ STMT{ INV{ MOV{ax:2 lm:2 an:-1} } } }</p>
+        <p class="actual"></p>
+      </section>
+    </article>
+    <article>
+      <h1>Double Mid-Layer Twists</h1>
+      <section class="unittest">
+        <p class="input">MR2</p>
+        <p class="expected">SEQ{ STMT{ MOV{ax:0 lm:2 an:2} } }</p>
+        <p class="actual"></p>
+      </section>
+      <section class="unittest">
+        <p class="input">MU2</p>
+        <p class="expected">SEQ{ STMT{ MOV{ax:1 lm:2 an:2} } }</p>
+        <p class="actual"></p>
+      </section>
+      <section class="unittest">
+        <p class="input">MF2</p>
+        <p class="expected">SEQ{ STMT{ MOV{ax:2 lm:2 an:2} } }</p>
+        <p class="actual"></p>
+      </section>
+      <section class="unittest">
+        <p class="input">ML2</p>
+        <p class="expected">SEQ{ STMT{ MOV{ax:0 lm:2 an:-2} } }</p>
+        <p class="actual"></p>
+      </section>
+      <section class="unittest">
+        <p class="input">MD2</p>
+        <p class="expected">SEQ{ STMT{ MOV{ax:1 lm:2 an:-2} } }</p>
+        <p class="actual"></p>
+      </section>
+      <section class="unittest">
+        <p class="input">MB2</p>
+        <p class="expected">SEQ{ STMT{ MOV{ax:2 lm:2 an:-2} } }</p>
         <p class="actual"></p>
       </section>
     </article>

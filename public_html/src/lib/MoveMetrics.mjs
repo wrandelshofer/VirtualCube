@@ -70,12 +70,12 @@ class MoveMetrics {
                 this.moveCount++;
             } else if (this.current.getAxis() == axis && this.current.getLayerMask() == layerMask) {
                 // coalesce subsequent move on same axis and same layer
-                this.current = new MoveNode(layerCount, axis, layerMask, angle +this. current.getAngle(),
+                this.current = new ScriptAST.MoveNode(layerCount, axis, layerMask, angle +this. current.getAngle(),
                   this.current.getStartPosition(), moveNode.getEndPosition());
                 this.moveCount++;
             } else if (this.current.getAxis() == axis && this.current.getAngle() == angle && (this.current.getLayerMask() & layerMask) == 0) {
                 // coalesce subsequent move on same axis and angle and different layers
-                this.current = new MoveNode(layerCount, axis,this.current.getLayerMask()|layerMask, angle,
+                this.current = new ScriptAST.MoveNode(layerCount, axis,this.current.getLayerMask()|layerMask, angle,
                         this.current.getStartPosition(), moveNode.getEndPosition());
                 this.moveCount++;
             } else {

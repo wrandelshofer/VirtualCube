@@ -82,7 +82,7 @@ class Node {
      *
      * @param inverse:boolean 
      */
-    * resolvedIterable(inverse) {
+    *resolvedIterable(inverse) {
         for (let i = this.children.length - 1; i >= 0; i--) {
             yield* this.children[i].resolvedIterable(inverse);
         }
@@ -511,7 +511,12 @@ class RepetitionNode extends Node {
             super.applyInverseTo(cube);
         }
     }
-
+    *resolvedIterable(inverse) {
+        for (let r=0; r < this.repeatCount; r++) {
+            yield* super.resolvedIterable(inverse);
+        }
+    }
+    
     toString() {
         const buf = [];
         buf.push("REP{");
@@ -572,22 +577,6 @@ class MoveNode extends Node {
     doesNothing() {
         return this.angle == 0 || this.layerMask == 0;
     }
-    /** Tries to consume the given MoveNode. 
-     * Returns true if successful.
-     * This MoveNode may return true for doesNothing afterwards!);
-     * /
-    consume(that) {
-        if (that.axis == this.axis
-          && that.layerMask == this.layerMask) {
-            this.angle = (this.angle + that.angle) % 4;
-            if (this.angle == 3)
-                this.angle = -1;
-            else if (this.angle == -3)
-                this.angle = 1;
-            return true;
-        }
-        return false;
-    }*/
     
     * resolvedIterable(inverse) {
         if (inverse) {

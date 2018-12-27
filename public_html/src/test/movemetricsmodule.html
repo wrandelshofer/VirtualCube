@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>MoveMetrics module: apply() function</title>
+    <title>MoveMetrics module: accept() function</title>
     <link href="virtualcube.css" rel="stylesheet" type="text/css">
     <script type="module">
       import RubiksCube from '../lib/RubiksCube.mjs';
@@ -29,11 +29,11 @@
           let metrics = new MoveMetrics.MoveMetrics();
           metrics.accept(ast);
           
-          let actual = metrics.getLayerTurnCount()+" ltm, "
-                        + metrics.getFaceTurnCount()+" ftm, "
-                        + metrics.getQuarterTurnCount()+" qtm, "
-                        + metrics.getBlockTurnCount()+" btm, " 
-                      +metrics.getMoveCount()+" moves";
+          let actual = metrics.getBlockTurnCount()+"btm, " 
+                        + metrics.getLayerTurnCount()+"ltm, "
+                        + metrics.getFaceTurnCount()+"ftm, "
+                        + metrics.getQuarterTurnCount()+"qtm, "
+                        + metrics.getMoveCount()+" moves";
           actuals[i].innerText = actual;
           tests[i].classList.add(actual == expected ? "pass" : "fail");
         } catch (err) {
@@ -47,12 +47,172 @@
     <h1>Tests the results of <kbd>MoveMetrics.get...Count()</kbd> methods in the <kbd>MoveMetrics</kbd> module.</h1>
 
     <article>
-      <h1>Single layer moves</h1>
       <section class="unittest">
-        <p class="input">R2 L2 · U D' · F2 B2 · U D'</p>
-        <p class="expected">8 ltm, 8 ftm, 12 qtm, 8 btm, 8 moves</p>
+        <p class="input">R</p>
+        <p class="expected">1btm, 1ltm, 1ftm, 1qtm, 1 moves</p>
         <p class="actual"></p>
       </section>
-    </article>    
+    </article>
+    <article>
+      <section class="unittest">
+        <p class="input">R2</p>
+        <p class="expected">1btm, 1ltm, 1ftm, 2qtm, 1 moves</p>
+        <p class="actual"></p>
+      </section>
+    </article>
+    <article>
+      <section class="unittest">
+        <p class="input">R'</p>
+        <p class="expected">1btm, 1ltm, 1ftm, 1qtm, 1 moves</p>
+        <p class="actual"></p>
+      </section>
+    </article>
+    <article>
+      <section class="unittest">
+        <p class="input">R R</p>
+        <p class="expected">1btm, 1ltm, 1ftm, 2qtm, 2 moves</p>
+        <p class="actual"></p>
+      </section>
+    </article>
+    <article>
+      <section class="unittest">
+        <p class="input">R R R</p>
+        <p class="expected">1btm, 1ltm, 1ftm, 1qtm, 3 moves</p>
+        <p class="actual"></p>
+      </section>
+    </article>
+    <article>
+      <section class="unittest">
+        <p class="input">R R R2</p>
+        <p class="expected">0btm, 0ltm, 0ftm, 0qtm, 3 moves</p>
+        <p class="actual"></p>
+      </section>
+    </article>
+    <article>
+      <section class="unittest">
+        <p class="input">CR</p>
+        <p class="expected">0btm, 0ltm, 0ftm, 0qtm, 1 moves</p>
+        <p class="actual"></p>
+      </section>
+    </article>
+    <article>
+      <section class="unittest">
+        <p class="input">CR2</p>
+        <p class="expected">0btm, 0ltm, 0ftm, 0qtm, 1 moves</p>
+        <p class="actual"></p>
+      </section>
+    </article>
+    <article>
+      <section class="unittest">
+        <p class="input">CR'</p>
+        <p class="expected">0btm, 0ltm, 0ftm, 0qtm, 1 moves</p>
+        <p class="actual"></p>
+      </section>
+    </article>
+    <article>
+      <section class="unittest">
+        <p class="input">R CR R</p>
+        <p class="expected">1btm, 1ltm, 1ftm, 2qtm, 3 moves</p>
+        <p class="actual"></p>
+      </section>
+    </article>
+    <article>
+      <section class="unittest">
+        <p class="input">R U</p>
+        <p class="expected">2btm, 2ltm, 2ftm, 2qtm, 2 moves</p>
+        <p class="actual"></p>
+      </section>
+    </article>
+    <article>
+      <section class="unittest">
+        <p class="input">R R U</p>
+        <p class="expected">2btm, 2ltm, 2ftm, 3qtm, 3 moves</p>
+        <p class="actual"></p>
+      </section>
+    </article>
+    <article>
+      <section class="unittest">
+        <p class="input">R U R</p>
+        <p class="expected">3btm, 3ltm, 3ftm, 3qtm, 3 moves</p>
+        <p class="actual"></p>
+      </section>
+    </article>
+    <article>
+      <section class="unittest">
+        <p class="input">R R U2</p>
+        <p class="expected">2btm, 2ltm, 2ftm, 4qtm, 3 moves</p>
+        <p class="actual"></p>
+      </section>
+    </article>
+    <article>
+      <section class="unittest">
+        <p class="input">R U2 R</p>
+        <p class="expected">3btm, 3ltm, 3ftm, 4qtm, 3 moves</p>
+        <p class="actual"></p>
+      </section>
+    </article>
+    <article>
+      <section class="unittest">
+        <p class="input">CR R R</p>
+        <p class="expected">1btm, 1ltm, 1ftm, 2qtm, 3 moves</p>
+        <p class="actual"></p>
+      </section>
+    </article>
+    <article>
+      <section class="unittest">
+        <p class="input">R CU R</p>
+        <p class="expected">2btm, 2ltm, 2ftm, 2qtm, 3 moves</p>
+        <p class="actual"></p>
+      </section>
+    </article>
+    <article>
+      <section class="unittest">
+        <p class="input">CU R R</p>
+        <p class="expected">1btm, 1ltm, 1ftm, 2qtm, 3 moves</p>
+        <p class="actual"></p>
+      </section>
+    </article>
+    <article>
+      <section class="unittest">
+        <p class="input">(R)1</p>
+        <p class="expected">1btm, 1ltm, 1ftm, 1qtm, 1 moves</p>
+        <p class="actual"></p>
+      </section>
+    </article>
+    <article>
+      <section class="unittest">
+        <p class="input">(R)2</p>
+        <p class="expected">1btm, 1ltm, 1ftm, 2qtm, 2 moves</p>
+        <p class="actual"></p>
+      </section>
+    </article>
+    <article>
+      <section class="unittest">
+        <p class="input">(R)3</p>
+        <p class="expected">1btm, 1ltm, 1ftm, 1qtm, 3 moves</p>
+        <p class="actual"></p>
+      </section>
+    </article>
+    <article>
+      <section class="unittest">
+        <p class="input">(R)4</p>
+        <p class="expected">0btm, 0ltm, 0ftm, 0qtm, 4 moves</p>
+        <p class="actual"></p>
+      </section>
+    </article>
+    <article>
+      <section class="unittest">
+        <p class="input">R MR L'</p>
+        <p class="expected">0btm, 0ltm, 0ftm, 0qtm, 3 moves</p>
+        <p class="actual"></p>
+      </section>
+    </article>
+    <article>
+      <section class="unittest">
+        <p class="input">MR2 MF2 MU2</p>
+        <p class="expected">3btm, 3ltm, 6ftm, 12qtm, 3 moves</p>
+        <p class="actual"></p>
+      </section>
+    </article>
   </body>
 </html>
