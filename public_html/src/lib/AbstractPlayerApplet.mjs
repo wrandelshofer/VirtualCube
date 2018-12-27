@@ -636,7 +636,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
     undo() {
         if (this.redoIndex > 0) {
             let move = this.undoList[--this.redoIndex];
-            move.applyInverseTo(this.cube);
+            move.applyTo(this.cube, true);
             if (this.cube.isSolved()) {
                 this.wobble();
             }
@@ -688,7 +688,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
             return true;
         } else {
             let move = this.moves.pop();
-            move.applyInverseTo(this.cube);
+            move.applyTo(this.cube, true);
             if (this.cube.isSolved()) {
                 this.moves = [];
                 this.wobble();

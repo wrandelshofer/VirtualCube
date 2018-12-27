@@ -64,15 +64,10 @@ class Node {
         return this.endPosition;
     }
 
-    applyTo(cube) {
+    applyTo(cube, inverse = false) {
         for (let i = 0; i < this.children.length; i++) {
-            this.children[i].applyTo(cube);
-        }
+            this.children[i].applyTo(cube, inverse);
     }
-    applyInverseTo(cube) {
-        for (let i = this.children.length - 1; i >= 0; i--) {
-            this.children[i].applyInverseTo(cube);
-        }
     }
 
     /** 
@@ -82,10 +77,10 @@ class Node {
      *
      * @param inverse:boolean 
      */
-    *resolvedIterable(inverse) {
+    * resolvedIterable(inverse = false) {
         for (let i = this.children.length - 1; i >= 0; i--) {
             yield* this.children[i].resolvedIterable(inverse);
-        }
+    }
     }
 
     toString() {
@@ -161,16 +156,13 @@ class InversionNode extends Node {
     constructor(layerCount, startPosition, endPosition) {
         super(layerCount, startPosition, endPosition);
     }
-    applyTo(cube) {
-        for (let i = this.children.length - 1; i >= 0; i--) {
-            this.children[i].applyInverseTo(cube);
-        }
+    applyTo(cube, inverse=false) {
+        super.applyTo(cube, !inverse);
     }
-    applyInverseTo(cube) {
-        for (let i = 0; i < this.children.length; i++) {
-            this.children[i].applyTo(cube);
-        }
+    *resolvedIterable(inverse=false) {
+        yield* super.resolvedIterable(!inverse);
     }
+
     toString() {
         const buf = [];
         buf.push("INV{");
@@ -501,22 +493,18 @@ class RepetitionNode extends Node {
     setRepeatCount(newValue) {
         this.repeatCount = newValue;
     }
-    applyTo(cube) {
+    applyTo(cube, inverse) {
         for (let r = 0; r < this.repeatCount; r++) {
-            super.applyTo(cube);
+            super.applyTo(cube, inverse);
         }
     }
-    applyInverseTo(cube) {
+
+    * resolvedIterable(inverse) {
         for (let r = 0; r < this.repeatCount; r++) {
-            super.applyInverseTo(cube);
-        }
-    }
-    *resolvedIterable(inverse) {
-        for (let r=0; r < this.repeatCount; r++) {
             yield* super.resolvedIterable(inverse);
         }
     }
-    
+
     toString() {
         const buf = [];
         buf.push("REP{");
@@ -555,29 +543,24 @@ class MoveNode extends Node {
         return this.angle;
     }
     getLayerCount() {
-        return  this.layerCount;
+        return this.layerCount;
     }
     getLayerMask() {
         return this.layerMask;
     }
 
     /** Applies the node to the specified cube. */
-    applyTo(cube) {
+    applyTo(cube, inverse) {
         if (!this.doesNothing()) {
-            cube.transform(this.axis, this.layerMask, this.angle);
+            cube.transform(this.axis, this.layerMask, inverse ? -this.angle : this.angle);
         }
     }
-    /** Applies the inverse of the node to the specified cube. */
-    applyInverseTo(cube) {
-        if (!this.doesNothing()) {
-            cube.transform(this.axis, this.layerMask, -this.angle);
-        }
-    }
+
     /** Returns true if this node does nothing. */
     doesNothing() {
         return this.angle == 0 || this.layerMask == 0;
     }
-    
+
     * resolvedIterable(inverse) {
         if (inverse) {
             yield new MoveNode(this.layerCount, this.axis, this.layerMask, -this.angle);
