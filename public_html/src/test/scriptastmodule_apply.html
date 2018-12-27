@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>ScriptAST module: apply() function</title>
+    <link href="virtualcube.css" rel="stylesheet" type="text/css">
+    <script type="module">
+      import RubiksCube from '../lib/RubiksCube.mjs';
+      import Cubes from '../lib/Cubes.mjs';
+      import ScriptParser from '../lib/ScriptParser.mjs';
+      import ScriptNotation from '../lib/ScriptNotation.mjs';
+
+      let tests = document.getElementsByClassName("unittest");
+      let inputs = document.getElementsByClassName("input");
+      let expecteds = document.getElementsByClassName("expected");
+      let actuals = document.getElementsByClassName("actual");
+
+      let notation = new ScriptNotation.DefaultNotation();
+      let parser = new ScriptParser.ScriptParser(notation);
+      let cube = new RubiksCube.RubiksCube();
+
+      for (let i = 0; i < tests.length; i++) {
+        let input = inputs[i].innerText;
+        let expected = expecteds[i].innerText;
+
+        try {
+          let ast = parser.parse(input);
+          cube.reset();
+          ast.applyTo(cube);
+          
+          let actual = Cubes.toPermutationString(cube, notation).replace(/\s+/g,' ');
+          actuals[i].innerText = actual;
+          tests[i].classList.add(actual == expected ? "pass" : "fail");
+        } catch (err) {
+          actuals[i].innerText = err;
+          tests[i].classList.add("fail");
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <h1>Tests the effect of <kbd>Node.apply()</kbd> methods in the <kbd>ScriptAST</kbd> module.</h1>
+
+    <article>
+      <h1>Face Moves</h1>
+      <section class="unittest">
+        <p class="input">R</p>
+        <p class="expected">(ubr,bdr,dfr,fur) (ur,br,dr,fr) (+r)</p>
+        <p class="actual"></p>
+      </section>
+      <section class="unittest">
+        <p class="input">U</p>
+        <p class="expected">(ufl,ulb,ubr,urf) (ur,uf,ul,ub) (+u)</p>
+        <p class="actual"></p>
+      </section>
+      <section class="unittest">
+        <p class="input">F</p>
+        <p class="expected">(dfr,lfd,ufl,rfu) (rf,df,lf,uf) (+f)</p>
+        <p class="actual"></p>
+      </section>
+      <section class="unittest">
+        <p class="input">L</p>
+        <p class="expected">(ufl,fdl,dbl,bul) (ul,fl,dl,bl) (+l)</p>
+        <p class="actual"></p>
+      </section>
+      <section class="unittest">
+        <p class="input">D</p>
+        <p class="expected">(drb,dbl,dlf,dfr) (dr,db,dl,df) (+d)</p>
+        <p class="actual"></p>
+      </section>
+      <section class="unittest">
+        <p class="input">B</p>
+        <p class="expected">(ulb,ldb,drb,rub) (bu,bl,bd,br) (+b)</p>
+        <p class="actual"></p>
+      </section>
+    </article>
+
+    <article>
+      <h1>Inverted Moves</h1>
+      <section class="unittest">
+        <p class="input">R'</p>
+        <p class="expected">(dfr,bdr,ubr,fur) (ur,fr,dr,br) (-r)</p>
+        <p class="actual"></p>
+      </section>
+      <section class="unittest">
+        <p class="input">U'</p>
+        <p class="expected">(ubr,ulb,ufl,urf) (ur,ub,ul,uf) (-u)</p>
+        <p class="actual"></p>
+      </section>
+      <section class="unittest">
+        <p class="input">F'</p>
+        <p class="expected">(ufl,lfd,dfr,rfu) (rf,uf,lf,df) (-f)</p>
+        <p class="actual"></p>
+      </section>
+      <section class="unittest">
+        <p class="input">L'</p>
+        <p class="expected">(dbl,fdl,ufl,bul) (ul,bl,dl,fl) (-l)</p>
+        <p class="actual"></p>
+      </section>
+      <section class="unittest">
+        <p class="input">D'</p>
+        <p class="expected">(dlf,dbl,drb,dfr) (dr,df,dl,db) (-d)</p>
+        <p class="actual"></p>
+      </section>
+      <section class="unittest">
+        <p class="input">B'</p>
+        <p class="expected">(drb,ldb,ulb,rub) (bu,br,bd,bl) (-b)</p>
+        <p class="actual"></p>
+      </section>
+    </article>
+    <article>
+      <h1>Repeated Moves</h1>
+      <section class="unittest">
+        <p class="input">R2</p>
+        <p class="expected">(drb,urf) (ubr,dfr) (ur,dr) (rf,rb) (++r)</p>
+        <p class="actual"></p>
+      </section>
+      <section class="unittest">
+        <p class="input">U2</p>
+        <p class="expected">(ulb,urf) (ufl,ubr) (ur,ul) (bu,fu) (++u)</p>
+        <p class="actual"></p>
+      </section>
+      <section class="unittest">
+        <p class="input">F2</p>
+        <p class="expected">(dlf,urf) (ufl,dfr) (rf,lf) (fu,fd) (++f)</p>
+        <p class="actual"></p>
+      </section>
+      <section class="unittest">
+        <p class="input">L2</p>
+        <p class="expected">(dlf,ulb) (ufl,dbl) (ul,dl) (lb,lf) (++l)</p>
+        <p class="actual"></p>
+      </section>
+      <section class="unittest">
+        <p class="input">D2</p>
+        <p class="expected">(dbl,dfr) (dlf,drb) (dr,dl) (bd,fd) (++d)</p>
+        <p class="actual"></p>
+      </section>
+      <section class="unittest">
+        <p class="input">B2</p>
+        <p class="expected">(dbl,ubr) (ulb,drb) (bu,bd) (rb,lb) (++b)</p>
+        <p class="actual"></p>
+      </section>
+    </article>
+    
+    <article>
+      <h1>No Operation</h1>
+      <section class="unittest">
+        <p class="input">.</p>
+        <p class="expected">()</p>
+        <p class="actual"></p>
+      </section>
+    </article>    
+  </body>
+</html>

@@ -26,8 +26,8 @@
   display: block;
 }
 .virtualcube .cube-canvas {
-  width: 22vw;
-  height: 22vw;
+  width: 22vw !important;
+  height: 22vw !important;
   border:1px solid #ccc;
 }
 .virtualcube .button-toolbar {

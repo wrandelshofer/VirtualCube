@@ -86,7 +86,9 @@ function attachVirtualCube(parameters, divOrCanvas) {
             canvasElem.setAttribute("id", id);
             canvasElem.setAttribute("width", "220px");
             canvasElem.setAttribute("height", "220px");
-
+            canvasElem.style.width="220px";
+            canvasElem.style.height="220px";
+ 
             // copy attributes from divOrCanvas over to the canvasElem
             for (let i = 0; i < divOrCanvas.attributes.length; i++) {
                 let attr = divOrCanvas.attributes[i];

@@ -91,13 +91,13 @@ class WebglPlayerApplet extends AbstractPlayerApplet.AbstractPlayerApplet {
      * This function is called before we draw.
      * It adjusts the perspective matrix to the dimensions of the canvas.
      */
-    reshapeOld() {
-    let gl = this.gl;
+    reshapeBroken() {
+        let gl = this.gl;
         let canvas = this.canvas;
 
-    this.drawingBufferWidth = canvas.clientWidth;
-    this.drawingBufferHeight = canvas.clientHeight;
-    if (this.drawingBufferWidth == this.width && this.drawingBufferHeight == this.height) {
+        this.drawingBufferWidth = canvas.clientWidth;
+        this.drawingBufferHeight = canvas.clientHeight;
+        if (this.drawingBufferWidth == this.width && this.drawingBufferHeight == this.height) {
             return;
         }
 
@@ -115,14 +115,19 @@ class WebglPlayerApplet extends AbstractPlayerApplet.AbstractPlayerApplet {
             return;
         }
 
-        this.drawingBufferWidth = canvas.clientWidth;
-        this.drawingBufferHeight = canvas.clientHeight;
-        
-        this.width =  this.drawingBufferWidth;
-        this.height = this.drawingBufferHeight;
+        let clientWidth = canvas.clientWidth;
+        let clientHeight = canvas.clientHeight;
+        this.width = clientWidth;
+        this.height = clientHeight;
+       
+        // support high dpi/retina displays:
+        let devicePixelRatio = window.devicePixelRatio || 1;
+        this.drawingBufferWidth = clientWidth * devicePixelRatio;
+        this.drawingBufferHeight = clientHeight * devicePixelRatio;
+
         canvas.width = this.drawingBufferWidth;
         canvas.height = this.drawingBufferHeight;
-
+        
         let gl = this.gl;
         gl.viewport(0, 0, this.drawingBufferWidth, this.drawingBufferHeight);
         this.checkGLError('reshape');
