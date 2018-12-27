@@ -1216,7 +1216,7 @@ parsePermutationItem( t, parent) {
           }
         }
         t.pushBack();
-      } while (token != null);
+      } while (symbols != null);
     //t.nextToken();
 
     let affix = null;

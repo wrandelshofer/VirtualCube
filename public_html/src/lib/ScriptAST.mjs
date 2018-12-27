@@ -78,9 +78,15 @@ class Node {
      * @param inverse:boolean 
      */
     * resolvedIterable(inverse = false) {
-        for (let i = this.children.length - 1; i >= 0; i--) {
-            yield* this.children[i].resolvedIterable(inverse);
-    }
+        if (inverse) {
+            for (let i = this.children.length - 1; i >= 0; i--) {
+                yield* this.children[i].resolvedIterable(inverse);
+            }
+        } else {
+            for (let i in this.children) {
+                yield* this.children[i].resolvedIterable(inverse);
+            }
+        }
     }
 
     toString() {
@@ -93,12 +99,28 @@ class Node {
  * The side effect of a commutation node is A B A' B'.
  */
 class CommutationNode extends Node {
-    constructor(layerCount, startPosition, endPosition) {
+    constructor(layerCount, commutator, commutee, startPosition, endPosition) {
         super(layerCount, startPosition, endPosition);
-        this.commutator = null;
+        this.commutator = commutator;
+        if (commutee != null) {
+            this.add(commutee);
+        }
     }
     setCommutator(newValue) {
         this.commutator = newValue;
+    }
+    toString() {
+        const buf = [];
+        buf.push("CommutationNode{ ");
+        buf.push(this.commutator);
+        buf.push(",");
+        const n = this.getChildCount();
+        for (var i = 0; i < n; i++) {
+            buf.push(" ");
+            buf.push(this.getChildAt(i).toString());
+        }
+        buf.push(" }");
+        return buf.join("");
     }
 }
 /**
@@ -106,12 +128,29 @@ class CommutationNode extends Node {
  * The side effect of a conjugation node is A B A'.
  */
 class ConjugationNode extends Node {
-    constructor(layerCount, startPosition, endPosition) {
+    constructor(layerCount, conjugator, conjugate, startPosition, endPosition) {
         super(layerCount, startPosition, endPosition);
-        this.conjugator = null;
+        this.conjugator = conjugator;
+        if (conjugate != null) {
+            this.add(conjugate);
+        }
     }
     setConjugator(newValue) {
         this.conjugator = newValue;
+    }
+
+    toString() {
+        const buf = [];
+        buf.push("ConjugationNode{ ");
+        buf.push(this.conjugator);
+        buf.push(",");
+        const n = this.getChildCount();
+        for (var i = 0; i < n; i++) {
+            buf.push(" ");
+            buf.push(this.getChildAt(i).toString());
+        }
+        buf.push(" }");
+        return buf.join("");
     }
 }
 class SequenceNode extends Node {
@@ -120,13 +159,14 @@ class SequenceNode extends Node {
     }
     toString() {
         const buf = [];
-        buf.push("SEQ{");
+        buf.push("SequenceNode{");
         const n = this.getChildCount();
         for (var i = 0; i < n; i++) {
+            buf.push(" ");
             buf.push(this.getChildAt(i).toString());
         }
-        buf.push("}");
-        return buf.join(" ");
+        buf.push(" }");
+        return buf.join("");
     }
 }
 class StatementNode extends Node {
@@ -136,13 +176,14 @@ class StatementNode extends Node {
 
     toString() {
         const buf = [];
-        buf.push("STMT{");
+        buf.push("StatementNode{");
         const n = this.getChildCount();
         for (var i = 0; i < n; i++) {
+            buf.push(" ");
             buf.push(this.getChildAt(i).toString());
         }
-        buf.push("}");
-        return buf.join(" ");
+        buf.push(" }");
+        return buf.join("");
     }
 }
 class GroupingNode extends Node {
@@ -150,28 +191,41 @@ class GroupingNode extends Node {
         super(layerCount, startPosition, endPosition);
         this.layerCount = layerCount;
     }
+    
+
+    toString() {
+        const buf = [];
+        buf.push("GroupingNode{");
+        const n = this.getChildCount();
+        for (var i = 0; i < n; i++) {
+            buf.push(" ");
+            buf.push(this.getChildAt(i).toString());
+        }
+        buf.push(" }");
+        return buf.join("");
+    }
 }
 
 class InversionNode extends Node {
     constructor(layerCount, startPosition, endPosition) {
         super(layerCount, startPosition, endPosition);
     }
-    applyTo(cube, inverse=false) {
+    applyTo(cube, inverse = false) {
         super.applyTo(cube, !inverse);
     }
-    *resolvedIterable(inverse=false) {
+    * resolvedIterable(inverse = false) {
         yield* super.resolvedIterable(!inverse);
     }
 
     toString() {
         const buf = [];
-        buf.push("INV{");
+        buf.push("InversionNode{ ");
         const n = this.getChildCount();
         for (var i = 0; i < n; i++) {
             buf.push(this.getChildAt(i).toString());
         }
-        buf.push("}");
-        return buf.join(" ");
+        buf.push(" }");
+        return buf.join("");
     }
 }
 
@@ -483,6 +537,17 @@ class ReflectionNode extends Node {
     constructor(layerCount, startPosition, endPosition) {
         super(layerCount, startPosition, endPosition);
     }
+    toString() {
+        const buf = [];
+        buf.push("ReflectionNode{");
+        const n = this.getChildCount();
+        for (var i = 0; i < n; i++) {
+            buf.push(" ");
+            buf.push(this.getChildAt(i).toString());
+        }
+        buf.push(" }");
+        return buf.join("");
+    }
 }
 
 class RepetitionNode extends Node {
@@ -507,14 +572,16 @@ class RepetitionNode extends Node {
 
     toString() {
         const buf = [];
-        buf.push("REP{");
+        buf.push("RepetitionNode{ ");
         buf.push(this.repeatCount);
+        buf.push(",");
         const n = this.getChildCount();
         for (var i = 0; i < n; i++) {
+            buf.push(" ");
             buf.push(this.getChildAt(i).toString());
         }
-        buf.push("}");
-        return buf.join(" ");
+        buf.push(" }");
+        return buf.join("");
     }
 }
 class NOPNode extends Node {
@@ -522,7 +589,7 @@ class NOPNode extends Node {
         super(layerCount, startPosition, endPosition);
     }
     toString() {
-        return "NOP";
+        return "NOPNode{ }";
     }
 }
 
@@ -570,7 +637,7 @@ class MoveNode extends Node {
     }
 
     toString() {
-        return 'MOV{ax:' + this.axis + ' lm:' + this.layerMask + ' an:' + this.angle + '}';
+        return 'MoveNode{ax:' + this.axis + ' lm:' + this.layerMask + ' an:' + this.angle + '}';
     }
 }
 

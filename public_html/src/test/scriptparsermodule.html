@@ -35,214 +35,803 @@
   <body class="responsive">
     <h1>Tests for the <kbd>ScriptParser.parse()</kbd> methods in the <kbd>ScriptParser</kbd> module.</h1>
 
-    <article>
-      <h1>Face Twists</h1>
-      <section class="unittest">
-        <p class="input">R</p>
-        <p class="expected">SEQ{ STMT{ MOV{ax:0 lm:4 an:1} } }</p>
-        <p class="actual"></p>
-      </section>
-      <section class="unittest">
-        <p class="input">U</p>
-        <p class="expected">SEQ{ STMT{ MOV{ax:1 lm:4 an:1} } }</p>
-        <p class="actual"></p>
-      </section>
-      <section class="unittest">
-        <p class="input">F</p>
-        <p class="expected">SEQ{ STMT{ MOV{ax:2 lm:4 an:1} } }</p>
-        <p class="actual"></p>
-      </section>
-      <section class="unittest">
-        <p class="input">L</p>
-        <p class="expected">SEQ{ STMT{ MOV{ax:0 lm:1 an:-1} } }</p>
-        <p class="actual"></p>
-      </section>
-      <section class="unittest">
-        <p class="input">D</p>
-        <p class="expected">SEQ{ STMT{ MOV{ax:1 lm:1 an:-1} } }</p>
-        <p class="actual"></p>
-      </section>
-      <section class="unittest">
-        <p class="input">B</p>
-        <p class="expected">SEQ{ STMT{ MOV{ax:2 lm:1 an:-1} } }</p>
-        <p class="actual"></p>
-      </section>
-    </article>
-
-    <article>
-      <h1>Inverted Face Twists</h1>
-      <section class="unittest">
-        <p class="input">R'</p>
-        <p class="expected">SEQ{ STMT{ INV{ MOV{ax:0 lm:4 an:1} } } }</p>
-        <p class="actual"></p>
-      </section>
-      <section class="unittest">
-        <p class="input">U'</p>
-        <p class="expected">SEQ{ STMT{ INV{ MOV{ax:1 lm:4 an:1} } } }</p>
-        <p class="actual"></p>
-      </section>
-      <section class="unittest">
-        <p class="input">F'</p>
-        <p class="expected">SEQ{ STMT{ INV{ MOV{ax:2 lm:4 an:1} } } }</p>
-        <p class="actual"></p>
-      </section>
-      <section class="unittest">
-        <p class="input">L'</p>
-        <p class="expected">SEQ{ STMT{ INV{ MOV{ax:0 lm:1 an:-1} } } }</p>
-        <p class="actual"></p>
-      </section>
-      <section class="unittest">
-        <p class="input">D'</p>
-        <p class="expected">SEQ{ STMT{ INV{ MOV{ax:1 lm:1 an:-1} } } }</p>
-        <p class="actual"></p>
-      </section>
-      <section class="unittest">
-        <p class="input">B'</p>
-        <p class="expected">SEQ{ STMT{ INV{ MOV{ax:2 lm:1 an:-1} } } }</p>
-        <p class="actual"></p>
-      </section>
-    </article>
-    <article>
-      <h1>Double Face Twists</h1>
-      <section class="unittest">
-        <p class="input">R2</p>
-        <p class="expected">SEQ{ STMT{ MOV{ax:0 lm:4 an:2} } }</p>
-        <p class="actual"></p>
-      </section>
-      <section class="unittest">
-        <p class="input">U2</p>
-        <p class="expected">SEQ{ STMT{ MOV{ax:1 lm:4 an:2} } }</p>
-        <p class="actual"></p>
-      </section>
-      <section class="unittest">
-        <p class="input">F2</p>
-        <p class="expected">SEQ{ STMT{ MOV{ax:2 lm:4 an:2} } }</p>
-        <p class="actual"></p>
-      </section>
-      <section class="unittest">
-        <p class="input">L2</p>
-        <p class="expected">SEQ{ STMT{ MOV{ax:0 lm:1 an:-2} } }</p>
-        <p class="actual"></p>
-      </section>
-      <section class="unittest">
-        <p class="input">D2</p>
-        <p class="expected">SEQ{ STMT{ MOV{ax:1 lm:1 an:-2} } }</p>
-        <p class="actual"></p>
-      </section>
-      <section class="unittest">
-        <p class="input">B2</p>
-        <p class="expected">SEQ{ STMT{ MOV{ax:2 lm:1 an:-2} } }</p>
-        <p class="actual"></p>
-      </section>
-    </article>
-    <article>
-      <h1>Mid-Layer Twists</h1>
-      <section class="unittest">
-        <p class="input">MR</p>
-        <p class="expected">SEQ{ STMT{ MOV{ax:0 lm:2 an:1} } }</p>
-        <p class="actual"></p>
-      </section>
-      <section class="unittest">
-        <p class="input">MU</p>
-        <p class="expected">SEQ{ STMT{ MOV{ax:1 lm:2 an:1} } }</p>
-        <p class="actual"></p>
-      </section>
-      <section class="unittest">
-        <p class="input">MF</p>
-        <p class="expected">SEQ{ STMT{ MOV{ax:2 lm:2 an:1} } }</p>
-        <p class="actual"></p>
-      </section>
-      <section class="unittest">
-        <p class="input">ML</p>
-        <p class="expected">SEQ{ STMT{ MOV{ax:0 lm:2 an:-1} } }</p>
-        <p class="actual"></p>
-      </section>
-      <section class="unittest">
-        <p class="input">MD</p>
-        <p class="expected">SEQ{ STMT{ MOV{ax:1 lm:2 an:-1} } }</p>
-        <p class="actual"></p>
-      </section>
-      <section class="unittest">
-        <p class="input">MB</p>
-        <p class="expected">SEQ{ STMT{ MOV{ax:2 lm:2 an:-1} } }</p>
-        <p class="actual"></p>
-      </section>
-    </article>
-
-    <article>
-      <h1>Inverted Mid-Layer Twists</h1>
-      <section class="unittest">
-        <p class="input">MR'</p>
-        <p class="expected">SEQ{ STMT{ INV{ MOV{ax:0 lm:2 an:1} } } }</p>
-        <p class="actual"></p>
-      </section>
-      <section class="unittest">
-        <p class="input">MU'</p>
-        <p class="expected">SEQ{ STMT{ INV{ MOV{ax:1 lm:2 an:1} } } }</p>
-        <p class="actual"></p>
-      </section>
-      <section class="unittest">
-        <p class="input">MF'</p>
-        <p class="expected">SEQ{ STMT{ INV{ MOV{ax:2 lm:2 an:1} } } }</p>
-        <p class="actual"></p>
-      </section>
-      <section class="unittest">
-        <p class="input">ML'</p>
-        <p class="expected">SEQ{ STMT{ INV{ MOV{ax:0 lm:2 an:-1} } } }</p>
-        <p class="actual"></p>
-      </section>
-      <section class="unittest">
-        <p class="input">MD'</p>
-        <p class="expected">SEQ{ STMT{ INV{ MOV{ax:1 lm:2 an:-1} } } }</p>
-        <p class="actual"></p>
-      </section>
-      <section class="unittest">
-        <p class="input">MB'</p>
-        <p class="expected">SEQ{ STMT{ INV{ MOV{ax:2 lm:2 an:-1} } } }</p>
-        <p class="actual"></p>
-      </section>
-    </article>
-    <article>
-      <h1>Double Mid-Layer Twists</h1>
-      <section class="unittest">
-        <p class="input">MR2</p>
-        <p class="expected">SEQ{ STMT{ MOV{ax:0 lm:2 an:2} } }</p>
-        <p class="actual"></p>
-      </section>
-      <section class="unittest">
-        <p class="input">MU2</p>
-        <p class="expected">SEQ{ STMT{ MOV{ax:1 lm:2 an:2} } }</p>
-        <p class="actual"></p>
-      </section>
-      <section class="unittest">
-        <p class="input">MF2</p>
-        <p class="expected">SEQ{ STMT{ MOV{ax:2 lm:2 an:2} } }</p>
-        <p class="actual"></p>
-      </section>
-      <section class="unittest">
-        <p class="input">ML2</p>
-        <p class="expected">SEQ{ STMT{ MOV{ax:0 lm:2 an:-2} } }</p>
-        <p class="actual"></p>
-      </section>
-      <section class="unittest">
-        <p class="input">MD2</p>
-        <p class="expected">SEQ{ STMT{ MOV{ax:1 lm:2 an:-2} } }</p>
-        <p class="actual"></p>
-      </section>
-      <section class="unittest">
-        <p class="input">MB2</p>
-        <p class="expected">SEQ{ STMT{ MOV{ax:2 lm:2 an:-2} } }</p>
-        <p class="actual"></p>
-      </section>
-    </article>
-
-    <article>
-      <h1>No Operation</h1>
-      <section class="unittest">
-        <p class="input">.</p>
-        <p class="expected">SEQ{ STMT{ NOP } }</p>
-        <p class="actual"></p>
-      </section>
-    </article>
+  <article>
+    <section class="unittest">
+      <p class="input">R</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:0 lm:4 an:1} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">U</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:1 lm:4 an:1} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">F</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:2 lm:4 an:1} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">L</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:0 lm:1 an:-1} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">D</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:1 lm:1 an:-1} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">B</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:2 lm:1 an:-1} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">R'</p>
+      <p class="expected">SequenceNode{ StatementNode{ InversionNode{ MoveNode{ax:0 lm:4 an:1} } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">U'</p>
+      <p class="expected">SequenceNode{ StatementNode{ InversionNode{ MoveNode{ax:1 lm:4 an:1} } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">F'</p>
+      <p class="expected">SequenceNode{ StatementNode{ InversionNode{ MoveNode{ax:2 lm:4 an:1} } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">L'</p>
+      <p class="expected">SequenceNode{ StatementNode{ InversionNode{ MoveNode{ax:0 lm:1 an:-1} } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">D'</p>
+      <p class="expected">SequenceNode{ StatementNode{ InversionNode{ MoveNode{ax:1 lm:1 an:-1} } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">B'</p>
+      <p class="expected">SequenceNode{ StatementNode{ InversionNode{ MoveNode{ax:2 lm:1 an:-1} } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">R2</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:0 lm:4 an:2} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">U2</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:1 lm:4 an:2} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">F2</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:2 lm:4 an:2} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">L2</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:0 lm:1 an:-2} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">D2</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:1 lm:1 an:-2} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">B2</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:2 lm:1 an:-2} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">MR</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:0 lm:2 an:1} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">MU</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:1 lm:2 an:1} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">MF</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:2 lm:2 an:1} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">ML</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:0 lm:2 an:-1} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">MD</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:1 lm:2 an:-1} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">MB</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:2 lm:2 an:-1} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">MR'</p>
+      <p class="expected">SequenceNode{ StatementNode{ InversionNode{ MoveNode{ax:0 lm:2 an:1} } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">MU'</p>
+      <p class="expected">SequenceNode{ StatementNode{ InversionNode{ MoveNode{ax:1 lm:2 an:1} } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">MF'</p>
+      <p class="expected">SequenceNode{ StatementNode{ InversionNode{ MoveNode{ax:2 lm:2 an:1} } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">ML'</p>
+      <p class="expected">SequenceNode{ StatementNode{ InversionNode{ MoveNode{ax:0 lm:2 an:-1} } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">MD'</p>
+      <p class="expected">SequenceNode{ StatementNode{ InversionNode{ MoveNode{ax:1 lm:2 an:-1} } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">MB'</p>
+      <p class="expected">SequenceNode{ StatementNode{ InversionNode{ MoveNode{ax:2 lm:2 an:-1} } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">MR2</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:0 lm:2 an:2} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">MU2</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:1 lm:2 an:2} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">MF2</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:2 lm:2 an:2} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">ML2</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:0 lm:2 an:-2} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">MD2</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:1 lm:2 an:-2} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">MB2</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:2 lm:2 an:-2} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">TR</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:0 lm:6 an:1} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">TU</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:1 lm:6 an:1} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">TF</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:2 lm:6 an:1} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">TL</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:0 lm:3 an:-1} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">TD</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:1 lm:3 an:-1} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">TB</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:2 lm:3 an:-1} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">TR'</p>
+      <p class="expected">SequenceNode{ StatementNode{ InversionNode{ MoveNode{ax:0 lm:6 an:1} } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">TU'</p>
+      <p class="expected">SequenceNode{ StatementNode{ InversionNode{ MoveNode{ax:1 lm:6 an:1} } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">TF'</p>
+      <p class="expected">SequenceNode{ StatementNode{ InversionNode{ MoveNode{ax:2 lm:6 an:1} } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">TL'</p>
+      <p class="expected">SequenceNode{ StatementNode{ InversionNode{ MoveNode{ax:0 lm:3 an:-1} } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">TD'</p>
+      <p class="expected">SequenceNode{ StatementNode{ InversionNode{ MoveNode{ax:1 lm:3 an:-1} } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">TB'</p>
+      <p class="expected">SequenceNode{ StatementNode{ InversionNode{ MoveNode{ax:2 lm:3 an:-1} } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">TR2</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:0 lm:6 an:2} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">TU2</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:1 lm:6 an:2} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">TF2</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:2 lm:6 an:2} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">TL2</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:0 lm:3 an:-2} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">TD2</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:1 lm:3 an:-2} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">TB2</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:2 lm:3 an:-2} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">CR</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:0 lm:7 an:1} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">CU</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:1 lm:7 an:1} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">CF</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:2 lm:7 an:1} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">CL</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:0 lm:7 an:-1} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">CD</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:1 lm:7 an:-1} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">CB</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:2 lm:7 an:-1} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">CR'</p>
+      <p class="expected">SequenceNode{ StatementNode{ InversionNode{ MoveNode{ax:0 lm:7 an:1} } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">CU'</p>
+      <p class="expected">SequenceNode{ StatementNode{ InversionNode{ MoveNode{ax:1 lm:7 an:1} } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">CF'</p>
+      <p class="expected">SequenceNode{ StatementNode{ InversionNode{ MoveNode{ax:2 lm:7 an:1} } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">CL'</p>
+      <p class="expected">SequenceNode{ StatementNode{ InversionNode{ MoveNode{ax:0 lm:7 an:-1} } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">CD'</p>
+      <p class="expected">SequenceNode{ StatementNode{ InversionNode{ MoveNode{ax:1 lm:7 an:-1} } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">CB'</p>
+      <p class="expected">SequenceNode{ StatementNode{ InversionNode{ MoveNode{ax:2 lm:7 an:-1} } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">CR2</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:0 lm:7 an:2} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">CU2</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:1 lm:7 an:2} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">CF2</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:2 lm:7 an:2} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">CL2</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:0 lm:7 an:-2} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">CD2</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:1 lm:7 an:-2} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">CB2</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:2 lm:7 an:-2} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">SR</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:0 lm:5 an:1} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">SU</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:1 lm:5 an:1} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">SF</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:2 lm:5 an:1} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">SL</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:0 lm:5 an:-1} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">SD</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:1 lm:5 an:-1} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">SB</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:2 lm:5 an:-1} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">SR'</p>
+      <p class="expected">SequenceNode{ StatementNode{ InversionNode{ MoveNode{ax:0 lm:5 an:1} } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">SU'</p>
+      <p class="expected">SequenceNode{ StatementNode{ InversionNode{ MoveNode{ax:1 lm:5 an:1} } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">SF'</p>
+      <p class="expected">SequenceNode{ StatementNode{ InversionNode{ MoveNode{ax:2 lm:5 an:1} } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">SL'</p>
+      <p class="expected">SequenceNode{ StatementNode{ InversionNode{ MoveNode{ax:0 lm:5 an:-1} } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">SD'</p>
+      <p class="expected">SequenceNode{ StatementNode{ InversionNode{ MoveNode{ax:1 lm:5 an:-1} } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">SB'</p>
+      <p class="expected">SequenceNode{ StatementNode{ InversionNode{ MoveNode{ax:2 lm:5 an:-1} } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">SR2</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:0 lm:5 an:2} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">SU2</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:1 lm:5 an:2} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">SF2</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:2 lm:5 an:2} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">SL2</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:0 lm:5 an:-2} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">SD2</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:1 lm:5 an:-2} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">SB2</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:2 lm:5 an:-2} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">(R U F)</p>
+      <p class="expected">SequenceNode{ StatementNode{ GroupingNode{ StatementNode{ MoveNode{ax:0 lm:4 an:1} } StatementNode{ MoveNode{ax:1 lm:4 an:1} } StatementNode{ MoveNode{ax:2 lm:4 an:1} } } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">(R U F)'</p>
+      <p class="expected">SequenceNode{ StatementNode{ InversionNode{ GroupingNode{ StatementNode{ MoveNode{ax:0 lm:4 an:1} } StatementNode{ MoveNode{ax:1 lm:4 an:1} } StatementNode{ MoveNode{ax:2 lm:4 an:1} } } } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">(R)2</p>
+      <p class="expected">SequenceNode{ StatementNode{ RepetitionNode{ 2, GroupingNode{ StatementNode{ MoveNode{ax:0 lm:4 an:1} } } } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">(R U F)3</p>
+      <p class="expected">SequenceNode{ StatementNode{ RepetitionNode{ 3, GroupingNode{ StatementNode{ MoveNode{ax:0 lm:4 an:1} } StatementNode{ MoveNode{ax:1 lm:4 an:1} } StatementNode{ MoveNode{ax:2 lm:4 an:1} } } } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">(R U F)'3</p>
+      <p class="expected">SequenceNode{ StatementNode{ RepetitionNode{ 3, InversionNode{ GroupingNode{ StatementNode{ MoveNode{ax:0 lm:4 an:1} } StatementNode{ MoveNode{ax:1 lm:4 an:1} } StatementNode{ MoveNode{ax:2 lm:4 an:1} } } } } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">(R U F)3'</p>
+      <p class="expected">SequenceNode{ StatementNode{ InversionNode{ RepetitionNode{ 3, GroupingNode{ StatementNode{ MoveNode{ax:0 lm:4 an:1} } StatementNode{ MoveNode{ax:1 lm:4 an:1} } StatementNode{ MoveNode{ax:2 lm:4 an:1} } } } } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">(R U F)3''</p>
+      <p class="expected">SequenceNode{ StatementNode{ InversionNode{ InversionNode{ RepetitionNode{ 3, GroupingNode{ StatementNode{ MoveNode{ax:0 lm:4 an:1} } StatementNode{ MoveNode{ax:1 lm:4 an:1} } StatementNode{ MoveNode{ax:2 lm:4 an:1} } } } } } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">(R U F)3'4</p>
+      <p class="expected">SequenceNode{ StatementNode{ RepetitionNode{ 4, InversionNode{ RepetitionNode{ 3, GroupingNode{ StatementNode{ MoveNode{ax:0 lm:4 an:1} } StatementNode{ MoveNode{ax:1 lm:4 an:1} } StatementNode{ MoveNode{ax:2 lm:4 an:1} } } } } } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">(R)'</p>
+      <p class="expected">SequenceNode{ StatementNode{ InversionNode{ GroupingNode{ StatementNode{ MoveNode{ax:0 lm:4 an:1} } } } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">(R F)'</p>
+      <p class="expected">SequenceNode{ StatementNode{ InversionNode{ GroupingNode{ StatementNode{ MoveNode{ax:0 lm:4 an:1} } StatementNode{ MoveNode{ax:2 lm:4 an:1} } } } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">(R- U F)- (R' U F)'</p>
+      <p class="expected">SequenceNode{ StatementNode{ InversionNode{ GroupingNode{ StatementNode{ InversionNode{ MoveNode{ax:0 lm:4 an:1} } } StatementNode{ MoveNode{ax:1 lm:4 an:1} } StatementNode{ MoveNode{ax:2 lm:4 an:1} } } } } StatementNode{ InversionNode{ GroupingNode{ StatementNode{ InversionNode{ MoveNode{ax:0 lm:4 an:1} } } StatementNode{ MoveNode{ax:1 lm:4 an:1} } StatementNode{ MoveNode{ax:2 lm:4 an:1} } } } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">&lt;CU&gt;R</p>
+      <p class="expected">SequenceNode{ StatementNode{ ConjugationNode{ SequenceNode{ StatementNode{ MoveNode{ax:1 lm:7 an:1} } }, MoveNode{ax:0 lm:4 an:1} } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">&lt;CU CF&gt;(R)</p>
+      <p class="expected">SequenceNode{ StatementNode{ ConjugationNode{ SequenceNode{ StatementNode{ MoveNode{ax:1 lm:7 an:1} } StatementNode{ MoveNode{ax:2 lm:7 an:1} } }, GroupingNode{ StatementNode{ MoveNode{ax:0 lm:4 an:1} } } } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">&lt;CU CF&gt;(R B)</p>
+      <p class="expected">SequenceNode{ StatementNode{ ConjugationNode{ SequenceNode{ StatementNode{ MoveNode{ax:1 lm:7 an:1} } StatementNode{ MoveNode{ax:2 lm:7 an:1} } }, GroupingNode{ StatementNode{ MoveNode{ax:0 lm:4 an:1} } StatementNode{ MoveNode{ax:2 lm:1 an:-1} } } } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">&lt;R&gt;U</p>
+      <p class="expected">SequenceNode{ StatementNode{ ConjugationNode{ SequenceNode{ StatementNode{ MoveNode{ax:0 lm:4 an:1} } }, MoveNode{ax:1 lm:4 an:1} } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">[CU,R]</p>
+      <p class="expected">SequenceNode{ StatementNode{ CommutationNode{ SequenceNode{ StatementNode{ MoveNode{ax:1 lm:7 an:1} } }, SequenceNode{ StatementNode{ MoveNode{ax:0 lm:4 an:1} } } } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">[CU CF,R]</p>
+      <p class="expected">SequenceNode{ StatementNode{ CommutationNode{ SequenceNode{ StatementNode{ MoveNode{ax:1 lm:7 an:1} } StatementNode{ MoveNode{ax:2 lm:7 an:1} } }, SequenceNode{ StatementNode{ MoveNode{ax:0 lm:4 an:1} } } } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">[CU CF,R B]</p>
+      <p class="expected">SequenceNode{ StatementNode{ CommutationNode{ SequenceNode{ StatementNode{ MoveNode{ax:1 lm:7 an:1} } StatementNode{ MoveNode{ax:2 lm:7 an:1} } }, SequenceNode{ StatementNode{ MoveNode{ax:0 lm:4 an:1} } StatementNode{ MoveNode{ax:2 lm:1 an:-1} } } } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">[R,U]</p>
+      <p class="expected">SequenceNode{ StatementNode{ CommutationNode{ SequenceNode{ StatementNode{ MoveNode{ax:0 lm:4 an:1} } }, SequenceNode{ StatementNode{ MoveNode{ax:1 lm:4 an:1} } } } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">(R' U F)*</p>
+      <p class="expected">SequenceNode{ StatementNode{ ReflectionNode{ GroupingNode{ StatementNode{ InversionNode{ MoveNode{ax:0 lm:4 an:1} } } StatementNode{ MoveNode{ax:1 lm:4 an:1} } StatementNode{ MoveNode{ax:2 lm:4 an:1} } } } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">(+urf,bru,drb,frd) (+ur,br,dr,fr) (+r) (r,b) (++u,d) (++f,+l)</p>
+      <p class="expected">SequenceNode{ StatementNode{ corner perm(sign:2 0:0,2:2,3:0,1:2) } StatementNode{ edge perm(sign:1 0:0,4:1,2:0,1:1) } StatementNode{ side perm(sign:3 0:0) } StatementNode{ side perm(sign:0 0:0,5:0) } StatementNode{ side perm(sign:2 1:0,4:0) } StatementNode{ side perm(sign:2 2:0,3:3) } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">.</p>
+      <p class="expected">SequenceNode{ StatementNode{ NOPNode{ } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">R . U · F</p>
+      <p class="expected">SequenceNode{ StatementNode{ MoveNode{ax:0 lm:4 an:1} } StatementNode{ NOPNode{ } } StatementNode{ MoveNode{ax:1 lm:4 an:1} } StatementNode{ NOPNode{ } } StatementNode{ MoveNode{ax:2 lm:4 an:1} } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input"></p>
+      <p class="expected">SequenceNode{ }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
   </body>
 </html>

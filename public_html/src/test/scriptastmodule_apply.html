@@ -20,135 +20,789 @@
       let cube = new RubiksCube.RubiksCube();
 
       for (let i = 0; i < tests.length; i++) {
-        let input = inputs[i].innerText;
-        let expected = expecteds[i].innerText;
+      let input = inputs[i].innerText;
+      let expected = expecteds[i].innerText;
 
-        try {
-          let ast = parser.parse(input);
-          cube.reset();
-          ast.applyTo(cube);
-          
-          let actual = Cubes.toPermutationString(cube, notation).replace(/\s+/g,' ');
-          actuals[i].innerText = actual;
-          tests[i].classList.add(actual == expected ? "pass" : "fail");
-        } catch (err) {
-          actuals[i].innerText = err;
-          tests[i].classList.add("fail");
-        }
+      try {
+      let ast = parser.parse(input);
+      cube.reset();
+      ast.applyTo(cube);
+
+      let actual = Cubes.toPermutationString(cube, notation).replace(/\n/g,'\\n');
+      actuals[i].innerText = actual;
+      tests[i].classList.add(actual == expected ? "pass" : "fail");
+      } catch (err) {
+      actuals[i].innerText = err;
+      tests[i].classList.add("fail");
+      }
       }
     </script>
   </head>
   <body class="responsive">
     <h1>Tests the effect of <kbd>Node.apply()</kbd> methods in the <kbd>ScriptAST</kbd> module.</h1>
 
-    <article>
-      <h1>Face Moves</h1>
-      <section class="unittest">
-        <p class="input">R</p>
-        <p class="expected">(ubr,bdr,dfr,fur) (ur,br,dr,fr) (+r)</p>
-        <p class="actual"></p>
-      </section>
-      <section class="unittest">
-        <p class="input">U</p>
-        <p class="expected">(ufl,ulb,ubr,urf) (ur,uf,ul,ub) (+u)</p>
-        <p class="actual"></p>
-      </section>
-      <section class="unittest">
-        <p class="input">F</p>
-        <p class="expected">(dfr,lfd,ufl,rfu) (rf,df,lf,uf) (+f)</p>
-        <p class="actual"></p>
-      </section>
-      <section class="unittest">
-        <p class="input">L</p>
-        <p class="expected">(ufl,fdl,dbl,bul) (ul,fl,dl,bl) (+l)</p>
-        <p class="actual"></p>
-      </section>
-      <section class="unittest">
-        <p class="input">D</p>
-        <p class="expected">(drb,dbl,dlf,dfr) (dr,db,dl,df) (+d)</p>
-        <p class="actual"></p>
-      </section>
-      <section class="unittest">
-        <p class="input">B</p>
-        <p class="expected">(ulb,ldb,drb,rub) (bu,bl,bd,br) (+b)</p>
-        <p class="actual"></p>
-      </section>
-    </article>
-
-    <article>
-      <h1>Inverted Moves</h1>
-      <section class="unittest">
-        <p class="input">R'</p>
-        <p class="expected">(dfr,bdr,ubr,fur) (ur,fr,dr,br) (-r)</p>
-        <p class="actual"></p>
-      </section>
-      <section class="unittest">
-        <p class="input">U'</p>
-        <p class="expected">(ubr,ulb,ufl,urf) (ur,ub,ul,uf) (-u)</p>
-        <p class="actual"></p>
-      </section>
-      <section class="unittest">
-        <p class="input">F'</p>
-        <p class="expected">(ufl,lfd,dfr,rfu) (rf,uf,lf,df) (-f)</p>
-        <p class="actual"></p>
-      </section>
-      <section class="unittest">
-        <p class="input">L'</p>
-        <p class="expected">(dbl,fdl,ufl,bul) (ul,bl,dl,fl) (-l)</p>
-        <p class="actual"></p>
-      </section>
-      <section class="unittest">
-        <p class="input">D'</p>
-        <p class="expected">(dlf,dbl,drb,dfr) (dr,df,dl,db) (-d)</p>
-        <p class="actual"></p>
-      </section>
-      <section class="unittest">
-        <p class="input">B'</p>
-        <p class="expected">(drb,ldb,ulb,rub) (bu,br,bd,bl) (-b)</p>
-        <p class="actual"></p>
-      </section>
-    </article>
-    <article>
-      <h1>Repeated Moves</h1>
-      <section class="unittest">
-        <p class="input">R2</p>
-        <p class="expected">(drb,urf) (ubr,dfr) (ur,dr) (rf,rb) (++r)</p>
-        <p class="actual"></p>
-      </section>
-      <section class="unittest">
-        <p class="input">U2</p>
-        <p class="expected">(ulb,urf) (ufl,ubr) (ur,ul) (bu,fu) (++u)</p>
-        <p class="actual"></p>
-      </section>
-      <section class="unittest">
-        <p class="input">F2</p>
-        <p class="expected">(dlf,urf) (ufl,dfr) (rf,lf) (fu,fd) (++f)</p>
-        <p class="actual"></p>
-      </section>
-      <section class="unittest">
-        <p class="input">L2</p>
-        <p class="expected">(dlf,ulb) (ufl,dbl) (ul,dl) (lb,lf) (++l)</p>
-        <p class="actual"></p>
-      </section>
-      <section class="unittest">
-        <p class="input">D2</p>
-        <p class="expected">(dbl,dfr) (dlf,drb) (dr,dl) (bd,fd) (++d)</p>
-        <p class="actual"></p>
-      </section>
-      <section class="unittest">
-        <p class="input">B2</p>
-        <p class="expected">(dbl,ubr) (ulb,drb) (bu,bd) (rb,lb) (++b)</p>
-        <p class="actual"></p>
-      </section>
-    </article>
-    
-    <article>
-      <h1>No Operation</h1>
-      <section class="unittest">
-        <p class="input">.</p>
-        <p class="expected">()</p>
-        <p class="actual"></p>
-      </section>
-    </article>    
+  <article>
+    <section class="unittest">
+      <p class="input">R</p>
+      <p class="expected">(ubr,bdr,dfr,fur)\n(ur,br,dr,fr)\n(+r)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">U</p>
+      <p class="expected">(ufl,ulb,ubr,urf)\n(ur,uf,ul,ub)\n(+u)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">F</p>
+      <p class="expected">(dfr,lfd,ufl,rfu)\n(rf,df,lf,uf)\n(+f)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">L</p>
+      <p class="expected">(ufl,fdl,dbl,bul)\n(ul,fl,dl,bl)\n(+l)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">D</p>
+      <p class="expected">(drb,dbl,dlf,dfr)\n(dr,db,dl,df)\n(+d)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">B</p>
+      <p class="expected">(ulb,ldb,drb,rub)\n(bu,bl,bd,br)\n(+b)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">R'</p>
+      <p class="expected">(dfr,bdr,ubr,fur)\n(ur,fr,dr,br)\n(-r)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">U'</p>
+      <p class="expected">(ubr,ulb,ufl,urf)\n(ur,ub,ul,uf)\n(-u)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">F'</p>
+      <p class="expected">(ufl,lfd,dfr,rfu)\n(rf,uf,lf,df)\n(-f)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">L'</p>
+      <p class="expected">(dbl,fdl,ufl,bul)\n(ul,bl,dl,fl)\n(-l)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">D'</p>
+      <p class="expected">(dlf,dbl,drb,dfr)\n(dr,df,dl,db)\n(-d)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">B'</p>
+      <p class="expected">(drb,ldb,ulb,rub)\n(bu,br,bd,bl)\n(-b)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">R2</p>
+      <p class="expected">(drb,urf) (ubr,dfr)\n(ur,dr) (rf,rb)\n(++r)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">U2</p>
+      <p class="expected">(ulb,urf) (ufl,ubr)\n(ur,ul) (bu,fu)\n(++u)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">F2</p>
+      <p class="expected">(dlf,urf) (ufl,dfr)\n(rf,lf) (fu,fd)\n(++f)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">L2</p>
+      <p class="expected">(dlf,ulb) (ufl,dbl)\n(ul,dl) (lb,lf)\n(++l)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">D2</p>
+      <p class="expected">(dbl,dfr) (dlf,drb)\n(dr,dl) (bd,fd)\n(++d)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">B2</p>
+      <p class="expected">(dbl,ubr) (ulb,drb)\n(bu,bd) (rb,lb)\n(++b)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">MR</p>
+      <p class="expected">(bu,db,fd,uf)\n(u,++b,-d,+f)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">MU</p>
+      <p class="expected">(rf,fl,lb,br)\n(r,-f,+l,++b)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">MF</p>
+      <p class="expected">(ur,rd,dl,lu)\n(r,++d,-l,+u)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">ML</p>
+      <p class="expected">(bu,uf,fd,db)\n(u,+f,-d,++b)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">MD</p>
+      <p class="expected">(rf,br,lb,fl)\n(r,++b,+l,-f)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">MB</p>
+      <p class="expected">(ur,lu,dl,rd)\n(r,+u,-l,++d)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">MR'</p>
+      <p class="expected">(bu,uf,fd,db)\n(u,+f,-d,++b)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">MU'</p>
+      <p class="expected">(rf,br,lb,fl)\n(r,++b,+l,-f)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">MF'</p>
+      <p class="expected">(ur,lu,dl,rd)\n(r,+u,-l,++d)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">ML'</p>
+      <p class="expected">(bu,db,fd,uf)\n(u,++b,-d,+f)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">MD'</p>
+      <p class="expected">(rf,fl,lb,br)\n(r,-f,+l,++b)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">MB'</p>
+      <p class="expected">(ur,rd,dl,lu)\n(r,++d,-l,+u)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">MR2</p>
+      <p class="expected">(bu,fd) (bd,fu)\n(u,-d) (f,+b)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">MU2</p>
+      <p class="expected">(rf,lb) (rb,lf)\n(r,+l) (f,-b)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">MF2</p>
+      <p class="expected">(ur,dl) (dr,ul)\n(r,-l) (u,+d)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">ML2</p>
+      <p class="expected">(bu,fd) (bd,fu)\n(u,-d) (f,+b)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">MD2</p>
+      <p class="expected">(rf,lb) (rb,lf)\n(r,+l) (f,-b)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">MB2</p>
+      <p class="expected">(ur,dl) (dr,ul)\n(r,-l) (u,+d)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">TR</p>
+      <p class="expected">(ubr,bdr,dfr,fur)\n(ur,br,dr,fr) (bu,db,fd,uf)\n(+r) (u,++b,-d,+f)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">TU</p>
+      <p class="expected">(ufl,ulb,ubr,urf)\n(ur,uf,ul,ub) (rf,fl,lb,br)\n(+u) (r,-f,+l,++b)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">TF</p>
+      <p class="expected">(dfr,lfd,ufl,rfu)\n(ur,rd,dl,lu) (rf,df,lf,uf)\n(+f) (r,++d,-l,+u)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">TL</p>
+      <p class="expected">(ufl,fdl,dbl,bul)\n(bu,uf,fd,db) (ul,fl,dl,bl)\n(+l) (u,+f,-d,++b)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">TD</p>
+      <p class="expected">(drb,dbl,dlf,dfr)\n(rf,br,lb,fl) (dr,db,dl,df)\n(+d) (r,++b,+l,-f)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">TB</p>
+      <p class="expected">(ulb,ldb,drb,rub)\n(ur,lu,dl,rd) (bu,bl,bd,br)\n(+b) (r,+u,-l,++d)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">TR'</p>
+      <p class="expected">(dfr,bdr,ubr,fur)\n(ur,fr,dr,br) (bu,uf,fd,db)\n(-r) (u,+f,-d,++b)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">TU'</p>
+      <p class="expected">(ubr,ulb,ufl,urf)\n(ur,ub,ul,uf) (rf,br,lb,fl)\n(-u) (r,++b,+l,-f)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">TF'</p>
+      <p class="expected">(ufl,lfd,dfr,rfu)\n(ur,lu,dl,rd) (rf,uf,lf,df)\n(-f) (r,+u,-l,++d)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">TL'</p>
+      <p class="expected">(dbl,fdl,ufl,bul)\n(bu,db,fd,uf) (ul,bl,dl,fl)\n(-l) (u,++b,-d,+f)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">TD'</p>
+      <p class="expected">(dlf,dbl,drb,dfr)\n(rf,fl,lb,br) (dr,df,dl,db)\n(-d) (r,-f,+l,++b)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">TB'</p>
+      <p class="expected">(drb,ldb,ulb,rub)\n(ur,rd,dl,lu) (bu,br,bd,bl)\n(-b) (r,++d,-l,+u)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">TR2</p>
+      <p class="expected">(drb,urf) (ubr,dfr)\n(ur,dr) (rf,rb) (bu,fd) (bd,fu)\n(++r) (u,-d) (f,+b)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">TU2</p>
+      <p class="expected">(ulb,urf) (ufl,ubr)\n(ur,ul) (rf,lb) (bu,fu) (rb,lf)\n(++u) (r,+l) (f,-b)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">TF2</p>
+      <p class="expected">(dlf,urf) (ufl,dfr)\n(ur,dl) (rf,lf) (dr,ul) (fu,fd)\n(++f) (r,-l) (u,+d)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">TL2</p>
+      <p class="expected">(dlf,ulb) (ufl,dbl)\n(bu,fd) (bd,fu) (ul,dl) (lb,lf)\n(++l) (u,-d) (f,+b)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">TD2</p>
+      <p class="expected">(dbl,dfr) (dlf,drb)\n(rf,lb) (dr,dl) (rb,lf) (bd,fd)\n(++d) (r,+l) (f,-b)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">TB2</p>
+      <p class="expected">(dbl,ubr) (ulb,drb)\n(ur,dl) (dr,ul) (bu,bd) (rb,lb)\n(++b) (r,-l) (u,+d)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">CR</p>
+      <p class="expected">(ubr,bdr,dfr,fur) (dbl,fdl,ufl,bul)\n(ur,br,dr,fr) (bu,db,fd,uf) (ul,bl,dl,fl)\n(+r) (-l) (u,++b,-d,+f)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">CU</p>
+      <p class="expected">(ufl,ulb,ubr,urf) (dlf,dbl,drb,dfr)\n(ur,uf,ul,ub) (rf,fl,lb,br) (dr,df,dl,db)\n(+u) (-d) (r,-f,+l,++b)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">CF</p>
+      <p class="expected">(dfr,lfd,ufl,rfu) (drb,ldb,ulb,rub)\n(ur,rd,dl,lu) (rf,df,lf,uf) (bu,br,bd,bl)\n(+f) (-b) (r,++d,-l,+u)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">CL</p>
+      <p class="expected">(dfr,bdr,ubr,fur) (ufl,fdl,dbl,bul)\n(ur,fr,dr,br) (bu,uf,fd,db) (ul,fl,dl,bl)\n(-r) (+l) (u,+f,-d,++b)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">CD</p>
+      <p class="expected">(ubr,ulb,ufl,urf) (drb,dbl,dlf,dfr)\n(ur,ub,ul,uf) (rf,br,lb,fl) (dr,db,dl,df)\n(-u) (+d) (r,++b,+l,-f)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">CB</p>
+      <p class="expected">(ufl,lfd,dfr,rfu) (ulb,ldb,drb,rub)\n(ur,lu,dl,rd) (rf,uf,lf,df) (bu,bl,bd,br)\n(-f) (+b) (r,+u,-l,++d)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">CR'</p>
+      <p class="expected">(dfr,bdr,ubr,fur) (ufl,fdl,dbl,bul)\n(ur,fr,dr,br) (bu,uf,fd,db) (ul,fl,dl,bl)\n(-r) (+l) (u,+f,-d,++b)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">CU'</p>
+      <p class="expected">(ubr,ulb,ufl,urf) (drb,dbl,dlf,dfr)\n(ur,ub,ul,uf) (rf,br,lb,fl) (dr,db,dl,df)\n(-u) (+d) (r,++b,+l,-f)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">CF'</p>
+      <p class="expected">(ufl,lfd,dfr,rfu) (ulb,ldb,drb,rub)\n(ur,lu,dl,rd) (rf,uf,lf,df) (bu,bl,bd,br)\n(-f) (+b) (r,+u,-l,++d)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">CL'</p>
+      <p class="expected">(ubr,bdr,dfr,fur) (dbl,fdl,ufl,bul)\n(ur,br,dr,fr) (bu,db,fd,uf) (ul,bl,dl,fl)\n(+r) (-l) (u,++b,-d,+f)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">CD'</p>
+      <p class="expected">(ufl,ulb,ubr,urf) (dlf,dbl,drb,dfr)\n(ur,uf,ul,ub) (rf,fl,lb,br) (dr,df,dl,db)\n(+u) (-d) (r,-f,+l,++b)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">CB'</p>
+      <p class="expected">(dfr,lfd,ufl,rfu) (drb,ldb,ulb,rub)\n(ur,rd,dl,lu) (rf,df,lf,uf) (bu,br,bd,bl)\n(+f) (-b) (r,++d,-l,+u)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">CR2</p>
+      <p class="expected">(drb,urf) (ubr,dfr) (dlf,ulb) (ufl,dbl)\n(ur,dr) (rf,rb) (bu,fd) (bd,fu) (ul,dl) (lb,lf)\n(++r) (++l) (u,-d) (f,+b)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">CU2</p>
+      <p class="expected">(ulb,urf) (dbl,dfr) (ufl,ubr) (dlf,drb)\n(ur,ul) (rf,lb) (dr,dl) (bu,fu) (rb,lf) (bd,fd)\n(++u) (++d) (r,+l) (f,-b)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">CF2</p>
+      <p class="expected">(dlf,urf) (ufl,dfr) (dbl,ubr) (ulb,drb)\n(ur,dl) (rf,lf) (dr,ul) (bu,bd) (rb,lb) (fu,fd)\n(++f) (++b) (r,-l) (u,+d)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">CL2</p>
+      <p class="expected">(drb,urf) (ubr,dfr) (dlf,ulb) (ufl,dbl)\n(ur,dr) (rf,rb) (bu,fd) (bd,fu) (ul,dl) (lb,lf)\n(++r) (++l) (u,-d) (f,+b)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">CD2</p>
+      <p class="expected">(ulb,urf) (dbl,dfr) (ufl,ubr) (dlf,drb)\n(ur,ul) (rf,lb) (dr,dl) (bu,fu) (rb,lf) (bd,fd)\n(++u) (++d) (r,+l) (f,-b)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">CB2</p>
+      <p class="expected">(dlf,urf) (ufl,dfr) (dbl,ubr) (ulb,drb)\n(ur,dl) (rf,lf) (dr,ul) (bu,bd) (rb,lb) (fu,fd)\n(++f) (++b) (r,-l) (u,+d)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">SR</p>
+      <p class="expected">(ubr,bdr,dfr,fur) (dbl,fdl,ufl,bul)\n(ur,br,dr,fr) (ul,bl,dl,fl)\n(+r) (-l)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">SU</p>
+      <p class="expected">(ufl,ulb,ubr,urf) (dlf,dbl,drb,dfr)\n(ur,uf,ul,ub) (dr,df,dl,db)\n(+u) (-d)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">SF</p>
+      <p class="expected">(dfr,lfd,ufl,rfu) (drb,ldb,ulb,rub)\n(rf,df,lf,uf) (bu,br,bd,bl)\n(+f) (-b)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">SL</p>
+      <p class="expected">(dfr,bdr,ubr,fur) (ufl,fdl,dbl,bul)\n(ur,fr,dr,br) (ul,fl,dl,bl)\n(-r) (+l)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">SD</p>
+      <p class="expected">(ubr,ulb,ufl,urf) (drb,dbl,dlf,dfr)\n(ur,ub,ul,uf) (dr,db,dl,df)\n(-u) (+d)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">SB</p>
+      <p class="expected">(ufl,lfd,dfr,rfu) (ulb,ldb,drb,rub)\n(rf,uf,lf,df) (bu,bl,bd,br)\n(-f) (+b)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">SR'</p>
+      <p class="expected">(dfr,bdr,ubr,fur) (ufl,fdl,dbl,bul)\n(ur,fr,dr,br) (ul,fl,dl,bl)\n(-r) (+l)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">SU'</p>
+      <p class="expected">(ubr,ulb,ufl,urf) (drb,dbl,dlf,dfr)\n(ur,ub,ul,uf) (dr,db,dl,df)\n(-u) (+d)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">SF'</p>
+      <p class="expected">(ufl,lfd,dfr,rfu) (ulb,ldb,drb,rub)\n(rf,uf,lf,df) (bu,bl,bd,br)\n(-f) (+b)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">SL'</p>
+      <p class="expected">(ubr,bdr,dfr,fur) (dbl,fdl,ufl,bul)\n(ur,br,dr,fr) (ul,bl,dl,fl)\n(+r) (-l)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">SD'</p>
+      <p class="expected">(ufl,ulb,ubr,urf) (dlf,dbl,drb,dfr)\n(ur,uf,ul,ub) (dr,df,dl,db)\n(+u) (-d)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">SB'</p>
+      <p class="expected">(dfr,lfd,ufl,rfu) (drb,ldb,ulb,rub)\n(rf,df,lf,uf) (bu,br,bd,bl)\n(+f) (-b)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">SR2</p>
+      <p class="expected">(drb,urf) (ubr,dfr) (dlf,ulb) (ufl,dbl)\n(ur,dr) (rf,rb) (ul,dl) (lb,lf)\n(++r) (++l)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">SU2</p>
+      <p class="expected">(ulb,urf) (dbl,dfr) (ufl,ubr) (dlf,drb)\n(ur,ul) (dr,dl) (bu,fu) (bd,fd)\n(++u) (++d)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">SF2</p>
+      <p class="expected">(dlf,urf) (ufl,dfr) (dbl,ubr) (ulb,drb)\n(rf,lf) (bu,bd) (rb,lb) (fu,fd)\n(++f) (++b)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">SL2</p>
+      <p class="expected">(drb,urf) (ubr,dfr) (dlf,ulb) (ufl,dbl)\n(ur,dr) (rf,rb) (ul,dl) (lb,lf)\n(++r) (++l)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">SD2</p>
+      <p class="expected">(ulb,urf) (dbl,dfr) (ufl,ubr) (dlf,drb)\n(ur,ul) (dr,dl) (bu,fu) (bd,fd)\n(++u) (++d)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">SB2</p>
+      <p class="expected">(dlf,urf) (ufl,dfr) (dbl,ubr) (ulb,drb)\n(rf,lf) (bu,bd) (rb,lb) (fu,fd)\n(++f) (++b)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">(R U F)</p>
+      <p class="expected">(dfr,urf) (drb,fdl,flu,lbu,bru)\n(+ur,br,dr,fd,fl,fu,lu,bu) (+rf)\n(+r) (+u) (+f)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">(R)2</p>
+      <p class="expected">(drb,urf) (ubr,dfr)\n(ur,dr) (rf,rb)\n(++r)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">(R U F)3 D1</p>
+      <p class="expected">(-drb,lbu,rdf,fur) (+ufl,ldb,fdl,bru)\n(ur,rd,uf) (+rf) (+bu,bd,ld,fd,lu,rb,lf)\n(-r) (-u) (-f) (+d)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">(R)'</p>
+      <p class="expected">(dfr,bdr,ubr,fur)\n(ur,fr,dr,br)\n(-r)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">(R F)'</p>
+      <p class="expected">(+ufl,lfd,bdr,ubr,fur) (-dfr)\n(ur,fr,fu,fl,fd,dr,br)\n(-r) (-f)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">(R- U F)- (R' U F)'</p>
+      <p class="expected">(+ulb,lfd,rub,luf,rfu) (+dfr) (+drb)\n(+ur,ul,lf) (rf,dr,rb) (+bu,fu,fd)\n(++r) (++u) (++f)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">&lt;CU&gt;R</p>
+      <p class="expected">(ulb,ldb,drb,rub)\n(bu,bl,bd,br)\n(+b)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">&lt;CU CF&gt;(R)</p>
+      <p class="expected">(ufl,ulb,ubr,urf)\n(ur,uf,ul,ub)\n(+u)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">&lt;CU CF&gt;(R B)</p>
+      <p class="expected">(-dlf,bld,ulb,ubr,urf) (+ufl)\n(ur,uf,fl,dl,bl,ul,ub)\n(+u) (+l)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">&lt;R&gt;U</p>
+      <p class="expected">(dfr,luf,bul,rfu)\n(rf,fu,lu,bu)\n(+u)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">[CU,R]</p>
+      <p class="expected">(+dfr,bdr,urf) (-ulb,ldb,bru)\n(ur,fr,dr,br,bu,bl,bd)\n(-r) (+b)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">[CU CF,R]</p>
+      <p class="expected">(-ufl,ulb,fur) (+drb,bru,rdf)\n(ur,uf,ul,ub,fr,dr,br)\n(-r) (+u)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">[CU CF,R B]</p>
+      <p class="expected">(-dlf,bul,bru,rdf,rbd,dbl,urf) (+ufl)\n(ur,uf,fl,dl,bu,rf,rd,rb,db,lb,lu)\n(-r) (+u) (+l) (-b)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">[R,U]</p>
+      <p class="expected">(+dfr,fur) (-ulb,rub)\n(ur,ub,fr)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">(R' U F)*</p>
+      <p class="expected">(-dlf,dbl,bru,bdr,rdf) (+ufl,ulb)\n(+dr,df,dl,bu,br,bd) (+ul,fl,lb)\n(+l) (-d) (-b)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">(+urf,bru,drb,frd) (+ur,br,dr,fr) (+r) (r,b) (++u,d) (++f,+l)</p>
+      <p class="expected">(+ubr,bdr,dfr,urf)\n(+ur,br,dr,fr)\n(+r,+b) (++u,d) (++f,+l)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">.</p>
+      <p class="expected">()</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">R . U · F</p>
+      <p class="expected">(dfr,urf) (drb,fdl,flu,lbu,bru)\n(+ur,br,dr,fd,fl,fu,lu,bu) (+rf)\n(+r) (+u) (+f)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input"></p>
+      <p class="expected">()</p>
+      <p class="actual"></p>
+    </section>
+  </article>
   </body>
 </html>
