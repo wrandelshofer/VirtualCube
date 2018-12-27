@@ -70,6 +70,5 @@ let baseUrl='lib';
 let parameters = {
     baseurl: baseUrl,
 };
-console.log('hello');
 VirtualCubeMain.attachVirtualCube(parameters);
 

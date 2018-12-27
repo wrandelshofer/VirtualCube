@@ -2,34 +2,37 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>kind</title>
+    <title>width and height</title>
     <script type="module" src="../lib/virtualcube.mjs"></script>
     <link href="virtualcube.css" rel="stylesheet" type="text/css">
   </head>
-  <body class="responsive">
-    <h1>Test of the <kbd>kind</kbd>  parameter</h1>
+  <body>
+     <h1>Test of the <kbd>width</kbd> and <kbd>height</kbd> parameters</h1>
     <article>
-      <section class="test">
+      <section>
         <div class="virtualcube small" 
-             kind="RubiksCube"
+             width="220"
+             height="220"
              ></div>
         <p>Default value.</p>
       </section>
     </article>
     <article>
-      <section class="test">
+      <section>
         <div class="virtualcube small" 
-             kind="RubiksCube"
+             width="220"
+             height="220"
              ></div>
-        <p><kbd>kind="RubiksCube"</kbd> (default)</p>
+        <p><kbd>width="220", height="220"</kbd> (default)</p>
       </section>
     </article>
     <article>
-      <section class="test">
+      <section>
         <div class="virtualcube small" 
-             kind="PocketCube"
+             width="400"
+             height="300"
              ></div>
-        <p><kbd>kind="PocketCube"</kbd></p>
+        <p><kbd>width="400", height="300"</kbd></p>
       </section>
     </article>
   </body>

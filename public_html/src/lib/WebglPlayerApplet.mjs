@@ -117,11 +117,13 @@ class WebglPlayerApplet extends AbstractPlayerApplet.AbstractPlayerApplet {
 
         let clientWidth = canvas.clientWidth;
         let clientHeight = canvas.clientHeight;
+        console.log("width heigth "+clientWidth+", "+clientHeight);
         this.width = clientWidth;
         this.height = clientHeight;
        
         // support high dpi/retina displays:
         let devicePixelRatio = window.devicePixelRatio || 1;
+        devicePixelRatio = 1; // XXX must set to 1 to prevent canvas client size from running away!!
         this.drawingBufferWidth = clientWidth * devicePixelRatio;
         this.drawingBufferHeight = clientHeight * devicePixelRatio;
 
