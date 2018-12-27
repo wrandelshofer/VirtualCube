@@ -9,6 +9,7 @@
       import Cubes from '../lib/Cubes.mjs';
       import ScriptParser from '../lib/ScriptParser.mjs';
       import ScriptNotation from '../lib/ScriptNotation.mjs';
+      import MoveMetrics from '../lib/MoveMetrics.mjs';
 
       let tests = document.getElementsByClassName("unittest");
       let inputs = document.getElementsByClassName("input");
@@ -25,10 +26,14 @@
         try {
           let ast = parser.parse(input);
           
-          let actual = ast.getLayerTurnCount()+" ltm, "
-                        + ast.getFaceTurnCount()+" ftm, "
-                        + ast.getQuarterTurnCount()+" qtm, "
-                        + ast.getBlockTurnCount()+" btm"  ;
+          let metrics = new MoveMetrics.MoveMetrics();
+          metrics.accept(ast);
+          
+          let actual = metrics.getLayerTurnCount()+" ltm, "
+                        + metrics.getFaceTurnCount()+" ftm, "
+                        + metrics.getQuarterTurnCount()+" qtm, "
+                        + metrics.getBlockTurnCount()+" btm, " 
+                      +metrics.getMoveCount()+" moves";
           actuals[i].innerText = actual;
           tests[i].classList.add(actual == expected ? "pass" : "fail");
         } catch (err) {
@@ -39,13 +44,13 @@
     </script>
   </head>
   <body class="responsive">
-    <h1>Tests the effect of <kbd>Node.get...TurnCount()</kbd> methods in the <kbd>ScriptAST</kbd> module.</h1>
+    <h1>Tests the results of <kbd>MoveMetrics.get...Count()</kbd> methods in the <kbd>MoveMetrics</kbd> module.</h1>
 
     <article>
       <h1>Single layer moves</h1>
       <section class="unittest">
         <p class="input">R2 L2 · U D' · F2 B2 · U D'</p>
-        <p class="expected">8 ltm, 8 ftm, 12 qtm, 8 btm</p>
+        <p class="expected">8 ltm, 8 ftm, 12 qtm, 8 btm, 8 moves</p>
         <p class="actual"></p>
       </section>
     </article>    

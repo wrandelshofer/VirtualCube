@@ -25,59 +25,7 @@ class ParseException extends Error {
   }
 }
 
-/**
- * Represents an Abstract Syntax Tree Node
- * /
-class Node {
 
-}
-
-class TwistNode extends Node {
-
-  /** Script nodes. * /
-  constructor(axis, layerMask, angle) {
-    this.axis = axis;
-    this.angle = angle;
-    this.layerMask = layerMask;
-  }
-
-  /** Applies the node to the specified cube. * /
-  applyTo(cube) {
-    if (!this.doesNothing()) {
-      cube.transform(this.axis, this.layerMask, this.angle);
-    }
-  }
-  /** Applies the inverse of the node to the specified cube. * /
-  applyInverseTo(cube) {
-    if (!this.doesNothing()) {
-      cube.transform(this.axis, this.layerMask, -this.angle);
-    }
-  }
-  /** Returns true if this node does nothing. * /
-  doesNothing() {
-    return this.angle == 0 || this.layerMask == 0;
-  }
-  /** Tries to consume the given TwistNode. 
-   * Returns true if successful.
-   * This TwistNode may return true for doesNothing afterwards!);
-   * /
-  consume(that) {
-    if (that.axis == this.axis
-      && that.layerMask == this.layerMask) {
-      this.angle = (this.angle + that.angle) % 4;
-      if (this.angle == 3)
-        this.angle = -1;
-      else if (this.angle == -3)
-        this.angle = 1;
-      return true;
-    }
-    return false;
-  }
-  toString() {
-    return 'TwistNode{ax:' + this.axis + ' an:' + this.angle + ' lm:' + this.layerMask + '}';
-  }
-}
-*/
 const UNKNOWN_MASK = 0;
 const GROUPING_MASK = 1;
 const CONJUGATION_MASK = 2;
@@ -1329,8 +1277,6 @@ parsePermutationItem( t, parent) {
    */
   parseMove(t, parent) {
     const ntn = this.notation;
-    let move = new AST.MoveNode(ntn.getLayerCount());
-    parent.add(move);
     if (t.nextToken() != Tokenizer.TT_KEYWORD) {
       throw new ParseException("Move: \"" + t.getStringValue() + "\" is a " + t.getTokenType() + " but not a keyword.", t.getStartPosition(), t.getEndPosition());
     }
@@ -1347,11 +1293,10 @@ parsePermutationItem( t, parent) {
     }
 
     module.log('parseMove: "%s".', t.getStringValue());
+    let move = new AST.MoveNode(ntn.getLayerCount(),symbol.getAxis(),symbol.getLayerMask(),symbol.getAngle());
     move.setStartPosition(t.getStartPosition());
     move.setEndPosition(t.getEndPosition());
-    move.setAxis(symbol.getAxis());
-    move.setAngle(symbol.getAngle());
-    move.setLayerMask(symbol.getLayerMask());
+    parent.add(move);
     return move;
   }
 

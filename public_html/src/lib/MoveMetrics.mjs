@@ -49,7 +49,7 @@ class MoveMetrics {
 
     accept(node) {
         // coalesce moves for counting
-        for (resolvedNode in node.resolvedIterable(false)) {
+        for (let resolvedNode of node.resolvedIterable(false)) {
             if (!(resolvedNode instanceof ScriptAST.MoveNode)) {
                 continue; // filter for move nodes
             }
@@ -61,27 +61,27 @@ class MoveMetrics {
             let axis = moveNode.getAxis();
             if (layerMask == 0 || angle == 0) {
                 // skip nop, don't count
-            } else if (current == null) {
+            } else if (this.current == null) {
                 // cannot coalesce
                 this.current = moveNode;
                 this.moveCount++;
-            } else if (current.getAxis() == axis && layerMask == allLayers) {
+            } else if (this.current.getAxis() == axis && layerMask == allLayers) {
                 // skip cube rotation over same axis
                 this.moveCount++;
-            } else if (current.getAxis() == axis && current.getLayerMask() == layerMask) {
+            } else if (this.current.getAxis() == axis && this.current.getLayerMask() == layerMask) {
                 // coalesce subsequent move on same axis and same layer
-                this.current = new MoveNode(layerCount, axis, layerMask, angle + current.getAngle(),
-                  current.getStartPosition(), moveNode.getEndPosition());
+                this.current = new MoveNode(layerCount, axis, layerMask, angle +this. current.getAngle(),
+                  this.current.getStartPosition(), moveNode.getEndPosition());
                 this.moveCount++;
-            } else if (current.getAxis() == axis && current.getAngle() == angle && (current.getLayerMask() & layerMask) == 0) {
+            } else if (this.current.getAxis() == axis && this.current.getAngle() == angle && (this.current.getLayerMask() & layerMask) == 0) {
                 // coalesce subsequent move on same axis and angle and different layers
-                this.current = new MoveNode(layerCount, axis,current.getLayerMask()|layerMask, angle,
-                        current.getStartPosition(), moveNode.getEndPosition());
+                this.current = new MoveNode(layerCount, axis,this.current.getLayerMask()|layerMask, angle,
+                        this.current.getStartPosition(), moveNode.getEndPosition());
                 this.moveCount++;
             } else {
                 // cannot coalesce
-                if (this.isTwistMove(current)) {
-                    this.addToTurnMetrics(current);
+                if (this.isTwistMove(this.current)) {
+                    this.addToTurnMetrics(this.current);
                 }
                 this.current = moveNode;
                 this.moveCount++;
@@ -120,28 +120,28 @@ class MoveMetrics {
      * Gets the current layer turn count.
      */
     getLayerTurnCount() {
-        return current == null ? this.ltm : this.ltm + countLayerTurns(current);
+        return this.current == null ? this.ltm : this.ltm + this.countLayerTurns(this.current);
     }
 
     /**
      * Gets the current block turn count.
      */
     getBlockTurnCount() {
-        return current == null ? this.btm : this.btm + countBlockTurns(current);
+        return this.current == null ? this.btm : this.btm + this.countBlockTurns(this.current);
     }
 
     /**
      * Gets the current face turn count.
      */
     getFaceTurnCount() {
-        return current == null ?this.ftm : this.ftm + countFaceTurns(current);
+        return this.current == null ?this.ftm : this.ftm + this.countFaceTurns(this.current);
     }
 
     /**
      * Gets the current quarter turn count.
      */
     getQuarterTurnCount() {
-        return current == null ? this.qtm : this.qtm + countQuarterTurns(current);
+        return this.current == null ? this.qtm : this.qtm + this.countQuarterTurns(this.current);
     }
 
     /**
@@ -221,7 +221,7 @@ class MoveMetrics {
         if (qturns == 3) {
             qturns = 1;
         }
-        return countFaceTurns(move) * qturns;
+        return this.countFaceTurns(move) * qturns;
     }
 
     /**

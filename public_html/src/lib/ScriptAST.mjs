@@ -74,7 +74,20 @@ class Node {
             this.children[i].applyInverseTo(cube);
         }
     }
-    
+
+    /** 
+     * Enumerates a resolved version of the subtree starting at this node. All
+     * elements of the enumeration except of MoveNode's and PermutationNode's
+     * may be safely ignored.
+     *
+     * @param inverse:boolean 
+     */
+    * resolvedIterable(inverse) {
+        for (let i = this.children.length - 1; i >= 0; i--) {
+            yield* this.children[i].resolvedIterable(inverse);
+        }
+    }
+
     toString() {
         return "Node";
     }
@@ -154,7 +167,7 @@ class InversionNode extends Node {
         }
     }
     applyInverseTo(cube) {
-        for (let i = 0; i< this.children.length; i++) {
+        for (let i = 0; i < this.children.length; i++) {
             this.children[i].applyTo(cube);
         }
     }
@@ -489,16 +502,16 @@ class RepetitionNode extends Node {
         this.repeatCount = newValue;
     }
     applyTo(cube) {
-        for (let r=0; r<this.repeatCount; r++) {
+        for (let r = 0; r < this.repeatCount; r++) {
             super.applyTo(cube);
-          }
+        }
     }
     applyInverseTo(cube) {
-        for (let r=0; r<this.repeatCount; r++) {
+        for (let r = 0; r < this.repeatCount; r++) {
             super.applyInverseTo(cube);
-          }
+        }
     }
-    
+
     toString() {
         const buf = [];
         buf.push("REP{");
@@ -530,17 +543,17 @@ class MoveNode extends Node {
         this.layerMask = layerMask;
     }
 
-    setAxis(newValue) {
-        this.axis = newValue;
+    getAxis() {
+        return this.axis;
     }
-    setAngle(newValue) {
-        this.angle = newValue;
+    getAngle() {
+        return this.angle;
     }
-    setLayerCount(newValue) {
-        this.layerCount = newValue;
+    getLayerCount() {
+        return  this.layerCount;
     }
-    setLayerMask(newValue) {
-        this.layerMask = newValue;
+    getLayerMask() {
+        return this.layerMask;
     }
 
     /** Applies the node to the specified cube. */
@@ -562,7 +575,7 @@ class MoveNode extends Node {
     /** Tries to consume the given MoveNode. 
      * Returns true if successful.
      * This MoveNode may return true for doesNothing afterwards!);
-     */
+     * /
     consume(that) {
         if (that.axis == this.axis
           && that.layerMask == this.layerMask) {
@@ -574,10 +587,18 @@ class MoveNode extends Node {
             return true;
         }
         return false;
+    }*/
+    
+    * resolvedIterable(inverse) {
+        if (inverse) {
+            yield new MoveNode(this.layerCount, this.axis, this.layerMask, -this.angle);
+        } else {
+            yield this;
+        }
     }
 
     toString() {
-        return 'MOV{ax:' + this.axis +' lm:' + this.layerMask  + ' an:' + this.angle + '}';
+        return 'MOV{ax:' + this.axis + ' lm:' + this.layerMask + ' an:' + this.angle + '}';
     }
 }
 
