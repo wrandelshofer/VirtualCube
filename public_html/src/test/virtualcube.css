@@ -43,7 +43,7 @@
 
 /* general layout */
 body {
-    word-break: break-word;
+    word-break: break-all;
 }
 body>h1,
 body>p {
@@ -84,6 +84,9 @@ body.responsive .virtualcube .cube-canvas {
 }
 
 /* system tests */
+section.unittest {
+    margin-bottom: 1em;
+}
 section.unittest.fail .actual { 
     background: lightcoral;
 }
