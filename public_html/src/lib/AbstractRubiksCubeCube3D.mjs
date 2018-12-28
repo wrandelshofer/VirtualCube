@@ -886,7 +886,7 @@ class AbstractRubiksCubeCube3D extends Cube3D.Cube3D {
         let token=new Object();
         this.isTwisting = token;
         let f = function () {
-            if (!self.isTwisting==token) {
+            if (!self.isTwisting===token) {
                 // Twisting was aborted. Complete this twisting animation.
                 self.validateTwist(partIndices, locations, orientations, finalCount, axis, angle, 1.0);
                 return; 
