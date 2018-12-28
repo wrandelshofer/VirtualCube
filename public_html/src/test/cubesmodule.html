@@ -44,7 +44,7 @@
           let parser = new ScriptParser.ScriptParser(notation)
           let ast = parser.parse(inputScript);
           cube.reset();
-          ast.applyTo(cube, notation);
+          ast.applyTo(cube);
           
           let actual = Cubes.toPermutationString(cube, notation).replace(/\s+/g,' ');
           actuals[i].innerText = actual;
