@@ -4,21 +4,18 @@
 
 // ttypes for Tokenizer
 // ----------------------
-  let TT_WORD = "word";
-  let TT_EOF = "eof";
-  let TT_SKIP = "skip";
+  let TT_WORD = -2;
+  let TT_EOF = -1;
 
 // the following ttypes can be activated on demand
-  let TT_KEYWORD = "keyword"
-  let TT_NUMBER = "number";
-  let TT_COMMENT = "comment";
-  let TT_SPECIAL = "special";
+  let TT_KEYWORD = -4;
+  let TT_NUMBER = -5;
 
-// the following ttypes are used internally
-  let TT_COMMENT_BEGIN = "commentBegin";
-  let TT_DIGIT = "numberDigit";
-
-  /**
+    // the following ttypes are used internally
+  let TT_DIGIT = -11;
+  let TT_SPECIAL = -12;
+  let TT_SKIP = -13;
+    /**
    * A node of keyword tree.
    * 
    * Example tree structure, for the keywords "ab", and "abcd".
@@ -33,12 +30,37 @@
     /**
      * Constructos a new instance.
      * 
-     * @paramkeyword
+     * @param String keyword
      */
-    constructor(keyword) {
-      this.keyword = keyword;
-      this.children = {};// HashMap<Character,KeywordTree>.
+    constructor() {
+      this.keyword = null;
+      this.commentEnd = null;
+      this.children = [];// HashMap<Character,KeywordTree>.
     }
+    
+    getChild(ch) {
+        return this.children[ch];
+    }
+    
+    putChild(ch, child) {
+        this.children[ch]=child;
+    }
+
+    setKeyword(value) {
+         this.keyword=value;
+    }
+
+    getKeyword() {
+        return this.keyword;
+    }
+
+    setCommentEnd(value) {
+        this.commentEnd = value;
+    }
+
+    getCommentEnd() {
+        return this.commentEnd;
+    }    
   }
 
 
@@ -56,7 +78,6 @@
     constructor() {
       this.specials = {}; // Map<Character,Object> maps char to  ttype
       this.digits = {}; // Map<Character,Object> maps char to  ttype
-      this.commentBeginEnd = []; // Map<String,Strings> maps comment begin to end
       this.input = "";
       this.pos = 0;
       this.pushedBack = false;
@@ -66,21 +87,9 @@
       this.sval = null;
       this.nval = null;
       this.keywordTree = new KeywordTree(null);
-      this.needChar = true;
+      this.lookup = {};//Map<Character, Integer>
     }
 
-    /**
-     * Defines a special character token.
-     * 
-     * @param {Character} token
-     * @param {Object} ttype
-     * @returns nothing
-     */
-    addSpecial(token, ttype) {
-      if (token.length != 1)
-        throw new "token must be 1 character!, token:" + token;
-      this.specials[token] = ttype;
-    }
     /**
      * Adds a digit token. (Also use this for adding signs, and decimal point tokens!).
      * 
@@ -93,118 +102,95 @@
         throw new "token must be 1 character!, token:" + token;
       this.digits[token] = ttype;
     }
+    
     /**
-     * Defines the tokens needed for parsing non-negative integers.
-     * 
-     * @param {String} token
-     * @param {Object} ttype
-     * @returns nothing
+     * Defines a comment begin and end token.
      */
-    addNumbers() {
-      this.addDigit("0", TT_DIGIT);
-      this.addDigit("1", TT_DIGIT);
-      this.addDigit("2", TT_DIGIT);
-      this.addDigit("3", TT_DIGIT);
-      this.addDigit("4", TT_DIGIT);
-      this.addDigit("5", TT_DIGIT);
-      this.addDigit("6", TT_DIGIT);
-      this.addDigit("7", TT_DIGIT);
-      this.addDigit("8", TT_DIGIT);
-      this.addDigit("9", TT_DIGIT);
-    }
-    /**
-     * Defines the specials needed for skipping whitespace.
-     * 
-     * @param {String} token
-     * @param {Object} ttype
-     * @returns nothing
-     */
-    skipWhitespace() {
-      this.addSpecial(" ", TT_SKIP);
-      this.addSpecial("\f", TT_SKIP);
-      this.addSpecial("\n", TT_SKIP);
-      this.addSpecial("\r", TT_SKIP);
-      this.addSpecial("\t", TT_SKIP);
-      this.addSpecial("\v", TT_SKIP);
-      this.addSpecial("\u00a0", TT_SKIP);
-      this.addSpecial("\u2028", TT_SKIP);
-      this.addSpecial("\u2029", TT_SKIP);
-    }
-    /**
-     * Defines a keyword token.
-     * 
-     * @param {String} token
-     * @returns nothing
-     */
-    addKeyword(token) {
-      let node = this.keywordTree;
-      for (let i = 0; i < token.length; i++) {
-        let ch = token.charAt(i);
-        let child = node.children[ch];
-        if (child == null) {
-          child = new KeywordTree(null);
-          node.children[ch] = child;
-        }
-        node = child;
-      }
-      node.keyword = token;
-    }
-    /**
-     * Defines keyword tokens.
-     * 
-     * @param {Array<String>} tokens
-     * @returns nothing
-     */
-    addKeywords(tokens) {
-      for (let i=0;i<tokens.length;i++) {
-        this.addKeyword(tokens[i]);
-      }
-    }
-    /**
-     * Defines special character tokens.
-     * 
-     * @param {Array<Character>} tokens
-     * @returns nothing
-     */
-    addSpecials(tokens) {
-      for (let i=0;i<tokens.length;i++) {
-        this.addSpecial(tokens[i],tokens[i]);
-      }
+    addComment(start, end) {
+        let node = this.addKeywordRecursively(start);
+        node.setKeyword(start);
+        node.setCommentEnd(end);
     }
 
-    /** Sets the input for the tokenizer. 
-     * 
-     * @param [String] input;
+    /**
+     * Adds a digit character.
      */
-    setInput(input) {
-      this.input = input;
-      this.pos = 0;
-      this.pushedBack = false;
-      this.ttype = null;
-      this.tstart = null;
-      this.tend = null;
-      this.sval = null;
-      this.needChar = true;
+    addDigit(ch) {
+        this.lookup[ch] = TT_DIGIT;
     }
     
+
+    /**
+     * Defines a keyword token.
+     *
+     * @param token the keyword token
+     */
+    addKeyword(token) {
+        let node = this.addKeywordRecursively(token);
+        node.setKeyword(token);
+    }
+    
+    addKeywordRecursively(token) {
+        let node = this.keywordTree;
+        for (var i = 0; i < token.length; i++) {
+            let ch = token.charAt(i);
+            let child = node.getChild(ch);
+            if (child == null) {
+                child = new KeywordTree();
+                node.putChild(ch, child);
+            }
+            node = child;
+        }
+        return node;
+    }    
+    
+    /**
+     * Defines the tokens needed for parsing non-negative integers.
+     */
+    addNumbers() {
+        this.addDigit('0');
+        this.addDigit('1');
+        this.addDigit('2');
+        this.addDigit('3');
+        this.addDigit('4');
+        this.addDigit('5');
+        this.addDigit('6');
+        this.addDigit('7');
+        this.addDigit('8');
+        this.addDigit('9');
+    }
+    
+    /**
+     * Adds a skip character.
+     */
+    addSkip(ch) {
+        this.lookup[ch] = TT_SKIP;
+    }
+    /**
+     * 
+     * Adds a special character.
+     */
+    addSpecial(ch) {
+        this.lookup[ch] = TT_SPECIAL;
+    }
+    
+    clone() {
+        let that = new Tokenizer();
+        that.setTo(this);
+        return that;
+    }    
+    
+    /**
+     * Returns the end position of the current token
+     * 
+     * @returns {unresolved}
+     */
+    getEndPosition() {
+      return this.tend;
+    }
+
     getInputLength() {
       return this.input.length;
-    }
-
-    /** Returns the current token type. 
-     * 
-     * @returns [Object] token type
-     */
-    getTokenType() {
-      return this.ttype;
-    }
-
-    /** Returns the current token string value. 
-     * 
-     * @returns [String] value or null
-     */
-    getStringValue() {
-      return this.sval;
     }
 
     /** Returns the current token numeric value. 
@@ -223,102 +209,118 @@
     getStartPosition() {
       return this.tstart;
     }
-    /**
-     * Returns the end position of the current token
+    
+    /** Returns the current token string value. 
      * 
-     * @returns {unresolved}
+     * @returns [String] value or null
      */
-    getEndPosition() {
-      return this.tend;
+    getStringValue() {
+      return this.sval;
+    }
+
+    /** Returns the current token type. 
+     * 
+     * @returns [Object] token type
+     */
+    getTokenType() {
+      return this.ttype;
     }
     
+    getOrDefault(map,key,defaultValue) {
+        let value = map[key];
+        return value == null ? defaultValue : value;
+    } 
+
     /** Parses the next token. 
      * @return [Object] ttype
      */
     nextToken() {
-      if (this.pushedBack) {
-        this.pushedBack = false;
-        return this.ttype;
-      }
+        loop:
+        while (true) {
+            if (this.pushedBack) {
+                this.pushedBack = false;
+                return this.ttype;
+            }
 
-      let start = this.pos;
-      let ch = this.read();
+            let start = this.pos;
+            let ch = this.read();
 
-      // try to skip characters
-      while (ch != null && this.specials[ch] == TT_SKIP) {
-        ch = this.read();
-        start += 1;
-      }
+            // try to skip characters
+            while (ch != TT_EOF && this.getOrDefault(this.lookup, ch, TT_WORD) == TT_SKIP) {
+                ch = this.read();
+                start += 1;
+            }
 
-      // start position of the token
+            // try to tokenize a keyword or a comment
+            let node = this.keywordTree;
+            let foundNode = null;
+            let end = start;
+            while (ch != TT_EOF && node.getChild(ch) != null) {
+                node = node.getChild(ch);
+                if (node.getKeyword() != null) {
+                    foundNode = node;
+                    end = this.pos;
+                }
+                ch = this.read();
+            }
+            if (foundNode != null) {
+                let commentEnd = foundNode.getCommentEnd();
+                if (commentEnd != null) {
+                    seekTo(commentEnd);
+                    continue loop;
+                }
 
-      // try to tokenize a keyword 
-      let node = this.keywordTree;
-      let foundNode = null;
-      let end = start;
-      while (ch != null && node.children[ch] != null) {
-        node = node.children[ch];
-        if (node.keyword != null) {
-          foundNode = node;
-          end = this.pos;
+                this.setPosition(end);
+                this.ttype = TT_KEYWORD;
+                this.tstart = start;
+                this.tend = end;
+                this.sval = foundNode.getKeyword();
+                return this.ttype;
+            }
+            this.setPosition(start);
+            ch = this.read();
+
+            // try to tokenize a number
+            if (ch != TT_EOF && this.getOrDefault(this.lookup,ch, TT_WORD) == TT_DIGIT) {
+                while (ch != TT_EOF && this.getOrDefault(this.lookup, ch, TT_WORD) == TT_DIGIT) {
+                    ch = this.read();
+                }
+                if (ch != TT_EOF) {
+                    this.unread();
+                }
+                this.ttype = TT_NUMBER;
+                this.tstart = start;
+                this.tend = this.pos;
+                this.sval = this.input.subSequence(start, this.pos).toString();
+                this.nval = Integer.parseInt(this.sval);
+                return this.ttype;
+            }
+
+            // try to tokenize a word
+            if (ch != TT_EOF && this.getOrDefault(this.lookup,ch, TT_WORD) == TT_WORD) {
+                while (ch != TT_EOF && this.getOrDefault(this.lookup, ch, TT_WORD) == TT_WORD) {
+                    ch = this.read();
+                }
+                if (ch != TT_EOF) {
+                    this.unread();
+                }
+                this.ttype = TT_WORD;
+                this.tstart = start;
+                this.tend = this.pos;
+                this.sval = this.input.subSequence(start, this.pos).toString();
+                return this.ttype;
+            }
+
+            this.ttype = ch; // special character
+            this.sval = ch == TT_EOF ? "<EOF>" : ch;
+            return this.ttype;
         }
-        ch = this.read();
-      }
-      if (foundNode != null) {
-        this.setPosition(end);
-        this.ttype = TT_KEYWORD;
-        this.tstart = start;
-        this.tend = end;
-        this.sval = foundNode.keyword;
-        return this.ttype;
-      }
-      this.setPosition(start);
-      ch = this.read();
-
-       // try to tokenize a number
-      if (ch != null && this.digits[ch] == TT_DIGIT) {
-        while (ch != null && this.digits[ch] == TT_DIGIT) {
-          ch = this.read();
-        }
-        if (ch!=null) {
-        this.unread();
-        }
-        this.ttype = TT_NUMBER;
-        this.tstart = start;
-        this.tend = this.pos;
-        this.sval = this.input.substring(start, this.pos);
-        this.nval = parseInt(this.sval);
-        return this.ttype;
-      }
-
-      // try to tokenize a word
-      if (ch != null && this.specials[ch] == null) {
-        while (ch != null && this.specials[ch] == null) {
-          ch = this.read();
-        }
-        if (ch!=null) {
-        this.unread();
-        }
-        this.ttype = TT_WORD;
-        this.tstart = start;
-        this.tend = this.pos;
-        this.sval = this.input.substring(start, this.pos);
-        return this.ttype;
-      }
-      
-      // try to tokenize a special character
-      if (ch != null && this.specials[ch] != null) {
-        this.ttype = TT_SPECIAL;
-        this.tstart = start;
-        this.tend = end;
-        this.sval = ch;
-        return this.ttype;
-      }
-
-      this.ttype = TT_EOF;
-      return this.ttype;
     }
 
+    pushBack() {
+      this.pushedBack=true;
+    }
+    
     /**
      * Reads the next character from input.
      * 
@@ -331,9 +333,69 @@
         return ch;
       } else {
         this.pos = this.input.length;
-        return null;
+        return TT_EOF;
       }
     }
+    
+    seekTo(str) {
+        let i = this.input.indexOf(str, this.pos);
+        pos = (i == -1) ? this.input.length() : i + str.length();
+    }
+
+
+    /** Sets the input for the tokenizer. 
+     * 
+     * @param [String] input;
+     */
+    setInput(input) {
+      this.input = input;
+      this.pos = 0;
+      this.pushedBack = false;
+      this.ttype = null;
+      this.tstart = null;
+      this.tend = null;
+      this.sval = null;
+      this.needChar = true;
+    }
+    
+     /**
+     * Sets the input position.
+     */
+    setPosition(newValue) {
+      this.pos = newValue;
+    }
+    
+    setTo(that) {
+        this.input = that.input;
+        this.pos = that.pos;
+        this.pushedBack = that.pushedBack;
+        this.ttype = that.ttype;
+        this.tstart = that.tstart;
+        this.tend = that.tend;
+        this.sval = that.sval;
+        this.nval = that.nval;
+        this.keywordTree = that.keywordTree;
+    }
+
+    /**
+     * Defines the specials needed for skipping whitespace.
+     * 
+     * @param {String} token
+     * @param {Object} ttype
+     * @returns nothing
+     */
+    skipWhitespace() {
+      this.addSpecial(" ", TT_SKIP);
+      this.addSpecial("\f", TT_SKIP);
+      this.addSpecial("\n", TT_SKIP);
+      this.addSpecial("\r", TT_SKIP);
+      this.addSpecial("\t", TT_SKIP);
+      this.addSpecial("\v", TT_SKIP);
+      this.addSpecial("\u00a0", TT_SKIP);
+      this.addSpecial("\u2028", TT_SKIP);
+      this.addSpecial("\u2029", TT_SKIP);
+    }
+
     /**
      * Unreads the last character from input.
      */
@@ -342,17 +404,7 @@
         this.pos = this.pos - 1;
       }
     }
-    /**
-     * Sets the input position.
-     */
-    setPosition(newValue) {
-      this.pos = newValue;
-    }
-    
-    pushBack() {
-      this.pushedBack=true;
-    }
-  }
+}
 
 /** A simple push back reader. */
 class PushBackReader {
@@ -398,10 +450,9 @@ class PushBackReader {
 export default {
     TT_WORD: TT_WORD,
     TT_KEYWORD: TT_KEYWORD,
-    TT_SKIP: TT_SKIP,
     TT_EOF: TT_EOF,
     TT_NUMBER: TT_NUMBER,
-    TT_COMMENT: TT_COMMENT,
+    TT_NUMBER: TT_SPECIAL,
     Tokenizer: Tokenizer,
     PushBackReader:PushBackReader
   };

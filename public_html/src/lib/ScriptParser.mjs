@@ -164,8 +164,7 @@ class ScriptParser {
   /**
    * Parses a Statement.
    * 
-   * @param {
-   Tokenizer} t
+   * @param {Tokenizer} t
    * @param {Node} parent
    * @returns {unresolved} the parsed statement
    * @throws parse exception

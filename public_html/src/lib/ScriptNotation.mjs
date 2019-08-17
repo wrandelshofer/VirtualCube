@@ -352,7 +352,7 @@ Symbol.isPermutationSign=function(s) {
     };
 
 
-/** Describes a move symbol.  */
+/** Describes properties of a specific move symbol.  */
 class Move {
     constructor(layerCount,axis,layerMask,angle) {
         this.layerCount=layerCount;
