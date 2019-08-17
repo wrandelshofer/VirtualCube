@@ -113,7 +113,7 @@ class TerminalSymbol extends Symbol {
 
 }
 /** Defines a compound symbol. */
-class CompoundSymbol extends Symbol {
+class CompositeSymbol extends Symbol {
     /**
      * 
      * @param {String} name
@@ -142,48 +142,18 @@ class CompoundSymbol extends Symbol {
         }
     }
 }
-/**
- * Symbol for a face.
- * Instances of this class are immutable.
- * <p>
- * This class must be Java 1.1 compliant.
- *
- * @author Werner Randelshofer.
- * @version 2.0 2007-06-16 Renamed from Twist to Move.
- * <br>1.0 May 1, 2006 Created.
- */
-class FaceSymbol extends Symbol {
-    constructor(name, face) {
-        super();
-        this.face = face;
-    }
-
-    getFace() {
-        return this.face;
-    }
-
-    toString() {
-        return "Face face=" + this.face;
-    }
-    /** Gets the type of the symbol. 
-     * (Actually this is like requesting the class of the symbol.
-     */
-    getType() {
-        return Symbol.FACE;
-    }
-}
 
 /**
  * Terminal symbols.
  */
 Symbol.NOP = new TerminalSymbol("NOP");
 Symbol.MOVE = new TerminalSymbol("move", "twist");
-Symbol.FACE_R = new FaceSymbol("r", 0);
-Symbol.FACE_U = new FaceSymbol("u", 1);
-Symbol.FACE_F = new FaceSymbol("f", 2);
-Symbol.FACE_L = new FaceSymbol("l", 3);
-Symbol.FACE_D = new FaceSymbol("d", 4);
-Symbol.FACE_B = new FaceSymbol("b", 5);
+Symbol.FACE_R = new TerminalSymbol("r");
+Symbol.FACE_U = new TerminalSymbol("u");
+Symbol.FACE_F = new TerminalSymbol("f");
+Symbol.FACE_L = new TerminalSymbol("l");
+Symbol.FACE_D = new TerminalSymbol("d");
+Symbol.FACE_B = new TerminalSymbol("b");
 Symbol.PERMUTATION_PLUS = new TerminalSymbol("permPlus");
 Symbol.PERMUTATION_MINUS = new TerminalSymbol("permMinus");
 Symbol.PERMUTATION_PLUSPLUS = new TerminalSymbol("permPlusPlus");
@@ -218,27 +188,27 @@ Symbol.MULTILINE_COMMENT_BEGIN = new TerminalSymbol("commentMultiLineBegin", "sl
 Symbol.MULTILINE_COMMENT_END = new TerminalSymbol("commentMultiLineEnd", "slashStarCommentEnd");
 Symbol.SINGLELINE_COMMENT_BEGIN = new TerminalSymbol("commentSingleLineBegin", "slashSlashComment");
 
-Symbol.COMMUTATION = new CompoundSymbol("commutation", [
+Symbol.COMMUTATION = new CompositeSymbol("commutation", [
     Symbol.COMMUTATION_BEGIN,
     Symbol.COMMUTATION_END,
     Symbol.COMMUTATION_DELIMITER
 ]);
-Symbol.CONJUGATION = new CompoundSymbol("conjugation", [
+Symbol.CONJUGATION = new CompositeSymbol("conjugation", [
     Symbol.CONJUGATION_BEGIN,
     Symbol.CONJUGATION_END,
     Symbol.CONJUGATION_DELIMITER
 ]);
-Symbol.GROUPING = new CompoundSymbol("grouping", [
+Symbol.GROUPING = new CompositeSymbol("grouping", [
     Symbol.GROUPING_BEGIN,
     Symbol.GROUPING_END
 ]);
-Symbol.INVERSION = new CompoundSymbol("inversion", [
+Symbol.INVERSION = new CompositeSymbol("inversion", [
     Symbol.INVERSION_BEGIN,
     Symbol.INVERSION_END,
     Symbol.INVERSION_DELIMITER,
     Symbol.INVERTOR
 ]);
-Symbol.PERMUTATION = new CompoundSymbol("permutation", [
+Symbol.PERMUTATION = new CompositeSymbol("permutation", [
     Symbol.FACE_R,
     Symbol.FACE_U,
     Symbol.FACE_F,
@@ -252,7 +222,7 @@ Symbol.PERMUTATION = new CompoundSymbol("permutation", [
     Symbol.PERMUTATION_END,
     Symbol.PERMUTATION_DELIMITER
 ]);
-Symbol.FACE = new CompoundSymbol("face", [
+Symbol.FACE = new CompositeSymbol("face", [
     Symbol.FACE_R,
     Symbol.FACE_U,
     Symbol.FACE_F,
@@ -260,28 +230,28 @@ Symbol.FACE = new CompoundSymbol("face", [
     Symbol.FACE_D,
     Symbol.FACE_B
 ]);
-Symbol.REFLECTION = new CompoundSymbol("reflection", [
+Symbol.REFLECTION = new CompositeSymbol("reflection", [
     Symbol.REFLECTION_BEGIN,
     Symbol.REFLECTION_END,
     Symbol.REFLECTION_DELIMITER,
     Symbol.REFLECTOR
 ]);
-Symbol.REPETITION = new CompoundSymbol("repetition", [
+Symbol.REPETITION = new CompositeSymbol("repetition", [
     Symbol.REPETITION_BEGIN,
     Symbol.REPETITION_END,
     Symbol.REPETITION_DELIMITER
 ]);
-Symbol.ROTATION = new CompoundSymbol("rotation", [
+Symbol.ROTATION = new CompositeSymbol("rotation", [
     Symbol.ROTATION_BEGIN,
     Symbol.ROTATION_END,
     Symbol.ROTATION_DELIMITER
 ]);
-Symbol.COMMENT = new CompoundSymbol("comment", [
+Symbol.COMMENT = new CompositeSymbol("comment", [
     Symbol.MULTILINE_COMMENT_BEGIN,
     Symbol.MULTILINE_COMMENT_END,
     Symbol.SINGLELINE_COMMENT_BEGIN
 ]);
-Symbol.STATEMENT = new CompoundSymbol("statement", [
+Symbol.STATEMENT = new CompositeSymbol("statement", [
     Symbol.NOP,
     Symbol.MOVE,
     Symbol.GROUPING,
@@ -294,101 +264,115 @@ Symbol.STATEMENT = new CompoundSymbol("statement", [
     Symbol.DELIMITER,
     Symbol.REPETITION
 ]);
-Symbol.SEQUENCE = new CompoundSymbol("sequence", [
+Symbol.SEQUENCE = new CompositeSymbol("sequence", [
     Symbol.STATEMENT,
     Symbol.COMMENT
 ]);
 
-/**
- * Symbol for a move.
- * Instances of this class are immutable.
- * <p>
- * This class must be Java 1.1 compliant.
- *
- * @author Werner Randelshofer.
- * @version 2.0 2007-06-16 Renamed from Twist to Move.
- * <br>1.0 May 1, 2006 Created.
- */
-class MoveSymbol extends Symbol {
-    constructor(axis, layerMask, angle) {
-        super();
-        this.axis = axis;
-        this.layerMask = layerMask;
-        this.angle = angle;
+Symbol.isBegin = new function(s) {
+        switch (s) {
+            case Symbol.CONJUGATION_BEGIN:
+            case Symbol.COMMUTATION_BEGIN:
+            case Symbol.ROTATION_BEGIN:
+            case Symbol.PERMUTATION_BEGIN:
+            case Symbol.INVERSION_BEGIN:
+            case Symbol.REFLECTION_BEGIN:
+            case Symbol.GROUPING_BEGIN:
+            case Symbol.MULTILINE_COMMENT_BEGIN:
+            case Symbol.SINGLELINE_COMMENT_BEGIN:
+                return true;
+            default:
+                return false;
+        }
+    };
+Symbol.isOperator = new function(s) {
+        switch (s) {
+            case Symbol.CONJUGATION_OPERATOR:
+            case Symbol.COMMUTATION_OPERATOR:
+            case Symbol.ROTATION_OPERATOR:
+            case Symbol.INVERSION_OPERATOR:
+            case Symbol.REFLECTION_OPERATOR:
+            case Symbol.REPETITION_OPERATOR:
+                return true;
+            default:
+                return false;
+        }
+    };
+
+Symbol.isDelimiter=function(s) {
+        switch (s) {
+            case Symbol.ROTATION_DELIMITER:
+            case Symbol.CONJUGATION_DELIMITER:
+            case Symbol.COMMUTATION_DELIMITER:
+                return true;
+            default:
+                return false;
+        }
     }
 
-    /**
-     * Returns an inverse Move of this Move.
-     */
-    toInverse() {
-        return new MoveSymbol(this.axis, this.layerMask, -this.angle);
-    }
+Symbol.isEnd=function(s) {
+        switch (s) {
+            case Symbol.CONJUGATION_END:
+            case Symbol.COMMUTATION_END:
+            case Symbol.PERMUTATION_END:
+            case Symbol.ROTATION_END:
+            case Symbol.INVERSION_END:
+            case Symbol.REFLECTION_END:
+            case Symbol.GROUPING_END:
+            case Symbol.MULTILINE_COMMENT_END:
+                return true;
+            default:
+                return false;
+        }
+    };
 
+Symbol.isFaceSymbol=function(s) {
+        switch (s) {
+            case Symbol.PERMUTATION_FACE_R:
+            case Symbol.PERMUTATION_FACE_U:
+            case Symbol.PERMUTATION_FACE_F:
+            case Symbol.PEMRUTATION_FACE_L:
+            case Symbol.PERMUTATION_FACE_D:
+            case Symbol.PERMUTATION_FACE_B:
+                return true;
+            default:
+                return false;
+        }
+    };
+    
+Symbol.isPermutationSign=function(s) {
+        switch (s) {
+            case Symbol.PERMUTATION_PLUS:
+            case Symbol.PERMUTATION_PLUSPLUS:
+            case Symbol.PERMUTATION_MINUS:
+                return true;
+            default:
+                return false;
+        }
+    };
+
+
+/** Describes a move symbol.  */
+class Move {
+    constructor(layerCount,axis,layerMask,angle) {
+        this.layerCount=layerCount;
+        this.axis=axis;
+        this.layerMask=layerMask;
+        this.angle=angle;
+    }
+    getLayerCount() {
+        return this.layerCount;
+    }
     getAxis() {
         return this.axis;
     }
-
-    getAngle() {
-        return this.angle;
-    }
-
     getLayerMask() {
         return this.layerMask;
     }
-
-    getLayerList() {
-        let buf = "";
-        for (let i = 0; i < 8; i++) {
-            if ((this.layerMask & (1 << i)) != 0) {
-                if (buf.length() > 0) {
-                    buf += ',';
-                }
-                buf += (i + 1);
-            }
-        }
-        return buf;
-    }
-
-    toString() {
-        return "Move axis=" + this.axis + " mask=" + this.layerMask + " angle=" + this.angle;
-    }
-    /** Gets the type of the symbol. 
-     * (Actually this is like requesting the class of the symbol.
-     */
-    getType() {
-        return Symbol.MOVE;
+    getAngle() {
+        return this.angle;
     }
 }
-Symbol.R = new MoveSymbol(0, 4, 1);
-Symbol.L = new MoveSymbol(0, 1, -1);
-Symbol.U = new MoveSymbol(1, 4, 1);
-Symbol.D = new MoveSymbol(1, 1, -1);
-Symbol.F = new MoveSymbol(2, 4, 1);
-Symbol.B = new MoveSymbol(2, 1, -1);
-Symbol.RI = new MoveSymbol(0, 4, -1);
-Symbol.LI = new MoveSymbol(0, 1, 1);
-Symbol.UI = new MoveSymbol(1, 4, -1);
-Symbol.DI = new MoveSymbol(1, 1, 1);
-Symbol.FI = new MoveSymbol(2, 4, -1);
-Symbol.BI = new MoveSymbol(2, 1, 1);
-Symbol.R2 = new MoveSymbol(0, 4, 2);
-Symbol.L2 = new MoveSymbol(0, 1, 2);
-Symbol.U2 = new MoveSymbol(1, 4, 2);
-Symbol.D2 = new MoveSymbol(1, 1, 2);
-Symbol.F2 = new MoveSymbol(2, 4, 2);
-Symbol.B2 = new MoveSymbol(2, 1, 2);
-Symbol.CR = new MoveSymbol(0, 7, 1);
-Symbol.CL = new MoveSymbol(0, 7, -1);
-Symbol.CU = new MoveSymbol(1, 7, 1);
-Symbol.CD = new MoveSymbol(1, 7, -1);
-Symbol.CF = new MoveSymbol(2, 7, 1);
-Symbol.CB = new MoveSymbol(2, 7, -1);
-Symbol.CR2 = new MoveSymbol(0, 7, 2);
-Symbol.CL2 = new MoveSymbol(0, 7, 2);
-Symbol.CU2 = new MoveSymbol(1, 7, 2);
-Symbol.CD2 = new MoveSymbol(1, 7, 2);
-Symbol.CF2 = new MoveSymbol(2, 7, 2);
-Symbol.CB2 = new MoveSymbol(2, 7, 2);
 
 /** Defines a notation. */
 class Notation {
@@ -398,11 +382,13 @@ class Notation {
         this.specials = [];
 
         this.layerCount = 3;
-        this.symbolToTokenMap = {};
-        this.tokenToSymbolMap = {};
-        this.moveToTokenMap = {};
-        this.tokenToMoveMap = {};
-        this.symbolToSyntaxMap = {};
+        this.symbolToTokensMap = {};// Map<Symbol,List<String>>
+        this.tokenToSymbolsMap = {};// Map<String,List<Symbol>>
+        this.moveToTokensMap = {};// Map<Move,List<String>>
+        this.tokenToMoveMap = {};// Map<String,Move>
+        this.symbolToSyntaxMap = {};//Map<Symbol,Syntax>
+        this.faceToTokensMap = {};// Map<Face,List<String>>
+        this.tokenToFaceMap = {};// Map<String,Face>
     }
 
     /**
@@ -422,26 +408,71 @@ class Notation {
         return this.layerCount;
     }
     addToken(symbol, token) {
-        // Add to symbolToTokenMap
-        if (null == this.symbolToTokenMap[symbol]) {
-            this.symbolToTokenMap[symbol] = token;
+        // Add to symbolToTokensMap
+        let tokens = this.symbolToTokensMap[symbol];
+        if (tokens == null) {
+            tokens = [];
+            this.symbolToTokensMap[symbol] = tokens;
         }
+        tokens.push(token);
 
-        // Add to tokenToSymbolMap
-        let symbols = this.tokenToSymbolMap[token];
+        // Add to tokenToSymbolsMap
+        let symbols = this.tokenToSymbolsMap[token];
         if (symbols == null) {
             symbols = [];
-            this.tokenToSymbolMap[token] = symbols;
+            this.tokenToSymbolsMap[token] = symbols;
         }
         symbols.push(symbol);
-        /*
-         if (Symbol.PERMUTATION.isSubSymbol(symbol)) {
-         symbols.add(Symbol.PERMUTATION);
-         }*/
+    }
+    addMoveToken(layerCount,axis,layerMask,angle,token) {
+        let move=new Move(layerCount,axis,layerMask,angle);
+        
+        // Add to tokenToSymbolsMap and symbolToTokensMap
+        this.addToken(Symbol.MOVE,token);
+        
+        // Add to moveToTokensMap
+        let tokens = this.moveToTokensMap[move];
+        if (tokens == null) {
+            tokens = [];
+            this.moveToTokensMap[move] = tokens;
+        }
+        tokens.push(token);
+        
+        // Add to tokenToMoveMap
+       this.tokenToMoveMap[token] = move;
+    }
+    getMove(token) {
+        return this.tokenToMoveMap[token];
+    }
+    addFaceToken(face,token) {
+        let faceObj=new Face(face);
+        
+        // Add to tokenToSymbolsMap and symbolToTokensMap
+        addToken(Symbol.FACE,token);
+        
+        // Add to moveToTokensMap
+        let tokens = this.faceToTokensMap[faceObj];
+        if (tokens == null) {
+            tokens = [];
+            this.faceToTokensMap[face] = tokens;
+        }
+        tokens.push(token);
+        
+        // Add to tokenToMoveMap
+       this.tokenToFaceMap[token] = faceObj;
     }
 
     getTokenToSymbolMap() {
-        return this.tokenToSymbolMap;
+        return this.tokenToSymbolsMap;
+    }
+    /**
+     * 
+     * @param {String} token
+     * @returns {Symbol[]} symbols
+     */
+    getSymbols(token) {
+        let symbols =  this.tokenToSymbolsMap[token];
+        return symbols == null ? [] : symbols;
     }
     isSyntax(symbol, syntax) {
         if (symbol == null || syntax == null) {
@@ -453,7 +484,7 @@ class Notation {
         return this.symbolToSyntaxMap[symbol];
     }
     isSupported(symbol) {
-        return this.symbolToSyntaxMap[symbol] != null || this.symbolToTokenMap[symbol] != null;
+        return this.symbolToSyntaxMap[symbol] != null || this.symbolToTokensMap[symbol] != null;
     }
 }
 /** Defines a default notation that works for 3x3 and 2x2 cubes. */
@@ -515,40 +546,40 @@ class DefaultNotation extends Notation {
 
         for (let i = 1; i <= 2; i++) {
             let suffix = i == 1 ? "" : "2";
-            this.addToken(new MoveSymbol(0, outer, 1 * i), "R" + suffix);
-            this.addToken(new MoveSymbol(1, outer, 1 * i), "U" + suffix);
-            this.addToken(new MoveSymbol(2, outer, 1 * i), "F" + suffix);
-            this.addToken(new MoveSymbol(0, inner, -1 * i), "L" + suffix);
-            this.addToken(new MoveSymbol(1, inner, -1 * i), "D" + suffix);
-            this.addToken(new MoveSymbol(2, inner, -1 * i), "B" + suffix);
+            this.addMoveToken(3, 0, outer, 1 * i, "R" + suffix);
+            this.addMoveToken(3, 1, outer, 1 * i, "U" + suffix);
+            this.addMoveToken(3, 2, outer, 1 * i, "F" + suffix);
+            this.addMoveToken(3, 0, inner, -1 * i, "L" + suffix);
+            this.addMoveToken(3, 1, inner, -1 * i, "D" + suffix);
+            this.addMoveToken(3, 2, inner, -1 * i, "B" + suffix);
 
-            this.addToken(new MoveSymbol(0, outer | inner, 1 * i), "SR" + suffix);
-            this.addToken(new MoveSymbol(1, outer | inner, 1 * i), "SU" + suffix);
-            this.addToken(new MoveSymbol(2, outer | inner, 1 * i), "SF" + suffix);
-            this.addToken(new MoveSymbol(0, outer | inner, -1 * i), "SL" + suffix);
-            this.addToken(new MoveSymbol(1, outer | inner, -1 * i), "SD" + suffix);
-            this.addToken(new MoveSymbol(2, outer | inner, -1 * i), "SB" + suffix);
+            this.addMoveToken(3, 0, outer | inner, 1 * i, "SR" + suffix);
+            this.addMoveToken(3, 1, outer | inner, 1 * i, "SU" + suffix);
+            this.addMoveToken(3, 2, outer | inner, 1 * i, "SF" + suffix);
+            this.addMoveToken(3, 0, outer | inner, -1 * i, "SL" + suffix);
+            this.addMoveToken(3, 1, outer | inner, -1 * i, "SD" + suffix);
+            this.addMoveToken(3, 2, outer | inner, -1 * i, "SB" + suffix);
 
-            this.addToken(new MoveSymbol(0, middle | outer, 1 * i), "TR" + suffix);
-            this.addToken(new MoveSymbol(1, middle | outer, 1 * i), "TU" + suffix);
-            this.addToken(new MoveSymbol(2, middle | outer, 1 * i), "TF" + suffix);
-            this.addToken(new MoveSymbol(0, middle | inner, -1 * i), "TL" + suffix);
-            this.addToken(new MoveSymbol(1, middle | inner, -1 * i), "TD" + suffix);
-            this.addToken(new MoveSymbol(2, middle | inner, -1 * i), "TB" + suffix);
+            this.addMoveToken(3, 0, middle | outer, 1 * i, "TR" + suffix);
+            this.addMoveToken(3, 1, middle | outer, 1 * i, "TU" + suffix);
+            this.addMoveToken(3, 2, middle | outer, 1 * i, "TF" + suffix);
+            this.addMoveToken(3, 0, middle | inner, -1 * i, "TL" + suffix);
+            this.addMoveToken(3, 1, middle | inner, -1 * i, "TD" + suffix);
+            this.addMoveToken(3, 2, middle | inner, -1 * i, "TB" + suffix);
 
-            this.addToken(new MoveSymbol(0, middle, 1 * i), "MR" + suffix);
-            this.addToken(new MoveSymbol(1, middle, 1 * i), "MU" + suffix);
-            this.addToken(new MoveSymbol(2, middle, 1 * i), "MF" + suffix);
-            this.addToken(new MoveSymbol(0, middle, -1 * i), "ML" + suffix);
-            this.addToken(new MoveSymbol(1, middle, -1 * i), "MD" + suffix);
-            this.addToken(new MoveSymbol(2, middle, -1 * i), "MB" + suffix);
+            this.addMoveToken(3, 0, middle, 1 * i, "MR" + suffix);
+            this.addMoveToken(3, 1, middle, 1 * i, "MU" + suffix);
+            this.addMoveToken(3, 2, middle, 1 * i, "MF" + suffix);
+            this.addMoveToken(3, 0, middle, -1 * i, "ML" + suffix);
+            this.addMoveToken(3, 1, middle, -1 * i, "MD" + suffix);
+            this.addMoveToken(3, 2, middle, -1 * i, "MB" + suffix);
 
-            this.addToken(new MoveSymbol(0, all, 1 * i), "CR" + suffix);
-            this.addToken(new MoveSymbol(1, all, 1 * i), "CU" + suffix);
-            this.addToken(new MoveSymbol(2, all, 1 * i), "CF" + suffix);
-            this.addToken(new MoveSymbol(0, all, -1 * i), "CL" + suffix);
-            this.addToken(new MoveSymbol(1, all, -1 * i), "CD" + suffix);
-            this.addToken(new MoveSymbol(2, all, -1 * i), "CB" + suffix);
+            this.addMoveToken(3, 0, all, 1 * i, "CR" + suffix);
+            this.addMoveToken(3, 1, all, 1 * i, "CU" + suffix);
+            this.addMoveToken(3, 2, all, 1 * i, "CF" + suffix);
+            this.addMoveToken(3, 0, all, -1 * i, "CL" + suffix);
+            this.addMoveToken(3, 1, all, -1 * i, "CD" + suffix);
+            this.addMoveToken(3, 2, all, -1 * i, "CB" + suffix);
         }
 
         this.symbolToSyntaxMap[Symbol.COMMUTATION] = Syntax.PRECIRCUMFIX;
@@ -561,6 +592,7 @@ class DefaultNotation extends Notation {
         this.symbolToSyntaxMap[Symbol.INVERSION] = Syntax.SUFFIX;
 
     }
+    
 }
 
 

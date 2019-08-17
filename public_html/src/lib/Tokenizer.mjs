@@ -15,11 +15,11 @@
   let TT_SPECIAL = "special";
 
 // the following ttypes are used internally
-  let TT_COMMENT_BEGIN = "commentBegin"; // FIXME implement me
+  let TT_COMMENT_BEGIN = "commentBegin";
   let TT_DIGIT = "numberDigit";
 
   /**
-   * Node of keyword tree.
+   * A node of keyword tree.
    * 
    * Example tree structure, for the keywords "ab", and "abcd".
    * 
@@ -32,24 +32,24 @@
   class KeywordTree {
     /**
      * Constructos a new instance.
-     * .
-     * @param {type} keyword
+     * 
+     * @paramkeyword
      */
     constructor(keyword) {
       this.keyword = keyword;
-      this.children = {};
+      this.children = {};// HashMap<Character,KeywordTree>.
     }
   }
 
 
   /**
-   * Represents a greedy tokenizer.
+   * A greedy tokenizer.
    * 
    * By default this tokenizer parses the entire input sequence as a single word.
    * You can activate skipping of whitespaces by invoking addWhitespaceTokens().
    * You can activate tokenizaton of comments, by invoking addMultilineTokens(begin,end)
    * or addSingleline.
-   * You can activate tokenization of positive integer numbers, by invokint addDigitTokens().
+   * You can activate tokenization of positive integer numbers, by invoking addDigitTokens().
    * You can activate tokenization of keywords, by adding keyword specials.
    */
   class Tokenizer {
@@ -65,7 +65,6 @@
       this.tend = 0;
       this.sval = null;
       this.nval = null;
-      this.tsymbol=null;
       this.keywordTree = new KeywordTree(null);
       this.needChar = true;
     }
@@ -137,7 +136,7 @@
      * @param {String} token
      * @returns nothing
      */
-    addKeyword(token,symbol) {
+    addKeyword(token) {
       let node = this.keywordTree;
       for (let i = 0; i < token.length; i++) {
         let ch = token.charAt(i);
@@ -149,7 +148,6 @@
         node = child;
       }
       node.keyword = token;
-      node.symbol = symbol;
     }
     /**
      * Defines keyword tokens.
@@ -186,7 +184,6 @@
       this.tstart = null;
       this.tend = null;
       this.sval = null;
-      this.tsymbol=null;
       this.needChar = true;
     }
     
@@ -216,14 +213,6 @@
      */
     getNumericValue() {
       return this.nval;
-    }
-    /**
-     * Returns the current token symbol value
-     * 
-     * @returns {unresolved}
-     */
-    getSymbolValue() {
-      return this.tsymbol;
     }
 
     /**
@@ -281,7 +270,6 @@
         this.tstart = start;
         this.tend = end;
         this.sval = foundNode.keyword;
-        this.tsymbol = foundNode.symbol;
         return this.ttype;
       }
       this.setPosition(start);
@@ -300,7 +288,6 @@
         this.tend = this.pos;
         this.sval = this.input.substring(start, this.pos);
         this.nval = parseInt(this.sval);
-        this.tsymbol = null;
         return this.ttype;
       }
 
@@ -316,20 +303,18 @@
         this.tstart = start;
         this.tend = this.pos;
         this.sval = this.input.substring(start, this.pos);
-        this.tsymbol=null;
         return this.ttype;
       }
       
       // try to tokenize a special character
       if (ch != null && this.specials[ch] != null) {
         this.ttype = TT_SPECIAL;
-        this.tsymbol = this.specials[ch];
         this.tstart = start;
         this.tend = end;
         this.sval = ch;
         return this.ttype;
       }
-      // FIXME implement me
+
       this.ttype = TT_EOF;
       return this.ttype;
     }

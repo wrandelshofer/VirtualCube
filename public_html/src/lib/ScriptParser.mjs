@@ -46,7 +46,6 @@ class ScriptParser {
   constructor(notation, localMacros) {
     this.notation = notation;
     this.macros = [];
-    this.tokenizer = null;
     if (localMacros != null) {
       for (let macro in localMacros) {
         macros.push(macro);
@@ -58,34 +57,26 @@ class ScriptParser {
     }
   }
 
-  getTokenizer() {
-    if (this.tokenizer == null) {
+  createTokenizer(str) {
       let tt = new Tokenizer.Tokenizer();
       tt.skipWhitespace();
       tt.addNumbers();
       let tokenToSymbolMap = this.notation.getTokenToSymbolMap();
       for (let i in tokenToSymbolMap) {
-        tt.addKeyword(i, tokenToSymbolMap[i]);
+        tt.addKeyword(i);
       }
-      /*
-       tt.addSpecials(this.notation.getSpecials());
-       tt.addKeywords(this.notation.getKeywords());*/
-      //tt.setSlashStarComment(...
-      //tt.setSlashSlashComment(..,
-      this.tokenizer = tt;
-    }
-    return this.tokenizer;
+    tt.setInput(str);
+    return tt;
   }
 
   /**
    * Parses the specified string.
-   * @param {type} str
+   * @param {String} str
    * @return {SequenceNode} the parsed script
-   * @throws a message if the parsing fails.
+   * @throws ParseException if the parsing fails.
    */
   parse(str) {
-    let tt = this.getTokenizer();
-    tt.setInput(str);
+    let tt = this.createTokenizer(str);
     let root = new AST.SequenceNode();
     let guard = str.length;
     while (tt.nextToken() != Tokenizer.TT_EOF) {
@@ -93,7 +84,7 @@ class ScriptParser {
       this.parseExpression(tt, root);
       guard = guard - 1;
       if (guard < 0) {
-        throw new Error("too many iterations! " + tt.getTokenType() + " pos:" + tt.pos);
+        throw new ParseException("Too many iterations! " + tt.getTokenType() , tt.getStartPosition(),tt.getEndPosition());
       }
     }
     return root;
@@ -101,8 +92,8 @@ class ScriptParser {
 
   /**
    * Returns true if the array contains a symbol of the specified symbol type
-   * @param {type} array of symbols
-   * @param {type} type desired type
+   * @param {List<Symbol>} symbols array of symbols
+   * @param {CompoundSymbol} type desired type
    * @return true if array contains a symbol of the specified type
    */
   containsType(symbols, type) {
@@ -117,8 +108,8 @@ class ScriptParser {
 
   /**
    * Returns true if the array contains a symbol of the specified symbol type
-   * @param {type} array of symbols
-   * @param {type} type desired type
+   * @param {List<Symbol>} array of symbols
+   * @param {List<CompoundSymbol>} type desired type
    * @return true if array contains a symbol of the specified type
    */
   intersectsTypes(symbols, types) {
@@ -136,9 +127,9 @@ class ScriptParser {
 
  /**
    * Returns true if the array contains a symbol of the specified symbol type
-   * @param {type} array of symbols
+   * @param {symbols} array of symbols
    * @param {type} type desired type
-   * @return true if array contains a symbol of the specified type
+   * @return the first symbol that is of the desired type or null
    */
   getFirstIntersectingType(symbols, types) {
     for (let i = 0; i < symbols.length; i++) {
@@ -189,7 +180,7 @@ class ScriptParser {
     }
 
     let startPos = t.getStartPosition();
-    let symbols = t.getSymbolValue();
+    let symbols = ntn.getSymbols(t.getStringValue());
 // Evaluate: Macro
     if (symbols.length == 0) {
       throw new ParseException("Statement: Unknown statement " + t.sval, t.getStartPosition(), t.getEndPosition());
@@ -223,7 +214,7 @@ class ScriptParser {
       let startpos = t.getStartPosition();
       let sign=symbols;
       t.nextToken();
-      symbols = t.getSymbolValue();
+      symbols = ntn.getSymbols(t.getStringValue());
       if (!this.containsType(symbols, Sym.PERMUTATION_BEGIN)) {
         throw new ParseException(
           "Permutation: Unexpected token - expected permutation begin.", t.getStartPosition(), t.getEndPosition());
@@ -257,7 +248,7 @@ class ScriptParser {
       if (t.nextToken() != Tokenizer.TT_KEYWORD) {
         throw new ParseException("Statement: keyword expected.", t.getStartPosition(), t.getEndPosition());
       }
-      symbols = t.getSymbolValue();
+      symbols = ntn.getSymbols(t.getStringValue());
       t.pushBack();
       if (symbols != null && this.intersectsTypes(symbols, Sym.PERMUTATION.getSubSymbols())) {
         return this.parsePermutation(t, parent, startPos);
@@ -302,7 +293,7 @@ class ScriptParser {
             case Tokenizer.TT_KEYWORD:
 
                 // Evaluate PermEnd
-                let symbols = t.getSymbolValue();
+                let symbols = ntn.getSymbols(t.getStringValue());
                 if (this.containsType(symbols, Sym.PERMUTATION_END)) {
                     permutation.setEndPosition(t.getEndPosition());
                     break ThePermutation;
@@ -311,7 +302,7 @@ class ScriptParser {
                     t.pushBack();
                     this.parsePermutationItem(t, permutation);
                     if (t.nextToken() == Tokenizer.TT_KEYWORD) {
-                        symbols = t.getSymbolValue();
+                        symbols = ntn.getSymbols(t.getStringValue());
                         if (this.containsType(symbols, Sym.PERMUTATION_DELIMITER)) {
 
                         } else if (ntn.isSyntax(Symbol.PERMUTATION, Syntax.POSTCIRCUMFIX) 
@@ -392,7 +383,7 @@ parsePermutationSign( t,  parent)  {
         t.pushBack();
         sign = null;
     } else {
-        let symbols = t.getSymbolValue();
+        let symbols = ntn.getSymbols(t.getStringValue());
         if (this.containsType(symbols, Sym.PERMUTATION_PLUS) 
                 || this.containsType(symbols, Sym.PERMUTATION_PLUSPLUS)
                 || this.containsType(symbols, Sym.PERMUTATION_MINUS)) {
@@ -439,7 +430,7 @@ parsePermutationItem( t, parent) {
         if (t.nextToken() != Tokenizer.TT_KEYWORD) {
             throw new ParseException("PermutationItem: Face token missing.", t.getStartPosition(), t.getEndPosition());
         }
-        let symbols = t.getSymbolValue();
+        let symbols = ntn.getSymbols(t.getStringValue());
         if (!this.containsType(symbols, Symbol.PERMUTATION)) {
             t.pushBack();
             break;
@@ -600,7 +591,7 @@ parsePermutationItem( t, parent) {
 
       switch (t.nextToken()) {
         case Tokenizer.TT_KEYWORD:
-          let symbols = t.getSymbolValue();
+          let symbols = ntn.getSymbols(t.getStringValue());
           // Look ahead the nextElement token.
 
           let endTypeMask
@@ -780,7 +771,7 @@ parsePermutationItem( t, parent) {
     let expression = this.parseConstruct(t, parent);
     let ttype = t.nextToken();
     if (ttype == Tokenizer.TT_KEYWORD) {
-      let symbols = t.getSymbolValue();
+      let symbols = ntn.getSymbols(t.getStringValue());
       if (ntn.isSyntax(Sym.COMMUTATION, Stx.PREINFIX)
         && this.containsType(symbols, Sym.COMMUTATION_DELIMITER)) {
         let exp2 = this.parseExpression(t, parent);
@@ -829,7 +820,7 @@ parsePermutationItem( t, parent) {
     let Stx = Notation.Syntax;
     let statement = null;
     let ttype = t.nextToken();
-    let symbols = t.getSymbolValue();
+    let symbols = ntn.getSymbols(t.getStringValue());
     if (ttype == Tokenizer.TT_KEYWORD
       && this.containsType(symbols, Sym.DELIMITER)) {
       // Evaluate: StmtDelimiter
@@ -906,7 +897,7 @@ parsePermutationItem( t, parent) {
       t.pushBack();
       return null;
     }
-    let symbols = t.getSymbolValue();
+    let symbols = ntn.getSymbols(t.getStringValue());
 // We push back, because we do just decisions in this production
     t.pushBack();
 // Is it a commutator?
@@ -980,7 +971,7 @@ parsePermutationItem( t, parent) {
       t.pushBack();
       return null;
     }
-    let symbols = t.getSymbolValue();
+    let symbols = ntn.getSymbols(t.getStringValue());
 // We push back, because we do just decisions in this production
     t.pushBack();
 // Is it a commutator?
@@ -1061,7 +1052,7 @@ parsePermutationItem( t, parent) {
     }
 
 // Is it a [RptrBegin] token? Consume it.
-    let symbols = t.getSymbolValue();
+    let symbols = ntn.getSymbols(t.getStringValue());
     if (symbols != null && this.isType(symbols, Sym.REPETITION_BEGIN)) {
       //consume
     } else {
@@ -1093,7 +1084,7 @@ parsePermutationItem( t, parent) {
     }
 
 // Is it a [RptrEnd] token? Consume it.
-    symbols = t.getSymbolValue();
+    symbols = ntn.getSymbols(t.getStringValue());
     if (this.isType(symbols, Sym.REPETITION_END)) {
       //consume
     } else {
@@ -1120,7 +1111,7 @@ parsePermutationItem( t, parent) {
     if (t.nextToken() != Tokenizer.TT_KEYWORD) {
       throw new ParseException("Invertor: illegal begin.", t.getStartPosition(), t.getEndPosition());
     }
-    let symbols = t.getSymbolValue();
+    let symbols = ntn.getSymbols(t.getStringValue());
     if (this.containsType(symbols, Sym.INVERTOR)) {
       module.log('parseInvertor: ' + t.getStringValue() + ' ' + t.getStartPosition() + '..' + t.getEndPosition());
       inversion.setEndPosition(t.getEndPosition());
@@ -1149,7 +1140,7 @@ parsePermutationItem( t, parent) {
     if (t.nextToken() != Tokenizer.TT_KEYWORD) {
       throw new ParseException("Reflector: illegal begin.", t.getStartPosition(), t.getEndPosition());
     }
-    let symbols = t.getSymbolValue();
+    let symbols = ntn.getSymbols(t.getStringValue());
     if (this.containsType(symbols, Sym.REFLECTOR)) {
       module.log('parseReflector: ' + t.getStringValue() + ' ' + t.getStartPosition() + '..' + t.getEndPosition());
       reflection.setEndPosition(t.getEndPosition());
@@ -1175,7 +1166,7 @@ parsePermutationItem( t, parent) {
     if (t.nextToken() != Tokenizer.TT_KEYWORD) {
       throw new ParseException("Affix: Invalid begin.", t.getStartPosition(), t.getEndPosition());
     }
-    let symbols = t.getSymbolValue();
+    let symbols = ntn.getSymbols(t.getStringValue());
 
     // Parse the BEGIN token and collect all potential end nodes
     const endSymbols = [];
@@ -1208,7 +1199,7 @@ parsePermutationItem( t, parent) {
         if (t.nextToken() != Tokenizer.TT_KEYWORD) {
           throw new ParseException("Affix: Statement missing.", t.getStartPosition(), t.getEndPosition());
         }
-        symbols = t.getSymbolValue();
+        symbols = ntn.getSymbols(t.getStringValue());
         for (let i = 0; i < endSymbols.length; i++) {
           endSymbol = endSymbols[i];
           if (this.containsType(symbols, endSymbol)) {
@@ -1255,7 +1246,7 @@ parsePermutationItem( t, parent) {
     if (t.nextToken() != Tokenizer.TT_KEYWORD) {
       throw new ParseException("NOP: \"" + t.getStringValue() + "\" is a " + t.getTokenType() + " but not a keyword.", t.getStartPosition(), t.getEndPosition());
     }
-    let symbols = t.getSymbolValue();
+    let symbols = ntn.getSymbols(t.getStringValue());
     if (!this.containsType(symbols, Sym.NOP)) {
       throw new ParseException("Move: \"" + t.getStringValue() + "\" is not a NOP", t.getStartPosition(), t.getEndPosition());
     }
@@ -1280,20 +1271,20 @@ parsePermutationItem( t, parent) {
     if (t.nextToken() != Tokenizer.TT_KEYWORD) {
       throw new ParseException("Move: \"" + t.getStringValue() + "\" is a " + t.getTokenType() + " but not a keyword.", t.getStartPosition(), t.getEndPosition());
     }
-    let symbols = t.getSymbolValue();
-    let symbol = null;
+    let symbols = ntn.getSymbols(t.getStringValue());
+    let moveDesc = null;
     for (let i = 0; i < symbols.length; i++) {
       if (symbols[i].getType() == Notation.Symbol.MOVE) {
-        symbol = symbols[i];
+        moveDesc = ntn.getMove(t.getStringValue());
         break;
       }
     }
-    if (symbol == null) {
+    if (moveDesc == null) {
       throw new ParseException("Move: \"" + t.getStringValue() + "\" is not a Move", t.getStartPosition(), t.getEndPosition());
     }
 
     module.log('parseMove: "%s".', t.getStringValue());
-    let move = new AST.MoveNode(ntn.getLayerCount(),symbol.getAxis(),symbol.getLayerMask(),symbol.getAngle());
+    let move = new AST.MoveNode(ntn.getLayerCount(),moveDesc.getAxis(),moveDesc.getLayerMask(),moveDesc.getAngle());
     move.setStartPosition(t.getStartPosition());
     move.setEndPosition(t.getEndPosition());
     parent.add(move);

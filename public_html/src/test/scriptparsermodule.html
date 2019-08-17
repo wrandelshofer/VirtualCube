@@ -20,15 +20,15 @@
         let input = inputs[i].innerText;
         let expected = expecteds[i].innerText;
 
-        try {
+       // try {
           let ast = parser.parse(input);
           let actual = ast.toString();
           actuals[i].innerText = actual;
           tests[i].classList.add(actual == expected ? "pass" : "fail");
-        } catch (err) {
+       /* } catch (err) {
           actuals[i].innerText = err;
           tests[i].classList.add("fail");
-        }
+        }*/
       }
     </script>
   </head>

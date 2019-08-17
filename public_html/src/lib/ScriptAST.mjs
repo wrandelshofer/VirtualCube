@@ -9,6 +9,12 @@ import ScriptNotation from './ScriptNotation.mjs';
 
 const Symbol = ScriptNotation.Symbol;
 
+class IllegalArgumentException extends Error {
+  constructor(msg) {
+    super(msg);
+  }
+}
+
 /**
  * Represents an Abstract Syntax Tree Node
  */
@@ -266,11 +272,15 @@ class PermutationNode extends Node {
      * @param {int} layerCount The number of layers of the cube.
      */
     addPermItem(type, signSymbol, faceSymbols, partNumber = 0, layerCount = 3) {
+        if (type==null) {
+            throw new IllegalArgumentException("type must not be null");
+        }
         if (this.type == null) {
             this.type = type;
         }
         if (this.type != type) {
-            throw new IllegalArgumentException("Permutation of different part types is not supported. Current type:" + this.type + " Added type:" + type + " Current length:" + this.getChildCount());
+            throw new IllegalArgumentException(
+              "Permutation of different part types is not supported. Current type:" + this.type + " Added type:" + type + " Current length:" + this.getChildCount());
         }
 
         // Evaluate the sign symbol.
