@@ -72,8 +72,8 @@
    */
   class Tokenizer {
     constructor() {
-      this.specials = {}; // Map<Character,Object> maps char to  ttype
-      this.digits = {}; // Map<Character,Object> maps char to  ttype
+      this.specials = new Map(); // Map<Character,Object> maps char to  ttype
+      this.digits = new Map(); // Map<Character,Object> maps char to  ttype
       this.input = "";
       this.pos = 0;
       this.pushedBack = false;
@@ -83,7 +83,7 @@
       this.sval = null;
       this.nval = null;
       this.keywordTree = new KeywordTree(null);
-      this.lookup = {};//Map<Character, Integer>
+      this.lookup = new Map();//Map<Character, Integer>
     }
 
     /**

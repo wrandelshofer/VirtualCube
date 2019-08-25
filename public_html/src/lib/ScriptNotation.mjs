@@ -382,13 +382,13 @@ class Notation {
         this.specials = [];
 
         this.layerCount = 3;
-        this.symbolToTokensMap = {};// Map<Symbol,List<String>>
-        this.tokenToSymbolsMap = {};// Map<String,List<Symbol>>
-        this.moveToTokensMap = {};// Map<Move,List<String>>
-        this.tokenToMoveMap = {};// Map<String,Move>
-        this.symbolToSyntaxMap = {};//Map<Symbol,Syntax>
-        this.faceToTokensMap = {};// Map<Face,List<String>>
-        this.tokenToFaceMap = {};// Map<String,Face>
+        this.symbolToTokensMap = new Map();// Map<Symbol,List<String>>
+        this.tokenToSymbolsMap = new Map();// Map<String,List<Symbol>>
+        this.moveToTokensMap = new Map();// Map<Move,List<String>>
+        this.tokenToMoveMap = new Map();// Map<String,Move>
+        this.symbolToSyntaxMap = new Map();//Map<Symbol,Syntax>
+        this.faceToTokensMap = new Map();// Map<Face,List<String>>
+        this.tokenToFaceMap = new Map();// Map<String,Face>
     }
 
     /**
@@ -465,14 +465,12 @@ class Notation {
     getTokenToSymbolMap() {
         return this.tokenToSymbolsMap;
     }
-    /**
-     * 
-     * @param {String} token
-     * @returns {Symbol[]} symbols
-     */
     getSymbols(token) {
         let symbols =  this.tokenToSymbolsMap[token];
         return symbols == null ? [] : symbols;
+    }
+    getTokens() {
+        return this.tokenToSymbolsMap.keys();
     }
     isSyntax(symbol, syntax) {
         if (symbol == null || syntax == null) {
