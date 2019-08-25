@@ -2,12 +2,12 @@
  * Copyright (c) 2011 Werner Randelshofer, Switzerland. MIT License.
  */
 
-// ttypes for Tokenizer
+// ttypes of Tokenizer
 // ----------------------
   let TT_WORD = -2;
   let TT_EOF = -1;
 
-// the following ttypes can be activated on demand
+  // the following ttypes can be activated on demand
   let TT_KEYWORD = -4;
   let TT_NUMBER = -5;
 
@@ -15,7 +15,8 @@
   let TT_DIGIT = -11;
   let TT_SPECIAL = -12;
   let TT_SKIP = -13;
-    /**
+
+  /**
    * A node of keyword tree.
    * 
    * Example tree structure, for the keywords "ab", and "abcd".
@@ -27,11 +28,6 @@
    * ''.'a'.'b'.'c'.'d'.KeywordTree("abcd")
    */
   class KeywordTree {
-    /**
-     * Constructos a new instance.
-     * 
-     * @param String keyword
-     */
     constructor() {
       this.keyword = null;
       this.commentEnd = null;
@@ -167,23 +163,14 @@
         this.lookup[ch] = TT_SKIP;
     }
     /**
-     * 
      * Adds a special character.
      */
     addSpecial(ch) {
         this.lookup[ch] = TT_SPECIAL;
     }
-    
-    clone() {
-        let that = new Tokenizer();
-        that.setTo(this);
-        return that;
-    }    
-    
+
     /**
-     * Returns the end position of the current token
-     * 
-     * @returns {unresolved}
+     * Returns the end position of the current token.
      */
     getEndPosition() {
       return this.tend;
@@ -202,15 +189,14 @@
     }
 
     /**
-     * Returns the start position of the current token
-     * 
-     * @returns {unresolved}
+     * Returns the start position of the current token.
      */
     getStartPosition() {
       return this.tstart;
     }
     
-    /** Returns the current token string value. 
+    /**
+     * Returns the current token string value.
      * 
      * @returns [String] value or null
      */
@@ -355,7 +341,6 @@
       this.tstart = null;
       this.tend = null;
       this.sval = null;
-      this.needChar = true;
     }
     
      /**
@@ -365,10 +350,22 @@
       this.pos = newValue;
     }
     
+    /**
+     * Sets this tokenizer to the state of that tokenizer
+     * <p>
+     * This should only be used for backtracking.
+     * <p>
+     * Note that both tokenizer share the same tokenizer
+     * settings (e.g. added keywords, added comments, ...)
+     * after this call.
+     *
+     * @param that another tokenizer
+     */
     setTo(that) {
         this.input = that.input;
         this.pos = that.pos;
         this.pushedBack = that.pushedBack;
+        this.lookup = that.lookup;
         this.ttype = that.ttype;
         this.tstart = that.tstart;
         this.tend = that.tend;
@@ -379,10 +376,6 @@
 
     /**
      * Defines the specials needed for skipping whitespace.
-     * 
-     * @param {String} token
-     * @param {Object} ttype
-     * @returns nothing
      */
     skipWhitespace() {
       this.addSpecial(" ", TT_SKIP);

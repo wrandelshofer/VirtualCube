@@ -1324,5 +1324,4 @@ export default {
     ParseException: ParseException,
     ScriptParser: ScriptParser,
     createRandomScript: createRandomScript,
-    newTwistNode: (axis, layerMask, angle) => new AST.MoveNode(3, axis, layerMask, angle)
 };
