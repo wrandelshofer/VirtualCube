@@ -1,5 +1,5 @@
-/* @(#)Tokenizer.mjs  1.0  2016-10-29
- * Copyright (c) 2011 Werner Randelshofer, Switzerland. MIT License.
+/* @(#)Tokenizer.mjs
+ * Copyright (c) 2019 Werner Randelshofer, Switzerland. MIT License.
  */
 
 // ttypes of Tokenizer
