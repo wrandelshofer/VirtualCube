@@ -277,7 +277,7 @@
                 this.ttype = TT_NUMBER;
                 this.tstart = start;
                 this.tend = this.pos;
-                this.sval = this.input.subSequence(start, this.pos).toString();
+                this.sval = this.input.substring(start, this.pos).toString();
                 this.nval = Integer.parseInt(this.sval);
                 return this.ttype;
             }
@@ -293,7 +293,7 @@
                 this.ttype = TT_WORD;
                 this.tstart = start;
                 this.tend = this.pos;
-                this.sval = this.input.subSequence(start, this.pos).toString();
+                this.sval = this.input.substring(start, this.pos).toString();
                 return this.ttype;
             }
 

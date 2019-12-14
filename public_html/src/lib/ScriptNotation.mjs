@@ -269,96 +269,96 @@ Symbol.SEQUENCE = new CompositeSymbol("sequence", [
     Symbol.COMMENT
 ]);
 
-Symbol.isBegin = new function(s) {
-        switch (s) {
-            case Symbol.CONJUGATION_BEGIN:
-            case Symbol.COMMUTATION_BEGIN:
-            case Symbol.ROTATION_BEGIN:
-            case Symbol.PERMUTATION_BEGIN:
-            case Symbol.INVERSION_BEGIN:
-            case Symbol.REFLECTION_BEGIN:
-            case Symbol.GROUPING_BEGIN:
-            case Symbol.MULTILINE_COMMENT_BEGIN:
-            case Symbol.SINGLELINE_COMMENT_BEGIN:
-                return true;
-            default:
-                return false;
-        }
-    };
-Symbol.isOperator = new function(s) {
-        switch (s) {
-            case Symbol.CONJUGATION_OPERATOR:
-            case Symbol.COMMUTATION_OPERATOR:
-            case Symbol.ROTATION_OPERATOR:
-            case Symbol.INVERSION_OPERATOR:
-            case Symbol.REFLECTION_OPERATOR:
-            case Symbol.REPETITION_OPERATOR:
-                return true;
-            default:
-                return false;
-        }
-    };
-
-Symbol.isDelimiter=function(s) {
-        switch (s) {
-            case Symbol.ROTATION_DELIMITER:
-            case Symbol.CONJUGATION_DELIMITER:
-            case Symbol.COMMUTATION_DELIMITER:
-                return true;
-            default:
-                return false;
-        }
+Symbol.isBegin = new function (s) {
+    switch (s) {
+        case Symbol.CONJUGATION_BEGIN:
+        case Symbol.COMMUTATION_BEGIN:
+        case Symbol.ROTATION_BEGIN:
+        case Symbol.PERMUTATION_BEGIN:
+        case Symbol.INVERSION_BEGIN:
+        case Symbol.REFLECTION_BEGIN:
+        case Symbol.GROUPING_BEGIN:
+        case Symbol.MULTILINE_COMMENT_BEGIN:
+        case Symbol.SINGLELINE_COMMENT_BEGIN:
+            return true;
+        default:
+            return false;
     }
+};
+Symbol.isOperator = new function (s) {
+    switch (s) {
+        case Symbol.CONJUGATION_OPERATOR:
+        case Symbol.COMMUTATION_OPERATOR:
+        case Symbol.ROTATION_OPERATOR:
+        case Symbol.INVERSION_OPERATOR:
+        case Symbol.REFLECTION_OPERATOR:
+        case Symbol.REPETITION_OPERATOR:
+            return true;
+        default:
+            return false;
+    }
+};
 
-Symbol.isEnd=function(s) {
-        switch (s) {
-            case Symbol.CONJUGATION_END:
-            case Symbol.COMMUTATION_END:
-            case Symbol.PERMUTATION_END:
-            case Symbol.ROTATION_END:
-            case Symbol.INVERSION_END:
-            case Symbol.REFLECTION_END:
-            case Symbol.GROUPING_END:
-            case Symbol.MULTILINE_COMMENT_END:
-                return true;
-            default:
-                return false;
-        }
-    };
+Symbol.isDelimiter = function (s) {
+    switch (s) {
+        case Symbol.ROTATION_DELIMITER:
+        case Symbol.CONJUGATION_DELIMITER:
+        case Symbol.COMMUTATION_DELIMITER:
+            return true;
+        default:
+            return false;
+    }
+}
 
-Symbol.isFaceSymbol=function(s) {
-        switch (s) {
-            case Symbol.PERMUTATION_FACE_R:
-            case Symbol.PERMUTATION_FACE_U:
-            case Symbol.PERMUTATION_FACE_F:
-            case Symbol.PEMRUTATION_FACE_L:
-            case Symbol.PERMUTATION_FACE_D:
-            case Symbol.PERMUTATION_FACE_B:
-                return true;
-            default:
-                return false;
-        }
-    };
-    
-Symbol.isPermutationSign=function(s) {
-        switch (s) {
-            case Symbol.PERMUTATION_PLUS:
-            case Symbol.PERMUTATION_PLUSPLUS:
-            case Symbol.PERMUTATION_MINUS:
-                return true;
-            default:
-                return false;
-        }
-    };
+Symbol.isEnd = function (s) {
+    switch (s) {
+        case Symbol.CONJUGATION_END:
+        case Symbol.COMMUTATION_END:
+        case Symbol.PERMUTATION_END:
+        case Symbol.ROTATION_END:
+        case Symbol.INVERSION_END:
+        case Symbol.REFLECTION_END:
+        case Symbol.GROUPING_END:
+        case Symbol.MULTILINE_COMMENT_END:
+            return true;
+        default:
+            return false;
+    }
+};
+
+Symbol.isFaceSymbol = function (s) {
+    switch (s) {
+        case Symbol.PERMUTATION_FACE_R:
+        case Symbol.PERMUTATION_FACE_U:
+        case Symbol.PERMUTATION_FACE_F:
+        case Symbol.PEMRUTATION_FACE_L:
+        case Symbol.PERMUTATION_FACE_D:
+        case Symbol.PERMUTATION_FACE_B:
+            return true;
+        default:
+            return false;
+    }
+};
+
+Symbol.isPermutationSign = function (s) {
+    switch (s) {
+        case Symbol.PERMUTATION_PLUS:
+        case Symbol.PERMUTATION_PLUSPLUS:
+        case Symbol.PERMUTATION_MINUS:
+            return true;
+        default:
+            return false;
+    }
+};
 
 
 /** Describes properties of a specific move symbol.  */
 class Move {
-    constructor(layerCount,axis,layerMask,angle) {
-        this.layerCount=layerCount;
-        this.axis=axis;
-        this.layerMask=layerMask;
-        this.angle=angle;
+    constructor(layerCount, axis, layerMask, angle) {
+        this.layerCount = layerCount;
+        this.axis = axis;
+        this.layerMask = layerMask;
+        this.angle = angle;
     }
     getLayerCount() {
         return this.layerCount;
@@ -424,12 +424,12 @@ class Notation {
         }
         symbols.push(symbol);
     }
-    addMoveToken(layerCount,axis,layerMask,angle,token) {
-        let move=new Move(layerCount,axis,layerMask,angle);
-        
+    addMoveToken(layerCount, axis, layerMask, angle, token) {
+        let move = new Move(layerCount, axis, layerMask, angle);
+
         // Add to tokenToSymbolsMap and symbolToTokensMap
-        this.addToken(Symbol.MOVE,token);
-        
+        this.addToken(Symbol.MOVE, token);
+
         // Add to moveToTokensMap
         let tokens = this.moveToTokensMap[move];
         if (tokens == null) {
@@ -437,19 +437,19 @@ class Notation {
             this.moveToTokensMap[move] = tokens;
         }
         tokens.push(token);
-        
+
         // Add to tokenToMoveMap
-       this.tokenToMoveMap[token] = move;
+        this.tokenToMoveMap[token] = move;
     }
     getMove(token) {
         return this.tokenToMoveMap[token];
     }
-    addFaceToken(face,token) {
-        let faceObj=new Face(face);
-        
+    addFaceToken(face, token) {
+        let faceObj = new Face(face);
+
         // Add to tokenToSymbolsMap and symbolToTokensMap
-        addToken(Symbol.FACE,token);
-        
+        addToken(Symbol.FACE, token);
+
         // Add to moveToTokensMap
         let tokens = this.faceToTokensMap[faceObj];
         if (tokens == null) {
@@ -457,20 +457,24 @@ class Notation {
             this.faceToTokensMap[face] = tokens;
         }
         tokens.push(token);
-        
+
         // Add to tokenToMoveMap
-       this.tokenToFaceMap[token] = faceObj;
+        this.tokenToFaceMap[token] = faceObj;
     }
 
     getTokenToSymbolMap() {
         return this.tokenToSymbolsMap;
     }
     getSymbols(token) {
-        let symbols =  this.tokenToSymbolsMap[token];
+        let symbols = this.tokenToSymbolsMap[token];
         return symbols == null ? [] : symbols;
     }
     getTokens() {
         return this.tokenToSymbolsMap.keys();
+    }
+    getToken(symbol) {
+        let tokens = this.symbolToTokensMap.get(symbol);
+        return tokens == null || tokens.isEmpty() ? null : tokens.get(0);
     }
     isSyntax(symbol, syntax) {
         if (symbol == null || syntax == null) {
@@ -590,7 +594,7 @@ class DefaultNotation extends Notation {
         this.symbolToSyntaxMap[Symbol.INVERSION] = Syntax.SUFFIX;
 
     }
-    
+
 }
 
 

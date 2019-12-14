@@ -59,7 +59,7 @@ class ScriptParser {
 
     createBinaryNode( tt,  binary,  operand1,  operand2) {
         if (operand1 == null || operand2 == null) {
-            throw createException(tt, "Binary: Two operands expected.");
+            throw this.createException(tt, "Binary: Two operands expected.");
         }
         binary.add(operand1);
         binary.add(operand2);
@@ -102,7 +102,7 @@ class ScriptParser {
 
     createRepetitionNode( tt,  operand1,  operand2) {
         if (operand1 == null || operand2 != null) {
-            throw createException(tt, "Repetition: One operand expected.");
+            throw this.createException(tt, "Repetition: One operand expected.");
         }
         let n = new RepetitionNode();
         n.add(operand1);
@@ -136,7 +136,7 @@ class ScriptParser {
 
     createUnaryNode( tt,  unary,  operand1,  operand2) {
         if (operand1 == null || operand2 != null) {
-            throw createException(tt, "Unary: One operand expected.");
+            throw this.createException(tt, "Unary: One operand expected.");
         }
         if (operand1 instanceof SequenceNode) {
             unary.addAll( operand1.getChildren.slice(0) );
@@ -153,7 +153,7 @@ class ScriptParser {
     parse( input) {
         let tt = this.createTokenizer(this.notation);
         tt.setInput(input);
-        return parseScript(tt);
+        return this.parseScript(tt);
     }
 
     parseCircumfix( tt,  parent,  symbol) {
@@ -168,18 +168,18 @@ class ScriptParser {
     parseCircumfixOperand( tt,  symbol) {
         let nodes = parseCircumfixOperands(tt, symbol);
         if (nodes.size() != 1) {
-            throw createException(tt, "Circumfix: Exactly one operand expected.");
+            throw this.createException(tt, "Circumfix: Exactly one operand expected.");
         }
         return nodes.get(0);
     }
 
     parseCircumfixOperands( tt,  symbol) {
         if (!Symbol.isBegin(symbol)) {
-            throw createException(tt, "Circumfix: Begin expected.");
+            throw this.createException(tt, "Circumfix: Begin expected.");
         }
         let compositeSymbol = symbol.getCompositeSymbol();
         let operands = [];
-        let operand = new SequenceNode();
+        let operand = new AST.SequenceNode();
         operand.setStartPosition(tt.getEndPosition());
         operands.add(operand);
         Loop:
@@ -187,7 +187,7 @@ class ScriptParser {
             switch (tt.nextToken()) {
                 case Tokenizer.TT_NUMBER:
                     tt.pushBack();
-                    parseStatement(tt, operand);
+                    this.parseStatement(tt, operand);
                     break;
                 case Tokenizer.TT_KEYWORD:
                     let maybeSeparatorOrEnd = tt.getStringValue();
@@ -195,7 +195,7 @@ class ScriptParser {
                         if (symbol1.getCompositeSymbol().equals(compositeSymbol)) {
                             if (Symbol.isDelimiter(symbol1)) {
                                 operand.setEndPosition(tt.getStartPosition());
-                                operand = new SequenceNode();
+                                operand = new AST.SequenceNode();
                                 operand.setStartPosition(tt.getEndPosition());
                                 operands.add(operand);
                                 continue Loop;
@@ -205,10 +205,10 @@ class ScriptParser {
                         }
                     }
                     tt.pushBack();
-                    parseStatement(tt, operand);
+                    this.parseStatement(tt, operand);
                     break;
                 default:
-                    throw createException(tt, "Circumfix: Number,  or End expected.");
+                    throw this.createException(tt, "Circumfix: Number,  or End expected.");
             }
         }
         operand.setEndPosition(tt.getStartPosition());
@@ -262,7 +262,7 @@ class ScriptParser {
                 parsePostinfix(tt, parent, symbol);
                 break;
             default:
-                throw createException(tt, "Unexpected Syntax: " + syntax);
+                throw this.createException(tt, "Unexpected Syntax: " + syntax);
         }
     }
 
@@ -283,7 +283,7 @@ class ScriptParser {
      */
     parseNonSuffixOrBacktrack( tt,  parent) {
         if (tt.nextToken() != Tokenizer.TT_KEYWORD) {
-            throw createException(tt, "Statement: Keyword expected.");
+            throw this.createException(tt, "Statement: Keyword expected.");
         }
 
         // Backtracking algorithm: try out each possible symbol for the given token.
@@ -320,7 +320,7 @@ class ScriptParser {
         }
         if (tt.nextToken() != Tokenizer.TT_KEYWORD ||
                 this.notation.getSymbolFor(tt.getStringValue(), Symbol.PERMUTATION) != Symbol.PERMUTATION_BEGIN) {
-            throw createException(tt, "Permutation: Begin expected.");
+            throw this.createException(tt, "Permutation: Begin expected.");
         }
         if (syntax == Syntax.PRECIRCUMFIX) {
             sign = this.parsePermutationSign(tt);
@@ -330,13 +330,13 @@ class ScriptParser {
         while (true) {
             switch (tt.nextToken()) {
                 case Tokenizer.TT_EOF:
-                    throw createException(tt, "Permutation: Unexpected EOF.");
+                    throw this.createException(tt, "Permutation: Unexpected EOF.");
                 case Tokenizer.TT_KEYWORD:
                     let sym = this.notation.getSymbolFor(tt.getStringValue(), Symbol.PERMUTATION);
                     if (sym == Symbol.PERMUTATION_END) {
                         break PermutationCycle;
                     } else if (sym == null) {
-                        throw createException(tt, "Permutation: Illegal symbol.");
+                        throw this.createException(tt, "Permutation: Illegal symbol.");
                     } else if (sym == Symbol.PERMUTATION_DELIMITER) {
                         // consume
                     } else {
@@ -375,10 +375,10 @@ class ScriptParser {
 
         let type = faceSymbols.size();
         if (type == 0) {
-            throw createException(t, "PermutationItem: Face expected.");
+            throw this.createException(t, "PermutationItem: Face expected.");
         }
         if (notation.getLayerCount() < 3 && type < 3) {
-            throw createException(t, "PermutationItem: The 2x2 cube only has corner parts.");
+            throw this.createException(t, "PermutationItem: The 2x2 cube only has corner parts.");
         }
 
         return faceSymbols;
@@ -412,7 +412,7 @@ class ScriptParser {
         switch (type) {
             case 3:
                 if (partNumber != 0) {
-                    throw createException(t, "PermutationItem: Invalid corner part number: " + partNumber);
+                    throw this.createException(t, "PermutationItem: Invalid corner part number: " + partNumber);
                 }
                 break;
             case 2: {
@@ -435,7 +435,7 @@ class ScriptParser {
                         break;
                 }
                 if (!valid) {
-                    throw createException(t, "PermutationItem: Invalid edge part number: " + partNumber);
+                    throw this.createException(t, "PermutationItem: Invalid edge part number: " + partNumber);
                 }
                 switch (layerCount) {
                     case 4:
@@ -465,7 +465,7 @@ class ScriptParser {
                         break;
                 }
                 if (!valid) {
-                    throw createException(t, "PermutationItem: Invalid side part number: " + partNumber);
+                    throw this.createException(t, "PermutationItem: Invalid side part number: " + partNumber);
                 }
                 switch (layerCount) {
                     case 4:
@@ -498,7 +498,7 @@ class ScriptParser {
         let start = tt.getStartPosition();
         let operands = parseCircumfixOperands(tt, symbol);
         if (operands.size() != 2) {
-            throw createException(tt, "Postcircumfix: Two operands expected.");
+            throw this.createException(tt, "Postcircumfix: Two operands expected.");
         }
         let end = tt.getEndPosition();
         let node = createCompositeNode(tt, symbol, operands.get(1), operands.get(0));
@@ -517,7 +517,7 @@ class ScriptParser {
      */
     parsePostinfix( tt,  parent,  symbol) {
         if (parent.getChildCount() == 0) {
-            throw createException(tt, "Postinfix: Operand expected.");
+            throw this.createException(tt, "Postinfix: Operand expected.");
         }
         let operand2 = parent.getChildAt(parent.getChildCount() - 1);
         let node = undefined;
@@ -528,8 +528,8 @@ class ScriptParser {
             node = createCompositeNode(tt, symbol, operand2, null);
             node.setRepeatCount(tt.getNumericValue());
         } else {
-            let tempParent = new SequenceNode();
-            parseStatement(tt, tempParent);
+            let tempParent = new AST.SequenceNode();
+            this.parseStatement(tt, tempParent);
             let operand1 = tempParent.getChildAt(0);
             node = createCompositeNode(tt, symbol, operand1, operand2);
         }
@@ -542,7 +542,7 @@ class ScriptParser {
         let start = tt.getStartPosition();
         let operands = parseCircumfixOperands(tt, symbol);
         if (operands.size() != 2) {
-            throw createException(tt, "Precircumfix: Two operands expected.");
+            throw this.createException(tt, "Precircumfix: Two operands expected.");
         }
         let end = tt.getEndPosition();
         let node = createCompositeNode(tt, symbol, operands.get(0), operands.get(1));
@@ -556,16 +556,16 @@ class ScriptParser {
         let node = undefined;
         if (Symbol.isBegin(symbol)) {
             let operand1 = parseCircumfixOperand(tt, symbol);
-            let tempParent = new SequenceNode();
-            parseStatement(tt, tempParent);
+            let tempParent = new AST.SequenceNode();
+            this.parseStatement(tt, tempParent);
             let operand2 = tempParent.getChildAt(0);
             node = createCompositeNode(tt, symbol, operand1, operand2);
         } else if (Symbol.isOperator(symbol)) {
-            let operand1 = new SequenceNode();
-            parseStatement(tt, operand1);
+            let operand1 = new AST.SequenceNode();
+            this.parseStatement(tt, operand1);
             node = createCompositeNode(tt, symbol, operand1, null);
         } else {
-            throw createException(tt, "Prefix: Begin or Operator expected.");
+            throw this.createException(tt, "Prefix: Begin or Operator expected.");
         }
         node.setStartPosition(startPosition);
         node.setEndPosition(tt.getEndPosition());
@@ -582,11 +582,11 @@ class ScriptParser {
      */
     parsePreinfix( tt,  parent,  symbol) {
         if (parent.getChildCount() == 0) {
-            throw createException(tt, "Preinfix: Operand expected.");
+            throw this.createException(tt, "Preinfix: Operand expected.");
         }
         let operand1 = parent.getChildAt(parent.getChildCount() - 1);
-        let tempParent = new SequenceNode();
-        parseStatement(tt, tempParent);
+        let tempParent = new AST.SequenceNode();
+        this.parseStatement(tt, tempParent);
         let operand2 = tempParent.getChildAt(0);
         let node = createCompositeNode(tt, symbol, operand1, operand2);
         node.setStartPosition(operand1.getStartPosition());
@@ -620,7 +620,7 @@ class ScriptParser {
                 }
                 break;
             default:
-                throw createException(tt, "Primary Expression: " + symbol + " cannot be used as a primary expression.");
+                throw this.createException(tt, "Primary Expression: " + symbol + " cannot be used as a primary expression.");
         }
         parent.add(child);
     }
@@ -640,14 +640,14 @@ class ScriptParser {
         let start = tt.getStartPosition();
         let repeatCount = tt.getNumericValue();
         let syntax = notation.getSyntax(Symbol.REPETITION);
-        let operand = new SequenceNode();
+        let operand = new AST.SequenceNode();
         switch (syntax) {
             case PREFIX:
-                parseStatement(tt, operand);
+                this.parseStatement(tt, operand);
                 break;
             case SUFFIX: {
                 if (parent.getChildCount() < 1) {
-                    throw createException(tt, "Repetition: Operand missing.");
+                    throw this.createException(tt, "Repetition: Operand missing.");
                 }
                 let sibling = parent.getChildAt(parent.getChildCount() - 1);
                 start = sibling.getStartPosition();
@@ -657,14 +657,14 @@ class ScriptParser {
             case PREINFIX:
                 if (tt.nextToken() != Tokenizer.TT_KEYWORD
                         || !this.notation.getSymbolsFor(tt.getStringValue()).contains(Symbol.REPETITION_OPERATOR)) {
-                    throw createException(tt, "Repetition: Operator expected.");
+                    throw this.createException(tt, "Repetition: Operator expected.");
                 }
-                parseStatement(tt, operand);
+                this.parseStatement(tt, operand);
                 break;
             case POSTINFIX:
                 // Note: Postinfix syntax is handled by parsePostinfix.
                 // We only get here,  the operator is missing!
-                throw createException(tt, "Repetition: Operator expected.");
+                throw this.createException(tt, "Repetition: Operator expected.");
             case CIRCUMFIX:
             case PRECIRCUMFIX:
             case POSTCIRCUMFIX: {
@@ -680,11 +680,11 @@ class ScriptParser {
     }
 
     parseScript( tt) {
-        let script = new SequenceNode();
+        let script = new AST.SequenceNode();
         script.setStartPosition(tt.getStartPosition());
         while (tt.nextToken() != Tokenizer.TT_EOF) {
             tt.pushBack();
-            parseStatement(tt, script);
+            this.parseStatement(tt, script);
         }
         script.setEndPosition(tt.getEndPosition());
         return script;
@@ -711,7 +711,7 @@ class ScriptParser {
                 parseNonSuffixOrBacktrack(tt, parent);
                 break;
             default:
-                throw createException(tt, "Statement: Keyword or Number expected.");
+                throw this.createException(tt, "Statement: Keyword or Number expected.");
         }
 
         // We parse suffix expressions here,  that they have precedence over
@@ -740,7 +740,7 @@ class ScriptParser {
         } else if (Symbol.isOperator(symbol)) {
             node = createCompositeNode(tt, symbol, sibling, null);
         } else {
-            throw createException(tt, "Suffix: Begin or Operator expected.");
+            throw this.createException(tt, "Suffix: Begin or Operator expected.");
         }
         node.setStartPosition(startPosition);
         node.setEndPosition(tt.getEndPosition());
