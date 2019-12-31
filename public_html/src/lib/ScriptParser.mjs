@@ -7,22 +7,33 @@ import AST from './ScriptAST.mjs';
 import Tokenizer from './Tokenizer.mjs';
 
 let module = {
-  log: (false && console != null && console.log != null) ? console.log : ()=>{},
-  info: (true && console != null && console.info != null) ? console.info : ()=>{},
-  warning: (true && console != null && console.warn != null) ? console.warn : ()=>{},
-  error: (true && console != null && console.error != null) ? console.error : ()=>{}
+    log: (false && console != null && console.log != null) ? console.log : () => {
+    },
+    info: (true && console != null && console.info != null) ? console.info : () => {
+    },
+    warning: (true && console != null && console.warn != null) ? console.warn : () => {
+    },
+    error: (true && console != null && console.error != null) ? console.error : () => {
+    }
 }
 
 class ParseException extends Error {
-  constructor(msg, start, end) {
-    super(msg);
-    this.msg = msg;
-    this.start = start;
-    this.end = end;
-  }
-  toString() {
-    return this.msg + " at:" + this.start + ".." + this.end;
-  }
+    constructor(msg, start, end) {
+        super(msg);
+        this.start = start;
+        this.end = end;
+    }
+    
+    getStartPosition() {
+        return this.start;
+    }
+    getEndPosition() {
+        return this.end;
+    }
+    
+    toString() {
+        return this.msg + " at:" + this.start + ".." + this.end;
+    }
 }
 
 
@@ -38,26 +49,26 @@ const REFLECTION_MASK = 64;
  * Implements a parser for a specific notation..
  */
 class ScriptParser {
-  /**
-   * Creates a new parser.
-   * @param {Notation} notation
-   * @param {Map<String,MacroNode>} localMacros
-   */
-  constructor(notation, localMacros) {
-    this.notation = notation;
-    this.macros = [];
-    if (localMacros != null) {
-      for (let macro in localMacros) {
-        macros.push(macro);
-      }
+    /**
+     * Creates a new parser.
+     * @param {Notation} notation
+     * @param {Map<String,MacroNode>} localMacros
+     */
+    constructor(notation, localMacros) {
+        this.notation = notation;
+        this.macros = [];
+        if (localMacros != null) {
+            for (let macro in localMacros) {
+                macros.push(macro);
+            }
+        }
+        // global macros override local macros
+        for (let macro in notation.getMacros()) {
+            macros.push(macro);
+        }
     }
-    // global macros override local macros
-    for (let macro in notation.getMacros()) {
-      macros.push(macro);
-    }
-  }
 
-    createBinaryNode( tt,  binary,  operand1,  operand2) {
+    createBinaryNode(tt, binary, operand1, operand2) {
         if (operand1 == null || operand2 == null) {
             throw this.createException(tt, "Binary: Two operands expected.");
         }
@@ -66,29 +77,29 @@ class ScriptParser {
         return binary;
     }
 
-    createCompositeNode( tt,  operation,  operand1,  operand2) {
+    createCompositeNode(tt, operation, operand1, operand2) {
         let node = undefined;
         switch (operation.getCompositeSymbol()) {
-            case GROUPING:
-                node = createUnaryNode(tt,  GroupingNode(), operand1, operand2);
+            case Notation.Symbol.GROUPING:
+                node = this.createUnaryNode(tt, new AST.GroupingNode(), operand1, operand2);
                 break;
-            case INVERSION:
-                node = createUnaryNode(tt,  InversionNode(), operand1, operand2);
+            case Notation.Symbol.INVERSION:
+                node = this.createUnaryNode(tt, new AST.InversionNode(), operand1, operand2);
                 break;
-            case REFLECTION:
-                node = createUnaryNode(tt,  ReflectionNode(), operand1, operand2);
+            case Notation.Symbol.REFLECTION:
+                node = this.createUnaryNode(tt, new AST.ReflectionNode(), operand1, operand2);
                 break;
-            case REPETITION:
-                node = createRepetitionNode(tt, operand1, operand2);
+            case Notation.Symbol.REPETITION:
+                node = this.createRepetitionNode(tt, operand1, operand2);
                 break;
-            case ROTATION:
-                node = createBinaryNode(tt,  RotationNode(), operand1, operand2);
+            case Notation.Symbol.ROTATION:
+                node = createBinaryNode(tt, new AST.RotationNode(), operand1, operand2);
                 break;
-            case COMMUTATION:
-                node = createBinaryNode(tt,  CommutationNode(), operand1, operand2);
+            case Notation.Symbol.COMMUTATION:
+                node = createBinaryNode(tt, new AST.CommutationNode(), operand1, operand2);
                 break;
-            case CONJUGATION:
-                node = createBinaryNode(tt,  ConjugationNode(), operand1, operand2);
+            case Notation.Symbol.CONJUGATION:
+                node = createBinaryNode(tt, new AST.ConjugationNode(), operand1, operand2);
                 break;
             default:
                 throw new AssertionError("Composite. Unexpected operation: " + operation);
@@ -96,11 +107,11 @@ class ScriptParser {
         return node;
     }
 
-    createException( tt,  msg) {
+    createException(tt, msg) {
         return new ParseException(msg + " Found \"" + tt.getStringValue() + "\".", tt.getStartPosition(), tt.getEndPosition());
     }
 
-    createRepetitionNode( tt,  operand1,  operand2) {
+    createRepetitionNode(tt, operand1, operand2) {
         if (operand1 == null || operand2 != null) {
             throw this.createException(tt, "Repetition: One operand expected.");
         }
@@ -109,7 +120,7 @@ class ScriptParser {
         return n;
     }
 
-    createTokenizer( notation) {
+    createTokenizer(notation) {
         let tt = new Tokenizer.Tokenizer();
         tt.addNumbers();
         tt.skipWhitespace();
@@ -121,25 +132,25 @@ class ScriptParser {
             tt.addKeyword(identifier);
         }
 
-        let mbegin = notation.getToken(Symbol.MULTILINE_COMMENT_BEGIN);
-        let mend = notation.getToken(Symbol.MULTILINE_COMMENT_END);
-        if (mbegin != null && mend != null && !mbegin.isEmpty() && !mend.isEmpty()) {
+        let mbegin = notation.getToken(Notation.Symbol.MULTILINE_COMMENT_BEGIN);
+        let mend = notation.getToken(Notation.Symbol.MULTILINE_COMMENT_END);
+        if (mbegin != null && mend != null && mbegin.length > 0 && mend.length > 0) {
             tt.addComment(mbegin, mend);
         }
-        let sbegin = notation.getToken(Symbol.SINGLELINE_COMMENT_BEGIN);
-        if (sbegin != null && !sbegin.isEmpty()) {
+        let sbegin = notation.getToken(Notation.Symbol.SINGLELINE_COMMENT_BEGIN);
+        if (sbegin != null && sbegin.length > 0) {
             tt.addComment(sbegin, "\n");
         }
 
         return tt;
     }
 
-    createUnaryNode( tt,  unary,  operand1,  operand2) {
+    createUnaryNode(tt, unary, operand1, operand2) {
         if (operand1 == null || operand2 != null) {
             throw this.createException(tt, "Unary: One operand expected.");
         }
-        if (operand1 instanceof SequenceNode) {
-            unary.addAll( operand1.getChildren.slice(0) );
+        if (operand1 instanceof AST.SequenceNode) {
+            unary.addAll(operand1.getChildren.slice(0));
         } else {
             unary.add(operand1);
         }
@@ -147,33 +158,33 @@ class ScriptParser {
     }
 
     getNotation() {
-        return notation;
+        return this.notation;
     }
 
-    parse( input) {
+    parse(input) {
         let tt = this.createTokenizer(this.notation);
         tt.setInput(input);
         return this.parseScript(tt);
     }
 
-    parseCircumfix( tt,  parent,  symbol) {
+    parseCircumfix(tt, parent, symbol) {
         let startPos = tt.getStartPosition();
-        let operand1 = parseCircumfixOperand(tt, symbol);
-        let compositeNode = createCompositeNode(tt, symbol, operand1, null);
+        let operand1 = this.parseCircumfixOperand(tt, symbol);
+        let compositeNode = this.createCompositeNode(tt, symbol, operand1, null);
         compositeNode.setStartPosition(startPos);
         compositeNode.setEndPosition(tt.getEndPosition());
         parent.add(compositeNode);
     }
 
-    parseCircumfixOperand( tt,  symbol) {
-        let nodes = parseCircumfixOperands(tt, symbol);
+    parseCircumfixOperand(tt, symbol) {
+        let nodes = this.parseCircumfixOperands(tt, symbol);
         if (nodes.size() != 1) {
             throw this.createException(tt, "Circumfix: Exactly one operand expected.");
         }
         return nodes.get(0);
     }
 
-    parseCircumfixOperands( tt,  symbol) {
+    parseCircumfixOperands(tt, symbol) {
         if (!Symbol.isBegin(symbol)) {
             throw this.createException(tt, "Circumfix: Begin expected.");
         }
@@ -183,7 +194,7 @@ class ScriptParser {
         operand.setStartPosition(tt.getEndPosition());
         operands.add(operand);
         Loop:
-        while (true) {
+          while (true) {
             switch (tt.nextToken()) {
                 case Tokenizer.TT_NUMBER:
                     tt.pushBack();
@@ -191,15 +202,15 @@ class ScriptParser {
                     break;
                 case Tokenizer.TT_KEYWORD:
                     let maybeSeparatorOrEnd = tt.getStringValue();
-                    for (let symbol1 of this.notation.getSymbolsFor(maybeSeparatorOrEnd)) {
+                    for (let symbol1 of this.notation.getSymbols(maybeSeparatorOrEnd)) {
                         if (symbol1.getCompositeSymbol().equals(compositeSymbol)) {
-                            if (Symbol.isDelimiter(symbol1)) {
+                            if (Notation.Symbol.isDelimiter(symbol1)) {
                                 operand.setEndPosition(tt.getStartPosition());
                                 operand = new AST.SequenceNode();
                                 operand.setStartPosition(tt.getEndPosition());
                                 operands.add(operand);
                                 continue Loop;
-                            } else if (Symbol.isEnd(symbol1)) {
+                            } else if (Notation.Symbol.isEnd(symbol1)) {
                                 break Loop;
                             }
                         }
@@ -230,36 +241,36 @@ class ScriptParser {
      * @param symbol the symbol that we want to try out
      * @on parse failure
      */
-    parseNonSuffix( tt,  parent,  token,  symbol) {
+    parseNonSuffix(tt, parent, token, symbol) {
         let c = symbol.getCompositeSymbol();
         if (c == Symbol.PERMUTATION) {
             tt.pushBack();
-            parsePermutation(tt, parent);
+            this.parsePermutation(tt, parent);
             return;
         }
 
-        let syntax = notation.getSyntax(symbol);
+        let syntax = this.notation.getSyntax(symbol);
         switch (syntax) {
-            case PRIMARY:
-                parsePrimary(tt, parent, token, symbol);
+            case Notation.Syntax.PRIMARY:
+                this.parsePrimary(tt, parent, token, symbol);
                 break;
-            case PREFIX:
-                parsePrefix(tt, parent, symbol);
+            case Notation.Syntax.PREFIX:
+                this.parsePrefix(tt, parent, symbol);
                 break;
-            case CIRCUMFIX:
-                parseCircumfix(tt, parent, symbol);
+            case Notation.Syntax.CIRCUMFIX:
+                this.parseCircumfix(tt, parent, symbol);
                 break;
-            case PRECIRCUMFIX:
-                parsePrecircumfix(tt, parent, symbol);
+            case Notation.Syntax.PRECIRCUMFIX:
+                this.parsePrecircumfix(tt, parent, symbol);
                 break;
-            case POSTCIRCUMFIX:
-                parsePostcircumfix(tt, parent, symbol);
+            case Notation.Syntax.POSTCIRCUMFIX:
+                this.parsePostcircumfix(tt, parent, symbol);
                 break;
-            case PREINFIX:
-                parsePreinfix(tt, parent, symbol);
+            case Notation.Syntax.PREINFIX:
+                this.parsePreinfix(tt, parent, symbol);
                 break;
-            case POSTINFIX:
-                parsePostinfix(tt, parent, symbol);
+            case Notation.Syntax.POSTINFIX:
+                this.parsePostinfix(tt, parent, symbol);
                 break;
             default:
                 throw this.createException(tt, "Unexpected Syntax: " + syntax);
@@ -278,10 +289,10 @@ class ScriptParser {
      * new child to the parent or replaces the last child.
      *
      * @param tt     the tokenizer
-     * @param parent the parent of the statement
+     * @param parent Node the parent of the statement
      * @throws ParseException
      */
-    parseNonSuffixOrBacktrack( tt,  parent) {
+    parseNonSuffixOrBacktrack(tt, parent) {
         if (tt.nextToken() != Tokenizer.TT_KEYWORD) {
             throw this.createException(tt, "Statement: Keyword expected.");
         }
@@ -292,12 +303,12 @@ class ScriptParser {
         let savedTokenizer = new Tokenizer.Tokenizer();
         savedTokenizer.setTo(tt);
         let token = tt.getStringValue();
-        for (let symbol of this.notation.getSymbolsFor(token)) {
+        for (let symbol of this.notation.getSymbols(token)) {
             try {
-                parseNonSuffix(tt, parent, token, symbol);
+                this.parseNonSuffix(tt, parent, token, symbol);
                 // Parse was successful
                 return;
-            } catch ( pe) {
+            } catch (pe) {
                 // Parse failed: backtrack and try with another symbol.
                 tt.setTo(savedTokenizer);
                 parent.removeAllChildren();
@@ -307,32 +318,32 @@ class ScriptParser {
                 }
             }
         }
-        throw (e != null) ? e : createException(tt, "Statement: Illegal token.");
+        throw (e != null) ? e : this.createException(tt, "Statement: Illegal token.");
     }
 
-    parsePermutation( tt,  parent) {
+    parsePermutation(tt, parent) {
         let permutation = new PermutationNode(tt.getStartPosition(), tt.getStartPosition());
 
         let sign = null;
-        let syntax = notation.getSyntax(Symbol.PERMUTATION);
-        if (syntax == Syntax.PREFIX) {
+        let syntax = this.notation.getSyntax(Notation.Symbol.PERMUTATION);
+        if (syntax == Notation.Syntax.PREFIX) {
             sign = this.parsePermutationSign(tt);
         }
         if (tt.nextToken() != Tokenizer.TT_KEYWORD ||
-                this.notation.getSymbolFor(tt.getStringValue(), Symbol.PERMUTATION) != Symbol.PERMUTATION_BEGIN) {
+          this.notation.getSymbolInCompositeSymbol(tt.getStringValue(), Symbol.PERMUTATION) != Symbol.PERMUTATION_BEGIN) {
             throw this.createException(tt, "Permutation: Begin expected.");
         }
-        if (syntax == Syntax.PRECIRCUMFIX) {
+        if (syntax == Notation.Syntax.PRECIRCUMFIX) {
             sign = this.parsePermutationSign(tt);
         }
 
         PermutationCycle:
-        while (true) {
+          while (true) {
             switch (tt.nextToken()) {
                 case Tokenizer.TT_EOF:
                     throw this.createException(tt, "Permutation: Unexpected EOF.");
                 case Tokenizer.TT_KEYWORD:
-                    let sym = this.notation.getSymbolFor(tt.getStringValue(), Symbol.PERMUTATION);
+                    let sym = this.notation.getSymbolInCompositeSymbol(tt.getStringValue(), Symbol.PERMUTATION);
                     if (sym == Symbol.PERMUTATION_END) {
                         break PermutationCycle;
                     } else if (sym == null) {
@@ -341,17 +352,17 @@ class ScriptParser {
                         // consume
                     } else {
                         tt.pushBack();
-                        parsePermutationItem(tt, permutation, syntax);
+                        this.parsePermutationItem(tt, permutation, syntax);
                     }
                     break;
 
             }
         }
 
-        if (syntax == Syntax.SUFFIX) {
+        if (syntax == Notation.Syntax.SUFFIX) {
             sign = this.parsePermutationSign(tt);
         }
-        if (syntax != Syntax.POSTCIRCUMFIX) {
+        if (syntax != Notation.Syntax.POSTCIRCUMFIX) {
             // postcircumfix is read in parsePermutationItem.
             permutation.setSign(sign);
         }
@@ -359,11 +370,11 @@ class ScriptParser {
         parent.add(permutation);
     }
 
-    parsePermutationFaces( t) {
+    parsePermutationFaces(t) {
         let faceSymbols = [];
         while (true) {
             if (t.nextToken() == Tokenizer.TT_KEYWORD) {
-                let symbol = this.notation.getSymbolFor(t.getStringValue(), Symbol.PERMUTATION);
+                let symbol = this.notation.getSymbolInCompositeSymbol(t.getStringValue(), Symbol.PERMUTATION);
                 if (symbol != null && Symbol.isFaceSymbol(symbol)) {
                     faceSymbols.add(symbol);
                     continue;
@@ -384,25 +395,25 @@ class ScriptParser {
         return faceSymbols;
     }
 
-    parsePermutationItem( t,  parent,  syntax) {
+    parsePermutationItem(t, parent, syntax) {
         let sign = null;
 
-        if (syntax == Syntax.PRECIRCUMFIX || syntax == Syntax.PREFIX) {
+        if (syntax == Notation.Syntax.PRECIRCUMFIX || syntax == Notation.Syntax.PREFIX) {
             sign = this.parsePermutationSign(t);
         }
 
-        let layerCount = notation.getLayerCount();
-        let faceSymbols = parsePermutationFaces(t);
+        let layerCount = this.notation.getLayerCount();
+        let faceSymbols = this.parsePermutationFaces(t);
         let partNumber = parsePermutationPartNumber(t, layerCount, faceSymbols.size());
 
-        if ((syntax == Syntax.POSTCIRCUMFIX || syntax == Syntax.SUFFIX)) {
-            sign = parsePermutationSign(t);
+        if ((syntax == Notation.Syntax.POSTCIRCUMFIX || syntax == Notation.Syntax.SUFFIX)) {
+            sign = this.parsePermutationSign(t);
         }
 
         parent.addPermItem(faceSymbols.size(), sign, faceSymbols, partNumber, layerCount);
     }
 
-    parsePermutationPartNumber( t,  layerCount,  type) {
+    parsePermutationPartNumber(t, layerCount, type) {
         let partNumber = 0;
         if (t.nextToken() == Tokenizer.TT_NUMBER) {
             partNumber = t.getNumericValue();
@@ -415,7 +426,8 @@ class ScriptParser {
                     throw this.createException(t, "PermutationItem: Invalid corner part number: " + partNumber);
                 }
                 break;
-            case 2: {
+            case 2:
+            {
                 let valid;
                 switch (layerCount) {
                     case 4:
@@ -445,7 +457,8 @@ class ScriptParser {
                 }
                 break;
             }
-            case 1: {
+            case 1:
+            {
                 let valid;
                 switch (layerCount) {
                     case 4:
@@ -483,9 +496,9 @@ class ScriptParser {
      * Parses a permutation sign and returns null or one of the three sign
      * symbols.
      */
-    parsePermutationSign( t) {
+    parsePermutationSign(t) {
         if (t.nextToken() == Tokenizer.TT_KEYWORD) {
-            let symbol = this.notation.getSymbolFor(t.getStringValue(), Symbol.PERMUTATION);
+            let symbol = this.notation.getSymbolInCompositeSymbol(t.getStringValue(), Symbol.PERMUTATION);
             if (symbol != null && Symbol.isPermutationSign(symbol)) {
                 return symbol;
             }
@@ -494,9 +507,9 @@ class ScriptParser {
         return null;
     }
 
-    parsePostcircumfix( tt,  parent,  symbol) {
+    parsePostcircumfix(tt, parent, symbol) {
         let start = tt.getStartPosition();
-        let operands = parseCircumfixOperands(tt, symbol);
+        let operands = this.parseCircumfixOperands(tt, symbol);
         if (operands.size() != 2) {
             throw this.createException(tt, "Postcircumfix: Two operands expected.");
         }
@@ -515,7 +528,7 @@ class ScriptParser {
      * @param symbol the symbol with post-infix syntax
      * @on parsing failure
      */
-    parsePostinfix( tt,  parent,  symbol) {
+    parsePostinfix(tt, parent, symbol) {
         if (parent.getChildCount() == 0) {
             throw this.createException(tt, "Postinfix: Operand expected.");
         }
@@ -525,22 +538,22 @@ class ScriptParser {
             if (tt.nextToken() != Tokenizer.TT_NUMBER) {
                 throw new ParseException("Repetition: Repetition count expected.", tt.getStartPosition(), tt.getEndPosition());
             }
-            node = createCompositeNode(tt, symbol, operand2, null);
+            node = this.createCompositeNode(tt, symbol, operand2, null);
             node.setRepeatCount(tt.getNumericValue());
         } else {
             let tempParent = new AST.SequenceNode();
             this.parseStatement(tt, tempParent);
             let operand1 = tempParent.getChildAt(0);
-            node = createCompositeNode(tt, symbol, operand1, operand2);
+            node = this.createCompositeNode(tt, symbol, operand1, operand2);
         }
         node.setStartPosition(operand2.getStartPosition());
         node.setEndPosition(tt.getEndPosition());
         parent.add(node);
     }
 
-    parsePrecircumfix( tt,  parent,  symbol) {
+    parsePrecircumfix(tt, parent, symbol) {
         let start = tt.getStartPosition();
-        let operands = parseCircumfixOperands(tt, symbol);
+        let operands = this.parseCircumfixOperands(tt, symbol);
         if (operands.size() != 2) {
             throw this.createException(tt, "Precircumfix: Two operands expected.");
         }
@@ -551,19 +564,19 @@ class ScriptParser {
         parent.add(node);
     }
 
-    parsePrefix( tt,  parent,  symbol) {
+    parsePrefix(tt, parent, symbol) {
         let startPosition = tt.getStartPosition();
         let node = undefined;
-        if (Symbol.isBegin(symbol)) {
-            let operand1 = parseCircumfixOperand(tt, symbol);
+        if (Notation.Symbol.isBegin(symbol)) {
+            let operand1 = this.parseCircumfixOperand(tt, symbol);
             let tempParent = new AST.SequenceNode();
             this.parseStatement(tt, tempParent);
             let operand2 = tempParent.getChildAt(0);
-            node = createCompositeNode(tt, symbol, operand1, operand2);
-        } else if (Symbol.isOperator(symbol)) {
+            node = this.createCompositeNode(tt, symbol, operand1, operand2);
+        } else if (Notation.Symbol.isOperator(symbol)) {
             let operand1 = new AST.SequenceNode();
             this.parseStatement(tt, operand1);
-            node = createCompositeNode(tt, symbol, operand1, null);
+            node = this.createCompositeNode(tt, symbol, operand1, null);
         } else {
             throw this.createException(tt, "Prefix: Begin or Operator expected.");
         }
@@ -580,7 +593,7 @@ class ScriptParser {
      * @param symbol the symbol with pre-infix syntax
      * @on parsing failure
      */
-    parsePreinfix( tt,  parent,  symbol) {
+    parsePreinfix(tt, parent, symbol) {
         if (parent.getChildCount() == 0) {
             throw this.createException(tt, "Preinfix: Operand expected.");
         }
@@ -588,35 +601,35 @@ class ScriptParser {
         let tempParent = new AST.SequenceNode();
         this.parseStatement(tt, tempParent);
         let operand2 = tempParent.getChildAt(0);
-        let node = createCompositeNode(tt, symbol, operand1, operand2);
+        let node = this.createCompositeNode(tt, symbol, operand1, operand2);
         node.setStartPosition(operand1.getStartPosition());
         node.setEndPosition(tt.getEndPosition());
         parent.add(node);
     }
 
-    parsePrimary( tt,  parent,  token,  symbol) {
+    parsePrimary(tt, parent, token, symbol) {
         let child = undefined;
         switch (symbol) {
-            case NOP:
-                child = new NOPNode(tt.getStartPosition(), tt.getEndPosition());
+            case Notation.Symbol.NOP:
+                child = new AST.NOPNode(tt.getStartPosition(), tt.getEndPosition());
                 break;
-            case MOVE:
-                let move = notation.getMoveFromToken(token);
-                child = new MoveNode(move.getLayerCount(), move.getAxis(), move.getLayerMask(), move.getAngle(),
-                        tt.getStartPosition(), tt.getEndPosition());
+            case Notation.Symbol.MOVE:
+                let move = this.notation.getMoveFromToken(token);
+                child = new AST.MoveNode(move.getLayerCount(), move.getAxis(), move.getLayerMask(), move.getAngle(),
+                  tt.getStartPosition(), tt.getEndPosition());
                 break;
-            case MACRO:
+            case Notation.Symbol.MACRO:
                 // Expand macro
                 try {
-                    let macro = notation.getMacro(token);
-                    let macroScript = parse(macro);
+                    let macro = this.notation.getMacro(token);
+                    let macroScript = this.parse(macro);
                     let macroNode = new MacroNode(null, macro, tt.getStartPosition(), tt.getEndPosition());
                     macroNode.add(macroScript);
                     child = macroNode;
-                } catch ( e) {
+                } catch (e) {
                     throw new ParseException("Error in macro \"" + token + "\":" + e.getMessage()
-                            + " at " + e.getStartPosition() + ".." + e.getEndPosition(),
-                            tt.getStartPosition(), tt.getEndPosition());
+                      + " at " + e.getStartPosition() + ".." + e.getEndPosition(),
+                      tt.getStartPosition(), tt.getEndPosition());
                 }
                 break;
             default:
@@ -633,19 +646,20 @@ class ScriptParser {
      * @param parent the parent
      * @on parsing failure
      */
-    parseRepetition( tt,  parent) {
+    parseRepetition(tt, parent) {
         if (tt.nextToken() != Tokenizer.TT_NUMBER) {
             throw new ParseException("Repetition: Number expected.", tt.getStartPosition(), tt.getEndPosition());
         }
         let start = tt.getStartPosition();
         let repeatCount = tt.getNumericValue();
-        let syntax = notation.getSyntax(Symbol.REPETITION);
+        let syntax = this.notation.getSyntax(Notation.Symbol.REPETITION);
         let operand = new AST.SequenceNode();
         switch (syntax) {
-            case PREFIX:
+            case Notation.Syntax.PREFIX:
                 this.parseStatement(tt, operand);
                 break;
-            case SUFFIX: {
+            case Notation.Syntax.SUFFIX:
+            {
                 if (parent.getChildCount() < 1) {
                     throw this.createException(tt, "Repetition: Operand missing.");
                 }
@@ -654,32 +668,33 @@ class ScriptParser {
                 operand.add(sibling);
                 break;
             }
-            case PREINFIX:
+            case Notation.Syntax.PREINFIX:
                 if (tt.nextToken() != Tokenizer.TT_KEYWORD
-                        || !this.notation.getSymbolsFor(tt.getStringValue()).contains(Symbol.REPETITION_OPERATOR)) {
+                  || !this.notation.getSymbols(tt.getStringValue()).contains(Notation.Symbol.REPETITION_OPERATOR)) {
                     throw this.createException(tt, "Repetition: Operator expected.");
                 }
                 this.parseStatement(tt, operand);
                 break;
-            case POSTINFIX:
+            case Notation.Syntax.POSTINFIX:
                 // Note: Postinfix syntax is handled by parsePostinfix.
                 // We only get here,  the operator is missing!
                 throw this.createException(tt, "Repetition: Operator expected.");
-            case CIRCUMFIX:
-            case PRECIRCUMFIX:
-            case POSTCIRCUMFIX: {
+            case Notation.Syntax.CIRCUMFIX:
+            case Notation.Syntax.PRECIRCUMFIX:
+            case Notation.Syntax.POSTCIRCUMFIX:
+            {
                 throw new ParseException("Repetition: Illegal syntax: " + syntax, tt.getStartPosition(), tt.getEndPosition());
             }
         }
         let repetitionNode = new RepetitionNode();
-        repetitionNode.addAll( operand.getChildren().slice(0));
+        repetitionNode.addAll(operand.getChildren().slice(0));
         repetitionNode.setRepeatCount(repeatCount);
         repetitionNode.setStartPosition(start);
         repetitionNode.setEndPosition(tt.getEndPosition());
         parent.add(repetitionNode);
     }
 
-    parseScript( tt) {
+    parseScript(tt) {
         let script = new AST.SequenceNode();
         script.setStartPosition(tt.getStartPosition());
         while (tt.nextToken() != Tokenizer.TT_EOF) {
@@ -700,15 +715,15 @@ class ScriptParser {
      * @param parent the parent of the statement
      * @throws ParseException
      */
-    parseStatement( tt,  parent) {
+    parseStatement(tt, parent) {
         switch (tt.nextToken()) {
             case Tokenizer.TT_NUMBER:
                 tt.pushBack();
-                parseRepetition(tt, parent);
+                this.parseRepetition(tt, parent);
                 break;
             case Tokenizer.TT_KEYWORD:
                 tt.pushBack();
-                parseNonSuffixOrBacktrack(tt, parent);
+                this.parseNonSuffixOrBacktrack(tt, parent);
                 break;
             default:
                 throw this.createException(tt, "Statement: Keyword or Number expected.");
@@ -716,7 +731,7 @@ class ScriptParser {
 
         // We parse suffix expressions here,  that they have precedence over
         // other expressions.
-        parseSuffixes(tt, parent);
+        this.parseSuffixes(tt, parent);
     }
 
     /**
@@ -727,18 +742,18 @@ class ScriptParser {
      * @param symbol the symbol with suffix syntax
      * @on parsing failure
      */
-    parseSuffix( tt,  parent,  symbol) {
+    parseSuffix(tt, parent, symbol) {
         if (parent.getChildCount() < 1) {
             throw new ParseException("Suffix: No sibling for suffix.", tt.getStartPosition(), tt.getEndPosition());
         }
         let sibling = parent.getChildAt(parent.getChildCount() - 1);
         let startPosition = sibling.getStartPosition();
         let node = undefined;
-        if (Symbol.isBegin(symbol)) {
-            let operand1 = parseCircumfixOperand(tt, symbol);
-            node = createCompositeNode(tt, symbol, operand1, sibling);
-        } else if (Symbol.isOperator(symbol)) {
-            node = createCompositeNode(tt, symbol, sibling, null);
+        if (Notation.Symbol.isBegin(symbol)) {
+            let operand1 = this.parseCircumfixOperand(tt, symbol);
+            node = this.createCompositeNode(tt, symbol, operand1, sibling);
+        } else if (Notation.Symbol.isOperator(symbol)) {
+            node = this.createCompositeNode(tt, symbol, sibling, null);
         } else {
             throw this.createException(tt, "Suffix: Begin or Operator expected.");
         }
@@ -756,25 +771,25 @@ class ScriptParser {
      * @param tt     the tokenizer
      * @param parent the parent of the statement
      */
-    parseSuffixes( tt,  parent) {
+    parseSuffixes(tt, parent) {
         let savedTT = new Tokenizer.Tokenizer();
         savedTT.setTo(tt);
         Outer:
-        while (true) {
+          while (true) {
             if (tt.nextToken() == Tokenizer.TT_KEYWORD) {
                 let token = tt.getStringValue();
 
                 // Backtracking algorithm: try out each possible symbol for the given token.
-                for (let symbol of this.notation.getSymbolsFor(token)) {
+                for (let symbol of this.notation.getSymbols(token)) {
                     if (symbol.getCompositeSymbol() != Symbol.PERMUTATION
-                            && notation.getSyntax(symbol) == Syntax.SUFFIX) {
+                      && this.notation.getSyntax(symbol) == Notation.Syntax.SUFFIX) {
 
                         try {
-                            parseSuffix(tt, parent, symbol);
+                            this.parseSuffix(tt, parent, symbol);
                             // Success: parse next suffix.
                             savedTT.setTo(tt);
                             continue Outer;
-                        } catch ( e) {
+                        } catch (e) {
                             // Failure: backtrack and try another symbol.
                             tt.setTo(savedTT);
                         }
@@ -782,13 +797,13 @@ class ScriptParser {
                     }
                 }
             } else if (tt.getTokenType() == Tokenizer.TT_NUMBER
-                    && notation.getSyntax(Symbol.REPETITION) == Syntax.SUFFIX) {
+              && this.notation.getSyntax(Notation.Symbol.REPETITION) == Notation.Syntax.SUFFIX) {
                 try {
                     tt.pushBack();
-                    parseRepetition(tt, parent);
+                    this.parseRepetition(tt, parent);
                     savedTT.setTo(tt);
                     continue;
-                } catch ( e) {
+                } catch (e) {
                     // Failure: try with another symbol.
                     tt.setTo(savedTT);
                 }
@@ -802,27 +817,27 @@ class ScriptParser {
 
 /** Returns an array of script nodes. */
 let createRandomScript = function (layerCount, scrambleCount, scrambleMinCount) {
-  if (scrambleCount == null)
-    scrambleCount = 21;
-  if (scrambleMinCount == null)
-    scrambleMinCount = 6;
-  let scrambler = new Array(Math.floor(Math.random() * scrambleCount - scrambleMinCount) + scrambleMinCount);
-  // Keep track of previous axis,  avoid two subsequent moves on
-  // the same axis.
-  let prevAxis = -1;
-  let axis, layerMask, angle;
-  for (let i = 0; i < scrambleCount; i++) {
-    while ((axis = Math.floor(Math.random() * 3)) == prevAxis) {
-    }
-    prevAxis = axis;
+    if (scrambleCount == null)
+        scrambleCount = 21;
+    if (scrambleMinCount == null)
+        scrambleMinCount = 6;
+    let scrambler = new Array(Math.floor(Math.random() * scrambleCount - scrambleMinCount) + scrambleMinCount);
+    // Keep track of previous axis,  avoid two subsequent moves on
+    // the same axis.
+    let prevAxis = -1;
+    let axis, layerMask, angle;
+    for (let i = 0; i < scrambleCount; i++) {
+        while ((axis = Math.floor(Math.random() * 3)) == prevAxis) {
+        }
+        prevAxis = axis;
 //    while ((layerMask = Math.floor(Math.random()*(1 << this.layerCount))) == 0) {        }
-    layerMask = 1 << Math.floor(Math.random() * layerCount);
-    while ((angle = Math.floor(Math.random() * 5) - 2) == 0) {
+        layerMask = 1 << Math.floor(Math.random() * layerCount);
+        while ((angle = Math.floor(Math.random() * 5) - 2) == 0) {
+        }
+        scrambler[i] = new AST.MoveNode(layerCount, axis, layerMask, angle);
     }
-    scrambler[i] = new AST.MoveNode(layerCount, axis, layerMask, angle);
-  }
 
-  return scrambler;
+    return scrambler;
 }
 
 // ------------------

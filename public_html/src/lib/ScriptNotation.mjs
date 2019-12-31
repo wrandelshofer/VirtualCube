@@ -5,65 +5,67 @@
 
 let Syntax = {
     /**
-     * Binary prefix syntax: The affix is placed between begin and end before
-     * the root.
+     * A primary expression: A single literal or name that stands for itself
+     * or can be used as a building block of other expressions.
+     */
+    PRIMARY : "primary",
+    /**
+     * Unary prefix expression. The operator consists
+     * of a single token that is placed before the operand.
      * <pre>
-     * Binary Prefix ::= Begin , Affix , End , Root ;
+     * Prefix ::= Operator, Operand ;
      * </pre>
      *
-     * Unary prefix syntax: The affix is placed before the root.
-     * <pre>
-     * Unary Prefix ::= Affix , Root ;
-     * </pre>
      */
     PREFIX: "prefix",
     /**
-     * Binary suffix syntax: The affix is placed between begin and end after
-     * the root.
+     * Unary suffix expression.  The operator consists
+     * of a single token that is placed after the operand.
      * <pre>
-     * Binary Suffix ::= Root , Begin , Affix , End ;
-     * </pre>
-     *
-     * Unary suffix syntax: The affix is placed after the root.
-     * <pre>
-     * Suffix ::= Root, Affix ;
+     * Suffix ::= Operand, Operator  ;
      * </pre>
      */
     SUFFIX: "suffix",
     /**
-     * Circumfix syntax: The root is placed between begin and end.
+     * Unary circumfix expression: The operator consists
+     * of two tokens (begin, end) that are placed
+     * around the operand.
      * <pre>
-     * Circumfix ::= Begin , Root , End ;
+     * Unary Circumfix ::= Begin , Operand1 , End ;
      * </pre>
      */
     CIRCUMFIX: "circumfix",
     /**
-     * Pre-Circumfix syntax: The affix is placed before the root.
-     * Begin, delimiter and end tokens are placed around them.
+     * Binary Pre-Circumfix expression:  The operator consists
+     * of three tokens (begin, delimiter, end) that are placed
+     * around operand 2 and operand 1.
      * <pre>
-     * Precircumfix ::= Begin , Affix , Delimiter , Root , End ;
+     * Binary Precircumfix ::= Begin , Operand2 , Delimiter , Operand1 , End ;
      * </pre>
      */
     PRECIRCUMFIX: "precircumfix",
     /**
-     * Post-Circumfix syntax: The affix is placed after the root.
-     * Begin, delimiter and end tokens are placed around them.
+     * Binary Post-Circumfix expression:  The operator consists
+     * of three tokens (begin, delimiter, end) that are placed
+     * around the operands 1 and 2.
      * <pre>
-     * Postcircumfix ::= Begin , Root , Delimiter , Affix , End ;
+     * Binary Postcircumfix ::= Begin , Operand1 , Delimiter , Operand2 , End ;
      * </pre>
      */
     POSTCIRCUMFIX: "postcircumfix",
     /**
-     * Binary Pre-Infix syntax: The affix is placed between pre-root and post-root.
+     * Binary Pre-Infix expression: The operator consists of a single token
+     * that is placed between operand 2 and 1.
      * <pre>
-     * Infix ::= Pre-Root , Affix, Post-Root;
+     * Preinfix ::= Operand2 , Operator, Operand1;
      * </pre>
      */
     PREINFIX: "preinfix",
     /**
-     * Binary Post-Infix syntax: The affix is placed between post-root and pre-root.
+     * Binary Post-Infix expression: The operator consists of a single token
+     * that is placed between operand 1 and 2.
      * <pre>
-     * Infix ::= Post-Root , Affix , Pre-Root;
+     * Postinfix ::= Operand1 , Operator, Operand2;
      * </pre>
      */
     POSTINFIX: "postinfix"
@@ -71,9 +73,18 @@ let Syntax = {
 
 };
 
+/** Declares the composite symbol map, so that we can reference it from class Symbol.
+ *  This map is filled near the end of this module. 
+ * @type Map<Symbol,Symbol>
+ */
+let COMPOSITE_SYMBOL_MAP = new Map();
+
 class Symbol {
     constructor(name) {
         this.name = name;
+    }
+    getCompositeSymbol() {
+        return COMPOSITE_SYMBOL_MAP.get(this);
     }
     getType() {
         return this;
@@ -103,7 +114,7 @@ class TerminalSymbol extends Symbol {
      * @param {String} alternativeName
      */
     constructor(name, alternativeName) {
-        super(name);
+       super(name);
         this.alternativeName = alternativeName;
     }
 
@@ -111,6 +122,9 @@ class TerminalSymbol extends Symbol {
         return this.alternativeName;
     }
 
+    toString() {
+        return "TerminalSymbol{"+this.name+","+this.alternativeName+"}";
+    }
 }
 /** Defines a compound symbol. */
 class CompositeSymbol extends Symbol {
@@ -121,7 +135,7 @@ class CompositeSymbol extends Symbol {
      * @param {Array<Symbol>} subSymbols
      */
     constructor(name, subSymbols) {
-        super(name);
+       super(name);
         this.subSymbols = subSymbols;
     }
     getSubSymbols() {
@@ -148,12 +162,12 @@ class CompositeSymbol extends Symbol {
  */
 Symbol.NOP = new TerminalSymbol("NOP");
 Symbol.MOVE = new TerminalSymbol("move", "twist");
-Symbol.FACE_R = new TerminalSymbol("r");
-Symbol.FACE_U = new TerminalSymbol("u");
-Symbol.FACE_F = new TerminalSymbol("f");
-Symbol.FACE_L = new TerminalSymbol("l");
-Symbol.FACE_D = new TerminalSymbol("d");
-Symbol.FACE_B = new TerminalSymbol("b");
+Symbol.PERMUTATION_FACE_R = new TerminalSymbol("r");
+Symbol.PERMUTATION_FACE_U = new TerminalSymbol("u");
+Symbol.PERMUTATION_FACE_F = new TerminalSymbol("f");
+Symbol.PERMUTATION_FACE_L = new TerminalSymbol("l");
+Symbol.PERMUTATION_FACE_D = new TerminalSymbol("d");
+Symbol.PERMUTATION_FACE_B = new TerminalSymbol("b");
 Symbol.PERMUTATION_PLUS = new TerminalSymbol("permPlus");
 Symbol.PERMUTATION_MINUS = new TerminalSymbol("permMinus");
 Symbol.PERMUTATION_PLUSPLUS = new TerminalSymbol("permPlusPlus");
@@ -163,26 +177,28 @@ Symbol.PERMUTATION_DELIMITER = new TerminalSymbol("permDelim", "permutationDelim
 Symbol.DELIMITER = new TerminalSymbol("delimiter", "statementDelimiter");
 Symbol.INVERSION_BEGIN = new TerminalSymbol("inversionBegin");
 Symbol.INVERSION_END = new TerminalSymbol("inversionEnd");
-Symbol.INVERSION_DELIMITER = new TerminalSymbol("inversionDelim");
-Symbol.INVERTOR = new TerminalSymbol("invertor");
+Symbol.INVERSION_OPERATOR = new TerminalSymbol("invertor");
 Symbol.REFLECTION_BEGIN = new TerminalSymbol("reflectionBegin");
 Symbol.REFLECTION_END = new TerminalSymbol("reflectionEnd");
-Symbol.REFLECTION_DELIMITER = new TerminalSymbol("reflectionDelim");
-Symbol.REFLECTOR = new TerminalSymbol("reflector");
+Symbol.REFLECTION_OPERATOR = new TerminalSymbol("reflector");
 Symbol.GROUPING_BEGIN = new TerminalSymbol("groupingBegin", "sequenceBegin");
 Symbol.GROUPING_END = new TerminalSymbol("groupingEnd", "sequenceEnd");
 Symbol.REPETITION_BEGIN = new TerminalSymbol("repetitionBegin", "repetitorBegin");
 Symbol.REPETITION_END = new TerminalSymbol("repetitionEnd", "repetitorEnd");
 Symbol.REPETITION_DELIMITER = new TerminalSymbol("repetitionDelim", "repetitorDelimiter");
+Symbol.REPETITION_OPERATOR = new TerminalSymbol("repetitionOperator");
 Symbol.COMMUTATION_BEGIN = new TerminalSymbol("commutationBegin", "commutatorBegin");
 Symbol.COMMUTATION_END = new TerminalSymbol("commutationEnd", "commutatorEnd");
 Symbol.COMMUTATION_DELIMITER = new TerminalSymbol("commutationDelim", "commutatorDelimiter");
+Symbol.COMMUTATION_OPERATOR = new TerminalSymbol("commutationOperator");
 Symbol.CONJUGATION_BEGIN = new TerminalSymbol("conjugationBegin", "conjugatorBegin");
 Symbol.CONJUGATION_END = new TerminalSymbol("conjugationEnd", "conjugatorEnd");
 Symbol.CONJUGATION_DELIMITER = new TerminalSymbol("conjugationDelim", "conjugatorDelimiter");
+Symbol.CONJUGATION_OPERATOR = new TerminalSymbol("conjugationOperator");
 Symbol.ROTATION_BEGIN = new TerminalSymbol("rotationBegin", "rotatorBegin");
 Symbol.ROTATION_END = new TerminalSymbol("rotationEnd", "rotatorEnd");
 Symbol.ROTATION_DELIMITER = new TerminalSymbol("rotationDelim", "rotatorDelimiter");
+Symbol.ROTATION_OPERATOR = new TerminalSymbol("rotationPOperator");
 Symbol.MACRO = new TerminalSymbol("macro");
 Symbol.MULTILINE_COMMENT_BEGIN = new TerminalSymbol("commentMultiLineBegin", "slashStarCommentBegin");
 Symbol.MULTILINE_COMMENT_END = new TerminalSymbol("commentMultiLineEnd", "slashStarCommentEnd");
@@ -191,12 +207,14 @@ Symbol.SINGLELINE_COMMENT_BEGIN = new TerminalSymbol("commentSingleLineBegin", "
 Symbol.COMMUTATION = new CompositeSymbol("commutation", [
     Symbol.COMMUTATION_BEGIN,
     Symbol.COMMUTATION_END,
-    Symbol.COMMUTATION_DELIMITER
+    Symbol.COMMUTATION_DELIMITER,
+    Symbol.COMMUTATION_OPERATOR
 ]);
 Symbol.CONJUGATION = new CompositeSymbol("conjugation", [
     Symbol.CONJUGATION_BEGIN,
     Symbol.CONJUGATION_END,
-    Symbol.CONJUGATION_DELIMITER
+    Symbol.CONJUGATION_DELIMITER,
+    Symbol.CONJUGATION_OPERATOR
 ]);
 Symbol.GROUPING = new CompositeSymbol("grouping", [
     Symbol.GROUPING_BEGIN,
@@ -205,16 +223,15 @@ Symbol.GROUPING = new CompositeSymbol("grouping", [
 Symbol.INVERSION = new CompositeSymbol("inversion", [
     Symbol.INVERSION_BEGIN,
     Symbol.INVERSION_END,
-    Symbol.INVERSION_DELIMITER,
-    Symbol.INVERTOR
+    Symbol.INVERSION_OPERATOR
 ]);
 Symbol.PERMUTATION = new CompositeSymbol("permutation", [
-    Symbol.FACE_R,
-    Symbol.FACE_U,
-    Symbol.FACE_F,
-    Symbol.FACE_L,
-    Symbol.FACE_D,
-    Symbol.FACE_B,
+    Symbol.PERMUTATION_FACE_R,
+    Symbol.PERMUTATION_FACE_U,
+    Symbol.PERMUTATION_FACE_F,
+    Symbol.PERMUTATION_FACE_L,
+    Symbol.PERMUTATION_FACE_D,
+    Symbol.PERMUTATION_FACE_B,
     Symbol.PERMUTATION_PLUS,
     Symbol.PERMUTATION_MINUS,
     Symbol.PERMUTATION_PLUSPLUS,
@@ -222,38 +239,35 @@ Symbol.PERMUTATION = new CompositeSymbol("permutation", [
     Symbol.PERMUTATION_END,
     Symbol.PERMUTATION_DELIMITER
 ]);
-Symbol.FACE = new CompositeSymbol("face", [
-    Symbol.FACE_R,
-    Symbol.FACE_U,
-    Symbol.FACE_F,
-    Symbol.FACE_L,
-    Symbol.FACE_D,
-    Symbol.FACE_B
-]);
 Symbol.REFLECTION = new CompositeSymbol("reflection", [
     Symbol.REFLECTION_BEGIN,
     Symbol.REFLECTION_END,
-    Symbol.REFLECTION_DELIMITER,
-    Symbol.REFLECTOR
+    Symbol.REFLECTION_OPERATOR
 ]);
 Symbol.REPETITION = new CompositeSymbol("repetition", [
     Symbol.REPETITION_BEGIN,
     Symbol.REPETITION_END,
-    Symbol.REPETITION_DELIMITER
+    Symbol.REPETITION_DELIMITER,
+    Symbol.REPETITION_OPERATOR
 ]);
 Symbol.ROTATION = new CompositeSymbol("rotation", [
     Symbol.ROTATION_BEGIN,
     Symbol.ROTATION_END,
-    Symbol.ROTATION_DELIMITER
+    Symbol.ROTATION_DELIMITER,
+    Symbol.ROTATION_OPERATOR
 ]);
 Symbol.COMMENT = new CompositeSymbol("comment", [
     Symbol.MULTILINE_COMMENT_BEGIN,
     Symbol.MULTILINE_COMMENT_END,
     Symbol.SINGLELINE_COMMENT_BEGIN
 ]);
-Symbol.STATEMENT = new CompositeSymbol("statement", [
+Symbol.PRIMARY = new CompositeSymbol("statement", [
     Symbol.NOP,
     Symbol.MOVE,
+    Symbol.MACRO
+]);
+Symbol.STATEMENT = new CompositeSymbol("statement", [
+    Symbol.PRIMARY,
     Symbol.GROUPING,
     Symbol.INVERSION,
     Symbol.REFLECTION,
@@ -308,8 +322,23 @@ Symbol.isDelimiter = function (s) {
         default:
             return false;
     }
-}
-
+};
+Symbol.isBegin = function(s) {
+        switch (s) {
+            case Symbol.CONJUGATION_BEGIN:
+            case Symbol.COMMUTATION_BEGIN:
+            case Symbol.ROTATION_BEGIN:
+            case Symbol.PERMUTATION_BEGIN:
+            case Symbol.INVERSION_BEGIN:
+            case Symbol.REFLECTION_BEGIN:
+            case Symbol.GROUPING_BEGIN:
+            case Symbol.MULTILINE_COMMENT_BEGIN:
+            case Symbol.SINGLELINE_COMMENT_BEGIN:
+                return true;
+            default:
+                return false;
+        }
+    };
 Symbol.isEnd = function (s) {
     switch (s) {
         case Symbol.CONJUGATION_END:
@@ -326,12 +355,27 @@ Symbol.isEnd = function (s) {
     }
 };
 
+Symbol.isOperator = function(s) {
+        switch (s) {
+            case Symbol.CONJUGATION_OPERATOR:
+            case Symbol.COMMUTATION_OPERATOR:
+            case Symbol.ROTATION_OPERATOR:
+            case Symbol.INVERSION_OPERATOR:
+            case Symbol.REFLECTION_OPERATOR:
+            case Symbol.REPETITION_OPERATOR:
+                return true;
+            default:
+                return false;
+        }
+    };
+
+
 Symbol.isFaceSymbol = function (s) {
     switch (s) {
         case Symbol.PERMUTATION_FACE_R:
         case Symbol.PERMUTATION_FACE_U:
         case Symbol.PERMUTATION_FACE_F:
-        case Symbol.PEMRUTATION_FACE_L:
+        case Symbol.PERMUTATION_FACE_L:
         case Symbol.PERMUTATION_FACE_D:
         case Symbol.PERMUTATION_FACE_B:
             return true;
@@ -409,18 +453,18 @@ class Notation {
     }
     addToken(symbol, token) {
         // Add to symbolToTokensMap
-        let tokens = this.symbolToTokensMap[symbol];
+        let tokens = this.symbolToTokensMap.get(symbol);
         if (tokens == null) {
             tokens = [];
-            this.symbolToTokensMap[symbol] = tokens;
+            this.symbolToTokensMap.set(symbol, tokens);
         }
         tokens.push(token);
 
         // Add to tokenToSymbolsMap
-        let symbols = this.tokenToSymbolsMap[token];
+        let symbols = this.tokenToSymbolsMap.get(token);
         if (symbols == null) {
             symbols = [];
-            this.tokenToSymbolsMap[token] = symbols;
+            this.tokenToSymbolsMap.set(token, symbols);
         }
         symbols.push(symbol);
     }
@@ -431,79 +475,106 @@ class Notation {
         this.addToken(Symbol.MOVE, token);
 
         // Add to moveToTokensMap
-        let tokens = this.moveToTokensMap[move];
+        let tokens = this.moveToTokensMap.get(move);
         if (tokens == null) {
             tokens = [];
-            this.moveToTokensMap[move] = tokens;
+            this.moveToTokensMap.set(move, tokens);
         }
         tokens.push(token);
 
         // Add to tokenToMoveMap
-        this.tokenToMoveMap[token] = move;
+        this.tokenToMoveMap.set(token, move);
     }
-    getMove(token) {
-        return this.tokenToMoveMap[token];
+    getMoveFromToken(token) {
+        return this.tokenToMoveMap.get(token);
     }
     addFaceToken(face, token) {
         let faceObj = new Face(face);
 
         // Add to tokenToSymbolsMap and symbolToTokensMap
-        addToken(Symbol.FACE, token);
+       this.addToken(Symbol.FACE, token);
 
         // Add to moveToTokensMap
-        let tokens = this.faceToTokensMap[faceObj];
+        let tokens = this.faceToTokensMap.get(faceObj);
         if (tokens == null) {
             tokens = [];
-            this.faceToTokensMap[face] = tokens;
+            this.faceToTokensMap.set(face, tokens);
         }
         tokens.push(token);
 
         // Add to tokenToMoveMap
-        this.tokenToFaceMap[token] = faceObj;
+        this.tokenToFaceMap.set(token, faceObj);
     }
 
     getTokenToSymbolMap() {
         return this.tokenToSymbolsMap;
     }
+    /**
+     * Given a (potentially ambiguous) token and a composite symbol
+     * that parser is currently parsing, returns the symbol for
+     * that token.
+     * 
+     * @param token:String a token
+     * @param compositeSymbol:Symbol the composite symbol being parsed
+     * @return :Symbol the symbol for the token in this composite symbol
+     */
+    getSymbolInCompositeSymbol(token, compositeSymbol) {
+        for (s of this.getSymbols(token)) {
+            if (compositeSymbol.isSubSymbol(s)) {
+                return s;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Given a (potentially ambiguous) token returns all symbols for
+     * that token.
+     *
+     * @param token a token
+     * @return the symbols for the token or an empty list
+     */
     getSymbols(token) {
-        let symbols = this.tokenToSymbolsMap[token];
+        let symbols = this.tokenToSymbolsMap.get(token);
         return symbols == null ? [] : symbols;
     }
+    
     getTokens() {
         return this.tokenToSymbolsMap.keys();
     }
     getToken(symbol) {
         let tokens = this.symbolToTokensMap.get(symbol);
-        return tokens == null || tokens.isEmpty() ? null : tokens.get(0);
+        return tokens == null || tokens.length == 0 ? null : tokens[0];
     }
     isSyntax(symbol, syntax) {
         if (symbol == null || syntax == null) {
             throw  new Error("illegal arguments symbol:" + symbol + " syntax:" + syntax);
         }
-        return this.symbolToSyntaxMap[symbol] == syntax;
+        return this.symbolToSyntaxMap.get(symbol) == syntax;
     }
     getSyntax(symbol) {
-        return this.symbolToSyntaxMap[symbol];
+        let syntax = this.symbolToSyntaxMap.get(symbol.getCompositeSymbol());
+        return syntax != null ? syntax : Syntax.PRIMARY;
     }
     isSupported(symbol) {
-        return this.symbolToSyntaxMap[symbol] != null || this.symbolToTokensMap[symbol] != null;
+        return this.symbolToSyntaxMap.get(symbol) != null || this.symbolToTokensMap.get(symbol) != null;
     }
 }
 /** Defines a default notation that works for 3x3 and 2x2 cubes. */
 class DefaultNotation extends Notation {
     constructor(layerCount) {
-        super();
+       super();
 
         this.layerCount = layerCount == null ? 3 : layerCount;
 
         this.addToken(Symbol.NOP, "·");
         this.addToken(Symbol.NOP, ".");
-        this.addToken(Symbol.FACE_R, "r");
-        this.addToken(Symbol.FACE_U, "u");
-        this.addToken(Symbol.FACE_F, "f");
-        this.addToken(Symbol.FACE_L, "l");
-        this.addToken(Symbol.FACE_D, "d");
-        this.addToken(Symbol.FACE_B, "b");
+        this.addToken(Symbol.PERMUTATION_FACE_R, "r");
+        this.addToken(Symbol.PERMUTATION_FACE_U, "u");
+        this.addToken(Symbol.PERMUTATION_FACE_F, "f");
+        this.addToken(Symbol.PERMUTATION_FACE_L, "l");
+        this.addToken(Symbol.PERMUTATION_FACE_D, "d");
+        this.addToken(Symbol.PERMUTATION_FACE_B, "b");
         this.addToken(Symbol.PERMUTATION_PLUS, "+");
         this.addToken(Symbol.PERMUTATION_MINUS, "-");
         this.addToken(Symbol.PERMUTATION_PLUSPLUS, "++");
@@ -514,13 +585,12 @@ class DefaultNotation extends Notation {
         //addToken(Symbol.INVERSION_BEGIN ,"(");
         //addToken(Symbol.INVERSION_END ,")");
         //addToken(Symbol.INVERSION_DELIMITER ,"");
-        this.addToken(Symbol.INVERTOR, "'");
-        this.addToken(Symbol.INVERTOR, "-");
-        this.addToken(Symbol.INVERTOR, "'");
+        this.addToken(Symbol.INVERSION_OPERATOR, "'");
+        this.addToken(Symbol.INVERSION_OPERATOR, "-");
         //addToken(Symbol.REFLECTION_BEGIN ,"(");
         //addToken(Symbol.REFLECTION_END ,")");
         //addToken(Symbol.REFLECTION_DELIMITER ,"");
-        this.addToken(Symbol.REFLECTOR, "*");
+        this.addToken(Symbol.REFLECTION_OPERATOR, "*");
         this.addToken(Symbol.GROUPING_BEGIN, "(");
         this.addToken(Symbol.GROUPING_END, ")");
         //addToken(Symbol.REPETITION_BEGIN ,"");
@@ -584,17 +654,33 @@ class DefaultNotation extends Notation {
             this.addMoveToken(3, 2, all, -1 * i, "CB" + suffix);
         }
 
-        this.symbolToSyntaxMap[Symbol.COMMUTATION] = Syntax.PRECIRCUMFIX;
-        this.symbolToSyntaxMap[Symbol.CONJUGATION] = Syntax.PREFIX;
-        this.symbolToSyntaxMap[Symbol.ROTATION] = Syntax.PREFIX;
-        this.symbolToSyntaxMap[Symbol.GROUPING] = Syntax.CIRCUMFIX;
-        this.symbolToSyntaxMap[Symbol.PERMUTATION] = Syntax.PRECIRCUMFIX;
-        this.symbolToSyntaxMap[Symbol.REPETITION] = Syntax.SUFFIX;
-        this.symbolToSyntaxMap[Symbol.REFLECTION] = Syntax.SUFFIX;
-        this.symbolToSyntaxMap[Symbol.INVERSION] = Syntax.SUFFIX;
+        this.symbolToSyntaxMap.set(Symbol.COMMUTATION, Syntax.PRECIRCUMFIX);
+        this.symbolToSyntaxMap.set(Symbol.CONJUGATION, Syntax.PREFIX);
+        this.symbolToSyntaxMap.set(Symbol.ROTATION, Syntax.PREFIX);
+        this.symbolToSyntaxMap.set(Symbol.GROUPING, Syntax.CIRCUMFIX);
+        this.symbolToSyntaxMap.set(Symbol.PERMUTATION, Syntax.PRECIRCUMFIX);
+        this.symbolToSyntaxMap.set(Symbol.REPETITION, Syntax.SUFFIX);
+        this.symbolToSyntaxMap.set(Symbol.REFLECTION, Syntax.SUFFIX);
+        this.symbolToSyntaxMap.set(Symbol.INVERSION, Syntax.SUFFIX);
 
     }
 
+}
+
+/* Initializes the composite symbol map that we have declared further above. */
+{
+    for (let s of Object.values(Symbol)) {
+        if (s instanceof Symbol) {
+            COMPOSITE_SYMBOL_MAP.set(s, s);
+        }
+    }
+    for (let s of COMPOSITE_SYMBOL_MAP.keys()) {
+        for (let subSymbol of s.getSubSymbols()) {
+            if (subSymbol.getSubSymbols().length == 0) {
+                COMPOSITE_SYMBOL_MAP.set(subSymbol, s);
+            }
+         }   
+    }
 }
 
 

@@ -6,13 +6,12 @@
 // Module imports
 // --------------
 import ScriptNotation from './ScriptNotation.mjs';
-
 const Symbol = ScriptNotation.Symbol;
 
 class IllegalArgumentException extends Error {
-  constructor(msg) {
-    super(msg);
-  }
+    constructor(msg) {
+        super(msg);
+    }
 }
 
 /**
@@ -23,7 +22,7 @@ class Node {
         this.children = [];
         this.parent = null;
         this.layerCount = layerCount;
-        this.startPostion = startPosition;
+        this.startPosition = startPosition;
         this.endPosition = endPosition;
     }
 
@@ -34,6 +33,12 @@ class Node {
         child.parent = this;
         this.children.push(child);
     }
+    addAll(children) {
+        for (let child of children) {
+            this.add(child);
+        }
+    }
+
     remove(child) {
         if (child.parent == this) {
             let index = this.children.indexOf(child);
@@ -48,6 +53,15 @@ class Node {
         if (this.parent != null) {
             this.parent.remove(this);
         }
+    }
+    removeAllChildren() {
+        for (let i = this.getChildCount() - 1; i >= 0; i--) {
+            this.remove(this.getChildAt(i));
+        }
+    }
+
+    getChildren() {
+        return this.children;
     }
     getChildCount() {
         return this.children.length;
@@ -90,9 +104,9 @@ class Node {
             }
         } else {
             for (let i in this.children) {
-                yield* this.children[i].resolvedIterable(inverse);
+                yield * this.children[i].resolvedIterable(inverse);
             }
-        }
+    }
     }
 
     toString() {
@@ -117,7 +131,7 @@ class CommutationNode extends Node {
     }
     toString() {
         const buf = [];
-        buf.push("CommutationNode{ ");
+        buf.push("Commutation{ ");
         buf.push(this.commutator);
         buf.push(",");
         const n = this.getChildCount();
@@ -147,7 +161,7 @@ class ConjugationNode extends Node {
 
     toString() {
         const buf = [];
-        buf.push("ConjugationNode{ ");
+        buf.push("Conjugation{ ");
         buf.push(this.conjugator);
         buf.push(",");
         const n = this.getChildCount();
@@ -165,7 +179,10 @@ class SequenceNode extends Node {
     }
     toString() {
         const buf = [];
-        buf.push("SequenceNode{");
+        buf.push(this.getStartPosition());
+        buf.push("..");
+        buf.push(this.getEndPosition());
+        buf.push(" Sequence{");
         const n = this.getChildCount();
         for (var i = 0; i < n; i++) {
             buf.push(" ");
@@ -182,7 +199,7 @@ class StatementNode extends Node {
 
     toString() {
         const buf = [];
-        buf.push("StatementNode{");
+        buf.push("Statement{");
         const n = this.getChildCount();
         for (var i = 0; i < n; i++) {
             buf.push(" ");
@@ -197,11 +214,10 @@ class GroupingNode extends Node {
         super(layerCount, startPosition, endPosition);
         this.layerCount = layerCount;
     }
-    
 
     toString() {
         const buf = [];
-        buf.push("GroupingNode{");
+        buf.push("Grouping{");
         const n = this.getChildCount();
         for (var i = 0; i < n; i++) {
             buf.push(" ");
@@ -225,7 +241,10 @@ class InversionNode extends Node {
 
     toString() {
         const buf = [];
-        buf.push("InversionNode{ ");
+        buf.push(this.getStartPosition());
+        buf.push("..");
+        buf.push(this.getEndPosition());
+        buf.push(" Inversion{ ");
         const n = this.getChildCount();
         for (var i = 0; i < n; i++) {
             buf.push(this.getChildAt(i).toString());
@@ -272,7 +291,7 @@ class PermutationNode extends Node {
      * @param {int} layerCount The number of layers of the cube.
      */
     addPermItem(type, signSymbol, faceSymbols, partNumber = 0, layerCount = 3) {
-        if (type==null) {
+        if (type == null) {
             throw new IllegalArgumentException("type must not be null");
         }
         if (this.type == null) {
@@ -549,7 +568,7 @@ class ReflectionNode extends Node {
     }
     toString() {
         const buf = [];
-        buf.push("ReflectionNode{");
+        buf.push("Reflection{");
         const n = this.getChildCount();
         for (var i = 0; i < n; i++) {
             buf.push(" ");
@@ -582,7 +601,7 @@ class RepetitionNode extends Node {
 
     toString() {
         const buf = [];
-        buf.push("RepetitionNode{ ");
+        buf.push("Repetition{ ");
         buf.push(this.repeatCount);
         buf.push(",");
         const n = this.getChildCount();
@@ -595,19 +614,23 @@ class RepetitionNode extends Node {
     }
 }
 class NOPNode extends Node {
-    constructor(layerCount, startPosition, endPosition) {
-        super(layerCount, startPosition, endPosition);
+    constructor(startPosition, endPosition) {
+        super(-1, startPosition, endPosition);
     }
     toString() {
-        return "NOPNode{ }";
+        return ""
+          + this.getStartPosition()
+          + ".."
+          + this.getEndPosition()
+          + " NOP{ }";
     }
 }
 
 class MoveNode extends Node {
 
     /** Script nodes. */
-    constructor(layerCount, axis, layerMask, angle) {
-        super(layerCount, -1, -1);
+    constructor(layerCount, axis, layerMask, angle, startPos, endPos) {
+        super(layerCount, startPos, endPos);
         this.axis = axis;
         this.angle = angle;
         this.layerMask = layerMask;
@@ -647,7 +670,11 @@ class MoveNode extends Node {
     }
 
     toString() {
-        return 'MoveNode{ax:' + this.axis + ' lm:' + this.layerMask + ' an:' + this.angle + '}';
+        return ""
+          + this.getStartPosition()
+          + ".."
+          + this.getEndPosition()
+          + ' Move{ ' + this.axis + ':' + this.layerMask + ':' + this.angle + ' }';
     }
 }
 

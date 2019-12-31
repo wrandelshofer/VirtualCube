@@ -337,9 +337,9 @@
       this.input = input;
       this.pos = 0;
       this.pushedBack = false;
-      this.ttype = null;
-      this.tstart = null;
-      this.tend = null;
+      this.ttype = TT_EOF;
+      this.tstart = 0;
+      this.tend = 0;
       this.sval = null;
     }
     
