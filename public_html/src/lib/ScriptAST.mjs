@@ -131,7 +131,10 @@ class CommutationNode extends Node {
     }
     toString() {
         const buf = [];
-        buf.push("Commutation{ ");
+        buf.push(this.getStartPosition());
+        buf.push("..");
+        buf.push(this.getEndPosition());
+        buf.push(" Commutation{ ");
         buf.push(this.commutator);
         buf.push(",");
         const n = this.getChildCount();
@@ -161,7 +164,10 @@ class ConjugationNode extends Node {
 
     toString() {
         const buf = [];
-        buf.push("Conjugation{ ");
+        buf.push(this.getStartPosition());
+        buf.push("..");
+        buf.push(this.getEndPosition());
+        buf.push(" Conjugation{ ");
         buf.push(this.conjugator);
         buf.push(",");
         const n = this.getChildCount();
@@ -217,7 +223,10 @@ class GroupingNode extends Node {
 
     toString() {
         const buf = [];
-        buf.push("Grouping{");
+        buf.push(this.getStartPosition());
+        buf.push("..");
+        buf.push(this.getEndPosition());
+        buf.push(" Grouping{");
         const n = this.getChildCount();
         for (var i = 0; i < n; i++) {
             buf.push(" ");

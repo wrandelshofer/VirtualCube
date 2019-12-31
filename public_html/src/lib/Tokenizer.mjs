@@ -72,8 +72,6 @@
    */
   class Tokenizer {
     constructor() {
-      this.specials = new Map(); // Map<Character,Object> maps char to  ttype
-      this.digits = new Map(); // Map<Character,Object> maps char to  ttype
       this.input = "";
       this.pos = 0;
       this.pushedBack = false;
@@ -87,19 +85,6 @@
     }
 
     /**
-     * Adds a digit token. (Also use this for adding signs, and decimal point tokens!).
-     * 
-     * @param {Character} token
-     * @param {Object} ttype
-     * @returns nothing
-     */
-    addDigit(token, ttype) {
-      if (token.length != 1)
-        throw new "token must be 1 character!, token:" + token;
-      this.digits[token] = ttype;
-    }
-    
-    /**
      * Defines a comment begin and end token.
      */
     addComment(start, end) {
@@ -112,7 +97,7 @@
      * Adds a digit character.
      */
     addDigit(ch) {
-        this.lookup[ch] = TT_DIGIT;
+        this.lookup.set(ch, TT_DIGIT);
     }
     
 
@@ -160,13 +145,13 @@
      * Adds a skip character.
      */
     addSkip(ch) {
-        this.lookup[ch] = TT_SKIP;
+        this.lookup.set(ch, TT_SKIP);
     }
     /**
      * Adds a special character.
      */
     addSpecial(ch) {
-        this.lookup[ch] = TT_SPECIAL;
+        this.lookup.set(ch, TT_SPECIAL);
     }
 
     /**
@@ -213,7 +198,7 @@
     }
     
     getOrDefault(map,key,defaultValue) {
-        let value = map[key];
+        let value = map.get(key);
         return value == null ? defaultValue : value;
     } 
 
@@ -278,7 +263,7 @@
                 this.tstart = start;
                 this.tend = this.pos;
                 this.sval = this.input.substring(start, this.pos).toString();
-                this.nval = Integer.parseInt(this.sval);
+                this.nval = parseInt(this.sval);
                 return this.ttype;
             }
 
@@ -378,15 +363,15 @@
      * Defines the specials needed for skipping whitespace.
      */
     skipWhitespace() {
-      this.addSpecial(" ", TT_SKIP);
-      this.addSpecial("\f", TT_SKIP);
-      this.addSpecial("\n", TT_SKIP);
-      this.addSpecial("\r", TT_SKIP);
-      this.addSpecial("\t", TT_SKIP);
-      this.addSpecial("\v", TT_SKIP);
-      this.addSpecial("\u00a0", TT_SKIP);
-      this.addSpecial("\u2028", TT_SKIP);
-      this.addSpecial("\u2029", TT_SKIP);
+      this.addSkip(" ", TT_SKIP);
+      this.addSkip("\f", TT_SKIP);
+      this.addSkip("\n", TT_SKIP);
+      this.addSkip("\r", TT_SKIP);
+      this.addSkip("\t", TT_SKIP);
+      this.addSkip("\v", TT_SKIP);
+      this.addSkip("\u00a0", TT_SKIP);// NO-BREAK SPACE
+      this.addSkip("\u2028", TT_SKIP);
+      this.addSkip("\u2029", TT_SKIP);
     }
 
     /**

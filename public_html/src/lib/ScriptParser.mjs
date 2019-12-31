@@ -150,7 +150,7 @@ class ScriptParser {
             throw this.createException(tt, "Unary: One operand expected.");
         }
         if (operand1 instanceof AST.SequenceNode) {
-            unary.addAll(operand1.getChildren.slice(0));
+            unary.addAll(operand1.getChildren().slice(0));
         } else {
             unary.add(operand1);
         }
@@ -178,21 +178,21 @@ class ScriptParser {
 
     parseCircumfixOperand(tt, symbol) {
         let nodes = this.parseCircumfixOperands(tt, symbol);
-        if (nodes.size() != 1) {
+        if (nodes.length != 1) {
             throw this.createException(tt, "Circumfix: Exactly one operand expected.");
         }
-        return nodes.get(0);
+        return nodes[0];
     }
 
     parseCircumfixOperands(tt, symbol) {
-        if (!Symbol.isBegin(symbol)) {
+        if (!Notation.Symbol.isBegin(symbol)) {
             throw this.createException(tt, "Circumfix: Begin expected.");
         }
         let compositeSymbol = symbol.getCompositeSymbol();
         let operands = [];
         let operand = new AST.SequenceNode();
         operand.setStartPosition(tt.getEndPosition());
-        operands.add(operand);
+        operands.push(operand);
         Loop:
           while (true) {
             switch (tt.nextToken()) {
@@ -203,12 +203,12 @@ class ScriptParser {
                 case Tokenizer.TT_KEYWORD:
                     let maybeSeparatorOrEnd = tt.getStringValue();
                     for (let symbol1 of this.notation.getSymbols(maybeSeparatorOrEnd)) {
-                        if (symbol1.getCompositeSymbol().equals(compositeSymbol)) {
+                        if (symbol1.getCompositeSymbol() == compositeSymbol) {
                             if (Notation.Symbol.isDelimiter(symbol1)) {
                                 operand.setEndPosition(tt.getStartPosition());
                                 operand = new AST.SequenceNode();
                                 operand.setStartPosition(tt.getEndPosition());
-                                operands.add(operand);
+                                operands.push(operand);
                                 continue Loop;
                             } else if (Notation.Symbol.isEnd(symbol1)) {
                                 break Loop;
@@ -309,6 +309,9 @@ class ScriptParser {
                 // Parse was successful
                 return;
             } catch (pe) {
+                if (!(pe instanceof ParseException)) {
+                    throw pe;
+                }
                 // Parse failed: backtrack and try with another symbol.
                 tt.setTo(savedTokenizer);
                 parent.removeAllChildren();
@@ -384,7 +387,7 @@ class ScriptParser {
         }
         t.pushBack();
 
-        let type = faceSymbols.size();
+        let type = faceSymbols.length;
         if (type == 0) {
             throw this.createException(t, "PermutationItem: Face expected.");
         }
@@ -404,13 +407,13 @@ class ScriptParser {
 
         let layerCount = this.notation.getLayerCount();
         let faceSymbols = this.parsePermutationFaces(t);
-        let partNumber = parsePermutationPartNumber(t, layerCount, faceSymbols.size());
+        let partNumber = parsePermutationPartNumber(t, layerCount, faceSymbols.length);
 
         if ((syntax == Notation.Syntax.POSTCIRCUMFIX || syntax == Notation.Syntax.SUFFIX)) {
             sign = this.parsePermutationSign(t);
         }
 
-        parent.addPermItem(faceSymbols.size(), sign, faceSymbols, partNumber, layerCount);
+        parent.addPermItem(faceSymbols.length, sign, faceSymbols, partNumber, layerCount);
     }
 
     parsePermutationPartNumber(t, layerCount, type) {
@@ -510,11 +513,11 @@ class ScriptParser {
     parsePostcircumfix(tt, parent, symbol) {
         let start = tt.getStartPosition();
         let operands = this.parseCircumfixOperands(tt, symbol);
-        if (operands.size() != 2) {
+        if (operands.length != 2) {
             throw this.createException(tt, "Postcircumfix: Two operands expected.");
         }
         let end = tt.getEndPosition();
-        let node = createCompositeNode(tt, symbol, operands.get(1), operands.get(0));
+        let node = createCompositeNode(tt, symbol, operands[1], operands[0]);
         node.setStartPosition(start);
         node.setEndPosition(end);
         parent.add(node);
@@ -554,11 +557,11 @@ class ScriptParser {
     parsePrecircumfix(tt, parent, symbol) {
         let start = tt.getStartPosition();
         let operands = this.parseCircumfixOperands(tt, symbol);
-        if (operands.size() != 2) {
+        if (operands.length != 2) {
             throw this.createException(tt, "Precircumfix: Two operands expected.");
         }
         let end = tt.getEndPosition();
-        let node = createCompositeNode(tt, symbol, operands.get(0), operands.get(1));
+        let node = createCompositeNode(tt, symbol, operands[0], operands[1]);
         node.setStartPosition(start);
         node.setEndPosition(end);
         parent.add(node);
