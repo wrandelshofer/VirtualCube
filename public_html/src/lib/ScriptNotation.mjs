@@ -79,9 +79,12 @@ let Syntax = {
  */
 let COMPOSITE_SYMBOL_MAP = new Map();
 
+
+let symbolOrdinal = 0; // this ordinal is used for sorting symbols
 class Symbol {
     constructor(name) {
         this.name = name;
+        this.ordinal = symbolOrdinal++;
     }
     getCompositeSymbol() {
         return COMPOSITE_SYMBOL_MAP.get(this);
@@ -103,6 +106,12 @@ class Symbol {
     }
     getName() {
         return this.name;
+    }
+    getOrdinal() {
+        return this.ordinal;
+    }
+    compareTo(that) {
+        return this.ordinal - that.ordinal;
     }
 }
 
@@ -162,12 +171,15 @@ class CompositeSymbol extends Symbol {
  */
 Symbol.NOP = new TerminalSymbol("NOP");
 Symbol.MOVE = new TerminalSymbol("move", "twist");
+
+// Note: THe ordering of the permutation face symbols is significant in ScriptASt.mjs PermutationNode.
 Symbol.PERMUTATION_FACE_R = new TerminalSymbol("r");
 Symbol.PERMUTATION_FACE_U = new TerminalSymbol("u");
 Symbol.PERMUTATION_FACE_F = new TerminalSymbol("f");
 Symbol.PERMUTATION_FACE_L = new TerminalSymbol("l");
 Symbol.PERMUTATION_FACE_D = new TerminalSymbol("d");
 Symbol.PERMUTATION_FACE_B = new TerminalSymbol("b");
+
 Symbol.PERMUTATION_PLUS = new TerminalSymbol("permPlus");
 Symbol.PERMUTATION_MINUS = new TerminalSymbol("permMinus");
 Symbol.PERMUTATION_PLUSPLUS = new TerminalSymbol("permPlusPlus");
@@ -225,6 +237,8 @@ Symbol.INVERSION = new CompositeSymbol("inversion", [
     Symbol.INVERSION_END,
     Symbol.INVERSION_OPERATOR
 ]);
+
+Symbol.PERMUTATION_ITEM = new TerminalSymbol("permutationItem");
 Symbol.PERMUTATION = new CompositeSymbol("permutation", [
     Symbol.PERMUTATION_FACE_R,
     Symbol.PERMUTATION_FACE_U,
@@ -519,7 +533,7 @@ class Notation {
      * @return :Symbol the symbol for the token in this composite symbol
      */
     getSymbolInCompositeSymbol(token, compositeSymbol) {
-        for (s of this.getSymbols(token)) {
+        for (let s of this.getSymbols(token)) {
             if (compositeSymbol.isSubSymbol(s)) {
                 return s;
             }

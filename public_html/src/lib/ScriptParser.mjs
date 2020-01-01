@@ -5,6 +5,7 @@
 import Notation from './ScriptNotation.mjs';
 import AST from './ScriptAST.mjs';
 import Tokenizer from './Tokenizer.mjs';
+let Symbol = Notation.Symbol;
 
 let module = {
     log: (false && console != null && console.log != null) ? console.log : () => {
@@ -379,7 +380,7 @@ class ScriptParser {
             if (t.nextToken() == Tokenizer.TT_KEYWORD) {
                 let symbol = this.notation.getSymbolInCompositeSymbol(t.getStringValue(), Symbol.PERMUTATION);
                 if (symbol != null && Symbol.isFaceSymbol(symbol)) {
-                    faceSymbols.add(symbol);
+                    faceSymbols.push(symbol);
                     continue;
                 }
             }
@@ -391,7 +392,7 @@ class ScriptParser {
         if (type == 0) {
             throw this.createException(t, "PermutationItem: Face expected.");
         }
-        if (notation.getLayerCount() < 3 && type < 3) {
+        if (this.notation.getLayerCount() < 3 && type < 3) {
             throw this.createException(t, "PermutationItem: The 2x2 cube only has corner parts.");
         }
 
@@ -407,7 +408,7 @@ class ScriptParser {
 
         let layerCount = this.notation.getLayerCount();
         let faceSymbols = this.parsePermutationFaces(t);
-        let partNumber = parsePermutationPartNumber(t, layerCount, faceSymbols.length);
+        let partNumber = this.parsePermutationPartNumber(t, layerCount, faceSymbols.length);
 
         if ((syntax == Notation.Syntax.POSTCIRCUMFIX || syntax == Notation.Syntax.SUFFIX)) {
             sign = this.parsePermutationSign(t);
