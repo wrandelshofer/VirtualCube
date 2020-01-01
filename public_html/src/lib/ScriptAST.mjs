@@ -77,6 +77,13 @@ class Node {
         this.endPosition = newValue;
     }
 
+    getSymbol() {
+        return null;
+    }
+    getNodeName() {
+        let sym = this.getSymbol();
+        return sym == null ? "node" : sym.getName().toLowerCase();
+    }
     getStartPosition() {
         return this.startPosition;
     }
@@ -115,35 +122,15 @@ class Node {
 }
 
 /**
- * A CommutationNode holds a commutator A and a single child B.
+ * A CommutationNode holds a child A and a child B.
  * The side effect of a commutation node is A B A' B'.
  */
 class CommutationNode extends Node {
-    constructor(layerCount, commutator, commutee, startPosition, endPosition) {
-        super(layerCount, startPosition, endPosition);
-        this.commutator = commutator;
-        if (commutee != null) {
-            this.add(commutee);
-        }
+    constructor() {
+        super();
     }
-    setCommutator(newValue) {
-        this.commutator = newValue;
-    }
-    toString() {
-        const buf = [];
-        buf.push(this.getStartPosition());
-        buf.push("..");
-        buf.push(this.getEndPosition());
-        buf.push(" Commutation{ ");
-        buf.push(this.commutator);
-        buf.push(",");
-        const n = this.getChildCount();
-        for (var i = 0; i < n; i++) {
-            buf.push(" ");
-            buf.push(this.getChildAt(i).toString());
-        }
-        buf.push(" }");
-        return buf.join("");
+    getSymbol() {
+        return Symbol.COMMUTATION;
     }
 }
 /**
@@ -151,95 +138,40 @@ class CommutationNode extends Node {
  * The side effect of a conjugation node is A B A'.
  */
 class ConjugationNode extends Node {
-    constructor(layerCount, conjugator, conjugate, startPosition, endPosition) {
-        super(layerCount, startPosition, endPosition);
-        this.conjugator = conjugator;
-        if (conjugate != null) {
-            this.add(conjugate);
-        }
-    }
-    setConjugator(newValue) {
-        this.conjugator = newValue;
+    constructor() {
+        super();
     }
 
-    toString() {
-        const buf = [];
-        buf.push(this.getStartPosition());
-        buf.push("..");
-        buf.push(this.getEndPosition());
-        buf.push(" Conjugation{ ");
-        buf.push(this.conjugator);
-        buf.push(",");
-        const n = this.getChildCount();
-        for (var i = 0; i < n; i++) {
-            buf.push(" ");
-            buf.push(this.getChildAt(i).toString());
-        }
-        buf.push(" }");
-        return buf.join("");
+    getSymbol() {
+        return Symbol.CONJUGATION;
     }
 }
 class SequenceNode extends Node {
     constructor(layerCount, startPosition, endPosition) {
         super(layerCount, startPosition, endPosition);
     }
-    toString() {
-        const buf = [];
-        buf.push(this.getStartPosition());
-        buf.push("..");
-        buf.push(this.getEndPosition());
-        buf.push(" Sequence{");
-        const n = this.getChildCount();
-        for (var i = 0; i < n; i++) {
-            buf.push(" ");
-            buf.push(this.getChildAt(i).toString());
-        }
-        buf.push(" }");
-        return buf.join("");
+    getSymbol() {
+        return Symbol.SEQUENCE;
     }
 }
-class StatementNode extends Node {
-    constructor(layerCount, startPosition, endPosition) {
-        super(layerCount, startPosition, endPosition);
-    }
 
-    toString() {
-        const buf = [];
-        buf.push("Statement{");
-        const n = this.getChildCount();
-        for (var i = 0; i < n; i++) {
-            buf.push(" ");
-            buf.push(this.getChildAt(i).toString());
-        }
-        buf.push(" }");
-        return buf.join("");
-    }
-}
 class GroupingNode extends Node {
-    constructor(layerCount, startPosition, endPosition) {
-        super(layerCount, startPosition, endPosition);
-        this.layerCount = layerCount;
+    constructor() {
+        super();
     }
 
-    toString() {
-        const buf = [];
-        buf.push(this.getStartPosition());
-        buf.push("..");
-        buf.push(this.getEndPosition());
-        buf.push(" Grouping{");
-        const n = this.getChildCount();
-        for (var i = 0; i < n; i++) {
-            buf.push(" ");
-            buf.push(this.getChildAt(i).toString());
-        }
-        buf.push(" }");
-        return buf.join("");
+    getSymbol() {
+        return Symbol.GROUPING;
     }
 }
 
+/**
+ * An InversionNode holds one child A.
+ * The side effect of an inversion node is A'.
+ */
 class InversionNode extends Node {
-    constructor(layerCount, startPosition, endPosition) {
-        super(layerCount, startPosition, endPosition);
+    constructor() {
+        super();
     }
     applyTo(cube, inverse = false) {
         super.applyTo(cube, !inverse);
@@ -248,18 +180,8 @@ class InversionNode extends Node {
         yield* super.resolvedIterable(!inverse);
     }
 
-    toString() {
-        const buf = [];
-        buf.push(this.getStartPosition());
-        buf.push("..");
-        buf.push(this.getEndPosition());
-        buf.push(" Inversion{ ");
-        const n = this.getChildCount();
-        for (var i = 0; i < n; i++) {
-            buf.push(this.getChildAt(i).toString());
-        }
-        buf.push(" }");
-        return buf.join("");
+    getSymbol() {
+        return Symbol.INVERSION;
     }
 }
 
@@ -569,32 +491,33 @@ class PermutationNode extends Node {
 
         this.add(permItem);
     }
+    getSymbol() {
+        return Symbol.PERMUTATION;
+    }
 }
 
 class ReflectionNode extends Node {
-    constructor(layerCount, startPosition, endPosition) {
-        super(layerCount, startPosition, endPosition);
+    constructor() {
+        super();
     }
-    toString() {
-        const buf = [];
-        buf.push("Reflection{");
-        const n = this.getChildCount();
-        for (var i = 0; i < n; i++) {
-            buf.push(" ");
-            buf.push(this.getChildAt(i).toString());
-        }
-        buf.push(" }");
-        return buf.join("");
+    getSymbol() {
+        return Symbol.REFLECTION;
     }
 }
-
+/**
+ * A RepetitionNode holds one child A and a repeat count.
+ * The side effect of a RepetitionNode on a cube is
+ * repeat count times A.
+ */
 class RepetitionNode extends Node {
-    constructor(layerCount, startPosition, endPosition, repeatCount) {
-        super(layerCount, startPosition, endPosition);
-        this.repeatCount = repeatCount;
+    constructor() {
+        super();
     }
     setRepeatCount(newValue) {
         this.repeatCount = newValue;
+    }
+    getRepeatCount() {
+        return this.repeatCount;
     }
     applyTo(cube, inverse) {
         for (let r = 0; r < this.repeatCount; r++) {
@@ -608,30 +531,30 @@ class RepetitionNode extends Node {
         }
     }
 
-    toString() {
-        const buf = [];
-        buf.push("Repetition{ ");
-        buf.push(this.repeatCount);
-        buf.push(",");
-        const n = this.getChildCount();
-        for (var i = 0; i < n; i++) {
-            buf.push(" ");
-            buf.push(this.getChildAt(i).toString());
-        }
-        buf.push(" }");
-        return buf.join("");
+    getSymbol() {
+        return Symbol.REPETITION;
     }
 }
+
+/**
+ * A RotationNode holds a rotator A and a single child B. The side effect of a
+ * rotation node to a Cube is A' B A.
+ */
+class RotationNode extends Node {
+    constructor() {
+        super();
+    }
+    getSymbol() {
+        return Symbol.ROTATION;
+    }
+}
+
 class NOPNode extends Node {
     constructor(startPosition, endPosition) {
         super(-1, startPosition, endPosition);
     }
-    toString() {
-        return ""
-          + this.getStartPosition()
-          + ".."
-          + this.getEndPosition()
-          + " NOP{ }";
+    getSymbol() {
+        return Symbol.NOP;
     }
 }
 
@@ -678,12 +601,12 @@ class MoveNode extends Node {
         }
     }
 
+    getSymbol() {
+        return Symbol.MOVE;
+    }
     toString() {
-        return ""
-          + this.getStartPosition()
-          + ".."
-          + this.getEndPosition()
-          + ' Move{ ' + this.axis + ':' + this.layerMask + ':' + this.angle + ' }';
+        return this.getSymbol()
+         +'{ ' + this.axis + ':' + this.layerMask + ':' + this.angle + ' }';
     }
 }
 
@@ -700,7 +623,7 @@ export default {
     NOPNode: NOPNode,
     ReflectionNode: ReflectionNode,
     RepetitionNode: RepetitionNode,
+    RotationNode: RotationNode,
     SequenceNode: SequenceNode,
-    StatementNode: StatementNode,
     PermutationNode: PermutationNode,
 };

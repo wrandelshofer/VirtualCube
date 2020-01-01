@@ -430,7 +430,7 @@ export default {
     TT_KEYWORD: TT_KEYWORD,
     TT_EOF: TT_EOF,
     TT_NUMBER: TT_NUMBER,
-    TT_NUMBER: TT_SPECIAL,
+    TT_SPECIAL: TT_SPECIAL,
     Tokenizer: Tokenizer,
     PushBackReader:PushBackReader
   };

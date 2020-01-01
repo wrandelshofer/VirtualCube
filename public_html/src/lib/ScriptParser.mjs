@@ -93,13 +93,13 @@ class ScriptParser {
                 node = this.createRepetitionNode(tt, operand1, operand2);
                 break;
             case Notation.Symbol.ROTATION:
-                node = createBinaryNode(tt, new AST.RotationNode(), operand1, operand2);
+                node = this.createBinaryNode(tt, new AST.RotationNode(), operand1, operand2);
                 break;
             case Notation.Symbol.COMMUTATION:
-                node = createBinaryNode(tt, new AST.CommutationNode(), operand1, operand2);
+                node = this.createBinaryNode(tt, new AST.CommutationNode(), operand1, operand2);
                 break;
             case Notation.Symbol.CONJUGATION:
-                node = createBinaryNode(tt, new AST.ConjugationNode(), operand1, operand2);
+                node = this.createBinaryNode(tt, new AST.ConjugationNode(), operand1, operand2);
                 break;
             default:
                 throw new AssertionError("Composite. Unexpected operation: " + operation);
@@ -115,7 +115,7 @@ class ScriptParser {
         if (operand1 == null || operand2 != null) {
             throw this.createException(tt, "Repetition: One operand expected.");
         }
-        let n = new RepetitionNode();
+        let n = new AST.RepetitionNode();
         n.add(operand1);
         return n;
     }
@@ -325,7 +325,7 @@ class ScriptParser {
     }
 
     parsePermutation(tt, parent) {
-        let permutation = new PermutationNode(tt.getStartPosition(), tt.getStartPosition());
+        let permutation = new AST.PermutationNode(tt.getStartPosition(), tt.getStartPosition());
 
         let sign = null;
         let syntax = this.notation.getSyntax(Notation.Symbol.PERMUTATION);
@@ -517,7 +517,7 @@ class ScriptParser {
             throw this.createException(tt, "Postcircumfix: Two operands expected.");
         }
         let end = tt.getEndPosition();
-        let node = createCompositeNode(tt, symbol, operands[1], operands[0]);
+        let node = this.createCompositeNode(tt, symbol, operands[1], operands[0]);
         node.setStartPosition(start);
         node.setEndPosition(end);
         parent.add(node);
@@ -561,7 +561,7 @@ class ScriptParser {
             throw this.createException(tt, "Precircumfix: Two operands expected.");
         }
         let end = tt.getEndPosition();
-        let node = createCompositeNode(tt, symbol, operands[0], operands[1]);
+        let node = this.createCompositeNode(tt, symbol, operands[0], operands[1]);
         node.setStartPosition(start);
         node.setEndPosition(end);
         parent.add(node);
@@ -626,7 +626,7 @@ class ScriptParser {
                 try {
                     let macro = this.notation.getMacro(token);
                     let macroScript = this.parse(macro);
-                    let macroNode = new MacroNode(null, macro, tt.getStartPosition(), tt.getEndPosition());
+                    let macroNode = new AST.MacroNode(null, macro, tt.getStartPosition(), tt.getEndPosition());
                     macroNode.add(macroScript);
                     child = macroNode;
                 } catch (e) {
@@ -689,7 +689,7 @@ class ScriptParser {
                 throw new ParseException("Repetition: Illegal syntax: " + syntax, tt.getStartPosition(), tt.getEndPosition());
             }
         }
-        let repetitionNode = new RepetitionNode();
+        let repetitionNode = new AST.RepetitionNode();
         repetitionNode.addAll(operand.getChildren().slice(0));
         repetitionNode.setRepeatCount(repeatCount);
         repetitionNode.setStartPosition(start);
