@@ -15,13 +15,12 @@ class IllegalArgumentException extends Error {
 }
 
 /**
- * Represents an Abstract Syntax Tree Node
+ * Represents an Abstract Syntax Tree Node.
  */
 class Node {
-    constructor(layerCount, startPosition, endPosition) {
+    constructor(startPosition, endPosition) {
         this.children = [];
         this.parent = null;
-        this.layerCount = layerCount;
         this.startPosition = startPosition;
         this.endPosition = endPosition;
     }
@@ -147,8 +146,8 @@ class ConjugationNode extends Node {
     }
 }
 class SequenceNode extends Node {
-    constructor(layerCount, startPosition, endPosition) {
-        super(layerCount, startPosition, endPosition);
+    constructor(startPosition, endPosition) {
+        super(startPosition, endPosition);
     }
     getSymbol() {
         return Symbol.SEQUENCE;
@@ -186,8 +185,8 @@ class InversionNode extends Node {
 }
 
 class PermutationItem extends Node {
-    constructor(layerCount, startPosition, endPosition) {
-        super(layerCount, startPosition, endPosition);
+    constructor(startPosition, endPosition) {
+        super(startPosition, endPosition);
     }
 }
 const PLUS_SIGN = 3;
@@ -203,7 +202,8 @@ const UNDEFINED_PERMUTATION = null;
 
 class PermutationNode extends Node {
     constructor(layerCount, startPosition, endPosition) {
-        super(layerCount, startPosition, endPosition);
+        super(startPosition, endPosition);
+        this.layerCount = layerCount;
         this.type = UNDEFINED_PERMUTATION;
         this.sign = UNDEFINED_SIGN;
     }
@@ -551,7 +551,7 @@ class RotationNode extends Node {
 
 class NOPNode extends Node {
     constructor(startPosition, endPosition) {
-        super(-1, startPosition, endPosition);
+        super(startPosition, endPosition);
     }
     getSymbol() {
         return Symbol.NOP;
@@ -562,10 +562,11 @@ class MoveNode extends Node {
 
     /** Script nodes. */
     constructor(layerCount, axis, layerMask, angle, startPos, endPos) {
-        super(layerCount, startPos, endPos);
+        super(startPos, endPos);
         this.axis = axis;
         this.angle = angle;
         this.layerMask = layerMask;
+        this.layerCount = layerCount;
     }
 
     getAxis() {
