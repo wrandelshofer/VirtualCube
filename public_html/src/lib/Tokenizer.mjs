@@ -2,7 +2,7 @@
  * Copyright (c) 2019 Werner Randelshofer, Switzerland. MIT License.
  */
 
-// ttypes of Tokenizer
+// token types of Tokenizer
 // ----------------------
   let TT_WORD = -2;
   let TT_EOF = -1;
@@ -11,39 +11,53 @@
   let TT_KEYWORD = -4;
   let TT_NUMBER = -5;
 
-    // the following ttypes are used internally
+  // the following ttypes are used internally
   let TT_DIGIT = -11;
   let TT_SPECIAL = -12;
   let TT_SKIP = -13;
 
-  /**
-   * A node of keyword tree.
-   * 
-   * Example tree structure, for the keywords "ab", and "abcd".
-   * 
-   * ''.KeywordTree(null)
-   * ''.'a'.KeywordTree(null)
-   * ''.'a'.'b'.KeywordTree("ab")
-   * ''.'a'.'b'.'c'.KeywordTree(null)
-   * ''.'a'.'b'.'c'.'d'.KeywordTree("abcd")
-   */
-  class KeywordTree {
+/**
+  * A node of keyword tree.
+  * 
+  * Example tree structure, for the keywords "ab", and "abcd".
+  * 
+  * ''.KeywordNode{keyword=null}
+  * ''.'a'.KeywordNode{keyword=null}
+  * ''.'a'.'b'.KeywordNode{keyword=n"ab"}
+  * ''.'a'.'b'.'c'.KeywordNode{keyword=null}
+  * ''.'a'.'b'.'c'.'d'.KeywordNode{keyword="abcd"}
+  */
+  class KeywordNode {
     constructor() {
+    /**
+     * The keyword.
+     * This value is non-null if the node represents a keyword.
+     * The value is null if the node is an intermediate node in the tree.
+     */
       this.keyword = null;
+    /**
+     * The character sequence that ends a comment.
+     * This value is non-null if the node represents a keyword that starts
+     * a comment.
+     */
       this.commentEnd = null;
-      this.children = [];// HashMap<Character,KeywordTree>.
+    /**
+     * The children map. The key of the map is the character that leads
+     * from this tree node down to the next.
+     */
+      this.children = new Map();// HashMap<Character,KeywordNode>.
     }
     
     getChild(ch) {
-        return this.children[ch];
+        return this.children.get(ch);
     }
     
     putChild(ch, child) {
-        this.children[ch]=child;
+        this.children.set(ch, child);
     }
 
     setKeyword(value) {
-         this.keyword=value;
+         this.keyword = value;
     }
 
     getKeyword() {
@@ -80,16 +94,25 @@
       this.tend = 0;
       this.sval = null;
       this.nval = null;
-      this.keywordTree = new KeywordTree(null);
+      this.keywordTree = new KeywordNode(null);
       this.lookup = new Map();//Map<Character, Integer>
     }
 
     /**
-     * Defines a comment begin and end token.
+     * Adds a comment token.
+     * <p>
+     * To add a single line comment, use:
+     * <pre>
+     *     addComment("//","\n");
+     * </pre>
+     *
+     * To add a multi line comment, use:
+     * <pre>
+     *     addComment("/*", "* /");
+     * </pre>
      */
     addComment(start, end) {
         let node = this.addKeywordRecursively(start);
-        node.setKeyword(start);
         node.setCommentEnd(end);
     }
 
@@ -102,29 +125,29 @@
     
 
     /**
-     * Defines a keyword token.
+     * Adds a keyword.
      *
-     * @param token the keyword token
+     * @param keyword the keyword token
      */
-    addKeyword(token) {
-        let node = this.addKeywordRecursively(token);
-        node.setKeyword(token);
+    addKeyword(keyword) {
+        this.addKeywordRecursively(keyword);
     }
     
-    addKeywordRecursively(token) {
+    addKeywordRecursively(keyword) {
         let node = this.keywordTree;
-        for (var i = 0; i < token.length; i++) {
-            let ch = token.charAt(i);
+        for (var i = 0; i < keyword.length; i++) {
+            let ch = keyword.charAt(i);
             let child = node.getChild(ch);
             if (child == null) {
-                child = new KeywordTree();
+                child = new KeywordNode();
                 node.putChild(ch, child);
             }
             node = child;
         }
+        node.setKeyword(keyword);
         return node;
-    }    
-    
+    }
+
     /**
      * Defines the tokens needed for parsing non-negative integers.
      */
@@ -140,18 +163,12 @@
         this.addDigit('8');
         this.addDigit('9');
     }
-    
+
     /**
-     * Adds a skip character.
+     * Adds a character that the tokenizer should skip.
      */
     addSkip(ch) {
         this.lookup.set(ch, TT_SKIP);
-    }
-    /**
-     * Adds a special character.
-     */
-    addSpecial(ch) {
-        this.lookup.set(ch, TT_SPECIAL);
     }
 
     /**
@@ -252,7 +269,7 @@
             ch = this.read();
 
             // try to tokenize a number
-            if (ch != TT_EOF && this.getOrDefault(this.lookup,ch, TT_WORD) == TT_DIGIT) {
+            if (ch != TT_EOF && this.getOrDefault(this.lookup, ch, TT_WORD) == TT_DIGIT) {
                 while (ch != TT_EOF && this.getOrDefault(this.lookup, ch, TT_WORD) == TT_DIGIT) {
                     ch = this.read();
                 }
@@ -268,7 +285,7 @@
             }
 
             // try to tokenize a word
-            if (ch != TT_EOF && this.getOrDefault(this.lookup,ch, TT_WORD) == TT_WORD) {
+            if (ch != TT_EOF && this.getOrDefault(this.lookup, ch, TT_WORD) == TT_WORD) {
                 while (ch != TT_EOF && this.getOrDefault(this.lookup, ch, TT_WORD) == TT_WORD) {
                     ch = this.read();
                 }
@@ -288,8 +305,12 @@
         }
     }
 
+    /**
+     * Causes the next call to the {@code nextToken} method of this
+     * tokenizer to return the current value.
+     */
     pushBack() {
-      this.pushedBack=true;
+        this.pushedBack = true;
     }
     
     /**
@@ -360,18 +381,19 @@
     }
 
     /**
-     * Defines the specials needed for skipping whitespace.
+     * Adds whitespace characters to the list of characters that the tokenizer
+     * is supposed to skip.
      */
     skipWhitespace() {
-      this.addSkip(" ", TT_SKIP);
-      this.addSkip("\f", TT_SKIP);
-      this.addSkip("\n", TT_SKIP);
-      this.addSkip("\r", TT_SKIP);
-      this.addSkip("\t", TT_SKIP);
-      this.addSkip("\v", TT_SKIP);
-      this.addSkip("\u00a0", TT_SKIP);// NO-BREAK SPACE
-      this.addSkip("\u2028", TT_SKIP);
-      this.addSkip("\u2029", TT_SKIP);
+        this.addSkip(' ');
+        this.addSkip('\f');// FORM FEED
+        this.addSkip('\n');// LINE FEED
+        this.addSkip('\r');// CARRIAGE RETURN
+        this.addSkip('\t');// CHARACTER TABULATION
+        this.addSkip('\u000b');// LINE TABULATION
+        this.addSkip('\u00a0');// NO-BREAK SPACE
+        this.addSkip('\u2028');// LINE SEPARATOR
+        this.addSkip('\u2029');// PARAGRAPH SEPARATOR
     }
 
     /**
