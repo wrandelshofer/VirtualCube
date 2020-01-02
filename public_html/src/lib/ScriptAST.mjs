@@ -653,10 +653,16 @@ class MoveNode extends Node {
     /** Script nodes. */
     constructor(layerCount, axis, layerMask, angle, startPos, endPos) {
         super(startPos, endPos);
+
         this.axis = axis;
-        this.angle = angle;
         this.layerMask = layerMask;
         this.layerCount = layerCount;
+
+        // Normalize angle to range [-2, +2].
+        let a = angle % 4;
+        if (a == 3) a = -1;
+        if (a == -3) a = 1;
+        this.angle = a;
     }
 
     getAxis() {
@@ -674,14 +680,7 @@ class MoveNode extends Node {
 
     /** Applies the node to the specified cube. */
     applyTo(cube, inverse) {
-        if (!this.doesNothing()) {
-            cube.transform(this.axis, this.layerMask, inverse ? -this.angle : this.angle);
-        }
-    }
-
-    /** Returns true if this node does nothing. */
-    doesNothing() {
-        return this.angle == 0 || this.layerMask == 0;
+       cube.transform(this.axis, this.layerMask, inverse ? -this.angle : this.angle);
     }
 
     * resolvedIterable(inverse) {

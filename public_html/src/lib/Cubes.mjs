@@ -4,6 +4,7 @@
 
 import Cube from './Cube.mjs';
 import ScriptNotation from './ScriptNotation.mjs';
+let Symbol = ScriptNotation.Symbol;
 
 /**
  * Returns a String describing the state of the cube using
@@ -20,11 +21,20 @@ function toPermutationString(cube, notation) {
     let syntax = notation.getSyntax(ScriptNotation.Symbol.PERMUTATION);
 
     return toPermutationString0(cube, syntax,
-      "r", "u", "f", "l", "d", "b",
-      "+", "++", "-",
-      "(", ")", ",");
+        notation.getToken(Symbol.PERMUTATION_FACE_R),
+                    notation.getToken(Symbol.PERMUTATION_FACE_U),
+                    notation.getToken(Symbol.PERMUTATION_FACE_F),
+                    notation.getToken(Symbol.PEMRUTATION_FACE_L),
+                    notation.getToken(Symbol.PERMUTATION_FACE_D),
+                    notation.getToken(Symbol.PERMUTATION_FACE_B),
+                    notation.getToken(Symbol.PERMUTATION_PLUS),
+                    notation.getToken(Symbol.PERMUTATION_PLUSPLUS),
+                    notation.getToken(Symbol.PERMUTATION_MINUS),
+                    notation.getToken(Symbol.PERMUTATION_BEGIN),
+                    notation.getToken(Symbol.PERMUTATION_END),
+                    notation.getToken(Symbol.PERMUTATION_DELIMITER));
 }
-;
+
 
 function toPermutationString0(cube,
   syntax,

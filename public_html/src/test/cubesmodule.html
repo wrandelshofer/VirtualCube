@@ -28,16 +28,16 @@
           let notation = new ScriptNotation.DefaultNotation();
           switch (inputSyntax) {
             case 'PRECIRCUMFIX':
-              notation.symbolToSyntaxMap[ScriptNotation.Symbol.PERMUTATION] = ScriptNotation.Syntax.PRECIRCUMFIX;
+              notation.symbolToSyntaxMap.set(ScriptNotation.Symbol.PERMUTATION, ScriptNotation.Syntax.PRECIRCUMFIX);
               break;
             case 'PREFIX':
-              notation.symbolToSyntaxMap[ScriptNotation.Symbol.PERMUTATION] = ScriptNotation.Syntax.PREFIX;
+              notation.symbolToSyntaxMap.set(ScriptNotation.Symbol.PERMUTATION, ScriptNotation.Syntax.PREFIX);
               break;
             case 'SUFFIX':
-              notation.symbolToSyntaxMap[ScriptNotation.Symbol.PERMUTATION] = ScriptNotation.Syntax.SUFFIX;
+              notation.symbolToSyntaxMap.set(ScriptNotation.Symbol.PERMUTATION, ScriptNotation.Syntax.SUFFIX);
               break;
             case 'POSTCIRCUMFIX':
-              notation.symbolToSyntaxMap[ScriptNotation.Symbol.PERMUTATION] = ScriptNotation.Syntax.POSTCIRCUMFIX;
+              notation.symbolToSyntaxMap.set(ScriptNotation.Symbol.PERMUTATION, ScriptNotation.Syntax.POSTCIRCUMFIX);
               break;
           }
           
