@@ -326,7 +326,7 @@ class ScriptParser {
     }
 
     parsePermutation(tt, parent) {
-        let permutation = new AST.PermutationNode(tt.getStartPosition(), tt.getStartPosition());
+        let permutation = new AST.PermutationCycleNode(tt.getStartPosition(), tt.getStartPosition());
 
         let sign = null;
         let syntax = this.notation.getSyntax(Notation.Symbol.PERMUTATION);
@@ -368,7 +368,7 @@ class ScriptParser {
         }
         if (syntax != Notation.Syntax.POSTCIRCUMFIX) {
             // postcircumfix is read in parsePermutationItem.
-            permutation.setSign(sign);
+            permutation.setSignSymbol(sign);
         }
         permutation.setEndPosition(tt.getEndPosition());
         parent.add(permutation);

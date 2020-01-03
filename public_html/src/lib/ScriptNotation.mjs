@@ -173,12 +173,12 @@ Symbol.NOP = new TerminalSymbol("NOP");
 Symbol.MOVE = new TerminalSymbol("move", "twist");
 
 // Note: THe ordering of the permutation face symbols is significant in ScriptASt.mjs PermutationNode.
-Symbol.PERMUTATION_FACE_R = new TerminalSymbol("r");
-Symbol.PERMUTATION_FACE_U = new TerminalSymbol("u");
-Symbol.PERMUTATION_FACE_F = new TerminalSymbol("f");
-Symbol.PERMUTATION_FACE_L = new TerminalSymbol("l");
-Symbol.PERMUTATION_FACE_D = new TerminalSymbol("d");
-Symbol.PERMUTATION_FACE_B = new TerminalSymbol("b");
+Symbol.FACE_R = new TerminalSymbol("r");
+Symbol.FACE_U = new TerminalSymbol("u");
+Symbol.FACE_F = new TerminalSymbol("f");
+Symbol.FACE_L = new TerminalSymbol("l");
+Symbol.FACE_D = new TerminalSymbol("d");
+Symbol.FACE_B = new TerminalSymbol("b");
 
 Symbol.PERMUTATION_PLUS = new TerminalSymbol("permPlus");
 Symbol.PERMUTATION_MINUS = new TerminalSymbol("permMinus");
@@ -240,12 +240,12 @@ Symbol.INVERSION = new CompositeSymbol("inversion", [
 
 Symbol.PERMUTATION_ITEM = new TerminalSymbol("permutationItem");
 Symbol.PERMUTATION = new CompositeSymbol("permutation", [
-    Symbol.PERMUTATION_FACE_R,
-    Symbol.PERMUTATION_FACE_U,
-    Symbol.PERMUTATION_FACE_F,
-    Symbol.PERMUTATION_FACE_L,
-    Symbol.PERMUTATION_FACE_D,
-    Symbol.PERMUTATION_FACE_B,
+    Symbol.FACE_R,
+    Symbol.FACE_U,
+    Symbol.FACE_F,
+    Symbol.FACE_L,
+    Symbol.FACE_D,
+    Symbol.FACE_B,
     Symbol.PERMUTATION_PLUS,
     Symbol.PERMUTATION_MINUS,
     Symbol.PERMUTATION_PLUSPLUS,
@@ -386,12 +386,12 @@ Symbol.isOperator = function(s) {
 
 Symbol.isFaceSymbol = function (s) {
     switch (s) {
-        case Symbol.PERMUTATION_FACE_R:
-        case Symbol.PERMUTATION_FACE_U:
-        case Symbol.PERMUTATION_FACE_F:
-        case Symbol.PERMUTATION_FACE_L:
-        case Symbol.PERMUTATION_FACE_D:
-        case Symbol.PERMUTATION_FACE_B:
+        case Symbol.FACE_R:
+        case Symbol.FACE_U:
+        case Symbol.FACE_F:
+        case Symbol.FACE_L:
+        case Symbol.FACE_D:
+        case Symbol.FACE_B:
             return true;
         default:
             return false;
@@ -583,12 +583,12 @@ class DefaultNotation extends Notation {
 
         this.addToken(Symbol.NOP, "·");
         this.addToken(Symbol.NOP, ".");
-        this.addToken(Symbol.PERMUTATION_FACE_R, "r");
-        this.addToken(Symbol.PERMUTATION_FACE_U, "u");
-        this.addToken(Symbol.PERMUTATION_FACE_F, "f");
-        this.addToken(Symbol.PERMUTATION_FACE_L, "l");
-        this.addToken(Symbol.PERMUTATION_FACE_D, "d");
-        this.addToken(Symbol.PERMUTATION_FACE_B, "b");
+        this.addToken(Symbol.FACE_R, "r");
+        this.addToken(Symbol.FACE_U, "u");
+        this.addToken(Symbol.FACE_F, "f");
+        this.addToken(Symbol.FACE_L, "l");
+        this.addToken(Symbol.FACE_D, "d");
+        this.addToken(Symbol.FACE_B, "b");
         this.addToken(Symbol.PERMUTATION_PLUS, "+");
         this.addToken(Symbol.PERMUTATION_MINUS, "-");
         this.addToken(Symbol.PERMUTATION_PLUSPLUS, "++");

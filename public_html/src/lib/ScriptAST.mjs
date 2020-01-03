@@ -38,6 +38,20 @@ class Node {
         }
     }
 
+    /**
+     * Inverses the subtree starting at this node.
+     */
+    invert() {
+        if (this.children != null) {
+            let a = this.getChildren().slice(0);
+            this.removeAllChildren();
+            for (let i = a.length - 1; i >= 0; i--) {
+                let elem = a[i];
+                elem.invert();
+                this.add(elem);
+            }
+        }
+    }
     remove(child) {
         if (child.parent == this) {
             let index = this.children.indexOf(child);
@@ -91,21 +105,14 @@ class Node {
     }
 
     applyTo(cube, inverse = false) {
-        if (inverse) {
-            for (let i = this.children.length - 1; i >= 0; i--) {
-                this.children[i].applyTo(cube, inverse);
-            }
-        } else {
-            for (let i = 0, n=this.children.length; i < n; i++) {
-                this.children[i].applyTo(cube, inverse);
-            }
+        for (let node of this.resolvedIterable(inverse)) {
+            node.applyTo(cube, false);
         }
     }
 
     /** 
-     * Enumerates a resolved version of the subtree starting at this node. All
-     * elements of the enumeration except of MoveNode's and PermutationNode's
-     * may be safely ignored.
+     * Enumerates a resolved version of the subtree starting at this node. The
+     * enumeration only includes objects of type MoveNode and PermutationCycleNode.
      *
      * @param inverse:boolean 
      */
@@ -118,11 +125,7 @@ class Node {
             for (let i in this.children) {
                 yield * this.children[i].resolvedIterable(inverse);
             }
-    }
-    }
-
-    toString() {
-        return "Node";
+        }
     }
 }
 
@@ -137,22 +140,22 @@ class CommutationNode extends Node {
     getSymbol() {
         return Symbol.COMMUTATION;
     }
-    applyTo(cube, inverse = false) {
+    * resolvedIterable(inverse = false) {
         if (this.getChildCount() != 2) {
             return;
         }
         let a = this.getChildAt(0);
         let b = this.getChildAt(1);
         if (inverse) {
-            b.applyTo(cube, false);
-            a.applyTo(cube, false);
-            b.applyTo(cube, true);
-            a.applyTo(cube, true);
+           yield * b.resolvedIterable(false);
+           yield * a.resolvedIterable(false);
+           yield * b.resolvedIterable(true);
+           yield * a.resolvedIterable(true);
         } else {
-            a.applyTo(cube, false);
-            b.applyTo(cube, false);
-            a.applyTo(cube, true);
-            b.applyTo(cube, true);
+           yield * a.resolvedIterable(false);
+           yield * b.resolvedIterable(false);
+           yield * a.resolvedIterable(true);
+           yield * b.resolvedIterable(true);
         }
     }
 }
@@ -169,17 +172,16 @@ class ConjugationNode extends Node {
         return Symbol.CONJUGATION;
     }
     
-    applyTo(cube, inverse = false) {
+    * resolvedIterable(inverse = false) {
         if (this.getChildCount() != 2) {
             return;
         }
         let a = this.getChildAt(0);
         let b = this.getChildAt(1);
-        a.applyTo(cube, false);
-        b.applyTo(cube, inverse);
-        a.applyTo(cube, true);
+        yield * a.resolvedIterable(false);
+        yield * b.resolvedIterable(inverse);
+        yield * a.resolvedIterable(true);
     }
-    
 }
 class SequenceNode extends Node {
     constructor(startPosition, endPosition) {
@@ -208,9 +210,7 @@ class InversionNode extends Node {
     constructor() {
         super();
     }
-    applyTo(cube, inverse = false) {
-        super.applyTo(cube, !inverse);
-    }
+    
     * resolvedIterable(inverse = false) {
         yield* super.resolvedIterable(!inverse);
     }
@@ -221,8 +221,8 @@ class InversionNode extends Node {
 }
 
 class PermutationItemNode extends Node {
-    constructor(startPosition, endPosition) {
-        super(startPosition, endPosition);
+    constructor() {
+        super();
 
         /**
          * The orientation of the part.
@@ -270,7 +270,7 @@ const EDGE_PERMUTATION = 2;
 const CORNER_PERMUTATION = 3;
 const UNDEFINED_PERMUTATION = null;
 
-class PermutationNode extends Node {
+class PermutationCycleNode extends Node {
     constructor(layerCount, startPosition, endPosition) {
         super(startPosition, endPosition);
         this.layerCount = layerCount;
@@ -291,10 +291,7 @@ class PermutationNode extends Node {
             return;
         }
 
-        let seq = new Array(this.getChildCount());
-        for (let i = 0; i < seq.length; i++) {
-            seq[i] = this.getChildAt(i);
-        }
+        let seq = this.getChildren();
 
         let loc = null;//int[]
         let orient = null;//int[]
@@ -361,10 +358,7 @@ class PermutationNode extends Node {
             return;
         }
 
-        let seq = new Array(getChildCount());
-        for (let i = 0; i < seq.length; i++) {
-            seq[i] = this.getChildAt(i);
-        }
+        let seq = this.getChildren();
 
         let loc = null;//int[]
         let orient = null;// int[]
@@ -430,10 +424,10 @@ class PermutationNode extends Node {
      * permutation already has permutation items
      * of a different type.
      *
-     * @param {int} type PermutationNode.SIDE, .EDGE, .CORNER
+     * @param {int} type PermutationCycleNode.SIDE, .EDGE, .CORNER
      * @param {Symbol} signSymbol Symbol.PERMUTATION_PLUS, .PMINUS or  .PPLUSPLUS or (0 if no sign symbol).
      * @param {Symbol[]} faceSymbols Array of 1, 2, or 3 entries of
-     *                   Symbol.PERMUTATION_FACE_R, .PU, .PB, .PL, .PD or .PF.
+     *                   Symbol.FACE_R, .PU, .PB, .PL, .PD or .PF.
      * @param {int} partNumber A value &gt;= 0 used to disambiguate multiple edge parts
      *                   and multiple side parts in 4x4 cubes and 5x5 cubes.
      * @param {int} layerCount The number of layers of the cube.
@@ -484,17 +478,17 @@ class PermutationNode extends Node {
                 break;
             case SIDE_PERMUTATION:
             {
-                if (faceSymbols[0] == Symbol.PERMUTATION_FACE_R) {
+                if (faceSymbols[0] == Symbol.FACE_R) {
                     loc = 0;
-                } else if (faceSymbols[0] == Symbol.PERMUTATION_FACE_U) {
+                } else if (faceSymbols[0] == Symbol.FACE_U) {
                     loc = 1;
-                } else if (faceSymbols[0] == Symbol.PERMUTATION_FACE_F) {
+                } else if (faceSymbols[0] == Symbol.FACE_F) {
                     loc = 2;
-                } else if (faceSymbols[0] == Symbol.PERMUTATION_FACE_L) {
+                } else if (faceSymbols[0] == Symbol.FACE_L) {
                     loc = 3;
-                } else if (faceSymbols[0] == Symbol.PERMUTATION_FACE_D) {
+                } else if (faceSymbols[0] == Symbol.FACE_D) {
                     loc = 4;
-                } else if (faceSymbols[0] == Symbol.PERMUTATION_FACE_B) {
+                } else if (faceSymbols[0] == Symbol.FACE_B) {
                     loc = 5;
                 }
 
@@ -528,53 +522,42 @@ class PermutationNode extends Node {
                 let high = (faceSymbols[0].compareTo(faceSymbols[1]) > 0) ? faceSymbols[0] : faceSymbols[1];
                 let first = faceSymbols[0];
                 let rotated = false;
-                if (low == Symbol.PERMUTATION_FACE_R && high == Symbol.PERMUTATION_FACE_U) {
+                if (low == Symbol.FACE_R && high == Symbol.FACE_U) {
                     loc = 0;
-                    rotated = first == Symbol.PERMUTATION_FACE_R;
-                } else if (low == Symbol.PERMUTATION_FACE_R
-                  && high == Symbol.PERMUTATION_FACE_F) {
+                    rotated = first == Symbol.FACE_R;
+                } else if (low == Symbol.FACE_R && high == Symbol.FACE_F) {
                     loc = 1;
-                    rotated = first == Symbol.PERMUTATION_FACE_F;
-                } else if (low == Symbol.PERMUTATION_FACE_R
-                  && high == Symbol.PERMUTATION_FACE_D) {
+                    rotated = first == Symbol.FACE_F;
+                } else if (low == Symbol.FACE_R && high == Symbol.FACE_D) {
                     loc = 2;
-                    rotated = first == Symbol.PERMUTATION_FACE_R;
-                } else if (low == Symbol.PERMUTATION_FACE_U
-                  && high == Symbol.PERMUTATION_FACE_B) {
+                    rotated = first == Symbol.FACE_R;
+                } else if (low == Symbol.FACE_U && high == Symbol.FACE_B) {
                     loc = 3;
-                    rotated = first == Symbol.PERMUTATION_FACE_U;
-                } else if (low == Symbol.PERMUTATION_FACE_R
-                  && high == Symbol.PERMUTATION_FACE_B) {
+                    rotated = first == Symbol.FACE_U;
+                } else if (low == Symbol.FACE_R && high == Symbol.FACE_B) {
                     loc = 4;
-                    rotated = first == Symbol.PERMUTATION_FACE_B;
-                } else if (low == Symbol.PERMUTATION_FACE_D
-                  && high == Symbol.PERMUTATION_FACE_B) {
+                    rotated = first == Symbol.FACE_B;
+                } else if (low == Symbol.FACE_D && high == Symbol.FACE_B) {
                     loc = 5;
-                    rotated = first == Symbol.PERMUTATION_FACE_D;
-                } else if (low == Symbol.PERMUTATION_FACE_U
-                  && high == Symbol.PERMUTATION_FACE_L) {
+                    rotated = first == Symbol.FACE_D;
+                } else if (low == Symbol.FACE_U && high == Symbol.FACE_L) {
                     loc = 6;
-                    rotated = first == Symbol.PERMUTATION_FACE_L;
-                } else if (low == Symbol.PERMUTATION_FACE_L
-                  && high == Symbol.PERMUTATION_FACE_B) {
+                    rotated = first == Symbol.FACE_L;
+                } else if (low == Symbol.FACE_L && high == Symbol.FACE_B) {
                     loc = 7;
-                    rotated = first == Symbol.PERMUTATION_FACE_B;
-                } else if (low == Symbol.PERMUTATION_FACE_L
-                  && high == Symbol.PERMUTATION_FACE_D) {
+                    rotated = first == Symbol.FACE_B;
+                } else if (low == Symbol.FACE_L && high == Symbol.FACE_D) {
                     loc = 8;
-                    rotated = first == Symbol.PERMUTATION_FACE_L;
-                } else if (low == Symbol.PERMUTATION_FACE_U
-                  && high == Symbol.PERMUTATION_FACE_F) {
+                    rotated = first == Symbol.FACE_L;
+                } else if (low == Symbol.FACE_U && high == Symbol.FACE_F) {
                     loc = 9;
-                    rotated = first == Symbol.PERMUTATION_FACE_U;
-                } else if (low == Symbol.PERMUTATION_FACE_F
-                  && high == Symbol.PERMUTATION_FACE_L) {
+                    rotated = first == Symbol.FACE_U;
+                } else if (low == Symbol.FACE_F && high == Symbol.FACE_L) {
                     loc = 10;
-                    rotated = first == Symbol.PERMUTATION_FACE_F;
-                } else if (low == Symbol.PERMUTATION_FACE_F
-                  && high == Symbol.PERMUTATION_FACE_D) {
+                    rotated = first == Symbol.FACE_F;
+                } else if (low == Symbol.FACE_F && high == Symbol.FACE_D) {
                     loc = 11;
-                    rotated = first == Symbol.PERMUTATION_FACE_D;
+                    rotated = first == Symbol.FACE_D;
 
                 } else {
                     throw new IllegalArgumentException("Impossible edge part \"" + low.getName() + high.getName() + "\".");
@@ -620,93 +603,93 @@ class PermutationNode extends Node {
                 //   4 = Orientation 1 counterclockwise
                 //   5 = Orientation 2 counterclockwise
                 let rotation = 0;
-                if (low == Symbol.PERMUTATION_FACE_R
-                  && mid == Symbol.PERMUTATION_FACE_U
-                  && high == Symbol.PERMUTATION_FACE_F) {
+                if (low == Symbol.FACE_R
+                  && mid == Symbol.FACE_U
+                  && high == Symbol.FACE_F) {
                     loc = 0;
-                    if (faceSymbols[0] == Symbol.PERMUTATION_FACE_U) {
-                        rotation = (faceSymbols[1] == Symbol.PERMUTATION_FACE_R) ? 0 : 3;
-                    } else if (faceSymbols[0] == Symbol.PERMUTATION_FACE_R) {
-                        rotation = (faceSymbols[1] == Symbol.PERMUTATION_FACE_F) ? 2 : 5;
+                    if (faceSymbols[0] == Symbol.FACE_U) {
+                        rotation = (faceSymbols[1] == Symbol.FACE_R) ? 0 : 3;
+                    } else if (faceSymbols[0] == Symbol.FACE_R) {
+                        rotation = (faceSymbols[1] == Symbol.FACE_F) ? 2 : 5;
                     } else {
-                        rotation = (faceSymbols[1] == Symbol.PERMUTATION_FACE_U) ? 1 : 4;
+                        rotation = (faceSymbols[1] == Symbol.FACE_U) ? 1 : 4;
                     }
-                } else if (low == Symbol.PERMUTATION_FACE_R
-                  && mid == Symbol.PERMUTATION_FACE_F
-                  && high == Symbol.PERMUTATION_FACE_D) {
+                } else if (low == Symbol.FACE_R
+                  && mid == Symbol.FACE_F
+                  && high == Symbol.FACE_D) {
                     loc = 1;
-                    if (faceSymbols[0] == Symbol.PERMUTATION_FACE_D) {
-                        rotation = (faceSymbols[1] == Symbol.PERMUTATION_FACE_F) ? 0 : 3;
-                    } else if (faceSymbols[0] == Symbol.PERMUTATION_FACE_F) {
-                        rotation = (faceSymbols[1] == Symbol.PERMUTATION_FACE_R) ? 2 : 5;
+                    if (faceSymbols[0] == Symbol.FACE_D) {
+                        rotation = (faceSymbols[1] == Symbol.FACE_F) ? 0 : 3;
+                    } else if (faceSymbols[0] == Symbol.FACE_F) {
+                        rotation = (faceSymbols[1] == Symbol.FACE_R) ? 2 : 5;
                     } else {
-                        rotation = (faceSymbols[1] == Symbol.PERMUTATION_FACE_D) ? 1 : 4;
+                        rotation = (faceSymbols[1] == Symbol.FACE_D) ? 1 : 4;
                     }
-                } else if (low == Symbol.PERMUTATION_FACE_R
-                  && mid == Symbol.PERMUTATION_FACE_U
-                  && high == Symbol.PERMUTATION_FACE_B) {
+                } else if (low == Symbol.FACE_R
+                  && mid == Symbol.FACE_U
+                  && high == Symbol.FACE_B) {
                     loc = 2;
-                    if (faceSymbols[0] == Symbol.PERMUTATION_FACE_U) {
-                        rotation = (faceSymbols[1] == Symbol.PERMUTATION_FACE_B) ? 0 : 3;
-                    } else if (faceSymbols[0] == Symbol.PERMUTATION_FACE_B) {
-                        rotation = (faceSymbols[1] == Symbol.PERMUTATION_FACE_R) ? 2 : 5;
+                    if (faceSymbols[0] == Symbol.FACE_U) {
+                        rotation = (faceSymbols[1] == Symbol.FACE_B) ? 0 : 3;
+                    } else if (faceSymbols[0] == Symbol.FACE_B) {
+                        rotation = (faceSymbols[1] == Symbol.FACE_R) ? 2 : 5;
                     } else {
-                        rotation = (faceSymbols[1] == Symbol.PERMUTATION_FACE_U) ? 1 : 4;
+                        rotation = (faceSymbols[1] == Symbol.FACE_U) ? 1 : 4;
                     }
-                } else if (low == Symbol.PERMUTATION_FACE_R
-                  && mid == Symbol.PERMUTATION_FACE_D
-                  && high == Symbol.PERMUTATION_FACE_B) {
+                } else if (low == Symbol.FACE_R
+                  && mid == Symbol.FACE_D
+                  && high == Symbol.FACE_B) {
                     loc = 3;
-                    if (faceSymbols[0] == Symbol.PERMUTATION_FACE_D) {
-                        rotation = (faceSymbols[1] == Symbol.PERMUTATION_FACE_R) ? 0 : 3;
-                    } else if (faceSymbols[0] == Symbol.PERMUTATION_FACE_R) {
-                        rotation = (faceSymbols[1] == Symbol.PERMUTATION_FACE_B) ? 2 : 5;
+                    if (faceSymbols[0] == Symbol.FACE_D) {
+                        rotation = (faceSymbols[1] == Symbol.FACE_R) ? 0 : 3;
+                    } else if (faceSymbols[0] == Symbol.FACE_R) {
+                        rotation = (faceSymbols[1] == Symbol.FACE_B) ? 2 : 5;
                     } else {
-                        rotation = (faceSymbols[1] == Symbol.PERMUTATION_FACE_D) ? 1 : 4;
+                        rotation = (faceSymbols[1] == Symbol.FACE_D) ? 1 : 4;
                     }
-                } else if (low == Symbol.PERMUTATION_FACE_U
-                  && mid == Symbol.PERMUTATION_FACE_L
-                  && high == Symbol.PERMUTATION_FACE_B) {
+                } else if (low == Symbol.FACE_U
+                  && mid == Symbol.FACE_L
+                  && high == Symbol.FACE_B) {
                     loc = 4;
-                    if (faceSymbols[0] == Symbol.PERMUTATION_FACE_U) {
-                        rotation = (faceSymbols[1] == Symbol.PERMUTATION_FACE_L) ? 0 : 3;
-                    } else if (faceSymbols[0] == Symbol.PERMUTATION_FACE_L) {
-                        rotation = (faceSymbols[1] == Symbol.PERMUTATION_FACE_B) ? 2 : 5;
+                    if (faceSymbols[0] == Symbol.FACE_U) {
+                        rotation = (faceSymbols[1] == Symbol.FACE_L) ? 0 : 3;
+                    } else if (faceSymbols[0] == Symbol.FACE_L) {
+                        rotation = (faceSymbols[1] == Symbol.FACE_B) ? 2 : 5;
                     } else {
-                        rotation = (faceSymbols[1] == Symbol.PERMUTATION_FACE_U) ? 1 : 4;
+                        rotation = (faceSymbols[1] == Symbol.FACE_U) ? 1 : 4;
                     }
-                } else if (low == Symbol.PERMUTATION_FACE_L
-                  && mid == Symbol.PERMUTATION_FACE_D
-                  && high == Symbol.PERMUTATION_FACE_B) {
+                } else if (low == Symbol.FACE_L
+                  && mid == Symbol.FACE_D
+                  && high == Symbol.FACE_B) {
                     loc = 5;
-                    if (faceSymbols[0] == Symbol.PERMUTATION_FACE_D) {
-                        rotation = (faceSymbols[1] == Symbol.PERMUTATION_FACE_B) ? 0 : 3;
-                    } else if (faceSymbols[0] == Symbol.PERMUTATION_FACE_B) {
-                        rotation = (faceSymbols[1] == Symbol.PERMUTATION_FACE_L) ? 2 : 5;
+                    if (faceSymbols[0] == Symbol.FACE_D) {
+                        rotation = (faceSymbols[1] == Symbol.FACE_B) ? 0 : 3;
+                    } else if (faceSymbols[0] == Symbol.FACE_B) {
+                        rotation = (faceSymbols[1] == Symbol.FACE_L) ? 2 : 5;
                     } else {
-                        rotation = (faceSymbols[1] == Symbol.PERMUTATION_FACE_D) ? 1 : 4;
+                        rotation = (faceSymbols[1] == Symbol.FACE_D) ? 1 : 4;
                     }
-                } else if (low == Symbol.PERMUTATION_FACE_U
-                  && mid == Symbol.PERMUTATION_FACE_F
-                  && high == Symbol.PERMUTATION_FACE_L) {
+                } else if (low == Symbol.FACE_U
+                  && mid == Symbol.FACE_F
+                  && high == Symbol.FACE_L) {
                     loc = 6;
-                    if (faceSymbols[0] == Symbol.PERMUTATION_FACE_U) {
-                        rotation = (faceSymbols[1] == Symbol.PERMUTATION_FACE_F) ? 0 : 3;
-                    } else if (faceSymbols[0] == Symbol.PERMUTATION_FACE_F) {
-                        rotation = (faceSymbols[1] == Symbol.PERMUTATION_FACE_L) ? 2 : 5;
+                    if (faceSymbols[0] == Symbol.FACE_U) {
+                        rotation = (faceSymbols[1] == Symbol.FACE_F) ? 0 : 3;
+                    } else if (faceSymbols[0] == Symbol.FACE_F) {
+                        rotation = (faceSymbols[1] == Symbol.FACE_L) ? 2 : 5;
                     } else {
-                        rotation = (faceSymbols[1] == Symbol.PERMUTATION_FACE_U) ? 1 : 4;
+                        rotation = (faceSymbols[1] == Symbol.FACE_U) ? 1 : 4;
                     }
-                } else if (low == Symbol.PERMUTATION_FACE_F
-                  && mid == Symbol.PERMUTATION_FACE_L
-                  && high == Symbol.PERMUTATION_FACE_D) {
+                } else if (low == Symbol.FACE_F
+                  && mid == Symbol.FACE_L
+                  && high == Symbol.FACE_D) {
                     loc = 7;
-                    if (faceSymbols[0] == Symbol.PERMUTATION_FACE_D) {
-                        rotation = (faceSymbols[1] == Symbol.PERMUTATION_FACE_L) ? 0 : 3;
-                    } else if (faceSymbols[0] == Symbol.PERMUTATION_FACE_L) {
-                        rotation = (faceSymbols[1] == Symbol.PERMUTATION_FACE_F) ? 2 : 5;
+                    if (faceSymbols[0] == Symbol.FACE_D) {
+                        rotation = (faceSymbols[1] == Symbol.FACE_L) ? 0 : 3;
+                    } else if (faceSymbols[0] == Symbol.FACE_L) {
+                        rotation = (faceSymbols[1] == Symbol.FACE_F) ? 2 : 5;
                     } else {
-                        rotation = (faceSymbols[1] == Symbol.PERMUTATION_FACE_D) ? 1 : 4;
+                        rotation = (faceSymbols[1] == Symbol.FACE_D) ? 1 : 4;
                     }
                 } else {
                     throw new IllegalArgumentException("Impossible corner part \"" + low.getName() + mid.getName() + high.getName() + "\".");
@@ -744,7 +727,62 @@ class PermutationNode extends Node {
     getSign() {
         return this.sign;
     }
-    setSign(signSymbol) {
+
+    invert() {
+        let a = this.getChildren().slice(0);
+        this.removeAllChildren();
+
+        if (a.length > 0) {
+            let old = a[0];
+            let inverted = new PermutationItemNode();
+            inverted.setOrientation(old.getOrientation());
+            inverted.setLocation(old.getLocation());
+            this.add(inverted);
+        }
+        for (let i = a.length - 1; i >= 1; i--) {
+            let old = a[i];
+            let inverted = new PermutationItemNode();
+            inverted.setOrientation(old.getOrientation());
+            inverted.setLocation(old.getLocation());
+            this.add(inverted);
+        }
+        switch (this.type) {
+            case UNDEFINED_PERMUTATION:
+                break;
+            case SIDE_PERMUTATION:
+                if (this.sign != 0) {
+                    this.sign = 4 - this.sign;
+                    for (let i = 1; i < this.getChildCount(); i++) {
+                        let inverted = this.getChildAt(i);
+                        inverted.setOrientation((this.sign + inverted.getOrientation()) % 4);
+                    }
+                }
+                break;
+            case CORNER_PERMUTATION:
+                if (this.sign != 0) {
+                    this.sign = 3 - this.sign;
+                    for (let i = 1; i < this.getChildCount(); i++) {
+                        let inverted = this.getChildAt(i);
+                        inverted.setOrientation((this.sign + inverted.getOrientation()) % 3);
+                    }
+                }
+                break;
+            case EDGE_PERMUTATION:
+                if (this.sign != 0) {
+                    for (let i = 1; i < this.getChildCount(); i++) {
+                        let inverted = this.getChildAt(i);
+                        inverted.setOrientation(this.sign ^ inverted.getOrientation());
+                    }
+                }
+                break;
+        }
+    }
+
+    setSign(sign) {
+        this.sign = sign;
+    }
+    
+    setSignSymbol(signSymbol) {
         let s;
         if (signSymbol == Symbol.PERMUTATION_MINUS) {
             s = MINUS_SIGN;
@@ -767,6 +805,35 @@ class PermutationNode extends Node {
         this.sign = s;
     }
 
+    setType(type) {
+        this.type = type;
+    }
+    
+    clone() {
+        let that = new PermutationCycleNode();
+        that.startPosition = this.startPosition;
+        that.endPosition = this.endPosition;
+        that.type = this.type;
+        that.sign = this.sign;
+        that.layerCount = this.layerCount;
+        for (let thisChild of this.getChildren()) {
+            let thatChild = new PermutationItemNode();
+            thatChild.setOrientation(thisChild.getOrientation());
+            thatChild.setLocation(thisChild.getLocation());
+            that.add(thatChild);
+        }
+        return that;
+    }
+
+    * resolvedIterable(inverse) {
+        if (inverse) {
+            let that = this.clone();
+            that.invert();
+            yield that;
+        } else {
+            yield this;
+        }
+    }
 }
 
 class ReflectionNode extends Node {
@@ -775,6 +842,13 @@ class ReflectionNode extends Node {
     }
     getSymbol() {
         return Symbol.REFLECTION;
+    }
+    * resolvedIterable(inverse) {
+        for (let node of super.resolvedIterable(inverse)) {
+            if (node.getSymbol()==Symbol.MOVE) {
+                yield node.createReflectedNode(); 
+            }
+        }
     }
 }
 /**
@@ -819,6 +893,17 @@ class RotationNode extends Node {
     }
     getSymbol() {
         return Symbol.ROTATION;
+    }
+    
+    * resolvedIterable(inverse = false) {
+        if (this.getChildCount() != 2) {
+            return;
+        }
+        let a = this.getChildAt(0);
+        let b = this.getChildAt(1);
+        yield * a.resolvedIterable(true);
+        yield * b.resolvedIterable(inverse);
+        yield * a.resolvedIterable(false);
     }
 }
 
@@ -875,6 +960,23 @@ class MoveNode extends Node {
             yield this;
         }
     }
+    
+    /**
+     * Creates a reflected node from this node.
+     */
+    createReflectedNode() {
+        let oldMask = this.layerMask;
+        let reflectedMask = 0;
+        if (this.angle != 0) {
+            for (let i = 0; i < this.layerCount; i++) {
+                reflectedMask <<= 1;
+                reflectedMask |= (oldMask & 1);
+                oldMask >>>= 1;
+            }
+        }
+        return new MoveNode(this.layerCount,this.axis,reflectedMask,this.angle,this.getStartPosition(),this.getEndPosition());
+    }
+    
 
     getSymbol() {
         return Symbol.MOVE;
@@ -900,5 +1002,5 @@ export default {
     RepetitionNode: RepetitionNode,
     RotationNode: RotationNode,
     SequenceNode: SequenceNode,
-    PermutationNode: PermutationNode,
+    PermutationCycleNode: PermutationCycleNode,
 };
