@@ -24,13 +24,19 @@
       let expected = expecteds[i].innerText;
 
       try {
-      let ast = parser.parse(input);
-      cube.reset();
-      ast.applyTo(cube);
+        let ast = parser.parse(input);
+        cube.reset();
 
-      let actual = Cubes.toPermutationString(cube, notation).replace(/\n/g,'\\n');
-      actuals[i].innerText = actual;
-      tests[i].classList.add(actual == expected ? "pass" : "fail");
+        // Test 1
+        ast.applyTo(cube);
+        let actual = Cubes.toPermutationString(cube, notation).replace(/\n/g,'\\n');
+        
+        // Test 2
+        
+        
+        
+        actuals[i].innerText = actual;
+        tests[i].classList.add(actual == expected ? "pass" : "fail");
       } catch (err) {
       actuals[i].innerText = err;
       tests[i].classList.add("fail");
@@ -701,6 +707,13 @@
   </article>
   <article>
     <section class="unittest">
+      <p class="input">F' R'</p>
+      <p class="expected">(+ufl,lfd,bdr,ubr,fur) (-dfr)\n(ur,fr,fu,fl,fd,dr,br)\n(-r) (-f)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
       <p class="input">(R F)'</p>
       <p class="expected">(+ufl,lfd,bdr,ubr,fur) (-dfr)\n(ur,fr,fu,fl,fd,dr,br)\n(-r) (-f)</p>
       <p class="actual"></p>
@@ -736,6 +749,13 @@
   </article>
   <article>
     <section class="unittest">
+      <p class="input">(&lt;CU CF&gt;(R B))'</p>
+      <p class="expected">(+ubr,ulb,bld,dlf,rfu) (-ufl)\n(ur,ub,ul,bl,dl,fl,uf)\n(-u) (-l)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
       <p class="input">&lt;R&gt;U</p>
       <p class="expected">(dfr,luf,bul,rfu)\n(rf,fu,lu,bu)\n(+u)</p>
       <p class="actual"></p>
@@ -759,6 +779,13 @@
     <section class="unittest">
       <p class="input">[CU CF,R B]</p>
       <p class="expected">(-dlf,bul,bru,rdf,rbd,dbl,urf) (+ufl)\n(ur,uf,fl,dl,bu,rf,rd,rb,db,lb,lu)\n(-r) (+u) (+l) (-b)</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+  <article>
+    <section class="unittest">
+      <p class="input">[CU CF,R B]'</p>
+      <p class="expected">(+dbl,rbd,rdf,bru,bul,dlf,rfu) (-ufl)\n(ur,lu,lb,db,rb,rd,rf,bu,dl,fl,uf)\n(+r) (-u) (-l) (+b)</p>
       <p class="actual"></p>
     </section>
   </article>

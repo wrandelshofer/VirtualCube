@@ -91,9 +91,15 @@ class Node {
     }
 
     applyTo(cube, inverse = false) {
-        for (let i = 0; i < this.children.length; i++) {
-            this.children[i].applyTo(cube, inverse);
-    }
+        if (inverse) {
+            for (let i = this.children.length - 1; i >= 0; i--) {
+                this.children[i].applyTo(cube, inverse);
+            }
+        } else {
+            for (let i = 0, n=this.children.length; i < n; i++) {
+                this.children[i].applyTo(cube, inverse);
+            }
+        }
     }
 
     /** 
@@ -131,6 +137,24 @@ class CommutationNode extends Node {
     getSymbol() {
         return Symbol.COMMUTATION;
     }
+    applyTo(cube, inverse = false) {
+        if (this.getChildCount() != 2) {
+            return;
+        }
+        let a = this.getChildAt(0);
+        let b = this.getChildAt(1);
+        if (inverse) {
+            b.applyTo(cube, false);
+            a.applyTo(cube, false);
+            b.applyTo(cube, true);
+            a.applyTo(cube, true);
+        } else {
+            a.applyTo(cube, false);
+            b.applyTo(cube, false);
+            a.applyTo(cube, true);
+            b.applyTo(cube, true);
+        }
+    }
 }
 /**
  * A ConjugationNode holds a conjugator A and a single child B.
@@ -144,6 +168,18 @@ class ConjugationNode extends Node {
     getSymbol() {
         return Symbol.CONJUGATION;
     }
+    
+    applyTo(cube, inverse = false) {
+        if (this.getChildCount() != 2) {
+            return;
+        }
+        let a = this.getChildAt(0);
+        let b = this.getChildAt(1);
+        a.applyTo(cube, false);
+        b.applyTo(cube, inverse);
+        a.applyTo(cube, true);
+    }
+    
 }
 class SequenceNode extends Node {
     constructor(startPosition, endPosition) {
@@ -189,17 +225,17 @@ class PermutationItemNode extends Node {
         super(startPosition, endPosition);
 
         /**
-        * The orientation of the part.
-        * Values: 0, 1 for edge parts.
-        * 0, 1, 2 for side parts.
-        * 0, 1, 2, 3, 4, 5 for corner parts
-        */
+         * The orientation of the part.
+         * Values: 0, 1 for edge parts.
+         * 0, 1, 2 for side parts.
+         * 0, 1, 2, 3, 4, 5 for corner parts
+         */
         this.orientation = null;
         /**
-        * The location of the part.
-        *
-        * @see ch.randelshofer.rubik.Cube
-        */
+         * The location of the part.
+         *
+         * @see ch.randelshofer.rubik.Cube
+         */
         this.location = null;
     }
 
@@ -349,52 +385,52 @@ class PermutationNode extends Node {
                     loc = 0;
                     rotated = first == Symbol.PERMUTATION_FACE_R;
                 } else if (low == Symbol.PERMUTATION_FACE_R
-                && high == Symbol.PERMUTATION_FACE_F) {
+                  && high == Symbol.PERMUTATION_FACE_F) {
                     loc = 1;
                     rotated = first == Symbol.PERMUTATION_FACE_F;
                 } else if (low == Symbol.PERMUTATION_FACE_R
-                && high == Symbol.PERMUTATION_FACE_D) {
+                  && high == Symbol.PERMUTATION_FACE_D) {
                     loc = 2;
                     rotated = first == Symbol.PERMUTATION_FACE_R;
                 } else if (low == Symbol.PERMUTATION_FACE_U
-                && high == Symbol.PERMUTATION_FACE_B) {
+                  && high == Symbol.PERMUTATION_FACE_B) {
                     loc = 3;
                     rotated = first == Symbol.PERMUTATION_FACE_U;
                 } else if (low == Symbol.PERMUTATION_FACE_R
-                && high == Symbol.PERMUTATION_FACE_B) {
+                  && high == Symbol.PERMUTATION_FACE_B) {
                     loc = 4;
                     rotated = first == Symbol.PERMUTATION_FACE_B;
                 } else if (low == Symbol.PERMUTATION_FACE_D
-                && high == Symbol.PERMUTATION_FACE_B) {
+                  && high == Symbol.PERMUTATION_FACE_B) {
                     loc = 5;
                     rotated = first == Symbol.PERMUTATION_FACE_D;
                 } else if (low == Symbol.PERMUTATION_FACE_U
-                && high == Symbol.PERMUTATION_FACE_L) {
+                  && high == Symbol.PERMUTATION_FACE_L) {
                     loc = 6;
                     rotated = first == Symbol.PERMUTATION_FACE_L;
                 } else if (low == Symbol.PERMUTATION_FACE_L
-                && high == Symbol.PERMUTATION_FACE_B) {
+                  && high == Symbol.PERMUTATION_FACE_B) {
                     loc = 7;
                     rotated = first == Symbol.PERMUTATION_FACE_B;
                 } else if (low == Symbol.PERMUTATION_FACE_L
-                && high == Symbol.PERMUTATION_FACE_D) {
+                  && high == Symbol.PERMUTATION_FACE_D) {
                     loc = 8;
                     rotated = first == Symbol.PERMUTATION_FACE_L;
                 } else if (low == Symbol.PERMUTATION_FACE_U
-                && high == Symbol.PERMUTATION_FACE_F) {
+                  && high == Symbol.PERMUTATION_FACE_F) {
                     loc = 9;
                     rotated = first == Symbol.PERMUTATION_FACE_U;
                 } else if (low == Symbol.PERMUTATION_FACE_F
-                && high == Symbol.PERMUTATION_FACE_L) {
+                  && high == Symbol.PERMUTATION_FACE_L) {
                     loc = 10;
                     rotated = first == Symbol.PERMUTATION_FACE_F;
                 } else if (low == Symbol.PERMUTATION_FACE_F
-                && high == Symbol.PERMUTATION_FACE_D) {
+                  && high == Symbol.PERMUTATION_FACE_D) {
                     loc = 11;
                     rotated = first == Symbol.PERMUTATION_FACE_D;
 
                 } else {
-                    throw new IllegalArgumentException("Impossible edge part \""+low.getName()+high.getName()+"\".");
+                    throw new IllegalArgumentException("Impossible edge part \"" + low.getName() + high.getName() + "\".");
                 }
 
                 if (layerCount <= 3) {
@@ -424,7 +460,7 @@ class PermutationNode extends Node {
                 //        imply that PR < PU < PF < PL < PD < PB
                 //        is an invariant.
                 let sorted = faceSymbols.slice(0);
-                sorted.sort((a,b) => a.compareTo(b));
+                sorted.sort((a, b) => a.compareTo(b));
                 let low = sorted[0];
                 let mid = sorted[1];
                 let high = sorted[2];
@@ -438,8 +474,8 @@ class PermutationNode extends Node {
                 //   5 = Orientation 2 counterclockwise
                 let rotation = 0;
                 if (low == Symbol.PERMUTATION_FACE_R
-                        && mid == Symbol.PERMUTATION_FACE_U
-                        && high == Symbol.PERMUTATION_FACE_F) {
+                  && mid == Symbol.PERMUTATION_FACE_U
+                  && high == Symbol.PERMUTATION_FACE_F) {
                     loc = 0;
                     if (faceSymbols[0] == Symbol.PERMUTATION_FACE_U) {
                         rotation = (faceSymbols[1] == Symbol.PERMUTATION_FACE_R) ? 0 : 3;
@@ -449,8 +485,8 @@ class PermutationNode extends Node {
                         rotation = (faceSymbols[1] == Symbol.PERMUTATION_FACE_U) ? 1 : 4;
                     }
                 } else if (low == Symbol.PERMUTATION_FACE_R
-                        && mid == Symbol.PERMUTATION_FACE_F
-                        && high == Symbol.PERMUTATION_FACE_D) {
+                  && mid == Symbol.PERMUTATION_FACE_F
+                  && high == Symbol.PERMUTATION_FACE_D) {
                     loc = 1;
                     if (faceSymbols[0] == Symbol.PERMUTATION_FACE_D) {
                         rotation = (faceSymbols[1] == Symbol.PERMUTATION_FACE_F) ? 0 : 3;
@@ -460,8 +496,8 @@ class PermutationNode extends Node {
                         rotation = (faceSymbols[1] == Symbol.PERMUTATION_FACE_D) ? 1 : 4;
                     }
                 } else if (low == Symbol.PERMUTATION_FACE_R
-                        && mid == Symbol.PERMUTATION_FACE_U
-                        && high == Symbol.PERMUTATION_FACE_B) {
+                  && mid == Symbol.PERMUTATION_FACE_U
+                  && high == Symbol.PERMUTATION_FACE_B) {
                     loc = 2;
                     if (faceSymbols[0] == Symbol.PERMUTATION_FACE_U) {
                         rotation = (faceSymbols[1] == Symbol.PERMUTATION_FACE_B) ? 0 : 3;
@@ -471,8 +507,8 @@ class PermutationNode extends Node {
                         rotation = (faceSymbols[1] == Symbol.PERMUTATION_FACE_U) ? 1 : 4;
                     }
                 } else if (low == Symbol.PERMUTATION_FACE_R
-                        && mid == Symbol.PERMUTATION_FACE_D
-                        && high == Symbol.PERMUTATION_FACE_B) {
+                  && mid == Symbol.PERMUTATION_FACE_D
+                  && high == Symbol.PERMUTATION_FACE_B) {
                     loc = 3;
                     if (faceSymbols[0] == Symbol.PERMUTATION_FACE_D) {
                         rotation = (faceSymbols[1] == Symbol.PERMUTATION_FACE_R) ? 0 : 3;
@@ -482,8 +518,8 @@ class PermutationNode extends Node {
                         rotation = (faceSymbols[1] == Symbol.PERMUTATION_FACE_D) ? 1 : 4;
                     }
                 } else if (low == Symbol.PERMUTATION_FACE_U
-                        && mid == Symbol.PERMUTATION_FACE_L
-                        && high == Symbol.PERMUTATION_FACE_B) {
+                  && mid == Symbol.PERMUTATION_FACE_L
+                  && high == Symbol.PERMUTATION_FACE_B) {
                     loc = 4;
                     if (faceSymbols[0] == Symbol.PERMUTATION_FACE_U) {
                         rotation = (faceSymbols[1] == Symbol.PERMUTATION_FACE_L) ? 0 : 3;
@@ -493,8 +529,8 @@ class PermutationNode extends Node {
                         rotation = (faceSymbols[1] == Symbol.PERMUTATION_FACE_U) ? 1 : 4;
                     }
                 } else if (low == Symbol.PERMUTATION_FACE_L
-                        && mid == Symbol.PERMUTATION_FACE_D
-                        && high == Symbol.PERMUTATION_FACE_B) {
+                  && mid == Symbol.PERMUTATION_FACE_D
+                  && high == Symbol.PERMUTATION_FACE_B) {
                     loc = 5;
                     if (faceSymbols[0] == Symbol.PERMUTATION_FACE_D) {
                         rotation = (faceSymbols[1] == Symbol.PERMUTATION_FACE_B) ? 0 : 3;
@@ -504,8 +540,8 @@ class PermutationNode extends Node {
                         rotation = (faceSymbols[1] == Symbol.PERMUTATION_FACE_D) ? 1 : 4;
                     }
                 } else if (low == Symbol.PERMUTATION_FACE_U
-                        && mid == Symbol.PERMUTATION_FACE_F
-                        && high == Symbol.PERMUTATION_FACE_L) {
+                  && mid == Symbol.PERMUTATION_FACE_F
+                  && high == Symbol.PERMUTATION_FACE_L) {
                     loc = 6;
                     if (faceSymbols[0] == Symbol.PERMUTATION_FACE_U) {
                         rotation = (faceSymbols[1] == Symbol.PERMUTATION_FACE_F) ? 0 : 3;
@@ -515,8 +551,8 @@ class PermutationNode extends Node {
                         rotation = (faceSymbols[1] == Symbol.PERMUTATION_FACE_U) ? 1 : 4;
                     }
                 } else if (low == Symbol.PERMUTATION_FACE_F
-                        && mid == Symbol.PERMUTATION_FACE_L
-                        && high == Symbol.PERMUTATION_FACE_D) {
+                  && mid == Symbol.PERMUTATION_FACE_L
+                  && high == Symbol.PERMUTATION_FACE_D) {
                     loc = 7;
                     if (faceSymbols[0] == Symbol.PERMUTATION_FACE_D) {
                         rotation = (faceSymbols[1] == Symbol.PERMUTATION_FACE_L) ? 0 : 3;
@@ -526,7 +562,7 @@ class PermutationNode extends Node {
                         rotation = (faceSymbols[1] == Symbol.PERMUTATION_FACE_D) ? 1 : 4;
                     }
                 } else {
-                    throw new IllegalArgumentException("Impossible corner part \""+low.getName()+mid.getName()+high.getName()+"\".");
+                    throw new IllegalArgumentException("Impossible corner part \"" + low.getName() + mid.getName() + high.getName() + "\".");
                 }
 
                 permItem.location = loc;
@@ -660,8 +696,10 @@ class MoveNode extends Node {
 
         // Normalize angle to range [-2, +2].
         let a = angle % 4;
-        if (a == 3) a = -1;
-        if (a == -3) a = 1;
+        if (a == 3)
+            a = -1;
+        if (a == -3)
+            a = 1;
         this.angle = a;
     }
 
@@ -680,7 +718,7 @@ class MoveNode extends Node {
 
     /** Applies the node to the specified cube. */
     applyTo(cube, inverse) {
-       cube.transform(this.axis, this.layerMask, inverse ? -this.angle : this.angle);
+        cube.transform(this.axis, this.layerMask, inverse ? -this.angle : this.angle);
     }
 
     * resolvedIterable(inverse) {
@@ -696,7 +734,7 @@ class MoveNode extends Node {
     }
     toString() {
         return this.getSymbol()
-         +'{ ' + this.axis + ':' + this.layerMask + ':' + this.angle + ' }';
+          + '{ ' + this.axis + ':' + this.layerMask + ':' + this.angle + ' }';
     }
 }
 
