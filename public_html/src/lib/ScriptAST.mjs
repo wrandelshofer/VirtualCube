@@ -278,6 +278,153 @@ class PermutationNode extends Node {
         this.sign = UNDEFINED_SIGN;
     }
 
+    applyTo(cube, inverse=false) {
+        if (inverse) {
+            this.applyInverseTo(cube);
+        } else {
+            this.applyForwardTo(cube);
+        }
+    }
+
+    applyForwardTo(cube) {
+        if (this.getChildCount() == 0) {
+            return;
+        }
+
+        let seq = new Array(this.getChildCount());
+        for (let i = 0; i < seq.length; i++) {
+            seq[i] = this.getChildAt(i);
+        }
+
+        let loc = null;//int[]
+        let orient = null;//int[]
+        let modulo = 0;
+        switch (this.type) {
+            case SIDE_PERMUTATION:
+                modulo = 4;
+                loc = cube.getSideLocations();
+                orient = cube.getSideOrientations();
+                break;
+            case CORNER_PERMUTATION:
+                modulo = 3;
+                loc = cube.getCornerLocations();
+                orient = cube.getCornerOrientations();
+                break;
+            case EDGE_PERMUTATION:
+                modulo = 2;
+                loc = cube.getEdgeLocations();
+                orient = cube.getEdgeOrientations();
+                break;
+        }
+
+        // Adjust the orientation of the parts
+        {
+            let newOrient;//int
+            let i;
+            for (i = 0; i < seq.length - 1; i++) {
+                newOrient = (seq[i + 1].getOrientation() - seq[i].getOrientation() + orient[seq[i].getLocation()]) % modulo;
+                orient[seq[i].getLocation()] = (newOrient < 0) ? modulo + newOrient : newOrient;
+            }
+
+            newOrient = (this.sign - seq[i].getOrientation() + seq[0].getOrientation() + orient[seq[i].getLocation()]) % modulo;
+            orient[seq[i].getLocation()] = (newOrient < 0) ? modulo + newOrient : newOrient;
+        }
+
+        // Adjust the location of the parts
+        let tempLoc = loc[seq[seq.length - 1].getLocation()];
+        let tempOrient = orient[seq[seq.length - 1].getLocation()];
+        for (let i = seq.length - 1; i > 0; i--) {
+            loc[seq[i].getLocation()] = loc[seq[i - 1].getLocation()];
+            orient[seq[i].getLocation()] = orient[seq[i - 1].getLocation()];
+        }
+        loc[seq[0].getLocation()] = tempLoc;
+        orient[seq[0].getLocation()] = tempOrient;
+
+        // Apply the changes to the cube
+        switch (this.type) {
+            case SIDE_PERMUTATION:
+                cube.setSides(loc, orient);
+                break;
+            case CORNER_PERMUTATION: {
+                cube.setCorners(loc, orient);
+                break;
+            }
+            case EDGE_PERMUTATION: {
+                cube.setEdges(loc, orient);
+                break;
+            }
+        }
+    }
+
+   applyInverseTo(cube) {
+        if (this.getChildCount()==0) {
+            return;
+        }
+
+        let seq = new Array(getChildCount());
+        for (let i = 0; i < seq.length; i++) {
+            seq[i] = this.getChildAt(i);
+        }
+
+        let loc = null;//int[]
+        let orient = null;// int[]
+        let modulo = 0;
+        switch (this.type) {
+            case SIDE_PERMUTATION:
+                modulo = 4;
+                loc = cube.getSideLocations();
+                orient = cube.getSideOrientations();
+                break;
+            case CORNER_PERMUTATION:
+                modulo = 3;
+                loc = cube.getCornerLocations();
+                orient = cube.getCornerOrientations();
+                break;
+            case EDGE_PERMUTATION:
+                modulo = 2;
+                loc = cube.getEdgeLocations();
+                orient = cube.getEdgeOrientations();
+                break;
+        }
+
+        // Adjust the orientation of the parts
+        {
+            let i;
+            let newOrient;//int
+            for (i = seq.length - 1; i > 0; i--) {
+                newOrient = (seq[i - 1].getOrientation() - seq[i].getOrientation() + orient[seq[i].getLocation()]) % modulo;
+                orient[seq[i].getLocation()] = (newOrient < 0) ? modulo + newOrient : newOrient;
+            }
+            newOrient = (-this.sign + seq[seq.length - 1].getOrientation() - seq[i].getOrientation() + orient[seq[i].getLocation()]) % modulo;
+            orient[seq[i].getLocation()] = (newOrient < 0) ? modulo + newOrient : newOrient;
+        }
+
+        // Adjust the location of the parts
+        let tempLoc = loc[seq[0].getLocation()];
+        let tempOrient = orient[seq[0].getLocation()];
+        for (let i = 1; i < seq.length; i++) {
+            loc[seq[i - 1].getLocation()] = loc[seq[i].getLocation()];
+            orient[seq[i - 1].getLocation()] = orient[seq[i].getLocation()];
+        }
+        loc[seq[seq.length - 1].getLocation()] = tempLoc;
+        orient[seq[seq.length - 1].getLocation()] = tempOrient;
+
+        // Apply the changes to the cube
+        switch (this.type) {
+            case SIDE_PERMUTATION:
+                cube.setSides(loc, orient);
+                break;
+            case CORNER_PERMUTATION: {
+                cube.setCorners(loc, orient);
+                break;
+            }
+            case EDGE_PERMUTATION: {
+                cube.setEdges(loc, orient);
+                break;
+            }
+        }
+    }
+    
     /**
      * Throws illegal argument exception if this
      * permutation already has permutation items
