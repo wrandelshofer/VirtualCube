@@ -74,6 +74,9 @@ class CubeAttributes {
   isPartVisible(partIndex) {
     return this.partsVisible[partIndex];
   }
+  setStickerFillColor(index, newValue) {
+    this.stickersFillColor[index] = newValue;
+  }
 }
 
 

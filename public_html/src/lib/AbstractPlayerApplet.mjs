@@ -51,7 +51,7 @@ let logger = {
  *  value = ( '0x' | '#' ) , (* hexdigits *) ;
  */
 let parseColorMap = function (str) {
-    let map = [];
+    let map = new Map();
     if (str == null)
         return map;
     let tokens = str.split(/([ =,\n]+)/);
@@ -81,9 +81,9 @@ let parseColorMap = function (str) {
                 hasAlpha ? ((intValue >>> 24) & 0xff) : 0xff]
 
             if (key != null) {
-                map[key] = rgbaValue;
+                map.set(key, rgbaValue);
             }
-            map[elementIndex] = rgbaValue;
+            map.set(elementIndex, rgbaValue);
             i++; // consume value
             elementIndex++; // increase element index
         } else if (tokens[i].match(/^[ ,]+$/)) {
@@ -980,13 +980,13 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
 
         // parse default colorMap
         // --------------
-        let deprecatedColorMap = {}; //parseColorMap("r=#ff4600,u=#ffd200,f=#003373,l=#8c000f,d=#f8f8f8,b=#00732f");
+        let deprecatedColorMap = new Map(); //parseColorMap("r=#ff4600,u=#ffd200,f=#003373,l=#8c000f,d=#f8f8f8,b=#00732f");
         let colorMap = parseColorMap("r=#ffd200,u=#003373,f=#8c000f,l=#f8f8f8,d=#00732f,b=#ff4600");
         for (let k in colorMap) {
             if (k >= 0 && k <= colorMap.length) {
-                deprecatedColorMap[k] = colorMap[deprecatedFaceIndices[k]];
+                deprecatedColorMap.set(k, colorMap.get(deprecatedFaceIndices[k]));
             } else {
-                deprecatedColorMap[k] = colorMap[k];
+                deprecatedColorMap.set(k, colorMap.get(k));
             }
         }
 
@@ -1002,9 +1002,9 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
             let parsedColorMap = parseColorMap(p.colortable);
             for (let k in parsedColorMap) {
                 if (0 <= k && k < deprecatedFaceIndices.length) {
-                    colorMap[deprecatedFaceIndices[k]] = parsedColorMap[k];
+                    colorMap.set(deprecatedFaceIndices[k], parsedColorMap.get(k));
                 } else {
-                    colorMap[k] = parsedColorMap[k];
+                    colorMap.set(k, parsedColorMap.get(k));
                 }
             }
             deprecatedColorMap = colorMap;
@@ -1043,12 +1043,81 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
 
         // apply face indices
         for (let i = 0; i < a.getFaceCount(); i++) {
-            let color = currentColorMap[faceIndices[i]];
+            let color = currentColorMap.get(faceIndices[i]);
             if (color != null) {
                 let face = i;
                 let offset = a.getStickerOffset(face);
                 for (let j = 0; j < a.getStickerCount(face); j++) {
                     a.stickersFillColor[offset + j] = color;
+                }
+            }
+        }
+        
+        // Set the colors for each sticker on each side of the cube.
+        // XXX - This does only work correctly with 6-faced cubes
+        let deprecatedParameterNames = [
+            "stickersfront", "stickersright", "stickersleft",
+            "stickersback", "stickersdown", "stickersup"
+        ];
+        let parameterNames = [
+            "stickersrightlist", "stickersuplist", "stickersfrontlist",
+            "stickersleftlist", "stickersdownlist", "stickersbacklist"
+        ];
+        for (let i = 0, n = Math.min(deprecatedParameterNames.length, a.getFaceCount()); i < n; i++) {
+            let value = p[deprecatedParameterNames[i]];
+            let keys = parseWordList(value);
+            if (keys != null && keys.length != 0) {
+                logger.warning("Parameter \"" +deprecatedParameterNames[i]+ "\" is deprecated, use \"" + parameterNames[i] + "\" instead.");
+                if (keys.length != a.getStickerCount(i)) {
+                    logger.error(
+                            "The Applet parameter \"" + deprecatedParameterNames[i]
+                            + "\" has " + keys.length + " items instead of of "
+                            + a.getStickerCount(i) + " items.",
+                            deprecatedParameterNames[i], value);
+                    return;
+                }
+                let face = deprecatedFaceMap[i];
+                let offset = a.getStickerOffset(face);
+                for (let j = 0, m = a.getStickerCount(face); j < m; j++) {
+                    if (!deprecatedColorTable.has(keys[j])) {
+                        logger.warning("AbstractPlayerApplet deprecatedColorTable:" + deprecatedColorTable);
+                        logger.error(
+                                deprecatedParameterNames[i]+","+ value+","+
+                                value.indexOf(keys[j])+","+
+                                value.indexOf(keys[j]) + keys[j].length() - 1);
+                        return;
+                    }
+                    a.setStickerFillColor(
+                            a.getStickerOffset(face) + j,
+                            deprecatedColorTable.get(keys[j]));
+                }
+            }
+        }
+        for (let i = 0, n = Math.min(parameterNames.length, a.getFaceCount()); i < n; i++) {
+            let value = p[parameterNames[i]];
+            let keys = parseWordList(value);
+            if (keys != null && keys.length != 0) {
+                if (keys.length != a.getStickerCount(i)) {
+                    logger.error(
+                            "The Applet parameter \"" + parameterNames[i]
+                            + "\" has " + keys.length + " items instead of "
+                            + a.getStickerCount(i) + " items.",
+                            parameterNames[i], value);
+                    return;
+                }
+                let face = i;
+                let offset = a.getStickerOffset(face);
+                for (let j = 0, m = a.getStickerCount(face); j < m; j++) {
+                    if (!colorMap.has(keys[j])) {
+                        logger.error(
+                                parameterNames[i]+","+ value+","+
+                                value.indexOf(keys[j])+","+
+                                value.indexOf(keys[j]) + keys[j].length());
+                         return;
+                    }
+                    a.setStickerFillColor(
+                            a.getStickerOffset(face) + j,
+                            colorMap.get(keys[j]));
                 }
             }
         }

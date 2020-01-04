@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>script</title>
+    <script type="module" src="../lib/virtualcube.mjs"></script>
+    <link href="virtualcube.css" rel="stylesheet" type="text/css">
+  </head>
+  <body class="responsive">
+    <h1>Test of the <kbd>applet</kbd> tag</h1>
+    <article>
+      <section class="test">
+          <applet code="RubikPlayerFlat" archive="RubikPlayerFlat.jar" codebase="lib" width="170" height="170">
+            <p>Please install the Java plugin.</p>
+          </applet>
+        <p>Default value.</p>
+      </section>
+    </article>
+    <article>
+      <section class="test">
+        <applet code="RubikPlayerFlat" archive="RubikPlayerFlat.jar" codebase="lib" width="170" height="170">
+        <param name="colorList" value="w=#ffffff,y=#fff100,g=#008b0d,b=#00468b,r=#a90034,o=#fc7216,p=#a57cda,lg=#606060,dg=#404040">
+        <param name="stickersRightList" value="dg,dg,dg,g,g,g,g,g,g">
+        <param name="stickersUpList" value="dg,dg,dg,dg,y,dg,dg,dg,dg">
+        <param name="stickersFrontList" value="dg,dg,dg,r,r,r,r,r,r">
+        <param name="stickersLeftList" value="dg,dg,dg,b,b,b,b,b,b">
+        <param name="stickersDownList" value="w,w,w,w,w,w,w,w,w">
+        <param name="stickersBackList" value="dg,dg,dg,o,o,o,o,o,o">
+        </applet>
+        <p>With <kbd>colorlist</kbd> and <kbd>stickerslist</kbd> parameters</p>
+      </section>
+    </article>
+  </body>
+</html>

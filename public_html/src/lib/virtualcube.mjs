@@ -45,6 +45,14 @@
   
   If the applet fails to run, it leaves the div elements untouched.
   You can put a placeholder into the div element.
+
+  Legacy Java Applet support:
+  --------------------------------
+  To ease the transition from Java Applets to JavaScript, this
+  applet also replaces applet tags with code="PocketPlayer.class", 
+  "PocketPlayerFlat.class", "RubikPlayer.class", or "RubikPlayerFlat.class".
+  
+
 */
 
 import VirtualCubeMain from './VirtualCubeMain.mjs';

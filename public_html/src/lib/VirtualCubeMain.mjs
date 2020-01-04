@@ -37,49 +37,61 @@ let nextId = 0;
  * </div>
  *
  * @param parameters applet parameters (key,names)
- * @param divOrCanvas 
- *               Optional <div> or <canvas> object.
- *               If divOrCanvas is null, a rubik's cube is attached to all
+ * @param element 
+ *               Optional <div>, <canvas> or <applet> element on the HTML page.
+ *               If element is null, a rubik's cube is attached to all
  *               <div> and <canvas>  elements in the document with 
- *               class "virtualcube".
+ *               class "virtualcube",
+ *               and to all <applet> elements in the document with
+ *               code="RubikPlayer.*".
  *               If a <canvas>-Element is specified, then a VirtualCube
  *               object is added to it as the property virtualcube.
  */
-function attachVirtualCube(parameters, divOrCanvas) {
+function attachVirtualCube(parameters, element) {
     logger.log("attaching virtual cube")
     if (parameters == null) {
         parameters = [];
     }
 
-    if (divOrCanvas == null) {
+    if (element == null) {
         // => no element was provided, attach to all elements with class "virtualcube"
         let htmlCollection = [];
         try {
-            htmlCollection = document.getElementsByClassName("virtualcube");
-            if (htmlCollection.length == 0) {
-                logger.error('no canvas or div element with class name "virtualcube" found.');
-                return;
+            for (let elem of document.getElementsByClassName("virtualcube")) {
+                htmlCollection.push(elem);
             }
         } catch (err) {
             // => IE does not support getElementsByClassName
             return;
         }
-        for (let i = 0; i < htmlCollection.length; i++) {
-            let elem = htmlCollection[i];
+        
+        // => also attach to all applet elements
+        for (let elem of document.getElementsByTagName("APPLET")) {
+           let code = elem.getAttribute("code");
+           if (code !=null && code.startsWith("RubikPlayer")) {
+               htmlCollection.push(elem);
+           }
+        }
+        
+        if (htmlCollection.length == 0) {
+            logger.error('no canvas or div element with class name "virtualcube" found, and no RubikPlayer applets found.');
+            return;
+        }
+        for (let elem of htmlCollection) {
             attachVirtualCube(parameters, elem);
         }
     } else {
         // => an element was provided, attach VirtualCube to it
         let canvasElem = null;
-        if (divOrCanvas.tagName == "CANVAS") {
+        if (element.tagName == "CANVAS") {
             // => A <canvas> element was provided, attach to it
-            canvasElem = divOrCanvas;
-        } else if (divOrCanvas.tagName == "DIV") {
+            canvasElem = element;
+        } else if (element.tagName == "DIV") {
             // => A <div> element was provided, remove content, then insert a canvas element and buttons
-            while (divOrCanvas.lastChild) {
-                divOrCanvas.removeChild(divOrCanvas.lastChild);
+            while (element.lastChild) {
+                element.removeChild(element.lastChild);
             }
-            let divElem = divOrCanvas;
+            let divElem = element;
             let attrwidth = divElem.getAttribute("width") != null ? divElem.getAttribute("width") : "220";
             let attrheight = divElem.getAttribute("height") != null ? divElem.getAttribute("height") : "220";
 
@@ -90,26 +102,26 @@ function attachVirtualCube(parameters, divOrCanvas) {
             canvasElem.setAttribute("width", attrwidth);
             canvasElem.setAttribute("height", attrheight);
 
-            // copy attributes from divOrCanvas over to the canvasElem
-            for (let i = 0; i < divOrCanvas.attributes.length; i++) {
-                let attr = divOrCanvas.attributes[i];
+            // copy attributes from element over to the canvasElem
+            for (let i = 0; i < element.attributes.length; i++) {
+                let attr = element.attributes[i];
                 if (attr.name != "id" && attr.name != "class") {
                     logger.log('.attachVirtualCube copying attribute attr.name:' + attr.name + ' attr.value:' + attr.value);
                     canvasElem.setAttribute(attr.name, attr.value);
                 }
             }
-            if (!divOrCanvas.hasAttribute("kind")) {
-                canvasElem.setAttribute("kind", divOrCanvas.getAttribute("kind"));
+            if (!element.hasAttribute("kind")) {
+                canvasElem.setAttribute("kind", element.getAttribute("kind"));
             }
-            if (!divOrCanvas.hasAttribute("debug")) {
+            if (!element.hasAttribute("debug")) {
                 canvasElem.setAttribute("debug", "");
             }
 
-            divOrCanvas.appendChild(canvasElem);
+            element.appendChild(canvasElem);
 
             let toolbarElem = document.createElement("div");
             toolbarElem.setAttribute("class", "button-toolbar");
-            divOrCanvas.appendChild(toolbarElem);
+            element.appendChild(toolbarElem);
             let buttonElem;
             buttonElem = document.createElement("button");
             buttonElem.setAttribute("type", "button");
@@ -147,8 +159,40 @@ function attachVirtualCube(parameters, divOrCanvas) {
              buttonElem.appendChild(document.createTextNode("Explode"));
              toolbarElem.appendChild(buttonElem);
              */
+        } else if (element.tagName == "APPLET") {
+            // => A <applet> element was provided, remove element, then insert a div element with
+            //     a canvas child and buttons
+            let appletElem = element;
+            
+            var divElem = document.createElement("div");
+            divElem.setAttribute("class","virtualcube");
+            
+            let attrwidth = appletElem.getAttribute("width") != null ? appletElem.getAttribute("width") : "220";
+            let attrheight = appletElem.getAttribute("height") != null ? appletElem.getAttribute("height") : "220";
+
+            let id = "virtualcube_" + nextId++;
+            canvasElem = document.createElement("canvas");
+            canvasElem.setAttribute("class", "cube-canvas");
+            canvasElem.setAttribute("id", id);
+            canvasElem.setAttribute("width", attrwidth);
+            canvasElem.setAttribute("height", attrheight);
+            canvasElem.setAttribute("debug", "");
+            divElem.appendChild(canvasElem);
+            
+            // copy applet parameters over to the canvasElem and into parameters map
+            for (let param of Array.from(appletElem.children)) {
+                if (param.tagName == "PARAM") {
+                    let name = param.getAttribute("name");
+                    let value = param.getAttribute("value");
+                    canvasElem.setAttribute(name, value);
+                    parameters[name.toLowerCase()] = value;
+                }
+            }
+            
+            // replace the applet with our div element
+            element.parentNode.replaceChild(divElem, appletElem);
         } else {
-            logger.error('element ' + divOrCanvas + ' is not a canvas or a div. tagName=' + divOrCanvas.tagName);
+            logger.error('element ' + element + ' is not a canvas or a div. tagName=' + element.tagName);
             return;
         }
         let vr = new VirtualCube(canvasElem);
@@ -156,8 +200,8 @@ function attachVirtualCube(parameters, divOrCanvas) {
         for (let key in parameters) {
             vr.parameters[key] = parameters[key];
         }
-        for (let i = 0; i < divOrCanvas.attributes.length; i++) {
-            let attr = divOrCanvas.attributes[i];
+        for (let i = 0; i < element.attributes.length; i++) {
+            let attr = element.attributes[i];
             if (attr.name != "id" && attr.name != "class") {
                 logger.log('.attachVirtualCube copying parameter attr.name:' + attr.name + ' attr.value:' + attr.value);
                 vr.parameters[attr.name] = attr.value;
