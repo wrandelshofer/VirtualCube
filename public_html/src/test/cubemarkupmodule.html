@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>CubeMarkup module: load() function</title>
+    <link href="virtualcube.css" rel="stylesheet" type="text/css">
+    <script type="module">
+      import CubeMarkup from '../lib/CubeMarkup.mjs';
+      let resources = new CubeMarkup.Loader().load(location + '/../../lib/template.xml');
+
+    </script>
+  </head>
+  <body class="responsive">
+    <h1>Tests the results of <kbd>Loader.load()</kbd> method in the <kbd>CubeMarkup</kbd> module.</h1>
+  </body>
+</html>

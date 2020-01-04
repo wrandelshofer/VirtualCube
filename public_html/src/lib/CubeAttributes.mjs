@@ -14,6 +14,9 @@
  */
 class CubeAttributes {
   constructor(partCount, stickerCount, stickerCountPerFace) {
+    this. alpha = (-25 / 180.0 * Math.PI);
+    this. beta = (45  / 180.0 * Math.PI);
+
     this.partsVisible = new Array(partCount);//boolean
     this.partsFillColor = new Array(partCount);//[r,g,b,a]
     this.partsPhong = new Array(partCount);//[ambient, diffuse, specular, shininess]
@@ -30,6 +33,7 @@ class CubeAttributes {
     this.developmentFactor=0; // range [0,1]
     
     this.stickersImageURL=null;
+    this.stickersImageVisible=true;
     
     // The twist duration of the cube.
     this.twistDuration=500;
@@ -68,14 +72,47 @@ class CubeAttributes {
   getPartCount() {
     return this.partsVisible.length;
   }
+  setExplosionFactor(newValue) {
+      this.explosionFactor=newValue;
+  }
+  setScaleFactor(newValue) {
+      this.scaleFactor=newValue;
+  }
+  setAlpha(newValue) {
+      this.alpha=newValue;
+  }
+  setBeta(newValue) {
+      this.beta=newValue;
+  }
+  setStickersImage(newValue) {
+      this.stickersImage=newValue;
+  }
+  setStickersImageVisible(newValue) {
+      this.stickersImageVisible=newValue;
+  }
   setPartVisible(partIndex, newValue) {
     this.partsVisible[partIndex]=newValue;
   }
   isPartVisible(partIndex) {
     return this.partsVisible[partIndex];
   }
+  setBackgroundColor(newValue) {
+    this.backgroundColor = newValue;
+  }
   setStickerFillColor(index, newValue) {
     this.stickersFillColor[index] = newValue;
+  }
+  setPartVisible(index, newValue) {
+    this.partsVisible[index] = newValue;
+  }
+  setStickerVisible(index, newValue) {
+    this.stickersVisible[index] = newValue;
+  }
+  setPartFillColor(index, newValue) {
+    this.partsFillColor[index] = newValue;
+  }
+  setTwistDuration(newValue) {
+    this.twistDuration = newValue;
   }
 }
 
