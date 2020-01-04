@@ -84,8 +84,11 @@ class CubeAttributes {
   setBeta(newValue) {
       this.beta=newValue;
   }
-  setStickersImage(newValue) {
-      this.stickersImage=newValue;
+  setStickersImageUrl(newValue) {
+      this.stickersImageURL=newValue;
+  }
+  getStickersImageUrl() {
+      return this.stickersImageURL;
   }
   setStickersImageVisible(newValue) {
       this.stickersImageVisible=newValue;

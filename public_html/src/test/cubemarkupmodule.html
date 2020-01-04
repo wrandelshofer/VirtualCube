@@ -2,12 +2,96 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>CubeMarkup module: load() function</title>
+    <title>CubeMarkup module: read() function</title>
     <link href="virtualcube.css" rel="stylesheet" type="text/css">
     <script type="module">
       import CubeMarkup from '../lib/CubeMarkup.mjs';
-      let resources = new CubeMarkup.Loader().load(location + '/../../lib/template.xml');
+      
+      let dumpCubeMarkupData = function(data) {
+        let body = document.body;
+        for (let obj of data.getCubes()) {
+          let articleElem=document.createElement("article");
+          let h1Elem=document.createElement("h1");
+          h1Elem.textContent = obj.getName();
+          articleElem.appendChild(h1Elem);
+          let pElem;
+          
+          if (obj.getStickersImageUrl() != null) {
+            let imgElem=document.createElement("img");
+            imgElem.setAttribute("src",obj.getStickersImageUrl());
+            imgElem.setAttribute("width","200");
+            imgElem.setAttribute("height","200");
+            articleElem.append(imgElem);
+          }
+          
+          pElem=document.createElement("p");
+          pElem.textContent = obj.getDescription();
+          articleElem.appendChild(pElem);
+          body.appendChild(articleElem);
+        }
+        for (let obj of data.getNotations()) {
+          let articleElem=document.createElement("article");
+          let h1Elem=document.createElement("h1");
+          h1Elem.textContent = obj.getName();
+          articleElem.appendChild(h1Elem);
+          
+          let pElem;
+          let kbdElem;
+          pElem=document.createElement("p");
+          let first=true;
+          for (let token of obj.getNotation().getTokens()) {
+            if (first) {
+              first=false;
+            }else{
+              pElem.appendChild(document.createTextNode(", "));
+            }
+            kbdElem = document.createElement("kbd");
+            kbdElem.appendChild(document.createTextNode(token));
+            pElem.appendChild(kbdElem);
+          }
+          articleElem.appendChild(pElem);
+          
+          pElem=document.createElement("p");
+          pElem.textContent = obj.getDescription();
+          articleElem.appendChild(pElem);
 
+        body.appendChild(articleElem);
+        }
+        for (let obj of data.getScripts()) {
+          let articleElem=document.createElement("article");
+          let h1Elem=document.createElement("h1");
+          h1Elem.textContent = obj.getName();
+          articleElem.appendChild(h1Elem);
+          
+          let pElem;
+          let kbdElem;
+          
+          pElem=document.createElement("p");
+          kbdElem=document.createElement("kbd");
+          kbdElem.textContent = obj.getSource();
+          pElem.appendChild(kbdElem);
+          articleElem.appendChild(pElem);
+          
+          pElem=document.createElement("p");
+          pElem.textContent = obj.getDescription();
+          articleElem.appendChild(pElem);
+          
+          body.appendChild(articleElem);
+        }
+        for (let obj of data.getTexts()) {
+          let articleElem=document.createElement("article");
+          let h1Elem=document.createElement("h1");
+          h1Elem.textContent = obj.getTitle();
+          let pElem=document.createElement("p");
+          pElem.textContent = obj.getBody();
+          articleElem.appendChild(h1Elem);
+          articleElem.appendChild(pElem);
+          body.appendChild(articleElem);
+        }
+      };
+      
+      let promise = new CubeMarkup.CubeMarkupReader().loadFromUrl(location + '/../../lib/template.xml');
+      promise.then(dumpCubeMarkupData);
     </script>
   </head>
   <body class="responsive">

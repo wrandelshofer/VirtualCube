@@ -3,7 +3,7 @@
  */
 
 
-let Syntax = {
+let Syntax = Object.freeze({
     /**
      * A primary expression: A single literal or name that stands for itself
      * or can be used as a building block of other expressions.
@@ -71,7 +71,7 @@ let Syntax = {
     POSTINFIX: "postinfix"
 
 
-};
+});
 
 /** Declares the composite symbol map, so that we can reference it from class Symbol.
  *  This map is filled near the end of this module. 
@@ -173,12 +173,12 @@ Symbol.NOP = new TerminalSymbol("NOP");
 Symbol.MOVE = new TerminalSymbol("move", "twist");
 
 // Note: THe ordering of the permutation face symbols is significant in ScriptASt.mjs PermutationNode.
-Symbol.FACE_R = new TerminalSymbol("r");
-Symbol.FACE_U = new TerminalSymbol("u");
-Symbol.FACE_F = new TerminalSymbol("f");
-Symbol.FACE_L = new TerminalSymbol("l");
-Symbol.FACE_D = new TerminalSymbol("d");
-Symbol.FACE_B = new TerminalSymbol("b");
+Symbol.FACE_R = new TerminalSymbol("permR");
+Symbol.FACE_U = new TerminalSymbol("permU");
+Symbol.FACE_F = new TerminalSymbol("permF");
+Symbol.FACE_L = new TerminalSymbol("permL");
+Symbol.FACE_D = new TerminalSymbol("permD");
+Symbol.FACE_B = new TerminalSymbol("permB");
 
 Symbol.PERMUTATION_PLUS = new TerminalSymbol("permPlus");
 Symbol.PERMUTATION_MINUS = new TerminalSymbol("permMinus");
@@ -409,7 +409,6 @@ Symbol.isPermutationSign = function (s) {
     }
 };
 
-
 /** Describes properties of a specific move symbol.  */
 class Move {
     constructor(layerCount, axis, layerMask, angle) {
@@ -435,7 +434,7 @@ class Move {
 /** Defines a notation. */
 class Notation {
     constructor() {
-        this.macros = [];
+        this.macros = new Map();//Map<String,String>
         this.keywords = [];
         this.specials = [];
 
@@ -451,10 +450,13 @@ class Notation {
 
     /**
      * Returns the macros defined by this notation.
-     * @returns {Array<MacroNode>} macros;
+     * @returns {Map<String,String>} macros;
      */
     getMacros() {
         return this.macros;
+    }
+    addMacro(identifier, code) {
+        this.macros.set(identifier, code);
     }
     getKeywords() {
         return this.keywords;
@@ -464,6 +466,9 @@ class Notation {
     }
     getLayerCount() {
         return this.layerCount;
+    }
+    setLayerCount(newValue) {
+        this.layerCount=newValue;
     }
     addToken(symbol, token) {
         // Add to symbolToTokensMap
@@ -574,6 +579,7 @@ class Notation {
         return this.symbolToSyntaxMap.get(symbol) != null || this.symbolToTokensMap.get(symbol) != null;
     }
 }
+
 /** Defines a default notation that works for 3x3 and 2x2 cubes. */
 class DefaultNotation extends Notation {
     constructor(layerCount) {

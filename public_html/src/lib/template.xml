@@ -8550,7 +8550,7 @@
   </Notation>
   <Script id="o333" scriptType="generator" cubeRef="o1" notationRef="o321">
     <Name>Pons Asinorum</Name>
-    <Description/>
+    <Description>Pons Asinorum produces a checkerboard pattern.</Description>
     <Source>MR2 MF2 MU2&#xa;</Source>
     <Author>Werner Randelshofer</Author>
     <Date>Sep 24, 2006 11:13:07 AM</Date>

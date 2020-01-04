@@ -53,19 +53,19 @@ class ScriptParser {
     /**
      * Creates a new parser.
      * @param {Notation} notation
-     * @param {Map<String,MacroNode>} localMacros
+     * @param {Map<String,String>} localMacros
      */
     constructor(notation, localMacros) {
         this.notation = notation;
-        this.macros = [];
+        this.macros = new Map();
         if (localMacros != null) {
-            for (let macro in localMacros) {
-                macros.push(macro);
+            for (let entry in localMacros.entries()) {
+                macros.set(entry[0],entry[1]);
             }
         }
         // global macros override local macros
-        for (let macro in notation.getMacros()) {
-            macros.push(macro);
+        for (let entry in notation.getMacros().entries()) {
+            macros.set(entry[0],entry[1]);
         }
     }
 
@@ -129,8 +129,8 @@ class ScriptParser {
         for (let token of notation.getTokens()) {
             tt.addKeyword(token);
         }
-        for (let identifier in this.localMacros) {
-            tt.addKeyword(identifier);
+        for (let id in this.macros.keys()) {
+            tt.addKeyword(id);
         }
 
         let mbegin = notation.getToken(Notation.Symbol.MULTILINE_COMMENT_BEGIN);
