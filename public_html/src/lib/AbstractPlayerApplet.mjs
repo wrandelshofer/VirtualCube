@@ -356,7 +356,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
             self.playSequence = [];
         }
         
-        this.reset();
+        this.reset(true);
     }
 
     updateMatrices() {
@@ -605,7 +605,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
         return this.parameters.scripttype == "solver";
     }
 
-    reset() {
+    reset(initialReset=false) {
         this.currentAngle = 0;
         this.xRot = this.cube3d.attributes.xRot;
         this.yRot = this.cube3d.attributes.yRot;
@@ -633,8 +633,12 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
                     self.script.applyTo(self.cube, true);
                     self.playIndex = 0;
                 } else {
-                    self.script.applyTo(self.cube, false);
-                    self.playIndex = self.playSequence.length;
+                    if (initialReset) {
+                        self.script.applyTo(self.cube, false);
+                        self.playIndex = self.playSequence.length;
+                    } else {
+                        self.playIndex = 0;
+                    }
                 }
             } else {
                 self.playIndex = 0;
@@ -690,7 +694,6 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
      */
     play() {
        if (this.script == null) {
-           this.scramble();
            return;
        }
        if (this.stopPlayback()) {
@@ -701,7 +704,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
        if (this.playIndex < this.playSequence.length) {
             playNodes = this.playSequence.slice(this.playIndex);
        } else {
-           this.resetPlayback();
+           this.resetPlayback(true);
            playNodes = this.playSequence;
        }
         this.playIndex = this.playSequence.length;
@@ -717,18 +720,30 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
         return isPlaying;
     }
     
-    resetPlayback() {
-           this.cube.reset();
+    /**
+     * Resets the playback header.
+     * @param {type} forward if true resets to start of sequence, 
+     * if false resets to end of sequence
+     */
+    resetPlayback(forward) {
            this.cube3d.setRepainter(null);
+           this.cube.reset();
            if (this.initScript != null) {
                this.initScript.applyTo(this.cube);
            }
-           if (this.isSolver()) {
-               this.script.applyTo(this.cube,true);
-               this.cube3d.setRepainter(this);
+           if (forward) {
+                 if (this.isSolver()) {
+                    this.script.applyTo(this.cube, true);
+                 }
+               this.playIndex = 0;
+           } else {
+                 if (!this.isSolver()) {
+                    this.script.applyTo(this.cube, false);
+                 }
+               this.playIndex = this.playSequence.length;
            }
+           this.cube3d.setRepainter(this);
            this.repaint();
-           this.playIndex = 0;
     }
     
     /** Plays the next step of the script.
@@ -748,7 +763,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
            this.pushMove(nextMove);
             this.playMoves(playNodes, true, this.cube3d.attributes.getUserTwistDuration());
        } else {
-           this.resetPlayback();
+           this.resetPlayback(true);
        }
     }
 
