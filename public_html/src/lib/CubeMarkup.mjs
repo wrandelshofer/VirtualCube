@@ -3,6 +3,8 @@
  */
 import CubeAttributes from './CubeAttributes.mjs';
 import ScriptNotation from './ScriptNotation.mjs';
+let Symbol = ScriptNotation.Symbol;
+let Syntax = ScriptNotation.Syntax;
 
 let module = {
     log: (true && console != null && console.log != null) ? console.log : () => {
@@ -672,6 +674,15 @@ class CubeMarkupReader {
     /** Parses a Notation element and adds its content to the provided CubeMarkupData object. */
     parseNotation(elem, data, refs) {
         let obj=new NotationData();
+        let n = obj.getNotation();
+        n.symbolToSyntaxMap.set(Symbol.COMMUTATION, Syntax.PRECIRCUMFIX);
+        n.symbolToSyntaxMap.set(Symbol.CONJUGATION, Syntax.PREFIX);
+        n.symbolToSyntaxMap.set(Symbol.ROTATION, Syntax.PREFIX);
+        n.symbolToSyntaxMap.set(Symbol.GROUPING, Syntax.CIRCUMFIX);
+        n.symbolToSyntaxMap.set(Symbol.PERMUTATION, Syntax.PRECIRCUMFIX);
+        n.symbolToSyntaxMap.set(Symbol.REPETITION, Syntax.SUFFIX);
+        n.symbolToSyntaxMap.set(Symbol.REFLECTION, Syntax.SUFFIX);
+        n.symbolToSyntaxMap.set(Symbol.INVERSION, Syntax.SUFFIX);
         
         for (let attr of elem.attributes) {
             switch (attr.nodeName) {
@@ -817,7 +828,12 @@ class CubeMarkupReader {
                       } else {
                           let tokenSymbol = parseSymbol(child.getAttribute("symbol"));
                           if (tokenSymbol != null) {
-                              
+                              let tokens=parseWordList(child.textContent);
+                                for (let token of tokens) {
+                                    if (enabled) {
+                                        notation.getNotation().addToken(tokenSymbol, token);
+                                    }
+                                }
                           } else {
                             module.warning("illegal token symbol="+child.getAttribute("symbol"));
                           }
