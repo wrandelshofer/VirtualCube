@@ -7,6 +7,7 @@
 
 import WebglPlayerApplet from './WebglPlayerApplet.mjs';
 import TwoDPlayerApplet from './TwoDPlayerApplet.mjs';
+import CubeMarkup from './CubeMarkup.mjs';
 
 let logger = {
     log: (false && console != null && console.log != null) ? console.log : () => {
@@ -21,6 +22,127 @@ let logger = {
 
 let nextId = 0;
 
+/**
+ * Returns a new parameters object which contains all parameters
+ * in the given parameters object plus all data from a CubeMarkup XML
+ * file, if the parameters file contains a reference to such a file.
+ */
+async function loadCubeMarkupParameters(parameters) {
+    let p = Object.assign({}, parameters);
+    if (parameters.resourcefile != null) {
+        let resourceUrl = document.URL+"/../"+parameters.resourcefile;
+        let data = await new CubeMarkup.CubeMarkupReader().loadFromUrl(resourceUrl);
+        if (data != null) {
+            let notationData = data.findNotation(parameters.notation);
+            if (notationData != null) {
+                p.scriptNotationObject = notationData.getNotation();
+            }
+            let cubeData = data.findCube(parameters.cube);
+            if (cubeData != null) {
+                p.cubeAttributesObject = cubeData.getAttributes();
+            }
+        }
+    }
+    return p;
+}
+
+function instantiateVirtualCube(canvasElem, parameters) {
+    let vr = new VirtualCube(canvasElem);
+    vr.parameters = Object.assign({}, parameters);
+    vr.init();
+    canvasElem.virtualcube = vr;   
+}
+
+function appendToolbar(element, id, parameters) {
+            let toolbarElem = document.createElement("div");
+            toolbarElem.setAttribute("class", "button-toolbar");
+            element.append(toolbarElem);
+            let buttonElem;
+            
+            if (parameters.script == null) {
+                buttonElem = document.createElement("button");
+                buttonElem.setAttribute("type", "button");
+                buttonElem.setAttribute("class", "scramble-button");
+                buttonElem.setAttribute("onclick", "document.getElementById('" + id + "').virtualcube.scramble();");
+                buttonElem.append(document.createTextNode("Scramble"));
+                toolbarElem.append(buttonElem);
+                
+                buttonElem = document.createElement("button");
+                buttonElem.setAttribute("type", "button");
+                buttonElem.setAttribute("class", "reset-button");
+                buttonElem.setAttribute("onclick", "document.getElementById('" + id + "').virtualcube.reset();");
+                buttonElem.append(document.createTextNode("Reset"));
+                toolbarElem.append(buttonElem);
+
+                buttonElem = document.createElement("button");
+                buttonElem.setAttribute("type", "button");
+                buttonElem.setAttribute("class", "undo-button");
+                buttonElem.setAttribute("onclick", "document.getElementById('" + id + "').virtualcube.undo();");
+                buttonElem.append(document.createTextNode("Undo"));
+                toolbarElem.append(buttonElem);
+
+                buttonElem = document.createElement("button");
+                buttonElem.setAttribute("type", "button");
+                buttonElem.setAttribute("class", "redo-button");
+                buttonElem.setAttribute("onclick", "document.getElementById('" + id + "').virtualcube.redo();");
+                buttonElem.append(document.createTextNode("Redo"));
+                toolbarElem.append(buttonElem);
+
+            } else {
+                /*
+                buttonElem = document.createElement("button");
+                buttonElem.setAttribute("type", "button");
+                buttonElem.setAttribute("class", "scramble-button");
+                buttonElem.setAttribute("onclick", "document.getElementById('" + id + "').virtualcube.scramble();");
+                buttonElem.append(document.createTextNode("☆"));
+                toolbarElem.append(buttonElem);
+            */
+                buttonElem = document.createElement("button");
+                buttonElem.setAttribute("type", "button");
+                buttonElem.setAttribute("class", "reset-button");
+                buttonElem.setAttribute("onclick", "document.getElementById('" + id + "').virtualcube.reset();");
+                buttonElem.append(document.createTextNode("▯◁"));
+                toolbarElem.append(buttonElem);
+                
+                buttonElem = document.createElement("button");
+                buttonElem.setAttribute("type", "button");
+                buttonElem.setAttribute("class", "play-button");
+                buttonElem.setAttribute("onclick", "document.getElementById('" + id + "').virtualcube.play();");
+                buttonElem.append(document.createTextNode("▷"));
+                toolbarElem.append(buttonElem);
+
+                buttonElem = document.createElement("button");
+                buttonElem.setAttribute("type", "button");
+                buttonElem.setAttribute("class", "step-backward-button");
+                buttonElem.setAttribute("onclick", "document.getElementById('" + id + "').virtualcube.stepBackward();");
+                buttonElem.append(document.createTextNode("◁▯"));
+                toolbarElem.append(buttonElem);
+
+                buttonElem = document.createElement("button");
+                buttonElem.setAttribute("type", "button");
+                buttonElem.setAttribute("class", "step-forward-button");
+                buttonElem.setAttribute("onclick", "document.getElementById('" + id + "').virtualcube.stepForward();");
+                buttonElem.append(document.createTextNode("▯▷"));
+                toolbarElem.append(buttonElem);
+            }
+            
+            
+            
+            
+            /*
+             buttonElem = document.createElement("button");
+             buttonElem.setAttribute("type","button");
+             buttonElem.setAttribute("onclick","document.getElementById('"+id+"').virtualcube.wobble();");  
+             buttonElem.append(document.createTextNode("Wobble"));
+             toolbarElem.append(buttonElem);
+             buttonElem = document.createElement("button");
+             buttonElem.setAttribute("type","button");
+             buttonElem.setAttribute("onclick","document.getElementById('"+id+"').virtualcube.explode();");  
+             buttonElem.append(document.createTextNode("Explode"));
+             toolbarElem.append(buttonElem);
+             */
+    
+}
 
 /** 
  * Attaches a VirtualCube object to the specified <div> or <canvas> element.
@@ -50,7 +172,7 @@ let nextId = 0;
 function attachVirtualCube(parameters, element) {
     logger.log("attaching virtual cube")
     if (parameters == null) {
-        parameters = [];
+        parameters = {};
     }
 
     if (element == null) {
@@ -78,7 +200,9 @@ function attachVirtualCube(parameters, element) {
             return;
         }
         for (let elem of htmlCollection) {
-            attachVirtualCube(parameters, elem);
+            // Note: we have to clone the parameters, because we add additional values to it for each
+            //         virtual cube that we create.
+            attachVirtualCube(Object.assign({}, parameters), elem);
         }
     } else {
         // => an element was provided, attach VirtualCube to it
@@ -108,6 +232,7 @@ function attachVirtualCube(parameters, element) {
                 if (attr.name != "id" && attr.name != "class") {
                     logger.log('.attachVirtualCube copying attribute attr.name:' + attr.name + ' attr.value:' + attr.value);
                     canvasElem.setAttribute(attr.name, attr.value);
+                    parameters[attr.name.toLowerCase()] = attr.value;
                 }
             }
             if (!element.hasAttribute("kind")) {
@@ -117,48 +242,9 @@ function attachVirtualCube(parameters, element) {
                 canvasElem.setAttribute("debug", "");
             }
 
-            element.appendChild(canvasElem);
+            element.append(canvasElem);
+            appendToolbar(divElem, id, parameters);
 
-            let toolbarElem = document.createElement("div");
-            toolbarElem.setAttribute("class", "button-toolbar");
-            element.appendChild(toolbarElem);
-            let buttonElem;
-            buttonElem = document.createElement("button");
-            buttonElem.setAttribute("type", "button");
-            buttonElem.setAttribute("class", "reset-button");
-            buttonElem.setAttribute("onclick", "document.getElementById('" + id + "').virtualcube.reset();");
-            buttonElem.appendChild(document.createTextNode("Reset"));
-            toolbarElem.appendChild(buttonElem);
-            buttonElem = document.createElement("button");
-            buttonElem.setAttribute("type", "button");
-            buttonElem.setAttribute("class", "undo-button");
-            buttonElem.setAttribute("onclick", "document.getElementById('" + id + "').virtualcube.undo();");
-            buttonElem.appendChild(document.createTextNode("Undo"));
-            toolbarElem.appendChild(buttonElem);
-            buttonElem = document.createElement("button");
-            buttonElem.setAttribute("type", "button");
-            buttonElem.setAttribute("class", "redo-button");
-            buttonElem.setAttribute("onclick", "document.getElementById('" + id + "').virtualcube.redo();");
-            buttonElem.appendChild(document.createTextNode("Redo"));
-            toolbarElem.appendChild(buttonElem);
-            buttonElem = document.createElement("button");
-            buttonElem.setAttribute("type", "button");
-            buttonElem.setAttribute("class", "scramble-button");
-            buttonElem.setAttribute("onclick", "document.getElementById('" + id + "').virtualcube.scramble();");
-            buttonElem.appendChild(document.createTextNode("Scramble"));
-            toolbarElem.appendChild(buttonElem);
-            /*
-             buttonElem = document.createElement("button");
-             buttonElem.setAttribute("type","button");
-             buttonElem.setAttribute("onclick","document.getElementById('"+id+"').virtualcube.wobble();");  
-             buttonElem.appendChild(document.createTextNode("Wobble"));
-             toolbarElem.appendChild(buttonElem);
-             buttonElem = document.createElement("button");
-             buttonElem.setAttribute("type","button");
-             buttonElem.setAttribute("onclick","document.getElementById('"+id+"').virtualcube.explode();");  
-             buttonElem.appendChild(document.createTextNode("Explode"));
-             toolbarElem.appendChild(buttonElem);
-             */
         } else if (element.tagName == "APPLET") {
             // => A <applet> element was provided, remove element, then insert a div element with
             //     a canvas child and buttons
@@ -177,7 +263,7 @@ function attachVirtualCube(parameters, element) {
             canvasElem.setAttribute("width", attrwidth);
             canvasElem.setAttribute("height", attrheight);
             canvasElem.setAttribute("debug", "");
-            divElem.appendChild(canvasElem);
+            divElem.append(canvasElem);
             
             // copy applet parameters over to the canvasElem and into parameters map
             for (let param of Array.from(appletElem.children)) {
@@ -189,28 +275,29 @@ function attachVirtualCube(parameters, element) {
                 }
             }
             
+            appendToolbar(divElem, id, parameters);
+            
             // replace the applet with our div element
             element.parentNode.replaceChild(divElem, appletElem);
         } else {
             logger.error('element ' + element + ' is not a canvas or a div. tagName=' + element.tagName);
             return;
         }
-        let vr = new VirtualCube(canvasElem);
-        vr.parameters = [];
-        for (let key in parameters) {
-            vr.parameters[key] = parameters[key];
-        }
+        
         for (let i = 0; i < element.attributes.length; i++) {
             let attr = element.attributes[i];
             if (attr.name != "id" && attr.name != "class") {
                 logger.log('.attachVirtualCube copying parameter attr.name:' + attr.name + ' attr.value:' + attr.value);
-                vr.parameters[attr.name] = attr.value;
+                parameters[attr.name] = attr.value;
             }
         }
-        vr.init();
-        canvasElem.virtualcube = vr;
+        loadCubeMarkupParameters(parameters).then(
+          p=>instantiateVirtualCube(canvasElem, p),
+          reason=>console.error("Couldn't load file "+parameters.resourcefile+". "+reason)
+          );
     }
 }
+
 
 /** Constructor.
  * 
@@ -239,6 +326,7 @@ class VirtualCube {
         for (let k in this.parameters) {
             this.canvas3d.parameters[k] = this.parameters[k];
         }
+        
         let s = this.canvas3d.setCanvas(this.canvas);
         if (!s) {
             logger.log("Could not instantiate WebGL Context, falling back to 2D Context");
@@ -267,8 +355,11 @@ class VirtualCube {
     play() {
         this.canvas3d.play();
     }
-    solveStep() {
-        this.canvas3d.solveStep();
+    stepForward() {
+        this.canvas3d.stepForward();
+    }
+    stepBackward() {
+        this.canvas3d.stepBackward();
     }
     wobble() {
         this.canvas3d.wobble();

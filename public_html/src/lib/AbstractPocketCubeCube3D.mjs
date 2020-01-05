@@ -377,7 +377,7 @@ class AbstractPocketCubeCube3D extends Cube3D.Cube3D {
         let self = this;
         let interpolator = new SplineInterpolator.SplineInterpolator(0, 0, 1, 1);
         let start = new Date().getTime();
-        let duration = this.attributes.twistDuration * Math.abs(angle);
+        let duration = this.attributes.getTwistDuration() * Math.abs(angle);
         let token=new Object();
         this.isTwisting = token;
         let f = function () {

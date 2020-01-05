@@ -33,7 +33,7 @@ class ParseException extends Error {
     }
     
     toString() {
-        return this.msg + " at:" + this.start + ".." + this.end;
+        return this.message + " at:" + this.start + ".." + this.end+".";
     }
 }
 

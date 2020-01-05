@@ -244,6 +244,38 @@ class CubeMarkupData {
     getTexts() {
         return this.texts;
     }
+    findNotation(name) {
+        for (let n of this.notations) {
+            if (n.getName()==name) {
+                return n;
+            }
+        }
+        return null;
+    }
+    findCube(name) {
+        for (let n of this.cubes) {
+            if (n.getName()==name) {
+                return n;
+            }
+        }
+        return null;
+    }
+    findScript(name) {
+        for (let n of this.scripts) {
+            if (n.getName()==name) {
+                return n;
+            }
+        }
+        return null;
+    }
+    findText(name) {
+        for (let n of this.texts) {
+            if (n.getTitle()==name) {
+                return n;
+            }
+        }
+        return null;
+    }
 }
 
 /**
@@ -874,9 +906,9 @@ class CubeMarkupReader {
                         statusText: xhr.statusText
                     });
                 }            };
-            xhr.onerror = function () {
+            xhr.onerror = event => {
                 reject({
-                    status: this.status,
+                    status: xhr.status,
                     statusText: xhr.statusText
                 });
             };

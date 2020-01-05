@@ -8,15 +8,7 @@
       import ScriptParser from '../lib/ScriptParser.mjs';
       import ScriptNotation from '../lib/ScriptNotation.mjs';
 
-      let tests = document.getElementsByClassName("unittest");
-      let inputs = document.getElementsByClassName("input");
-      let expecteds = document.getElementsByClassName("expected");
-      let actuals = document.getElementsByClassName("actual");
-
-      let notation = new ScriptNotation.DefaultNotation();
-      let parser = new ScriptParser.ScriptParser(notation);
-
-      let appendAst = function (buf, ast) {
+      function appendAst (buf, ast) {
         if (ast.getNodeName() == "permutationitem") {
           buf.push(ast.getLocation());
           buf.push(":");
@@ -71,22 +63,35 @@
 //        buf.push(ast.toString());
       };
 
+      function performTests() {
+      let tests = document.getElementsByClassName("unittest");
+      let inputs = document.getElementsByClassName("input");
+      let expecteds = document.getElementsByClassName("expected");
+      let actuals = document.getElementsByClassName("actual");
+
+      let notation = new ScriptNotation.DefaultNotation();
+      let parser = new ScriptParser.ScriptParser(notation);
+
       for (let i = 0; i < tests.length; i++) {
         let input = inputs[i].innerText;
         let expected = expecteds[i].innerText;
 
-       // try {
+        try {
           let ast = parser.parse(input);
           let buf = new Array();
           appendAst(buf, ast);
           let actual = buf.join("");
           actuals[i].innerText = actual;
           tests[i].classList.add(actual == expected ? "pass" : "fail");
-       /* } catch (err) {
+        } catch (err) {
           actuals[i].innerText = err;
           tests[i].classList.add("fail");
-        }*/
+        }
       }
+    }
+    
+    performTests();
+     
     </script>
   </head>
   <body class="responsive">

@@ -113,7 +113,7 @@ class Cube3D extends Node3D.Node3D {
         this.validateCube();
         this.fireStateChanged();
     }
-
+    
     validateCube() {
         if (!this.isCubeValid) {
             this.isCubeValid = true;
@@ -331,6 +331,17 @@ class Cube3D extends Node3D.Node3D {
      /* Immediately completes the current twisting animation. */
      finishTwisting() {
         // subclasses can override this methods
+     }
+     
+     /** Sets the repainter for animation. Set this value to null to prevent animation. 
+      *  Set this value to an object which has a repaint() method. The repaint() method
+      *  must paint the current state of the Cube3D.
+      */
+     setRepainter(newValue) {
+         this.repainter=newValue;
+     }
+     getRepainter() {
+         return this.repainter;
      }
 }
 

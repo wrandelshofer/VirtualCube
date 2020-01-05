@@ -125,6 +125,15 @@ class CubeAttributes {
   getStickerFillColor(index) {
       return this.stickersFillColor[index];
   }
+  getTwistDuration() {
+      return this.twistDuration;
+  }
+  getScrambleTwistDuration() {
+      return this.scrambleTwistDuration;
+  }
+  getUserTwistDuration() {
+      return this.userTwistDuration;
+  }
 }
 
 

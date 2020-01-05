@@ -809,6 +809,7 @@ class PermutationCycleNode extends Node {
         this.type = type;
     }
     
+    /** Creates a clone of this node and of all its children. */
     clone() {
         let that = new PermutationCycleNode();
         that.startPosition = this.startPosition;
@@ -975,6 +976,17 @@ class MoveNode extends Node {
             }
         }
         return new MoveNode(this.layerCount,this.axis,reflectedMask,this.angle,this.getStartPosition(),this.getEndPosition());
+    }
+    
+    invert() {
+        this.angle = -this.angle;
+    }
+    
+    /**
+     * Creates a clone of this node.
+     */
+    clone() {
+        return new MoveNode(this.layerCount,this.axis,this.layerMask,this.angle,this.getStartPosition(),this.getEndPosition());
     }
     
 

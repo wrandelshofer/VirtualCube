@@ -117,7 +117,6 @@ class WebglPlayerApplet extends AbstractPlayerApplet.AbstractPlayerApplet {
 
         let clientWidth = canvas.clientWidth;
         let clientHeight = canvas.clientHeight;
-        console.log("width heigth "+clientWidth+", "+clientHeight);
         this.width = clientWidth;
         this.height = clientHeight;
        

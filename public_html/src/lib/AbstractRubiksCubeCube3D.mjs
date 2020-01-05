@@ -795,7 +795,7 @@ class AbstractRubiksCubeCube3D extends Cube3D.Cube3D {
         this.fireStateChanged();
     }
 
-    validateTwist(partIndices, locations, orientations, length, axis, angle, alpha) {
+    validateTwist(partIndices, locations, orientations, partCount, axis, angle, alpha) {
         let rotation = this.updateTwistRotation;
         rotation.makeIdentity();
         let rad = (90 * angle * (1 - alpha));
@@ -812,7 +812,7 @@ class AbstractRubiksCubeCube3D extends Cube3D.Cube3D {
         }
 
         let orientationMatrix = this.updateTwistOrientation;
-        for (let i = 0; i < length; i++) {
+        for (let i = 0; i < partCount; i++) {
             orientationMatrix.makeIdentity();
             if (partIndices[i] < this.edgeOffset) { //=> part is a corner
                 // Base location of a corner part is urf. (= corner part 0)
@@ -882,11 +882,11 @@ class AbstractRubiksCubeCube3D extends Cube3D.Cube3D {
         let self = this;
         let interpolator = new SplineInterpolator.SplineInterpolator(0, 0, 1, 1);
         let start = new Date().getTime();
-        let duration = this.attributes.twistDuration * Math.abs(angle);
+        let duration = this.attributes.getTwistDuration() * Math.abs(angle);
         let token=new Object();
         this.isTwisting = token;
         let f = function () {
-            if (!self.isTwisting===token) {
+            if (self.isTwisting!==token) {
                 // Twisting was aborted. Complete this twisting animation.
                 self.validateTwist(partIndices, locations, orientations, finalCount, axis, angle, 1.0);
                 return; 
@@ -902,7 +902,9 @@ class AbstractRubiksCubeCube3D extends Cube3D.Cube3D {
                 self.isTwisting = null;
             }
         };
-        this.repainter.repaint(f);
+        if (this.repainter != null) {
+            this.repainter.repaint(f);
+        }
     }
     
     /* Immediately completes the current twisting animation. */

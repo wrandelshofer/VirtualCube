@@ -22,7 +22,6 @@ import PocketCubeS1Cube3D from './PocketCubeS1Cube3D.mjs';
 import PocketCubeS4Cube3D from './PocketCubeS4Cube3D.mjs';
 import PocketCubeS5Cube3D from './PocketCubeS5Cube3D.mjs';
 
-
 let logger = {
     log: (false) ? console.log : () => {
     },
@@ -132,7 +131,7 @@ let parseCommaOrSpaceSeparatedList = function (str) {
  *  optionallyQuotedId = (* words *) | (* quote *), (* characters *), (* quote *) ;
  *  optionallyQuotedValue = (* words *) | (* quote *), (* characters *), (* quote *) ;
  */
-let parserMacroDefinitions = function (str) {
+let parseMacroDefinitions = function (str) {
     const t = new Tokenizer.PushBackReader(str);
     let defs = {};
     do {
@@ -208,7 +207,6 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
         this.smoothRotationFunction = null;
         this.spin = new J3DIMath.J3DIVector3();
         this.useFullModel = true;
-        this.moves = [];
         this.undoList = [];
         this.redoIndex = 0;
         this.stickersTexture = null;
@@ -221,6 +219,10 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
             colortable: null, //frdblu (deprecated)
             colorlist: null, //rufldb
         };
+        
+        this.playSequence = [];
+        this.playIndex = 0;
+        this.playToken = null;
     }
 
     createCube3D() {
@@ -347,6 +349,13 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
         this.rotationMatrix = new J3DIMath.J3DIMatrix4();
         this.viewportMatrix = new J3DIMath.J3DIMatrix4();
         this.forceColorUpdate = false;
+        
+        if (self.script != null) {
+            self.playSequence = Array.from(self.script.resolvedIterable());
+        } else {
+            self.playSequence = [];
+        }
+        
         this.reset();
     }
 
@@ -586,6 +595,15 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
          tri[i].draw(g);
          }*/
     }
+    
+    /**
+     * Returns true if the script type is "solver",
+     * false otherwise. When false, the script type is
+     * assumed to be "generator".
+     */
+    isSolver() {
+        return this.parameters.scripttype == "solver";
+    }
 
     reset() {
         this.currentAngle = 0;
@@ -593,7 +611,6 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
         this.yRot = this.cube3d.attributes.yRot;
         this.rotationMatrix.makeIdentity();
         this.smoothRotationFunction = null;
-        this.moves = [];
         let self = this;
         let f = function () {
             // Cancel all other lenghty operations
@@ -610,8 +627,19 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
             if (self.initscript != null) {
                 self.initscript.applyTo(self.cube);
             }
-
             self.clearUndoRedo();
+            if (self.script != null) {
+                if (self.isSolver()) {
+                    self.script.applyTo(self.cube, true);
+                    self.playIndex = 0;
+                } else {
+                    self.script.applyTo(self.cube, false);
+                    self.playIndex = self.playSequence.length;
+                }
+            } else {
+                self.playIndex = 0;
+            }
+
             // reinstall repainter needed for animation
             self.cube3d.repainter = this;
             // Other lenghty operations are go now
@@ -620,10 +648,11 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
         this.repaint(f);
         return;
     }
-    /** @param move twistNode. */
+    /**
+     * Pushes a move for undoing. 
+     * @param move twistNode. 
+     * */
     pushMove(move) {
-        // subclass responsibility
-        this.moves.push(move);
         if (this.redoIndex < this.undoList.length) {
             this.undoList = this.undoList.splice(0, this.redoIndex);
         }
@@ -632,7 +661,6 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
         this.redoIndex = this.undoList.length;
     }
 
-    /** FIXME Does not update this.moves ! */
     undo() {
         if (this.redoIndex > 0) {
             let move = this.undoList[--this.redoIndex];
@@ -642,7 +670,6 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
             }
         }
     }
-    /** FIXME Does not update this.moves ! */
     redo() {
         if (this.redoIndex < this.undoList.length) {
             let move = this.undoList[this.redoIndex++];
@@ -657,102 +684,100 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
         this.redoIndex = 0;
     }
 
-    /** Play. Scrambles or solves the cube.
+    /** Plays the script.
+     * Plays the entire script if the playIndex is at the start or the end
+     * of the script. Plays the remainder of the script otherwise.
      */
     play() {
-        if (this.cube.isSolved()) {
-            this.scramble();
-        } else {
-            this.solve();
+       if (this.script == null) {
+           this.scramble();
+           return;
+       }
+       if (this.stopPlayback()) {
+           return;
+       }
+       
+       let playNodes;
+       if (this.playIndex < this.playSequence.length) {
+            playNodes = this.playSequence.slice(this.playIndex);
+       } else {
+           this.resetPlayback();
+           playNodes = this.playSequence;
+       }
+        this.playIndex = this.playSequence.length;
+        for (let move of playNodes) {
+            this.pushMove(move);
         }
+        this.playMoves(playNodes, true, this.cube3d.attributes.getUserTwistDuration());
     }
-    /** Play. Scrambles or solves the cube.
+    
+    stopPlayback() {
+        let isPlaying = this.playToken != null;
+        this.playToken = null;
+        return isPlaying;
+    }
+    
+    resetPlayback() {
+           this.cube.reset();
+           this.cube3d.setRepainter(null);
+           if (this.initScript != null) {
+               this.initScript.applyTo(this.cube);
+           }
+           if (this.isSolver()) {
+               this.script.applyTo(this.cube,true);
+               this.cube3d.setRepainter(this);
+           }
+           this.repaint();
+           this.playIndex = 0;
+    }
+    
+    /** Plays the next step of the script.
      */
-    solveStep() {
-        // Wait until we can lock the cube. This prevents that multiple
-        // twist operations run concurrently.
-        let owner = new Object();
-        if (!this.cube.lock(owner)) {
-            return false;
-        }
-        this.cube.unlock(owner);
-        return this.doSolveStep();
-    }
-    /** Protected method. */
-    doSolveStep() {
-        if (this.cube.isSolved()) {
-            this.moves = [];
-            return true;
-        } else if (this.moves.length == 0) {
-            this.reset();
-            return true;
-        } else {
-            let move = this.moves.pop();
-            move.applyTo(this.cube, true);
-            if (this.cube.isSolved()) {
-                this.moves = [];
-                this.wobble();
-                return true;
-            }
-            return false;
-        }
-    }
-    /** Solves the cube.
-     */
-    solve() {
-        let self = this;
-        let owner = new Object();
-        let f = function () {
-            // Wait until we can lock the cube. This prevents that multiple
-            // scramble operations run concurrently.
-            if (!self.cube.lock(owner)) {
-                self.repaint(f);
-                return;
-            }
-            // Wait until cube3d has finished twisting
-            if (self.cube3d.isTwisting) {
-                self.repaint(f);
-                return;
-            }
-            // => First move: Speed the cube up 
-            self.cube3d.attributes.twistDuration = self.cube3d.attributes.scrambleTwistDuration;
-            if (!self.cube.cancel) {
-                // => not cancelled? solve one step
-                if (!self.doSolveStep()) {
-                    // => not solved? go again
-                    self.repaint(f);
-                    return;
-                }
-            }
-
-            // => We are done: Restore the speed
-            self.cube3d.attributes.twistDuration = self.cube3d.attributes.userTwistDuration;
-            // => Clear undo/redo list
-            self.clearUndoRedo();
-            // Unlock the cube
-            self.cube.unlock(owner);
-        };
-        this.repaint(f);
+    stepForward() {
+       if (this.script == null) {
+           return;
+       }
+       if (this.stopPlayback()) {
+           return;
+       }
+       
+       if (this.playIndex < this.playSequence.length) {
+           let nextMove = this.playSequence[this.playIndex];
+           this.playIndex++;
+           let playNodes = [nextMove];
+           this.pushMove(nextMove);
+            this.playMoves(playNodes, true, this.cube3d.attributes.getUserTwistDuration());
+       } else {
+           this.resetPlayback();
+       }
     }
 
-    /** Scrambles the cube.
-     * @param scrambleCount Number > 1.
-     * @param animate       Boolean. Whether to animate to cube or just snap
-     *                               into scrambled position.
+    /** Plays the previous step of the script.
      */
-    scramble(scrambleCount, animate) {
-        if (scrambleCount == null)
-            scrambleCount = 16;
-        if (animate == null)
-            animate = true;
-        let self = this;
-        // => Clear undo/redo list
-        this.clearUndoRedo();
-        // Create random moves
-        let layerCount = this.cube3d.cube.layerCount;
-        let scrambleNodes = ScriptParser.createRandomScript(layerCount, scrambleCount);
-        this.moves = this.moves.concat(scrambleNodes);
-        // Perform the scrambling moves
+    stepBackward() {
+       if (this.script == null) {
+           return;
+       }
+       if (this.stopPlayback()) {
+           return;
+       }
+       
+       if (this.playIndex > 0) {
+           this.playIndex--;
+           let nextMove = this.playSequence[this.playIndex].clone();
+           nextMove.invert();
+           this.pushMove(nextMove);
+           let playNodes = [nextMove];
+           this.playMoves(playNodes, true, this.cube3d.attributes.getUserTwistDuration());
+       } else {
+           this.resetPlayback();
+           this.playIndex = this.playSequence.length;
+       }
+    }
+
+    playMoves(playNodes, animate, twistDuration=1000) {
+        let self=this;
+        
         if (!animate) {
             let f = function () {
                 // Cancel all other lenghty operations
@@ -763,10 +788,12 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
                     return;
                 }
 
-                // Scramble the cube
-                for (let i = 0; i < scrambleNodes.length; i++) {
-                    scrambleNodes[i].applyTo(self.cube);
+                self.cube3d.setRepainter(null);
+                for (let i = 0; i < playNodes.length; i++) {
+                    playNodes[i].applyTo(self.cube);
                 }
+                self.cube3d.setRepainter(self);
+                self.cube3d.repaint();
 
                 // Other lenghty operations are go now
                 self.cube.cancel = false;
@@ -777,6 +804,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
 
         let next = 0; // next twist to be performed
         let owner = new Object();
+        this.playToken = owner;
         let f = function () {
             // Wait until we can lock the cube. This prevents that multiple
             // scramble operations run concurrently.
@@ -784,36 +812,62 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
                 self.repaint(f);
                 return;
             }
+            // Playback has been aborted
+            if (self.playToken != owner) {
+                self.cube.unlock(owner);
+                return;
+            }
+            
             // Wait until cube3d has finished twisting
             if (self.cube3d.isTwisting) {
-                self.repaint(f);
+                self.repaint(f);// busy loop
                 return;
             }
 
             if (next == 0) {
                 // => First move: Speed the cube up 
-                self.cube3d.attributes.twistDuration = self.cube3d.attributes.scrambleTwistDuration;
+                self.cube3d.attributes.setTwistDuration(twistDuration);
             }
 
             if (self.cube.cancel) {
-                // => cancel? gently stop scrambling
-                next = scrambleNodes.length;
+                // => cancel? gently stop 
+                next = playNodes.length;
             }
 
             // Initiate the next move
-            if (next < scrambleNodes.length) {
-                scrambleNodes[next].applyTo(self.cube);
+            if (next < playNodes.length) {
+                playNodes[next].applyTo(self.cube);
                 next++;
                 self.repaint(f);
             } else {
                 // => We are done: Restore the speed
-                self.cube3d.attributes.twistDuration = self.cube3d.attributes.userTwistDuration;
+                self.cube3d.attributes.setTwistDuration(self.cube3d.attributes.getUserTwistDuration());
                 // Unlock the cube
                 self.cube.unlock(owner);
+                self.playToken = null;
             }
 
         };
         this.repaint(f);
+    }
+    
+    /** Scrambles the cube.
+     * @param scrambleCount Number > 1.
+     * @param animate       Boolean. Whether to animate to cube or just snap
+     *                               into scrambled position.
+     */
+    scramble(scrambleCount, animate) {
+        if (scrambleCount == null)
+            scrambleCount = 16;
+        if (animate == null)
+            animate = true;
+
+        // => Clear undo/redo list
+        this.clearUndoRedo();
+        // Create random moves
+        let layerCount = this.cube3d.cube.layerCount;
+        let scrambleNodes = ScriptParser.createRandomScript(layerCount, scrambleCount);
+        this.playMoves(scrambleNodes, animate,this.cube3d.attributes.getScrambleTwistDuration());
     }
 
     /**
@@ -1130,22 +1184,15 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
     readScriptParameters(cube3d) {
         let a = cube3d.attributes;
         let p = this.parameters;
-        // parse resourceFile
-        // --------------
-        if (p.resourcefile != null) {
-            logger.log('.readParameters resourcefile:' + p.resourcefile);
-            // FIXME implement me
-        }
 
-        // FIXME parse notation
-        // ----------
-        let notation = new ScriptNotation.DefaultNotation();
+        let notation = p.scriptNotationObject != null ? p.scriptNotationObject : new ScriptNotation.DefaultNotation();
+        
         // parse scriptmacros
         // --------------
         if (p.scriptmacros != null) {
             logger.log('.readParameters scriptmacros:' + p.scriptmacros);
             try {
-                this.macros = parserMacroDefinitions(p.scriptmacros);
+                this.macros = parseMacroDefinitions(p.scriptmacros);
                 logger.log('.readParameters scriptmacros: %o', this.macros);
             } catch (e) {
                 logger.error(e);
@@ -1168,7 +1215,6 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
         // --------------
         if (p.initscript != null) {
             logger.log('.readParameters initscript:' + p.initscript);
-            let notation = new ScriptNotation.DefaultNotation();
             let parser = new ScriptParser.ScriptParser(notation);
             try {
                 this.initscript = parser.parse(p.initscript);
