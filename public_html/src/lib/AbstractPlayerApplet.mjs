@@ -96,21 +96,21 @@ let parseColorMap = function (str) {
     }
     return map;
 }
-/** Parses a word list into an array.
+/** Parses a comma or space separated list into an array.
  *
  *  EBNF: (|)=choice, []=optional, {}=zero or more, (* *)=comment
  * 
  *  list = value, { [','] , {' '} , value } ;
  *  value = (* word *) ;
  */
-let parseWordList = function (str) {
+let parseCommaOrSpaceSeparatedList = function (str) {
     let map = [];
     if (str == null)
         return map;
-    let tokens = str.split(/([ ,]+)/);
+    let tokens = str.split(/(\s|,)+/);
     let elementIndex = 0;
     for (let i = 0; i < tokens.length; ) {
-        if (tokens[i].match(/^[ ,]+$/)) {
+        if (tokens[i].match(/^(\s|,)+$/)) {
             // found a separator
             i++; // consume separator
         } else {
@@ -1029,7 +1029,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
         if (p.faces != null) {
             logger.log('.readParameters faces:' + p.faces);
             logger.warning('the parameter "faces" is deprecated, please use "faceList" instead.');
-            let parsedIndices = parseWordList(p.faces);
+            let parsedIndices = parseCommaOrSpaceSeparatedList(p.faces);
             for (let i in parsedIndices) {
                 faceIndices[deprecatedFaceIndices[i]] = parsedIndices[i];
             }
@@ -1038,7 +1038,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
         // parse faceIndices from faceList
         if (p.facelist != null) {
             logger.log('.readParameters facelist:' + p.facelist);
-            faceIndices = parseWordList(p.facelist);
+            faceIndices = parseCommaOrSpaceSeparatedList(p.facelist);
         }
 
         // apply face indices
@@ -1065,7 +1065,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
         ];
         for (let i = 0, n = Math.min(deprecatedParameterNames.length, a.getFaceCount()); i < n; i++) {
             let value = p[deprecatedParameterNames[i]];
-            let keys = parseWordList(value);
+            let keys = parseCommaOrSpaceSeparatedList(value);
             if (keys != null && keys.length != 0) {
                 logger.warning("Parameter \"" +deprecatedParameterNames[i]+ "\" is deprecated, use \"" + parameterNames[i] + "\" instead.");
                 if (keys.length != a.getStickerCount(i)) {
@@ -1095,7 +1095,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
         }
         for (let i = 0, n = Math.min(parameterNames.length, a.getFaceCount()); i < n; i++) {
             let value = p[parameterNames[i]];
-            let keys = parseWordList(value);
+            let keys = parseCommaOrSpaceSeparatedList(value);
             if (keys != null && keys.length != 0) {
                 if (keys.length != a.getStickerCount(i)) {
                     logger.error(

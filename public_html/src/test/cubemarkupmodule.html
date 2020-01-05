@@ -2,33 +2,93 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>CubeMarkup module: read() function</title>
+    <title>CubeMarkup module: CubeMarkupReader().loadFromUrl() function</title>
     <link href="virtualcube.css" rel="stylesheet" type="text/css">
     <script type="module">
       import CubeMarkup from '../lib/CubeMarkup.mjs';
       
       let dumpCubeMarkupData = function(data) {
         let body = document.body;
+        dumpCubes(data);
+        dumpNotations(data);
+        dumpScripts(data);
+        dumpTexts(data);
+      }
+      let dumpCubes = function(data) {
+        let body = document.body;
         for (let obj of data.getCubes()) {
           let articleElem=document.createElement("article");
           let h1Elem=document.createElement("h1");
           h1Elem.textContent = obj.getName();
-          articleElem.appendChild(h1Elem);
+          articleElem.append(h1Elem);
           let pElem;
           
+          let imgSize=200;
           if (obj.getStickersImageUrl() != null) {
             let imgElem=document.createElement("img");
             imgElem.setAttribute("src",obj.getStickersImageUrl());
-            imgElem.setAttribute("width","200");
-            imgElem.setAttribute("height","200");
+            imgElem.setAttribute("width",imgSize);
+            imgElem.setAttribute("height",imgSize);
             articleElem.append(imgElem);
+          } else {
+            let layerCount=obj.getKind().getLayerCount();
+            let tileSize=Math.floor(imgSize/(layerCount*3));
+            let svgElem=document.createElementNS("http://www.w3.org/2000/svg","svg");
+            svgElem.setAttribute("width",imgSize);
+            svgElem.setAttribute("height",imgSize);
+            let stickerIndex=0;
+            
+            //FIXME the following origins only work with cubic cubes,
+            //         Cuboctahedron, Diamond and Barrel cube have different schemes
+            let faceOrigins=[
+              {x:tileSize*layerCount*2,y:tileSize*layerCount*1},//right
+              {x:tileSize*layerCount*1,y:tileSize*layerCount*0},//up
+              {x:tileSize*layerCount*1,y:tileSize*layerCount*1},//front
+              {x:tileSize*layerCount*0,y:tileSize*layerCount*1},//left
+              {x:tileSize*layerCount*1,y:tileSize*layerCount*2},//down
+              {x:tileSize*layerCount*2,y:tileSize*layerCount*2},//back
+              {x:tileSize*layerCount*0,y:tileSize*layerCount*0},//extra face 
+              {x:tileSize*layerCount*2,y:tileSize*layerCount*0},//extra face
+              {x:tileSize*layerCount*0,y:tileSize*layerCount*2},//extra face
+              {x:tileSize*layerCount*0,y:tileSize*layerCount*3},//extra face
+              {x:tileSize*layerCount*0,y:tileSize*layerCount*4},//extra face
+              {x:tileSize*layerCount*0,y:tileSize*layerCount*5},//extra face
+              {x:tileSize*layerCount*0,y:tileSize*layerCount*6},//extra face
+              {x:tileSize*layerCount*0,y:tileSize*layerCount*7},//extra face
+            ];
+            let face=0;
+            for (let countPerFace of obj.getKind().getStickerCountPerFace()) {
+              let x=faceOrigins[face].x;
+              let y=faceOrigins[face].y;
+              for (let i=0; i<countPerFace; i++) {
+                let rectElem=document.createElementNS("http://www.w3.org/2000/svg", "rect");
+                rectElem.setAttribute("x",x);
+                rectElem.setAttribute("y",y);
+                rectElem.setAttribute("width",tileSize);
+                rectElem.setAttribute("height",tileSize);
+                let fillColor = obj.getAttributes().getStickerFillColor(stickerIndex);
+                rectElem.setAttribute("fill","rgb("+fillColor[0]+","+fillColor[1]+","+fillColor[2]+")");
+                svgElem.append(rectElem);
+                stickerIndex++;
+                x+=tileSize;
+                if (stickerIndex % layerCount == 0) {
+                  x=faceOrigins[face].x;
+                  y+=tileSize;
+                }
+              }
+              face++;
+            }
+            articleElem.append(svgElem);
           }
           
           pElem=document.createElement("p");
           pElem.textContent = obj.getDescription();
-          articleElem.appendChild(pElem);
-          body.appendChild(articleElem);
+          articleElem.append(pElem);
+          body.append(articleElem);
         }
+      }
+      let dumpNotations = function(data) {
+        let body = document.body;
         for (let obj of data.getNotations()) {
           let articleElem=document.createElement("article");
           let h1Elem=document.createElement("h1");
@@ -49,6 +109,16 @@
             kbdElem.appendChild(document.createTextNode(token));
             pElem.appendChild(kbdElem);
           }
+          for (let token of obj.getNotation().getMacros().keys()) {
+            if (first) {
+              first=false;
+            } else {
+              pElem.appendChild(document.createTextNode(", "));
+            }
+            kbdElem = document.createElement("kbd");
+            kbdElem.appendChild(document.createTextNode(token));
+            pElem.appendChild(kbdElem);
+          }
           articleElem.appendChild(pElem);
           
           pElem=document.createElement("p");
@@ -57,6 +127,9 @@
 
         body.appendChild(articleElem);
         }
+      }
+      let dumpScripts = function(data) {
+        let body = document.body;
         for (let obj of data.getScripts()) {
           let articleElem=document.createElement("article");
           let h1Elem=document.createElement("h1");
@@ -78,6 +151,9 @@
           
           body.appendChild(articleElem);
         }
+      }
+      let dumpTexts = function(data) {
+        let body = document.body;
         for (let obj of data.getTexts()) {
           let articleElem=document.createElement("article");
           let h1Elem=document.createElement("h1");
@@ -95,6 +171,6 @@
     </script>
   </head>
   <body class="responsive">
-    <h1>Tests the results of <kbd>Loader.load()</kbd> method in the <kbd>CubeMarkup</kbd> module.</h1>
+    <h1>Tests the results of <kbd>CubeMarkupReader().loadFromUrl()</kbd> method in the <kbd>CubeMarkup</kbd> module.</h1>
   </body>
 </html>

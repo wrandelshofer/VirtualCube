@@ -117,6 +117,14 @@ class CubeAttributes {
   setTwistDuration(newValue) {
     this.twistDuration = newValue;
   }
+  /**
+   * Gets the specified sticker fill color.
+   * @param {type} index of sticker
+   * @returns {Array} with [r,g,b,a] values
+   */
+  getStickerFillColor(index) {
+      return this.stickersFillColor[index];
+  }
 }
 
 

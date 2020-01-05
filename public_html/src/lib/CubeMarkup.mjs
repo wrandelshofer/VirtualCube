@@ -77,21 +77,48 @@ let parseAngle = function (string) {
     return Math.round(parseInt(string) / 90);
 }
 
+/** Parses a comma or space separated list into an array.
+ *
+ *  EBNF: (|)=choice, []=optional, {}=zero or more, (* *)=comment
+ *
+ *  list = value, { [','] , {' '} , value } ;
+ *  value = (* word *) ;
+ */
+let parseCommaOrSpaceSeparatedList = function (str) {
+    let map = [];
+    if (str == null)
+        return map;
+    let tokens = str.split(/(\s|,)+/);
+    let elementIndex = 0;
+    for (let i = 0; i < tokens.length; ) {
+        if (tokens[i].match(/^(\s|,)+$/)) {
+            // found a separator
+            i++; // consume separator
+        } else {
+            // found a value
+            let stringValue = tokens[i];
+            map[elementIndex] = stringValue;
+            i++; // consume value
+            elementIndex++; // increase element index
+        }
+    }
+    return map;
+}
 /** Parses a word list into an array.
  *
  *  EBNF: (|)=choice, []=optional, {}=zero or more, (* *)=comment
  * 
- *  list = value, { [','] , {' '} , value } ;
+ *  list = value, { [' '] , {' '} , value } ;
  *  value = (* word *) ;
  */
 let parseWordList = function (str) {
     let map = [];
     if (str == null)
         return map;
-    let tokens = str.split(/([ ,]+)/);
+    let tokens = str.split(/(\s+)/);
     let elementIndex = 0;
     for (let i = 0; i < tokens.length; ) {
-        if (tokens[i].match(/^[ ,]+$/)) {
+        if (tokens[i].match(/^\s+$/)) {
             // found a separator
             i++; // consume separator
         } else {
@@ -109,7 +136,7 @@ let parseWordList = function (str) {
  */
 let parseLayerList = function (string) {
     let mask=0;
-    for (let word of parseWordList(string)) {
+    for (let word of parseCommaOrSpaceSeparatedList(string)) {
         mask |= 1<<parseInt(word - 1);
     }
     return mask;
@@ -128,18 +155,42 @@ let parseRgbColor = function (string) {
     let v=parseInt("0x"+string.substring(1));
     return [(v>>>16)&0xff,(v>>>8)&0xff,v&0xff,255];
 }
+class CubeKind {
+    constructor(name,layerCount,partCount,stickerCount,stickerCountPerFace) {
+        this.name=name;
+        this.layerCount=layerCount;
+        this.partCount=partCount;
+        this.stickerCount=stickerCount;
+        this.stickerCountPerFace=stickerCountPerFace;//Array
+    }
+    getName() {
+        return this.name;
+    }
+    getLayerCount() {
+        return this.layerCount;
+    }
+    getPartCount() {
+        return this.partCount;
+    }
+    getStickerCount() {
+        return this.stickerCount;
+    }
+    getStickerCountPerFace() {
+        return this.stickerCountPerFace;
+    }
+}
 const CubeKindEnum = Object.freeze({
-    POCKET:{name:"2x2 Pocket Cube", layers:2},
-    RUBIK:{name:"3x3 Rubik's Cube", layers:3},
-    REVENGE:{name:"4x4 Revenge Cube", layers:4},
-    PROFESSOR:{name:"5x5 Professor Cube", layers:5},
-    VCUBE_6:{name:"6x6 V-Cube", layers:6},
-    VCUBE_7:{name:"7x7 V-Cube", layers:7},
-    BARREL:{name:"3x3 Rubik's Barrel", layers:3},
-    DIAMOND:{name:"3x3 Rubik's Diamond", layers:3},
-    CUBOCTAHEDRON:{name:"3x3 Rubik's Cuboctahedron", layers:3},
-    CUBE_6:{name:"6x6 Cube", layers:6},
-    CUBE_7:{name:"7x7 Cube", layers:7},
+    POCKET:new CubeKind("2x2 Pocket Cube", 2,4,24,[4,4,4,4,4,4]),
+    RUBIK:new CubeKind("3x3 Rubik's Cube", 3,9,54,[9,9,9,9,9,9]),
+    REVENGE:new CubeKind("4x4 Revenge Cube", 4,57,96,[16,16,16,16,16,16]),
+    PROFESSOR:new CubeKind("5x5 Professor Cube", 5,99,150,[25,25,25,25,25,25]),
+    VCUBE_6:new CubeKind("6x6 V-Cube", 6,153,216,[36,36,36,36,36,36]),
+    VCUBE_7:new CubeKind("7x7 V-Cube", 7,219,294,[49,49,49,49,49,49]),
+    BARREL:new CubeKind("3x3 Rubik's Barrel", 3,9,42,[6,6,6,6,9,9]),
+    DIAMOND:new CubeKind("3x3 Rubik's Diamond", 3,9,26,[6,6,6,6,1,1]),
+    CUBOCTAHEDRON:new CubeKind("3x3 Rubik's Cuboctahedron", 3,9,86,[9,9,9,9,9,9,4,4,4,4,4,4,4,4]),
+    CUBE_6:new CubeKind("6x6 Cube", 6,153,216,[36,36,36,36,36,36]),
+    CUBE_7:new CubeKind("7x7 Cube", 7,219,294,[49,49,49,49,49,49]),
     });
 const CubeKindMap = new Map([
     ["2x2 Pocket Cube",CubeKindEnum.POCKET] ,["PocketCube",CubeKindEnum.POCKET] ,["Pocket",CubeKindEnum.POCKET] ,["2x2 Cube",CubeKindEnum.POCKET],
@@ -209,7 +260,8 @@ class CubeData {
         this.date=null;
         
         // FIXME we should store the actual attributes data and create CubeAttributes on demand
-        this.attributes = new CubeAttributes.CubeAttributes();
+        //          the size of the cube attributes changes when we change the cube kind!
+        this.attributes = new CubeAttributes.CubeAttributes(9,54,[9,9,9,9,9,9]);
     }
     getAttributes(){
         return this.attributes;
@@ -238,9 +290,14 @@ class CubeData {
     setDate(newValue) {
         this.date=newValue;
     }
-    setKind(newValue) {
-        this.kind=newValue;
+    setKind(kind) {
+        this.kind=kind;
+        this.attributes=new CubeAttributes.CubeAttributes(kind.getPartCount(),kind.getStickerCount(),kind.getStickerCountPerFace());
     }
+    getKind() {
+        return this.kind;
+    }
+      
     setDefault(newValue) {
         this.default=newValue;
     }
@@ -755,7 +812,7 @@ class CubeMarkupReader {
           }
         }
         
-        for (let identifier in parseWordList(identifiers)) {
+        for (let identifier of parseWordList(identifiers)) {
             notation.getNotation().addMacro(identifier, source);
         }
     }    
