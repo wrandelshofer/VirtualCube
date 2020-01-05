@@ -20,18 +20,20 @@
     </section>
     <section>
       <h2>Usage</h2>
-      <p>The VirtualCube JavaScript Applet consists of the following files:</p>
+      <p>The VirtualCube JavaScript Applet consists of JavaScript modules which are provided
+        in the <kbd>lib</kbd> directory.</p>
       <dl>
-        <dt><kbd>virtualcube.js</kbd></dt><dd>This file contains the JavaScript code.</dd>
+        <dt><kbd>virtualcube.mjs</kbd></dt><dd>This file contains the main program.</dd>
         <dt><kbd>virtualcube.css</kbd></dt><dd>This is an optional stylesheet file which you can change to alter the appearance of the VirtualCube JavaScript Applet.</dd>
       </dl>
-      <p>You can include these files with the following code into your HTML page:</p>
+      <p>Make sure that you copy all files contained in the <kbd>lib</kbd> directory to your web server.<br>
+        You can then include these files with the following code into your HTML page:</p>
       <pre><code>
 &lt;!DOCTYPE html&gt;
 &lt;html&gt;
 &lt;head&gt;
   &lt;meta charset="utf-8"&gt;
-  &lt;script src="lib/virtualcube.js"&gt;&lt;/script&gt;
+  &lt;script type="module" src="lib/virtualcube.mjs"&gt;&lt;/script&gt;
   &lt;link href="style/virtualcube.css" rel="stylesheet" type="text/css"&gt;
 &lt;/head&gt;
 &lt;body&gt;
@@ -46,16 +48,35 @@
        kind="RubiksCube" 
        stickersImage="img/RubiksCube_512.gif"&gt;&lt;/div&gt;
 </code></pre>
+      <p>
       This code has the following meaning:
       <dl>
         <dt><kbd>class="virtualcube" </kbd></dt><dd>The VirtualCube JavaScript Applet is inserted into all div-Elements with the class "virtualcube". You can have more than one div-Element of this class in your HTML page.</dd>
         <dt><kbd>kind="RubiksCube"</kbd></dt><dd>Specifies the desired cube model. You can specify <kbd>RubiksCube</kbd> or <kbd>PocketCube</kbd>.</dd>
         <dt><kbd>stickersImage="img/RubiksCube_512.gif"</kbd></dt><dd>Specifies an image which is applied on the stickers of the cube.</dd>
       </dl>
+    </p>
+      <p>For backward compatibility you can alternatively specify an applet tag.</p>
+      <pre><code>
+  &lt;applet code="RubikPlayerFlat" archive="RubikPlayerFlat.jar" codebase="../lib" width="170" height="170"&gt;
+    &lt;param name="kind" value="RubiksCube"&gt;
+    &lt;param name="stickersImage" value="img/RubiksCube_512.gif"&gt;
+  &lt;/applet&gt;
+</code></pre>
+      <p>The code has the same meaning. Only the syntax is different.
+        The code attribute is used to determine whether the applet tag should be replaced by the JavaScript applet.
+        Currently the following values are supported for <kbd>code</kbd>:
+      <ul>
+        <li><kbd>RubikPlayer</kbd></li>
+      <li><kbd>RubikPlayerFlat</kbd></li>
+      </ul>
+      </p>
     </section>
     <section>
       <h2>Supported Attributes</h2>
-      <p>The div-element may have the following attributes:</p>
+      <p>The div-element may have the following attributes:<br>
+        (If you are using the applet tag, then you can specify the attributes with param-elements)
+      </p>
       <table>
         <tr><td><kbd>rendercontext</kbd></td> <td><kbd>name</kbd></td>  <td>Selects the rendering context to be used, "webgl" or "2d". Default: "webgl"<td></tr>
         <tr><td><kbd>alpha</kbd></td> <td><kbd>int</kbd></td>  <td>Vertical orientation of the cube, -90..+90. Default: "-25"<td></tr>
@@ -63,9 +84,12 @@
         <tr><td><kbd>colorlist</kbd></td> <td><kbd>[name=]int, ...</kbd></td>  <td>RGB color list. Each entry consists of an optional name and a RGB value. Default:"r=#ffd200,u=#003373,f=#8c000f,l=#f8f8f8,d=#00732f,b=#ff4600"<td></tr>
         <tr><td><kbd>facelist</kbd></td> <td><kbd>name, ...</kbd></td>  <td>Maps colors from the color map to the faces of the cube; 6 integer values or color names; r, u, f, l, d, b. Default: "0,1,2,3,4,5"<td></tr>
         <tr><td><kbd>kind</kbd></td> <td><kbd>name</kbd></td>  <td>Specifies the desired cube model: <kbd>RubiksCube</kbd> or <kbd>PocketCube</kbd>. Default: <kbd>"RubiksCube"</kbd><td></tr>
+        <tr><td><kbd>notation</kbd></td> <td><kbd>string</kbd></td>  <td>Name of a notation in the resource file. If you don't specify this parameter, the default notation of the resource file is used.<td></tr>
+        <tr><td><kbd>resourceFile</kbd></td> <td><kbd>URL</kbd></td>  <td>Address of a Cube Markup XML resource file. The file extension must be .xml.<td></tr>
         <tr><td><kbd>script</kbd></td> <td><kbd>string</kbd></td>  <td>Script. Default value: "".<td></tr>
         <tr><td><kbd>initscript</kbd></td> <td><kbd>string</kbd></td>  <td>This script is used to initialize the cube, and when the reset button is pressed. If you don't specify this parameter, no script is used.<td></tr>
         <tr><td><kbd>partlist</kbd></td> <td><kbd>name, ...</kbd></td>  <td>List of visible parts. Default: "urf,dfr,ubr,drb,ulb,dbl,ufl,dlf,ru,rf,rd,...,center"<td></tr>
+        <tr><td><kbd>scriptType</kbd></td> <td><kbd>string</kbd></td>  <td>The type of the script: "solver" or "generator". Default: "solver".<td></tr>
         <tr><td><kbd>stickersRightList</kbd></td> <td><kbd>(name|int), ...</kbd></td>  <td>Maps colors from the color table to the stickers on the side of the cube; 9 names or indices. Default: "r r r, r r r, r r r"</td></tr>
         <tr><td><kbd>stickersUpList</kbd></td> <td><kbd>(name|int), ...</kbd></td>  <td>Maps colors from the color map to the stickers on the side of the cube; 9 names or indices. Default: "u u u, u u u, u u u"</td></tr>
         <tr><td><kbd>stickersFrontList</kbd></td> <td><kbd>(name|int), ...</kbd></td>  <td>Maps colors from the color map to the stickers on the side of the cube; 9 names or indices. Default: "f f f, f f f, f f f"</td></tr>
@@ -85,11 +109,8 @@
         <tr><td><kbd>debug</kbd></td> <td><kbd>boolean</kbd></td>  <td>Set this to 'true' to print debug informations on the console. Default: false.<td></tr>
         <tr><td><kbd>displayLines</kbd></td> <td><kbd>int</kbd></td>  <td>Number of lines of the Script display: set to 0 to switch the display off. Default: 1<td></tr>
         <tr><td><kbd>locale</kbd></td> <td><kbd>language</kbd></td>  <td>Locale, for example "en", "de", "fr".<td></tr>
-        <tr><td><kbd>notation</kbd></td> <td><kbd>string</kbd></td>  <td>Name of a notation in the resource file. If you don't specify this parameter, the default notation of the resource file is used.<td></tr>
-        <tr><td><kbd>resourceFile</kbd></td> <td><kbd>URL</kbd></td>  <td>Address of a Cube Markup XML resource file. This file can be Zip-compressed to improve the startup time of the applet. The file extension must be .xml or .zip.<td></tr>
         <tr><td><kbd>resourceData</kbd></td> <td><kbd>xml</kbd></td>  <td>Cube Markup XML resource data.<td></tr>
         <tr><td><kbd>scaleFactor</kbd></td> <td><kbd>float</kbd></td>  <td>Scale factor. Default: "1.0"<td></tr>
-        <tr><td><kbd>scriptType</kbd></td> <td><kbd>string</kbd></td>  <td>The type of the script: "solver" or "generator". Default: "solver".<td></tr>
         <tr><td><kbd>scriptProgress</kbd></td> <td><kbd>int</kbd></td>  <td>Position of the progress bar. Default value:  end of script if scriptType is 'generator', 0 if script type is "solver".<td></tr>
         <tr><td><kbd>showPlayer</kbd></td> <td><kbd>boolean</kbd></td>  <td>Set this to false, to hide the player. Default: true<td></tr>
         <tr><td><kbd>showInfo</kbd></td> <td><kbd>boolean</kbd></td>  <td>Set this to true, to display an info field on the right of the player. Default: false<td></tr>
@@ -107,7 +128,7 @@
     <section>
       <h2>License Terms</h2>
       <p>
-        <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br /><span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/InteractiveResource" property="dct:title" rel="dct:type">VirtualCube JavaScript Applet</span> by <span xmlns:cc="http://creativecommons.org/ns#" property="cc:attributionName">Werner Randelshofer</span> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
+        MIT License
       </p>
     </section>
   </body>
