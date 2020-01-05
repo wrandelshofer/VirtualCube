@@ -43,7 +43,7 @@
 
 /* general layout */
 body {
-    word-break: break-all;
+    word-break: break-word;
 }
 body>h1,
 body>p {

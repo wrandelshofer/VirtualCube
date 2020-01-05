@@ -7,6 +7,20 @@
     <script type="module">
       import CubeMarkup from '../lib/CubeMarkup.mjs';
       
+      let toHtmlParagraph = function(str) {
+          let pElem=document.createElement("p");
+          let first=true;
+          for (let line of str.split(/\n/)) {
+            if (first) {
+              first=false;
+            } else {
+              pElem.append(document.createElement("br"));
+            }
+            pElem.append(document.createTextNode(line));
+          }
+          return pElem;
+      }
+      
       let dumpCubeMarkupData = function(data) {
         let body = document.body;
         dumpCubes(data);
@@ -81,9 +95,7 @@
             articleElem.append(svgElem);
           }
           
-          pElem=document.createElement("p");
-          pElem.textContent = obj.getDescription();
-          articleElem.append(pElem);
+          articleElem.append(toHtmlParagraph(obj.getDescription()));
           body.append(articleElem);
         }
       }
@@ -93,7 +105,7 @@
           let articleElem=document.createElement("article");
           let h1Elem=document.createElement("h1");
           h1Elem.textContent = obj.getName();
-          articleElem.appendChild(h1Elem);
+          articleElem.append(h1Elem);
           
           let pElem;
           let kbdElem;
@@ -103,29 +115,26 @@
             if (first) {
               first=false;
             }else{
-              pElem.appendChild(document.createTextNode(", "));
+              pElem.append(document.createTextNode(", "));
             }
             kbdElem = document.createElement("kbd");
-            kbdElem.appendChild(document.createTextNode(token));
-            pElem.appendChild(kbdElem);
+            kbdElem.append(document.createTextNode(token));
+            pElem.append(kbdElem);
           }
           for (let token of obj.getNotation().getMacros().keys()) {
             if (first) {
               first=false;
             } else {
-              pElem.appendChild(document.createTextNode(", "));
+              pElem.append(document.createTextNode(", "));
             }
             kbdElem = document.createElement("kbd");
-            kbdElem.appendChild(document.createTextNode(token));
-            pElem.appendChild(kbdElem);
+            kbdElem.append(document.createTextNode(token));
+            pElem.append(kbdElem);
           }
-          articleElem.appendChild(pElem);
+          articleElem.append(pElem);
           
-          pElem=document.createElement("p");
-          pElem.textContent = obj.getDescription();
-          articleElem.appendChild(pElem);
-
-        body.appendChild(articleElem);
+          articleElem.append(toHtmlParagraph(obj.getDescription()));
+          body.append(articleElem);
         }
       }
       let dumpScripts = function(data) {
@@ -134,7 +143,7 @@
           let articleElem=document.createElement("article");
           let h1Elem=document.createElement("h1");
           h1Elem.textContent = obj.getName();
-          articleElem.appendChild(h1Elem);
+          articleElem.append(h1Elem);
           
           let pElem;
           let kbdElem;
@@ -142,14 +151,10 @@
           pElem=document.createElement("p");
           kbdElem=document.createElement("kbd");
           kbdElem.textContent = obj.getSource();
-          pElem.appendChild(kbdElem);
-          articleElem.appendChild(pElem);
-          
-          pElem=document.createElement("p");
-          pElem.textContent = obj.getDescription();
-          articleElem.appendChild(pElem);
-          
-          body.appendChild(articleElem);
+          pElem.append(kbdElem);
+          articleElem.append(pElem);
+          articleElem.append(toHtmlParagraph(obj.getDescription()));
+          body.append(articleElem);
         }
       }
       let dumpTexts = function(data) {
@@ -158,11 +163,9 @@
           let articleElem=document.createElement("article");
           let h1Elem=document.createElement("h1");
           h1Elem.textContent = obj.getTitle();
-          let pElem=document.createElement("p");
-          pElem.textContent = obj.getBody();
-          articleElem.appendChild(h1Elem);
-          articleElem.appendChild(pElem);
-          body.appendChild(articleElem);
+          articleElem.append(h1Elem);
+          articleElem.append(toHtmlParagraph(obj.getBody()));
+          body.append(articleElem);
         }
       };
       
