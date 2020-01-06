@@ -82,7 +82,7 @@ let parseColorMap = function (str) {
             if (key != null) {
                 map.set(key, rgbaValue);
             }
-            map.set(elementIndex, rgbaValue);
+            map.set(""+elementIndex, rgbaValue);
             i++; // consume value
             elementIndex++; // increase element index
         } else if (tokens[i].match(/^[ ,]+$/)) {
@@ -1051,9 +1051,9 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
         // --------------
         let deprecatedColorMap = new Map(); //parseColorMap("r=#ff4600,u=#ffd200,f=#003373,l=#8c000f,d=#f8f8f8,b=#00732f");
         let colorMap = parseColorMap("r=#ffd200,u=#003373,f=#8c000f,l=#f8f8f8,d=#00732f,b=#ff4600");
-        for (let k in colorMap) {
-            if (k >= 0 && k <= colorMap.length) {
-                deprecatedColorMap.set(k, colorMap.get(deprecatedFaceIndices[k]));
+        for (let k of colorMap.keys()) {
+            if (k >= 0 && k <= colorMap.size) {
+                deprecatedColorMap.set(k, colorMap.get(""+deprecatedFaceIndices[k]));
             } else {
                 deprecatedColorMap.set(k, colorMap.get(k));
             }
@@ -1140,7 +1140,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
                 if (keys.length != a.getStickerCount(i)) {
                     logger.error(
                             "The Applet parameter \"" + deprecatedParameterNames[i]
-                            + "\" has " + keys.length + " items instead of of "
+                            + "\" has " + keys.length + " items instead of "
                             + a.getStickerCount(i) + " items.",
                             deprecatedParameterNames[i], value);
                     return;
@@ -1149,8 +1149,8 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
                 let offset = a.getStickerOffset(face);
                 for (let j = 0, m = a.getStickerCount(face); j < m; j++) {
                     if (!deprecatedColorTable.has(keys[j])) {
-                        logger.warning("AbstractPlayerApplet deprecatedColorTable:" + deprecatedColorTable);
-                        logger.error(
+                        logger.error("AbstractPlayerApplet error in deprecatedColorTable:" + deprecatedColorTable
+                                +"\n"+
                                 deprecatedParameterNames[i]+","+ value+","+
                                 value.indexOf(keys[j])+","+
                                 value.indexOf(keys[j]) + keys[j].length() - 1);
