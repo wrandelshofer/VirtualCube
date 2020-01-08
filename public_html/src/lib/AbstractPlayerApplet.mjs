@@ -1112,7 +1112,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
 
         // apply face indices
         for (let i = 0; i < a.getFaceCount(); i++) {
-            let color = currentColorMap.get(faceIndices[i]);
+            let color = currentColorMap.get(""+faceIndices[i]);
             if (color != null) {
                 let face = i;
                 let offset = a.getStickerOffset(face);

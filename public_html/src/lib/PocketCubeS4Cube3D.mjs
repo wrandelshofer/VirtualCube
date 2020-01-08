@@ -45,7 +45,7 @@ class PocketCubeS4Cube3D extends AbstractPocketCubeCube3D.AbstractPocketCubeCube
         a.partsFillColor[this.centerOffset] = [240, 240, 240, 255];
 
         let faceColors = [//Right, Up, Front, Left, Down, Back
-            [255, 210, 0, 155], // Yellow
+            [255, 210, 0, 255], // Yellow
             [0, 51, 115, 255], // Blue
             [140, 0, 15, 255], // Red
             [248, 248, 248, 255], // White
