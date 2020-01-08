@@ -262,6 +262,8 @@ function attachVirtualCube(parameters, element) {
             canvasElem.setAttribute("id", id);
             canvasElem.setAttribute("width", attrwidth);
             canvasElem.setAttribute("height", attrheight);
+            // explicitly set stlled width and height so that we can use high dpi support
+            canvasElem.setAttribute("style","width:"+attrwidth+"px;height:"+attrheight+"px");
             canvasElem.setAttribute("debug", "");
             divElem.append(canvasElem);
             

@@ -115,19 +115,28 @@ class WebglPlayerApplet extends AbstractPlayerApplet.AbstractPlayerApplet {
             return;
         }
 
+        // read the current screen dimensions of the canvas
         let clientWidth = canvas.clientWidth;
         let clientHeight = canvas.clientHeight;
-        this.width = clientWidth;
-        this.height = clientHeight;
        
         // support high dpi/retina displays:
         let devicePixelRatio = window.devicePixelRatio || 1;
-        devicePixelRatio = 1; // XXX must set to 1 to prevent canvas client size from running away!!
-        this.drawingBufferWidth = clientWidth * devicePixelRatio;
-        this.drawingBufferHeight = clientHeight * devicePixelRatio;
-
+       // devicePixelRatio = 1;
+        this.drawingBufferWidth = Math.round(clientWidth * devicePixelRatio);
+        this.drawingBufferHeight = Math.round(clientHeight * devicePixelRatio);
         canvas.width = this.drawingBufferWidth;
         canvas.height = this.drawingBufferHeight;
+        
+        // read canvas client dimensions again, because 
+        this.width = canvas.clientWidth;
+        this.height = canvas.clientHeight;
+        if (this.width != clientWidth || this.height != clientHeight) {
+            // setting the drawing buffer size has changed the screen dimensions!
+            // -> when this happens, we must revert to a 1:1 ratio.       
+            this.width = this.drawingBufferWidth = canvas.width = clientWidth;
+            this.height = this.drawingBufferHeight = canvas.height = clientHeight;
+        }
+        
         
         let gl = this.gl;
         gl.viewport(0, 0, this.drawingBufferWidth, this.drawingBufferHeight);
