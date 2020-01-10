@@ -4,7 +4,6 @@
 
 import AbstractPocketCubeCube3D from './AbstractPocketCubeCube3D.mjs';
 import CubeAttributes from './CubeAttributes.mjs';
-import PreloadPocketCubeS4 from './PreloadPocketCubeS4.mjs';
 
 
 let module = {

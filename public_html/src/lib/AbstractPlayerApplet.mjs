@@ -17,10 +17,8 @@ import ScriptParser from './ScriptParser.mjs';
 import Tokenizer from './Tokenizer.mjs';
 import RubiksCubeS1Cube3D from './RubiksCubeS1Cube3D.mjs';
 import RubiksCubeS4Cube3D from './RubiksCubeS4Cube3D.mjs';
-import RubiksCubeS5Cube3D from './RubiksCubeS5Cube3D.mjs';
 import PocketCubeS1Cube3D from './PocketCubeS1Cube3D.mjs';
 import PocketCubeS4Cube3D from './PocketCubeS4Cube3D.mjs';
-import PocketCubeS5Cube3D from './PocketCubeS5Cube3D.mjs';
 
 let logger = {
     log: (false) ? console.log : () => {
@@ -253,10 +251,8 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
                 break;
             case "RubiksCube s3" :
             case "RubiksCube s4" :
-                c3d = new RubiksCubeS4Cube3D.Cube3D();
-                break;
             case "RubiksCube s5" :
-                c3d = new RubiksCubeS5Cube3D.Cube3D();
+                c3d = new RubiksCubeS4Cube3D.Cube3D();
                 break;
             case "PocketCube s1" :
             case "PocketCube s2" :
@@ -265,9 +261,6 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
             case "PocketCube s3" :
             case "PocketCube s4" :
                 c3d = new PocketCubeS4Cube3D.Cube3D();
-                break;
-            case "PocketCube s5" :
-                c3d = new PocketCubeS5Cube3D.Cube3D();
                 break;
             default :
                 logger.error('illegal cube attribute :' + cname);

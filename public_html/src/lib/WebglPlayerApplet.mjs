@@ -5,7 +5,6 @@
 import AbstractPlayerApplet from './AbstractPlayerApplet.mjs';
 import Node3D from './Node3D.mjs';
 import J3DI from './J3DI.mjs';
-import PreloadWebglShaders from './PreloadWebglShaders.mjs';
 import J3DIMath from './J3DIMath.mjs';
 
 

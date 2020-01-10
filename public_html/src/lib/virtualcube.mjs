@@ -57,6 +57,43 @@
 
 import VirtualCubeMain from './VirtualCubeMain.mjs';
 
+// Performance: Import transitively required modules to reduce loading time.
+//              With HTML/1.0 and HTML/1.1 only up to 6 TCP connections may be open at the same time.
+import WebglPlayerApplet from "./WebglPlayerApplet.mjs";
+import TwoDPlayerApplet from "./TwoDPlayerApplet.mjs";
+import CubeMarkup from "./CubeMarkup.mjs";
+import AbstractPlayerApplet from "./AbstractPlayerApplet.mjs";
+import Node3D from "./Node3D.mjs";
+import J3DI from "./J3DI.mjs";
+
+import J3DIMath from "./J3DIMath.mjs";
+import CubeAttributes from "./CubeAttributes.mjs";
+import ScriptNotation from "./ScriptNotation.mjs";
+import PreloadWebglShaders from "./PreloadWebglShaders.mjs";
+import ScriptParser from "./ScriptParser.mjs";
+import Tokenizer from "./Tokenizer.mjs";
+
+import Cube3D from "./Cube3D.mjs";
+import Cube from "./Cube.mjs";
+import RubiksCube from "./RubiksCube.mjs";
+import PocketCube from "./PocketCube.mjs";
+import SplineInterpolator from "./SplineInterpolator.mjs";
+import RubiksCubeS1Cube3D from "./RubiksCubeS1Cube3D.mjs";
+
+import RubiksCubeS4Cube3D from "./RubiksCubeS4Cube3D.mjs";
+import PocketCubeS1Cube3D from "./PocketCubeS1Cube3D.mjs";
+import PocketCubeS4Cube3D from "./PocketCubeS4Cube3D.mjs";
+import AbstractRubiksCubeCube3D from "./AbstractRubiksCubeCube3D.mjs";
+import AbstractPocketCubeCube3D from "./AbstractPocketCubeCube3D.mjs";
+
+import PreloadRubiksCubeS1 from "./PreloadRubiksCubeS1.mjs";
+import PreloadRubiksCubeS4 from "./PreloadRubiksCubeS4.mjs";
+import PreloadPocketCubeS1 from "./PreloadPocketCubeS1.mjs";
+import PreloadPocketCubeS4 from "./PreloadPocketCubeS4.mjs";
+
+import AbstractCanvas from "./AbstractCanvas.mjs";
+import ScriptAST from "./ScriptAST.mjs";
+
 // try to determine base url
 let baseUrl='lib';
 {

@@ -4,7 +4,6 @@
 
 import AbstractRubiksCubeCube3D from './AbstractRubiksCubeCube3D.mjs';
 import CubeAttributes from './CubeAttributes.mjs';
-import PreloadRubiksCubeS1 from './PreloadRubiksCubeS1.mjs';
 
 class RubiksCubeS1Cube3D extends AbstractRubiksCubeCube3D.AbstractRubiksCubeCube3D {
     /** Constructor

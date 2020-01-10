@@ -71,14 +71,10 @@
 import J3DIMath from './J3DIMath.mjs';
 
 let module = {
-    log: (false) ? console.log : () => {
-    },
-    info: (true) ? console.info : () => {
-    },
-    warning: (true) ? console.warning : () => {
-    },
-    error: (true) ? console.error : () => {
-    }
+    log: (true) ? console.log : () => {},
+    info: (true) ? console.info : () => {},
+    warning: (true) ? console.warning : () => {},
+    error: (true) ? console.error : () => {}
 }
 
 /**

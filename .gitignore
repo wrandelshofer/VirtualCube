@@ -1,2 +1,4 @@
 /public_html/build/
 /dist/
+/public_html/src/lib/patterns-test/
+/.idea/workspace.xml

@@ -3,8 +3,7 @@
  */
 
 import AbstractPocketCubeCube3D from './AbstractPocketCubeCube3D.mjs';
-  import CubeAttributes from './CubeAttributes.mjs';
-  import PreloadPocketCubeS1 from './PreloadPocketCubeS1.mjs';
+import CubeAttributes from './CubeAttributes.mjs';
 
 /** Constructor
  * Creates the 3D geometry of a "Rubik's Cube".
