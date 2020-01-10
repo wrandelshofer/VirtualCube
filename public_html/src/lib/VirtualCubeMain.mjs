@@ -190,7 +190,9 @@ function attachVirtualCube(parameters, element) {
         // => also attach to all applet elements
         for (let elem of document.getElementsByTagName("APPLET")) {
            let code = elem.getAttribute("code");
-           if (code !=null && code.startsWith("RubikPlayer")) {
+           if (code !=null && (
+                code.startsWith("RubikPlayer") || code.startsWith("PocketPlayer")
+           )) {
                htmlCollection.push(elem);
            }
         }
@@ -276,7 +278,17 @@ function attachVirtualCube(parameters, element) {
                     parameters[name.toLowerCase()] = value;
                 }
             }
-            
+
+            let code = appletElem.getAttribute("code");
+            let kind;
+            if (code.startsWith("PocketPlayer")) {
+                kind = "PocketCube";
+            } else {
+                kind = "RubiksCube";
+            }
+            canvasElem.setAttribute("kind",kind);
+            parameters["kind"] = kind;
+
             appendToolbar(divElem, id, parameters);
             
             // replace the applet with our div element

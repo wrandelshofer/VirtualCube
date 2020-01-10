@@ -1193,7 +1193,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
         let a = cube3d.attributes;
         let p = this.parameters;
 
-        let notation = p.scriptNotationObject != null ? p.scriptNotationObject : new ScriptNotation.DefaultNotation();
+        let notation = p.scriptNotationObject != null ? p.scriptNotationObject : new ScriptNotation.DefaultNotation(cube3d.getCube().getLayerCount());
         
         // parse scriptmacros
         // --------------
