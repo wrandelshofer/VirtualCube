@@ -97,6 +97,10 @@ p.input, p.expected, p.actual {
     margin: 0;
 }
 
+.differentValues {
+    background: orange;
+}
+
 p.input:before {
     content: "input: ";
 }

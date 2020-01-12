@@ -6,6 +6,44 @@ import Cube from './Cube.mjs';
 import ScriptNotation from './ScriptNotation.mjs';
 let Symbol = ScriptNotation.Symbol;
 
+    /**
+     * Returns an int whose value is the smallest common multiple of
+     * <tt>abs(a)</tt> and <tt>abs(b)</tt>.  Returns 0 if
+     * <tt>a==0 || b==0</tt>.
+     *
+     * @param  a value with with the SCM is to be computed.
+     * @param  b value with with the SCM is to be computed.
+     * @return <tt>SCM(a, b)</tt>
+     */
+    function scm(a, b) {
+        // Quelle:
+        //   Herrmann, D. (1992). Algorithmen Arbeitsbuch.
+        //   Bonn, München Paris: Addison Wesley.
+        //   gill, Seite 141
+
+        if (a == 0 || b == 0) return 0;
+
+        a = Math.abs(a);
+        b = Math.abs(b);
+
+        let u = a;
+        let v = b;
+
+        while (a != b) {
+            if (a < b) {
+                b -= a;
+                v += u;
+            } else {
+                a -= b;
+                u += v;
+            }
+        }
+
+
+        //return a; // gcd
+        return (u + v) / 2; // scm
+    }
+
 /**
  * Returns a String describing the state of the cube using
  * Bandelow's permutation notation.
@@ -470,10 +508,314 @@ function toSidePermutationString(cube, syntax,
 }
 
 
+    /**
+     * Returns a number that describes the order
+     * of the permutation of the supplied cube.
+     * <p>
+     * The order says how many times the permutation
+     * has to be applied to the cube to get the
+     * initial state.
+     *
+     * @param cube A cube
+     * @return the order of the permutation of the cube
+     */
+    function getOrder(cube) {
+        let cornerLoc = cube.getCornerLocations();
+        let cornerOrient = cube.getCornerOrientations();
+        let edgeLoc = cube.getEdgeLocations();
+        let edgeOrient = cube.getEdgeOrientations();
+        let sideLoc = cube.getSideLocations();
+        let sideOrient = cube.getSideOrientations();
+
+        let order = 1;
+
+        let visitedLocs;
+        let i, j, k, n, p;
+        let prevOrient;
+        let length;
+
+        // determine cycle lengths of the current corner permutation
+        // and compute smallest common multiple
+        visitedLocs = new Array(cornerLoc.length);
+
+        for (i = 0; i < 8; i++) {
+            if (!visitedLocs[i]) {
+                if (cornerLoc[i] == i && cornerOrient[i] == 0) {
+                    continue;
+                }
+
+                length = 1;
+
+                visitedLocs[i] = true;
+                prevOrient = 0;
+
+                for (j = 0; cornerLoc[j] != i; j++) {
+                }
+
+                while (!visitedLocs[j]) {
+                    visitedLocs[j] = true;
+                    prevOrient = (prevOrient + cornerOrient[j]) % 3;
+
+                    length++;
+
+                    for (k = 0; cornerLoc[k] != j; k++) {
+                    }
+                    j = k;
+                }
+
+                prevOrient = (prevOrient + cornerOrient[i]) % 3;
+                if (prevOrient != 0) {
+                    //order = scm(order, 3);
+                    length *= 3;
+                }
+                order = scm(order, length);
+            }
+        }
+
+        // determine cycle lengths of the current edge permutation
+        // and compute smallest common multiple
+        visitedLocs = new Array(edgeLoc.length);
+        for (i = 0, n = edgeLoc.length; i < n; i++) {
+            if (!visitedLocs[i]) {
+                if (edgeLoc[i] == i && edgeOrient[i] == 0) {
+                    continue;
+                }
+
+                length = 1;
+
+                visitedLocs[i] = true;
+                prevOrient = 0;
+
+                for (j = 0; edgeLoc[j] != i; j++) {
+                }
+
+                while (!visitedLocs[j]) {
+                    visitedLocs[j] = true;
+                    prevOrient ^= edgeOrient[j];
+
+                    length++;
+
+                    for (k = 0; edgeLoc[k] != j; k++) {
+                    }
+                    j = k;
+                }
+
+                if ((prevOrient ^ edgeOrient[i]) == 1) {
+                    //order = scm(order, 2);
+                    length *= 2;
+                }
+                order = scm(order, length);
+            }
+        }
+
+        // determine cycle lengths of the current side permutation
+        // and compute smallest common multiple
+        visitedLocs = new Array(sideLoc.length);
+        for (i = 0, n = sideLoc.length; i < n; i++) {
+            if (!visitedLocs[i]) {
+                if (sideLoc[i] == i && sideOrient[i] == 0) {
+                    continue;
+                }
+
+                length = 1;
+
+                visitedLocs[i] = true;
+                prevOrient = 0;
+
+                for (j = 0; sideLoc[j] != i; j++) {
+                }
+
+                while (!visitedLocs[j]) {
+                    visitedLocs[j] = true;
+
+                    length++;
+
+                    prevOrient = (prevOrient + sideOrient[j]) % 4;
+
+                    for (k = 0; sideLoc[k] != j; k++) {
+                    }
+                    j = k;
+                }
+
+                prevOrient = (prevOrient + sideOrient[i]) % 4;
+                switch (prevOrient) {
+                    case 0: // no sign
+                        break;
+                    case 1: // '-' sign
+                        //order = scm(order, 4);
+                        length *= 4;
+                        break;
+                    case 2: // '++' sign
+                        //order = scm(order, 2);
+                        length *= 2;
+                        break;
+                    case 3: // '+' sign
+                        //order = scm(order, 4);
+                        length *= 4;
+                        break;
+                }
+                order = scm(order, length);
+            }
+        }
+
+        return order;
+    }
+
+    /**
+     * Returns a number that describes the order
+     * of the permutation of the supplied cube,
+     * assuming that all stickers only have a solid
+     * color, and that all stickers on the same face
+     * have the same color.
+     * <p>
+     * On a cube with such stickers, we can
+     * not visually determine the orientation of its
+     * side parts, and we can not visually determine
+     * a permutation of side parts of which all side
+     * parts are on the same face of the cube.
+     * <p>
+     * The order says how many times the permutation
+     * has to be applied to the cube to get the
+     * initial state.
+     *
+     * @param cube A cube
+     * @return the order of the permutation of the cube
+     */
+function getVisibleOrder(cube) {
+        let cornerLoc = cube.getCornerLocations();
+        let cornerOrient = cube.getCornerOrientations();
+        let edgeLoc = cube.getEdgeLocations();
+        let edgeOrient = cube.getEdgeOrientations();
+        let sideLoc = cube.getSideLocations();
+        let sideOrient = cube.getSideOrientations();
+        let order = 1;
+
+        let visitedLocs;
+        let i, j, k, n, p;
+        let prevOrient;
+        let length;
+
+        // determine cycle lengths of the current corner permutation
+        // and compute smallest common multiple
+        visitedLocs = new Array(cornerLoc.length);
+
+        for (i = 0, n = cornerLoc.length; i < n; i++) {
+            if (!visitedLocs[i]) {
+                if (cornerLoc[i] == i && cornerOrient[i] == 0) {
+                    continue;
+                }
+
+                length = 1;
+
+                visitedLocs[i] = true;
+                prevOrient = 0;
+
+                for (j = 0; cornerLoc[j] != i; j++) {
+                }
+
+                while (!visitedLocs[j]) {
+                    visitedLocs[j] = true;
+                    prevOrient = (prevOrient + cornerOrient[j]) % 3;
+
+                    length++;
+
+                    for (k = 0; cornerLoc[k] != j; k++) {
+                    }
+                    j = k;
+                }
+
+                prevOrient = (prevOrient + cornerOrient[i]) % 3;
+                if (prevOrient != 0) {
+                    //order = scm(order, 3);
+                    length *= 3;
+                }
+                order = scm(order, length);
+            }
+        }
+
+        // determine cycle lengths of the current edge permutation
+        // and compute smallest common multiple
+        visitedLocs = new Array(edgeLoc.length);
+        for (i = 0, n = edgeLoc.length; i < n; i++) {
+            if (!visitedLocs[i]) {
+                if (edgeLoc[i] == i && edgeOrient[i] == 0) {
+                    continue;
+                }
+
+                length = 1;
+
+                visitedLocs[i] = true;
+                prevOrient = 0;
+
+                for (j = 0; edgeLoc[j] != i; j++) {
+                }
+
+                while (!visitedLocs[j]) {
+                    visitedLocs[j] = true;
+                    prevOrient ^= edgeOrient[j];
+
+                    length++;
+
+                    for (k = 0; edgeLoc[k] != j; k++) {
+                    }
+                    j = k;
+                }
+
+                if ((prevOrient ^ edgeOrient[i]) == 1) {
+                    //order = scm(order, 2);
+                    length *= 2;
+                }
+                order = scm(order, length);
+            }
+        }
+
+        // Determine cycle lengths of the current side permutation
+        // and compute smallest common multiple.
+        // Ignore changes of orientation.
+        // Ignore side permutations which are entirely on same face.
+        visitedLocs = new Array(sideLoc.length);
+        for (i = 0, n = sideLoc.length; i < n; i++) {
+            if (!visitedLocs[i]) {
+                if (sideLoc[i] == i && sideOrient[i] == 0) {
+                    continue;
+                }
+
+                length = 1;
+
+                visitedLocs[i] = true;
+                let firstFace = sideLoc[i] % 6;
+                let allPartsAreOnSameFace = true;
+
+                for (j = 0; sideLoc[j] != i; j++) {
+                }
+
+                while (!visitedLocs[j]) {
+                    visitedLocs[j] = true;
+
+                    length++;
+                    if (firstFace != sideLoc[j] % 6) {
+                        allPartsAreOnSameFace = false;
+                    }
+
+                    for (k = 0; sideLoc[k] != j; k++) {
+                    }
+                    j = k;
+                }
+                if (!allPartsAreOnSameFace) {
+                    order = scm(order, length);
+                }
+            }
+        }
+
+        return order;
+    }
+
 // ------------------
 // MODULE API    
 // ------------------
 export default {
-    toPermutationString: toPermutationString
+    toPermutationString: toPermutationString,
+    getOrder : getOrder,
+    getVisibleOrder: getVisibleOrder
 };
 

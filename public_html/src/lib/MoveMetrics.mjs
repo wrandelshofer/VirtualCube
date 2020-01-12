@@ -45,6 +45,20 @@ class MoveMetrics {
          * Includes the current node.
          */
         this.moveCount = 0;
+
+        /**
+         * True if we coalesce subsequent moves over the same axis and angle
+         * while counting.
+         */
+        this.coalesce = true;
+    }
+
+    isCoalesce() {
+        return this.coalesce;
+    }
+
+    setCoalesce(coalesce) {
+        this.coalesce = coalesce;
     }
 
     accept(node) {
@@ -65,15 +79,15 @@ class MoveMetrics {
                 // cannot coalesce
                 this.current = moveNode;
                 this.moveCount++;
-            } else if (this.current.getAxis() == axis && layerMask == allLayers) {
+            } else if (this.coalesce && this.current.getAxis() == axis && layerMask == allLayers) {
                 // skip cube rotation over same axis
                 this.moveCount++;
-            } else if (this.current.getAxis() == axis && this.current.getLayerMask() == layerMask) {
+            } else if (this.coalesce && this.current.getAxis() == axis && this.current.getLayerMask() == layerMask) {
                 // coalesce subsequent move on same axis and same layer
                 this.current = new ScriptAST.MoveNode(layerCount, axis, layerMask, angle +this.current.getAngle(),
                   this.current.getStartPosition(), moveNode.getEndPosition());
                 this.moveCount++;
-            } else if (this.current.getAxis() == axis && this.current.getAngle() == angle && (this.current.getLayerMask() & layerMask) == 0) {
+            } else if (this.coalesce && this.current.getAxis() == axis && this.current.getAngle() == angle && (this.current.getLayerMask() & layerMask) == 0) {
                 // coalesce subsequent move on same axis and angle and different layers
                 this.current = new ScriptAST.MoveNode(layerCount, axis,this.current.getLayerMask()|layerMask, angle,
                         this.current.getStartPosition(), moveNode.getEndPosition());
@@ -201,16 +215,28 @@ class MoveMetrics {
 
     /**
      * Gets the face turn count of the specified node.
+     * <p>
+     * If a move has changed at least one layer but not all layers:
+     * <ul>
+     *     <li>counts 1: if the inner-most layer has been turned
+     *     together with the outer-most layer</li>
+     *     <li>counts 2: otherwise</li>
+     * </ul>
      */
     countFaceTurns(move) {
         let layerCount = move.getLayerCount();
         let layerMask = move.getLayerMask();
-        let count = getBlockTurnCount(move);
-        if (count != 0 && ((layerMask & (1 | (1 << (layerCount - 1)))) == 0
-          || (layerMask & (1 | (1 << (layerCount - 1)))) == (1 | (1 << (layerCount - 1))))) {
-            count++;
+        let angle = Math.abs(move.getAngle()) % 4;
+
+        let allLayers = (1 << layerCount) - 1;
+        if (angle == 0 || layerMask == 0 || layerMask == allLayers) {
+            return 0;
         }
-        return count;
+
+        let innerTurned = (layerMask & 1) != 0;
+        let outerTurned = (layerMask & (1 << (layerCount - 1))) != 0;
+
+        return innerTurned == outerTurned ? 2 : 1;
     }
 
     /**
@@ -253,8 +279,9 @@ class MoveMetrics {
  * Gets the layer turn count of the subtree starting
  * at this node.
  */
-function getLayerTurnCount(node) {
+function getLayerTurnCount(node, coalesce=true) {
     let metrics = new MoveMetrics();
+    metrics.setCoalesce(coalesce);
     metrics.accept(node);
     return metrics.getLayerTurnCount();
 }
@@ -263,8 +290,9 @@ function getLayerTurnCount(node) {
  * Gets the block turn count of the subtree starting
  * at this node.
  */
-function getBlockTurnCount(node) {
+function getBlockTurnCount(node, coalesce=true) {
     let metrics = new MoveMetrics();
+    metrics.setCoalesce(coalesce);
     metrics.accept(node);
     return metrics.getBlockTurnCount();
 }
@@ -273,8 +301,9 @@ function getBlockTurnCount(node) {
  * Gets the face turn count of the subtree starting
  * at this node.
  */
-function getFaceTurnCount(node) {
+function getFaceTurnCount(node, coalesce=true) {
     let metrics = new MoveMetrics();
+    metrics.setCoalesce(coalesce);
     metrics.accept(node);
     return metrics.getFaceTurnCount();
 }
@@ -283,8 +312,9 @@ function getFaceTurnCount(node) {
  * Gets the quarter turn count of the subtree starting
  * at this node.
  */
-function getQuarterTurnCount(node) {
+function getQuarterTurnCount(node, coalesce=true) {
     let metrics = new MoveMetrics();
+    metrics.setCoalesce(coalesce);
     metrics.accept(node);
     return metrics.getQuarterTurnCount();
 }

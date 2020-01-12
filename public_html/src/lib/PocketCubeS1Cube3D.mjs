@@ -6,7 +6,7 @@ import AbstractPocketCubeCube3D from './AbstractPocketCubeCube3D.mjs';
 import CubeAttributes from './CubeAttributes.mjs';
 
 /** Constructor
- * Creates the 3D geometry of a "Rubik's Cube".
+ * Creates the 3D geometry of a "Pocket Cube".
  * Subclasses must call initPocketCubeS1Cube3D(). 
  */
 class PocketCubeS1Cube3D extends AbstractPocketCubeCube3D.AbstractPocketCubeCube3D {

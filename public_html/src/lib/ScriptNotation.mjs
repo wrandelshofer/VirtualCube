@@ -586,6 +586,9 @@ class DefaultNotation extends Notation {
        super();
 
         this.layerCount = layerCount == null ? 3 : layerCount;
+        if (this.layerCount<2||this.layerCount>7) {
+            throw "Cannot create a DefaultNotation with layerCount="+layerCount;
+        }
 
         this.addToken(Symbol.NOP, "·");
         this.addToken(Symbol.NOP, ".");

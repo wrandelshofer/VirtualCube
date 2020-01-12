@@ -24,7 +24,7 @@ class ParseException extends Error {
         this.start = start;
         this.end = end;
     }
-    
+
     getStartPosition() {
         return this.start;
     }
@@ -344,14 +344,12 @@ class ScriptParser {
         PermutationCycle:
           while (true) {
             switch (tt.nextToken()) {
-                case Tokenizer.TT_EOF:
-                    throw this.createException(tt, "Permutation: Unexpected EOF.");
                 case Tokenizer.TT_KEYWORD:
                     let sym = this.notation.getSymbolInCompositeSymbol(tt.getStringValue(), Symbol.PERMUTATION);
                     if (sym == Symbol.PERMUTATION_END) {
                         break PermutationCycle;
                     } else if (sym == null) {
-                        throw this.createException(tt, "Permutation: Illegal symbol.");
+                        throw this.createException(tt, "Permutation: PermutationItem expected.");
                     } else if (sym == Symbol.PERMUTATION_DELIMITER) {
                         // consume
                     } else {
@@ -359,7 +357,8 @@ class ScriptParser {
                         this.parsePermutationItem(tt, permutation, syntax);
                     }
                     break;
-
+                default:
+                    throw this.createException(tt, "Permutation: PermutationItem expected.");
             }
         }
 

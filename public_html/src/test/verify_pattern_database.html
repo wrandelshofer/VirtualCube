@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Verify JavaScript against the pattern database</title>
+    <link href="virtualcube.css" rel="stylesheet" type="text/css">
+    <script type="module">
+      import ScriptParser   from '../lib/ScriptParser.mjs';
+      import ScriptNotation from '../lib/ScriptNotation.mjs';
+      import MoveMetrics    from '../lib/MoveMetrics.mjs';
+      import RubiksCube     from '../lib/RubiksCube.mjs';
+      import PocketCube     from '../lib/PocketCube.mjs';
+      import Cubes          from '../lib/Cubes.mjs';
+
+      /** Creates a cube with the specified number of layers. */
+      function createCube(layerCount) {
+        switch (layerCount) {
+          case 2:
+            return new PocketCube.PocketCube();
+          case 3:
+            return new RubiksCube.RubiksCube();
+          default:
+            throw "Cannot create a cube with "+layerCount+" layers.";
+        }
+      }
+
+      /**
+       * Verifies if the JavaScript functions compute the same
+       * data that we have in the provided patternData object.
+       *
+       * @param layerCount the number of layers in the cube
+       * @param data a data object from the pattern database,
+       *             must be a map.
+       * @return computed a copy of the map into which we have
+       *                  filled in computed values
+       */
+      function verifyPatternData(layerCount, data) {
+        let computed = new Map(data.entries());
+        let notation = new ScriptNotation.DefaultNotation(layerCount);
+        let parser = new ScriptParser.ScriptParser(notation);
+
+        let script = data.get("script");
+        if (script == null) {
+          computed.set("script", "Expected a script but found null");
+          return computed;
+        }
+        let ast;
+        try {
+           ast = parser.parse(script);
+         } catch (e) {
+          computed.set("script", "Error parsing script. "+e.message);
+          return;
+         }
+
+        if (layerCount != 2) { // PocketCube database has no value in ltm_or_btm
+          let ltm_or_btm = MoveMetrics.getLayerTurnCount(ast,false);
+          computed.set("ltm_or_btm",ltm_or_btm+(data.get("ltm_or_btm").endsWith("*")?"*":""));
+        }
+
+        let ftm = MoveMetrics.getFaceTurnCount(ast,false);
+        computed.set("ftm",ftm+(data.get("ftm").endsWith("*")?"*":""));
+
+        let qtm = MoveMetrics.getQuarterTurnCount(ast,false);
+        computed.set("qtm",qtm+(data.get("qtm").endsWith("*")?"*":""));
+
+        let cube = createCube(layerCount);
+        ast.applyTo(cube);
+        let order = Cubes.getVisibleOrder(cube);
+        computed.set("order",order+"");
+
+        // only set permutation string if the given permutation does not match the script
+        let permCube = createCube(layerCount);
+        let permAst;
+        let permutation = Cubes.toPermutationString(cube, notation);
+        try {
+          permAst = parser.parse(data.get("permutation"));
+          permAst.applyTo(permCube);
+          if (!permCube.equals(cube)) {
+            computed.set("permutation",permutation);
+          }
+         } catch (e) {
+            //computed.set("permutation", "Error parsing permutation. "+e.message);
+            computed.set("permutation",permutation);
+         }
+        return computed;
+      }
+
+      /** Returns true if the two provided maps are equal. */
+      function mapsEquals(a,b) {
+        if (a.size == b.size) {
+          for (let [key, value] of a.entries()) {
+            if (!b.has(key) || b.get(key)!=value) {
+              return false;
+            }
+          }
+          return true;
+        }
+        return false;
+      }
+      /** Returns a String representation of the map. */
+      function mapToString(map) {
+        let array=[];
+          array.push("{");
+          for (let [key, value] of map.entries()) {
+            array.push(" ");
+            array.push(key);
+            array.push("=");
+            array.push(value);
+          }
+          array.push(" }");
+          return array.join("");
+      }
+
+      /** Converts the contents of a tab-separated values file into an array
+       * of data objects. Each data object is a map.
+       * <p>
+       * Line breaks inside a data element are encoded with 0x000b.
+       *
+       * @param headers the header line of the file (tab-separated)
+       * @param lines the data lines of the file (tab-separated)
+       * @return an array of data objects
+       */
+      function processTsvData(headers, lines) {
+        let keys = headers.split("\t");
+        let array = new Array();
+        for (let line of lines) {
+          if (line.length == 0) continue;
+
+          let columns = line.replace(/\u000b/g,'\n').split("\t");
+          let dataObject = new Map();
+          for (let index=0;index<keys.length;index++) {
+            dataObject.set(keys[index], columns[index]);
+          }
+          array.push(dataObject);
+        }
+        return array;
+      }
+
+      /** Loads a tab-separated values file from the local file system.
+       * The file must be encoded with MacRoman.
+       *
+       * @return A promise which will receive an array of data objects.
+       */
+      function loadTsvFile(file,hasHeaders,headers) {
+          let promise = new Promise((resolve,reject)=>{
+            let reader=new FileReader();
+            reader.onload= (event) => {
+              let lines = reader.result.split('\n');
+              resolve(
+                (hasHeaders)
+                    ? processTsvData(lines[0],lines.slice(1))
+                    : processTsvData(headers,lines)
+                );
+            };
+            reader.onerror= (event) => {
+              reject();
+            }
+            reader.readAsText(file,"macintosh");
+          });
+          return promise;
+      }
+
+      /**
+       * Creates a Html table object, uses the provided
+       * data object to generate the table headers.
+       */
+      function createTable(data) {
+        let table = document.createElement("table");
+        table.setAttribute("id","table");
+        let thead = document.createElement("thead");
+        let tr = document.createElement("tr");
+        for (let header of data.keys()) {
+          let th = document.createElement("th");
+          th.append(document.createTextNode(header));
+          tr.append(th);
+        }
+        thead.append(tr);
+        table.append(thead);
+        return table;
+      }
+      /**
+       * Adds a data row to the specified tbody element.
+       */
+      function addDataRowToTable(tbody, data) {
+        let tr = document.createElement("tr");
+        for (let [key, value] of data.entries()) {
+          let td = document.createElement("td");
+          td.append(document.createTextNode(value));
+          tr.append(td);
+        }
+        tbody.append(tr);
+      }
+      /**
+       * Adds a data row to the specified tbody element.
+       */
+      function addDataRowToTableWithDiff(tbody, expected, actual) {
+        let tr = document.createElement("tr");
+        for (let [key, expectedValue] of expected.entries()) {
+          let actualValue = actual.get(key);
+
+          let td = document.createElement("td");
+          if (expectedValue == actualValue) {
+            td.append(document.createTextNode(expectedValue));
+          } else {
+            td.classList.add("differentValues");
+            td.append(document.createTextNode("Expected <"+expectedValue+"> but found <"+actualValue+">."));
+          }
+          tr.append(td);
+        }
+        tbody.append(tr);
+      }
+
+      /** Executes the form.
+       */
+      async function executeForm() {
+        // parse the form contents
+        let files=document.getElementById("fileInput").files;
+        let hasHeaders=document.getElementById("hasHeadersInput").checked;
+        let headers = document.getElementById("headersInput").value;
+        let layerCount = parseInt(document.getElementById("layerCount").value);
+        headers = headers.trim().replace(/\s+/g,"\t");
+
+
+        for (let file of files) {
+          let array = await loadTsvFile(file,hasHeaders,headers);
+          let equalCount=0;
+          let table=null;
+          let tbody=null;
+          for (let data of array) {
+            if (table == null) {
+              table = createTable(data);
+              tbody = document.createElement("tbody");
+              table.append(tbody);
+              document.getElementById("table").replaceWith(table);
+            }
+            let computed = verifyPatternData(layerCount, data);
+            if (mapsEquals(computed, data)) {
+              //addDataRowToTable(tbody, computed);
+              equalCount++;
+            } else {
+              addDataRowToTableWithDiff(tbody, data, computed);
+              //console.log("expected <"+mapToString(data)+"> but was <"+mapToString(computed)+">");
+            }
+          }
+          console.log("from "+array.length+" records, "+equalCount+" are equal, "+(array.length-equalCount)+" are different");
+        }
+      }
+
+      document.getElementById("loadButton").onclick = executeForm;
+    </script>
+  </head>
+  <body>
+    <h1>Verifies the JavaScript modules against the pattern database</h1>
+    <p>The values computed by the JavaScript modules should match the values that are already in the patterns database.</p>
+
+    <form>
+      <p>
+      Pattern database file (a tab-separated text file with MacRoman encoding):<br>
+        <input id="fileInput" type="file" name="file">
+      </p>
+      <p>
+        Number of cube layers: <input id="layerCount" type="number" name="layerCount" value="3"><br>
+      <p>
+      <p>
+      <input id="hasHeadersInput" type="checkbox" name="hasHeaders">First line contains column headers<br>
+      <p>
+      Column headers (if file has no column headers):<br>
+      <textarea id="headersInput" cols="80" rows="2" name="headers">
+id number category_de category_en sub_category_de sub_category_en name_de name_en script ltm_or_btm ftm qtm order permutation author description_de description_en
+      </textarea>
+      </p>
+      <p>
+        <input id="loadButton" type="button" name="load" value="Load">
+      </p>
+    </form>
+
+  <table id="table" class="w3-table-all">
+  </table>
+
+  </body>
+</html>

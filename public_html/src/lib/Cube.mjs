@@ -357,7 +357,13 @@
      * Compares two cubes for equality.
      */
     equals(that) {
-      return that.getLayerCount() == this.layerCount && Arrays.equals(that.getCornerLocations(), this.cornerLoc) && Arrays.equals(that.getCornerOrientations(), this.cornerOrient) && Arrays.equals(that.getEdgeLocations(), this.edgeLoc) && Arrays.equals(that.getEdgeOrientations(), this.edgeOrient) && Arrays.equals(that.getSideLocations(), this.sideLoc) && Arrays.equals(that.getSideOrientations(), this.sideOrient);
+      return that.getLayerCount() == this.layerCount
+        && arraysEquals(that.getCornerLocations(), this.cornerLoc)
+        && arraysEquals(that.getCornerOrientations(), this.cornerOrient)
+        && arraysEquals(that.getEdgeLocations(), this.edgeLoc)
+        && arraysEquals(that.getEdgeOrientations(), this.edgeOrient)
+        && arraysEquals(that.getSideLocations(), this.sideLoc)
+        && arraysEquals(that.getSideOrientations(), this.sideOrient);
     }
 
     /**
@@ -1708,7 +1714,25 @@
     ]
   ];
 
+/** Checks if the given arrays are equal. */
+function arraysEquals(a, b) {
+    if (a===b) {
+        return true;
+    }
+    if (a==null || b==null){
+        return false;
+    }
 
+    let length = a.length;
+    if (b.length != length){
+        return false;
+    }
+
+    for (let i=0,n=a.length;i<n;i++) {
+        if (a[i]!=b[i]) return false;
+    }
+    return true;
+}
 
 // ------------------
 // MODULE API    

@@ -16,15 +16,17 @@
       let expecteds = document.getElementsByClassName("expected");
       let actuals = document.getElementsByClassName("actual");
 
-      let notation = new ScriptNotation.DefaultNotation();
-      let parser = new ScriptParser.ScriptParser(notation);
-
       for (let i = 0; i < tests.length; i++) {
         let input = inputs[i].innerText;
+        let layerCount = parseInt(input.substring(0, input.indexOf(';')));
+        let script = input.substring(input.indexOf(';')+1).trim();
         let expected = expecteds[i].innerText;
 
+        let notation = new ScriptNotation.DefaultNotation(layerCount);
+        let parser = new ScriptParser.ScriptParser(notation);
+
         try {
-          let ast = parser.parse(input);
+          let ast = parser.parse(script);
           
           let metrics = new MoveMetrics.MoveMetrics();
           metrics.accept(ast);
@@ -48,169 +50,190 @@
 
     <article>
       <section class="unittest">
-        <p class="input">R</p>
+        <p class="input">3; R</p>
         <p class="expected">1btm, 1ltm, 1ftm, 1qtm, 1 moves</p>
         <p class="actual"></p>
       </section>
     </article>
     <article>
       <section class="unittest">
-        <p class="input">R2</p>
+        <p class="input">3; R2</p>
         <p class="expected">1btm, 1ltm, 1ftm, 2qtm, 1 moves</p>
         <p class="actual"></p>
       </section>
     </article>
     <article>
       <section class="unittest">
-        <p class="input">R'</p>
+        <p class="input">3; R'</p>
         <p class="expected">1btm, 1ltm, 1ftm, 1qtm, 1 moves</p>
         <p class="actual"></p>
       </section>
     </article>
     <article>
       <section class="unittest">
-        <p class="input">R R</p>
+        <p class="input">3; R R</p>
         <p class="expected">1btm, 1ltm, 1ftm, 2qtm, 2 moves</p>
         <p class="actual"></p>
       </section>
     </article>
     <article>
       <section class="unittest">
-        <p class="input">R R R</p>
+        <p class="input">3; R R R</p>
         <p class="expected">1btm, 1ltm, 1ftm, 1qtm, 3 moves</p>
         <p class="actual"></p>
       </section>
     </article>
     <article>
       <section class="unittest">
-        <p class="input">R R R2</p>
+        <p class="input">3; R R R2</p>
         <p class="expected">0btm, 0ltm, 0ftm, 0qtm, 3 moves</p>
         <p class="actual"></p>
       </section>
     </article>
     <article>
       <section class="unittest">
-        <p class="input">CR</p>
+        <p class="input">3; CR</p>
         <p class="expected">0btm, 0ltm, 0ftm, 0qtm, 1 moves</p>
         <p class="actual"></p>
       </section>
     </article>
     <article>
       <section class="unittest">
-        <p class="input">CR2</p>
+        <p class="input">3; CR2</p>
         <p class="expected">0btm, 0ltm, 0ftm, 0qtm, 1 moves</p>
         <p class="actual"></p>
       </section>
     </article>
     <article>
       <section class="unittest">
-        <p class="input">CR'</p>
+        <p class="input">3; CR'</p>
         <p class="expected">0btm, 0ltm, 0ftm, 0qtm, 1 moves</p>
         <p class="actual"></p>
       </section>
     </article>
     <article>
       <section class="unittest">
-        <p class="input">R CR R</p>
+        <p class="input">3; R CR R</p>
         <p class="expected">1btm, 1ltm, 1ftm, 2qtm, 3 moves</p>
         <p class="actual"></p>
       </section>
     </article>
     <article>
       <section class="unittest">
-        <p class="input">R U</p>
+        <p class="input">3; R U</p>
         <p class="expected">2btm, 2ltm, 2ftm, 2qtm, 2 moves</p>
         <p class="actual"></p>
       </section>
     </article>
     <article>
       <section class="unittest">
-        <p class="input">R R U</p>
+        <p class="input">3; R R U</p>
         <p class="expected">2btm, 2ltm, 2ftm, 3qtm, 3 moves</p>
         <p class="actual"></p>
       </section>
     </article>
     <article>
       <section class="unittest">
-        <p class="input">R U R</p>
+        <p class="input">3; R U R</p>
         <p class="expected">3btm, 3ltm, 3ftm, 3qtm, 3 moves</p>
         <p class="actual"></p>
       </section>
     </article>
     <article>
       <section class="unittest">
-        <p class="input">R R U2</p>
+        <p class="input">3; R R U2</p>
         <p class="expected">2btm, 2ltm, 2ftm, 4qtm, 3 moves</p>
         <p class="actual"></p>
       </section>
     </article>
     <article>
       <section class="unittest">
-        <p class="input">R U2 R</p>
+        <p class="input">3; R U2 R</p>
         <p class="expected">3btm, 3ltm, 3ftm, 4qtm, 3 moves</p>
         <p class="actual"></p>
       </section>
     </article>
     <article>
       <section class="unittest">
-        <p class="input">CR R R</p>
+        <p class="input">3; CR R R</p>
         <p class="expected">1btm, 1ltm, 1ftm, 2qtm, 3 moves</p>
         <p class="actual"></p>
       </section>
     </article>
     <article>
       <section class="unittest">
-        <p class="input">R CU R</p>
+        <p class="input">3; R CU R</p>
         <p class="expected">2btm, 2ltm, 2ftm, 2qtm, 3 moves</p>
         <p class="actual"></p>
       </section>
     </article>
     <article>
       <section class="unittest">
-        <p class="input">CU R R</p>
+        <p class="input">3; CU R R</p>
         <p class="expected">1btm, 1ltm, 1ftm, 2qtm, 3 moves</p>
         <p class="actual"></p>
       </section>
     </article>
     <article>
       <section class="unittest">
-        <p class="input">(R)1</p>
+        <p class="input">3; (R)1</p>
         <p class="expected">1btm, 1ltm, 1ftm, 1qtm, 1 moves</p>
         <p class="actual"></p>
       </section>
     </article>
     <article>
       <section class="unittest">
-        <p class="input">(R)2</p>
+        <p class="input">3; (R)2</p>
         <p class="expected">1btm, 1ltm, 1ftm, 2qtm, 2 moves</p>
         <p class="actual"></p>
       </section>
     </article>
     <article>
       <section class="unittest">
-        <p class="input">(R)3</p>
+        <p class="input">3; (R)3</p>
         <p class="expected">1btm, 1ltm, 1ftm, 1qtm, 3 moves</p>
         <p class="actual"></p>
       </section>
     </article>
     <article>
       <section class="unittest">
-        <p class="input">(R)4</p>
+        <p class="input">3; (R)4</p>
         <p class="expected">0btm, 0ltm, 0ftm, 0qtm, 4 moves</p>
         <p class="actual"></p>
       </section>
     </article>
     <article>
       <section class="unittest">
-        <p class="input">R MR L'</p>
+        <p class="input">3; R MR L'</p>
         <p class="expected">0btm, 0ltm, 0ftm, 0qtm, 3 moves</p>
         <p class="actual"></p>
       </section>
     </article>
     <article>
       <section class="unittest">
-        <p class="input">MR2 MF2 MU2</p>
+        <p class="input">3; MR2 MF2 MU2</p>
         <p class="expected">3btm, 3ltm, 6ftm, 12qtm, 3 moves</p>
+        <p class="actual"></p>
+      </section>
+    </article>
+    <article>
+      <section class="unittest">
+        <p class="input">3; R L'</p>
+        <p class="expected">1btm, 1ltm, 2ftm, 2qtm, 2 moves</p>
+        <p class="actual"></p>
+      </section>
+    </article>
+    <article>
+      <section class="unittest">
+        <p class="input">3; SR</p>
+        <p class="expected">1btm, 1ltm, 2ftm, 2qtm, 1 moves</p>
+        <p class="actual"></p>
+      </section>
+    </article>
+    <article>
+      <section class="unittest">
+        <p class="input">2; MR2 MD MR2 MD- · CD2</p>
+        <p class="expected">4btm, 4ltm, 8ftm, 12qtm, 5 moves</p>
         <p class="actual"></p>
       </section>
     </article>

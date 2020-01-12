@@ -84,7 +84,7 @@
    * You can activate tokenization of positive integer numbers, by invoking addDigitTokens().
    * You can activate tokenization of keywords, by adding keyword specials.
    */
-  class Tokenizer {
+  class GreedyTokenizer {
     constructor() {
       this.input = "";
       this.pos = 0;
@@ -453,7 +453,7 @@ export default {
     TT_EOF: TT_EOF,
     TT_NUMBER: TT_NUMBER,
     TT_SPECIAL: TT_SPECIAL,
-    Tokenizer: Tokenizer,
+    Tokenizer: GreedyTokenizer,
     PushBackReader:PushBackReader
   };
 
