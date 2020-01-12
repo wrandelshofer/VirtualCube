@@ -217,12 +217,20 @@
         let files=document.getElementById("fileInput").files;
         let hasHeaders=document.getElementById("hasHeadersInput").checked;
         let headers = document.getElementById("headersInput").value;
-        let layerCount = parseInt(document.getElementById("layerCount").value);
         headers = headers.trim().replace(/\s+/g,"\t");
+        let layerCount = parseInt(document.getElementById("layerCount").value);
+        let skipColumns = document.getElementById("skipColumns").value;
+        skipColumns = skipColumns.trim().replace(/\s+/g,"\t").split("\t");
 
 
         for (let file of files) {
           let array = await loadTsvFile(file,hasHeaders,headers);
+          for (let record of array) {
+            for (let column of skipColumns) {
+              record.delete(column);
+            }
+          }
+
           let equalCount=0;
           let table=null;
           let tbody=null;
@@ -242,7 +250,10 @@
               //console.log("expected <"+mapToString(data)+"> but was <"+mapToString(computed)+">");
             }
           }
-          console.log("from "+array.length+" records, "+equalCount+" are equal, "+(array.length-equalCount)+" are different");
+
+          console.log(
+            "Done. From "+array.length+" records, "+equalCount+" are equal, "+(array.length-equalCount)+" differ."
+          );
         }
       }
 
@@ -267,6 +278,12 @@
       Column headers (if file has no column headers):<br>
       <textarea id="headersInput" cols="80" rows="2" name="headers">
 id number category_de category_en sub_category_de sub_category_en name_de name_en script ltm_or_btm ftm qtm order permutation author description_de description_en
+      </textarea>
+      </p>
+      <p>
+        Skip the following columns:<br>
+        <textarea id="skipColumns" cols="80" rows="2" name="skipColumns">
+category_de category_en sub_category_de sub_category_en name_en author description_de description_en
       </textarea>
       </p>
       <p>

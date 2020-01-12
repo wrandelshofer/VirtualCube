@@ -487,12 +487,8 @@ class Notation {
         }
         symbols.push(symbol);
     }
-    addMoveToken(layerCount, axis, layerMask, angle, token) {
-        let move = new Move(layerCount, axis, layerMask, angle);
-
-        // Add to tokenToSymbolsMap and symbolToTokensMap
+    addMove(move, token) {
         this.addToken(Symbol.MOVE, token);
-
         // Add to moveToTokensMap
         let tokens = this.moveToTokensMap.get(move);
         if (tokens == null) {
@@ -500,9 +496,11 @@ class Notation {
             this.moveToTokensMap.set(move, tokens);
         }
         tokens.push(token);
-
-        // Add to tokenToMoveMap
         this.tokenToMoveMap.set(token, move);
+    }
+    addMoveToken(layerCount, axis, layerMask, angle, token) {
+        let move = new Move(layerCount, axis, layerMask, angle);
+        this.addMove(move,token);
     }
     getMoveFromToken(token) {
         return this.tokenToMoveMap.get(token);
@@ -582,10 +580,12 @@ class Notation {
 
 /** Defines a default notation that works for 3x3 and 2x2 cubes. */
 class DefaultNotation extends Notation {
-    constructor(layerCount) {
+    constructor(layerCount = 3) {
        super();
 
-        this.layerCount = layerCount == null ? 3 : layerCount;
+        this.layerCount = layerCount;
+
+
         if (this.layerCount<2||this.layerCount>7) {
             throw "Cannot create a DefaultNotation with layerCount="+layerCount;
         }
@@ -634,47 +634,108 @@ class DefaultNotation extends Notation {
         this.addToken(Symbol.SINGLELINE_COMMENT_BEGIN, "//");
 
         // Layer masks
+        let all = (1 << layerCount) - 1;
+        let outer = 1 << (layerCount - 1);
         let inner = 1;
-        let middle = 1 << (this.layerCount / 2);
-        let outer = 1 << (this.layerCount - 1);
-        let all = inner | middle | outer;
 
-        for (let i = 1; i <= 2; i++) {
-            let suffix = i == 1 ? "" : "2";
-            this.addMoveToken(3, 0, outer, 1 * i, "R" + suffix);
-            this.addMoveToken(3, 1, outer, 1 * i, "U" + suffix);
-            this.addMoveToken(3, 2, outer, 1 * i, "F" + suffix);
-            this.addMoveToken(3, 0, inner, -1 * i, "L" + suffix);
-            this.addMoveToken(3, 1, inner, -1 * i, "D" + suffix);
-            this.addMoveToken(3, 2, inner, -1 * i, "B" + suffix);
+        for (let angle = 1; angle <= 2; angle++) {
+            let suffix = angle == 1 ? "" : "2";
 
-            this.addMoveToken(3, 0, outer | inner, 1 * i, "SR" + suffix);
-            this.addMoveToken(3, 1, outer | inner, 1 * i, "SU" + suffix);
-            this.addMoveToken(3, 2, outer | inner, 1 * i, "SF" + suffix);
-            this.addMoveToken(3, 0, outer | inner, -1 * i, "SL" + suffix);
-            this.addMoveToken(3, 1, outer | inner, -1 * i, "SD" + suffix);
-            this.addMoveToken(3, 2, outer | inner, -1 * i, "SB" + suffix);
+            // Face twists
+            this.addMoves(layerCount, outer, inner, angle, "", suffix);
 
-            this.addMoveToken(3, 0, middle | outer, 1 * i, "TR" + suffix);
-            this.addMoveToken(3, 1, middle | outer, 1 * i, "TU" + suffix);
-            this.addMoveToken(3, 2, middle | outer, 1 * i, "TF" + suffix);
-            this.addMoveToken(3, 0, middle | inner, -1 * i, "TL" + suffix);
-            this.addMoveToken(3, 1, middle | inner, -1 * i, "TD" + suffix);
-            this.addMoveToken(3, 2, middle | inner, -1 * i, "TB" + suffix);
+            // Mid-layer twists
+            for (let layer = 0; layer < layerCount - 2; layer++) {
+                let innerMiddle = (layerCount % 2 == 0)
+                        ? ((1 << (layer + 1)) - 1) << (layerCount / 2 - (layer + 1) / 2 - (layer + 1) % 2)
+                        : ((1 << (layer + 1)) - 1) << (layerCount / 2 - (layer + 1) / 2);
+                let outerMiddle = (layerCount % 2 == 0)
+                        ? ((1 << (layer + 1)) - 1) << (layerCount / 2 - (layer + 1) / 2)
+                        : ((1 << (layer + 1)) - 1) << (layerCount / 2 - (layer + 1) / 2);
+                if (innerMiddle == all) {
+                    continue;
+                }
+                if (layer == 0) {
+                    this.addMoves(layerCount, outerMiddle, innerMiddle, angle, "M", suffix);
+                }
+                this.addMoves(layerCount, outerMiddle, innerMiddle, angle, "M" + (layer + 1), suffix);
+            }
 
-            this.addMoveToken(3, 0, middle, 1 * i, "MR" + suffix);
-            this.addMoveToken(3, 1, middle, 1 * i, "MU" + suffix);
-            this.addMoveToken(3, 2, middle, 1 * i, "MF" + suffix);
-            this.addMoveToken(3, 0, middle, -1 * i, "ML" + suffix);
-            this.addMoveToken(3, 1, middle, -1 * i, "MD" + suffix);
-            this.addMoveToken(3, 2, middle, -1 * i, "MB" + suffix);
+            // Wide twists
+            let wide = all ^ (inner | outer);
+            if (wide != 0) {
+                this.addMoves(layerCount, wide, wide, angle, "W", suffix);
+            }
 
-            this.addMoveToken(3, 0, all, 1 * i, "CR" + suffix);
-            this.addMoveToken(3, 1, all, 1 * i, "CU" + suffix);
-            this.addMoveToken(3, 2, all, 1 * i, "CF" + suffix);
-            this.addMoveToken(3, 0, all, -1 * i, "CL" + suffix);
-            this.addMoveToken(3, 1, all, -1 * i, "CD" + suffix);
-            this.addMoveToken(3, 2, all, -1 * i, "CB" + suffix);
+            // Tier twists
+            for (let layer = 0; layer < layerCount; layer++) {
+                let innerTier = (1 << (layer + 1)) - 1;
+                let outerTier = all ^ ((1 << (layerCount - layer - 1)) - 1);
+                if (layer == 1) {
+                    this.addMoves(layerCount, outerTier, innerTier, angle, "T", suffix);
+                }
+                this.addMoves(layerCount, outerTier, innerTier, angle, "T" + (layer + 1), suffix);
+            }
+
+            // N-th layer twists
+            for (let layer = 0; layer < layerCount; layer++) {
+                let innerLayer = 1 << layer;
+                let outerLayer = 1 << (layerCount - layer - 1);
+                if (layer == 1) {
+                    this.addMoves(layerCount, outerLayer, innerLayer, angle, "N", suffix);
+                }
+                this.addMoves(layerCount, outerLayer, innerLayer, angle, "N" + (layer + 1), suffix);
+            }
+            // N-th layer range range twists
+            for (let from = 1; from < layerCount - 2; from++) {
+                let innerFrom = (1 << (from)) - 1;
+                let outerFrom = all ^ ((1 << (layerCount - from)) - 1);
+                for (let to = from; to < layerCount - 1; to++) {
+                    let innerTo = (1 << (to + 1)) - 1;
+                    let outerTo = all ^ ((1 << (layerCount - to - 1)) - 1);
+                    let innerRange = (innerTo ^ innerFrom);
+                    let outerRange = (outerTo ^ outerFrom);
+                    this.addMoves(layerCount, outerRange, innerRange, angle, "N" + (from + 1) + "-" + (to + 1), suffix);
+                }
+            }
+
+            // Verge twists (tier twists without face)
+            for (let layer = 1; layer < layerCount; layer++) {
+                let innerTier = inner ^ ((1 << (layer + 1)) - 1);
+                let outerTier = outer ^ (all ^ ((1 << (layerCount - layer - 1)) - 1));
+                if (layer == 2) {
+                    this.addMoves(layerCount, outerTier, innerTier, angle, "V", suffix);
+                }
+                this.addMoves(layerCount, outerTier, innerTier, angle, "V" + (layer + 1), suffix);
+            }
+            // Slice twists
+            for (let layer = 0; layer < layerCount / 2; layer++) {
+                let innerTier = (1 << (layer + 1)) - 1;
+                let outerTier = all ^ ((1 << (layerCount - layer - 1)) - 1);
+                let slice = innerTier | outerTier;
+                if (slice == all) {
+                    continue;
+                }
+                if (layer == 0) {
+                    this.addMoves(layerCount, slice, slice, angle, "S", suffix);
+                }
+                this.addMoves(layerCount, slice, slice, angle, "S" + (layer + 1), suffix);
+            }
+            // Slice range twists
+            for (let from = 1; from < layerCount - 2; from++) {
+                let innerFrom = (1 << (from)) - 1;
+                let outerFrom = all ^ ((1 << (layerCount - from)) - 1);
+                for (let to = from; to < layerCount - 1; to++) {
+                    let innerTo = (1 << (to + 1)) - 1;
+                    let outerTo = all ^ ((1 << (layerCount - to - 1)) - 1);
+                    let innerSlice = all ^ (innerTo ^ innerFrom);
+                    let outerSlice = all ^ (outerTo ^ outerFrom);
+                    this.addMoves(layerCount, outerSlice, innerSlice, angle, "S" + (from + 1) + "-" + (to + 1), suffix);
+                }
+            }
+
+            // Cube rotations
+            this.addMoves(layerCount, all, all, angle, "C", suffix);
         }
 
         this.symbolToSyntaxMap.set(Symbol.COMMUTATION, Syntax.PRECIRCUMFIX);
@@ -686,6 +747,14 @@ class DefaultNotation extends Notation {
         this.symbolToSyntaxMap.set(Symbol.REFLECTION, Syntax.SUFFIX);
         this.symbolToSyntaxMap.set(Symbol.INVERSION, Syntax.SUFFIX);
 
+    }
+    addMoves(layerCount,  outer,  inner,  angle,  prefix,  suffix) {
+        this.addMove(new Move(layerCount, 0, outer, 1 * angle), prefix + "R" + suffix);
+        this.addMove(new Move(layerCount, 1, outer, 1 * angle), prefix + "U" + suffix);
+        this.addMove(new Move(layerCount, 2, outer, 1 * angle), prefix + "F" + suffix);
+        this.addMove(new Move(layerCount, 0, inner, -1 * angle), prefix + "L" + suffix);
+        this.addMove(new Move(layerCount, 1, inner, -1 * angle), prefix + "D" + suffix);
+        this.addMove(new Move(layerCount, 2, inner, -1 * angle), prefix + "B" + suffix);
     }
 
 }

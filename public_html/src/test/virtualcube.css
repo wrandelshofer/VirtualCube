@@ -46,9 +46,14 @@ body {
     word-break: break-word;
 }
 body>h1,
-body>p {
+body>p,
+body>form {
     padding: 0.5vw;
 }
+form {
+    background: lightgray;
+}
+
 /* Responsive layout */
 /* Create four equal columns that floats next to each other */
 body.responsive article {
