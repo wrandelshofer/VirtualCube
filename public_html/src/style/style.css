@@ -24,7 +24,7 @@ body {
     word-break: break-word;
 }
 body>* {
-    padding: 0.5vw;
+    padding: 0 0.5vw;
 }
 form {
     background: lightgray;
