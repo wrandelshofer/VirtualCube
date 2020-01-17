@@ -1,8 +1,7 @@
 @charset "UTF-8";
 /*
  * @(#)virtualcube.css
- * Copyright (c) 2011 Werner Randelshofer, Switzerland.
- * You may only use this software in accordance with the license terms.
+ * Copyright (c) 2020 Werner Randelshofer, Switzerland. MIT License.
  */
 
 /* Stylesheet for the VirtualCube JavaScript applet.
@@ -11,10 +10,13 @@
  <div class="virtualcube"">
    <canvas class="cube-canvas" width="220" height="220"/>
    <div class="button-toolbar">
-      <div class="reset-button">Reset</div>
-      <div class="undo-button">Undo</div>
-      <div class="redo-button">Redo</div>
-      <div class="scramble-button">Scramble</div>
+      <div class="reset-button"><span>Reset</span></div>
+      <div class="play-button"><span>Undo</span></div>
+      <div class="step-backward-button"><span>Previous</span></div>
+      <div class="step-forward-button"><span>Next</span></div>
+      <div class="undo-button"><span>Undo</span></div>
+      <div class="redo-button"><span>Redo</span></div>
+      <div class="scramble-button"><span>Scramble</span></div>
    </div>
  </div>
  
@@ -23,12 +25,8 @@
 
 .virtualcube {
   display:inline-block;
-  width:220px;
-  height:274px;
 }
 .virtualcube .cube-canvas {
-  width:220px;
-  height:220px;
   object-fit:contain;
   border:1px solid #ccc;
 }
@@ -37,17 +35,44 @@
   height:54px;
 }
 .virtualcube .button-toolbar button {
+  width: 30px;
+  height: 30px;
+  padding: 0px;
+  margin: 2px;
+  font-size: 16px;
+  float: left;
 }
 .virtualcube .button-toolbar button:active {
 }
-.virtualcube .button-toolbar .reset-button {
-}
-.virtualcube .button-toolbar .undo-button {
-}
-.virtualcube .button-toolbar .redo-button {
-}
-.virtualcube .button-toolbar .scramble-button {
+
+.virtualcube .button-toolbar .reset-button span,
+.virtualcube .button-toolbar .undo-button span,
+.virtualcube .button-toolbar .redo-button span,
+.virtualcube .button-toolbar .step-forward-button span,
+.virtualcube .button-toolbar .step-backward-button span,
+.virtualcube .button-toolbar .play-button span,
+.virtualcube .button-toolbar .scramble-button span {
+    display: none;
 }
 
-
-
+.virtualcube .button-toolbar .scramble-button:after {
+    content: "＊";
+}
+.virtualcube .button-toolbar .reset-button:after {
+    content: "⇤";
+}
+.virtualcube .button-toolbar .undo-button:after {
+    content: "↩︎";
+}
+.virtualcube .button-toolbar .redo-button:after {
+    content: "↪︎";
+}
+.virtualcube .button-toolbar .step-forward-button:after {
+    content: "→";
+}
+.virtualcube .button-toolbar .step-backward-button:after {
+    content: "←";
+}
+.virtualcube .button-toolbar .play-button:after {
+    content: "➤";
+}

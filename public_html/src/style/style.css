@@ -1,10 +1,7 @@
 @charset "UTF-8";
 /*
- * @(#)virtualcube.css  1.0  2014-01-13
- *
- * Copyright (c) 2013 Werner Randelshofer, Switzerland.
- * You may not use, copy or modify this file, except in compliance with the
- * accompanying license terms.
+ * @(#)style.css
+ * Copyright (c) 2020 Werner Randelshofer, Switzerland. MIT License.
  */
 
 /* Stylesheet for the VirtualCube JavaScript applet.
@@ -22,32 +19,11 @@
  
 */
 
-.virtualcube {
-  display: block;
-}
-.virtualcube .button-toolbar {
-}
-.virtualcube .button-toolbar button {
-}
-.virtualcube .button-toolbar button:active {
-}
-.virtualcube .button-toolbar .reset-button {
-}
-.virtualcube .button-toolbar .undo-button {
-}
-.virtualcube .button-toolbar .redo-button {
-}
-.virtualcube .button-toolbar .scramble-button {
-}
-
-
 /* general layout */
 body {
     word-break: break-word;
 }
-body>h1,
-body>p,
-body>form {
+body>* {
     padding: 0.5vw;
 }
 form {

@@ -53,95 +53,38 @@ function instantiateVirtualCube(canvasElem, parameters) {
     canvasElem.virtualcube = vr;   
 }
 
-function appendToolbar(element, id, parameters) {
-            let toolbarElem = document.createElement("div");
-            toolbarElem.setAttribute("class", "button-toolbar");
-            element.append(toolbarElem);
-            let buttonElem;
-            
-            if (parameters.script == null) {
-                buttonElem = document.createElement("button");
-                buttonElem.setAttribute("type", "button");
-                buttonElem.setAttribute("class", "scramble-button");
-                buttonElem.setAttribute("onclick", "document.getElementById('" + id + "').virtualcube.scramble();");
-                buttonElem.append(document.createTextNode("Scramble"));
-                toolbarElem.append(buttonElem);
-                
-                buttonElem = document.createElement("button");
-                buttonElem.setAttribute("type", "button");
-                buttonElem.setAttribute("class", "reset-button");
-                buttonElem.setAttribute("onclick", "document.getElementById('" + id + "').virtualcube.reset();");
-                buttonElem.append(document.createTextNode("Reset"));
-                toolbarElem.append(buttonElem);
+function appendButton(parent, text, styleClass, onclick) {
+    let buttonElem, spanElem;
 
-                buttonElem = document.createElement("button");
-                buttonElem.setAttribute("type", "button");
-                buttonElem.setAttribute("class", "undo-button");
-                buttonElem.setAttribute("onclick", "document.getElementById('" + id + "').virtualcube.undo();");
-                buttonElem.append(document.createTextNode("Undo"));
-                toolbarElem.append(buttonElem);
+    buttonElem = document.createElement("button");
+    buttonElem.setAttribute("type", "button");
+    buttonElem.setAttribute("class", styleClass);
+    buttonElem.setAttribute("onclick", onclick);
+    buttonElem.setAttribute("title", text);
+    spanElem = document.createElement("span");
+    spanElem.append(document.createTextNode(text));
+    buttonElem.append(spanElem);
+    parent.append(buttonElem);
+}
 
-                buttonElem = document.createElement("button");
-                buttonElem.setAttribute("type", "button");
-                buttonElem.setAttribute("class", "redo-button");
-                buttonElem.setAttribute("onclick", "document.getElementById('" + id + "').virtualcube.redo();");
-                buttonElem.append(document.createTextNode("Redo"));
-                toolbarElem.append(buttonElem);
-
-            } else {
-                /*
-                buttonElem = document.createElement("button");
-                buttonElem.setAttribute("type", "button");
-                buttonElem.setAttribute("class", "scramble-button");
-                buttonElem.setAttribute("onclick", "document.getElementById('" + id + "').virtualcube.scramble();");
-                buttonElem.append(document.createTextNode("☆"));
-                toolbarElem.append(buttonElem);
-            */
-                buttonElem = document.createElement("button");
-                buttonElem.setAttribute("type", "button");
-                buttonElem.setAttribute("class", "reset-button");
-                buttonElem.setAttribute("onclick", "document.getElementById('" + id + "').virtualcube.reset();");
-                buttonElem.append(document.createTextNode("▯◁"));
-                toolbarElem.append(buttonElem);
-                
-                buttonElem = document.createElement("button");
-                buttonElem.setAttribute("type", "button");
-                buttonElem.setAttribute("class", "play-button");
-                buttonElem.setAttribute("onclick", "document.getElementById('" + id + "').virtualcube.play();");
-                buttonElem.append(document.createTextNode("▷"));
-                toolbarElem.append(buttonElem);
-
-                buttonElem = document.createElement("button");
-                buttonElem.setAttribute("type", "button");
-                buttonElem.setAttribute("class", "step-backward-button");
-                buttonElem.setAttribute("onclick", "document.getElementById('" + id + "').virtualcube.stepBackward();");
-                buttonElem.append(document.createTextNode("◁▯"));
-                toolbarElem.append(buttonElem);
-
-                buttonElem = document.createElement("button");
-                buttonElem.setAttribute("type", "button");
-                buttonElem.setAttribute("class", "step-forward-button");
-                buttonElem.setAttribute("onclick", "document.getElementById('" + id + "').virtualcube.stepForward();");
-                buttonElem.append(document.createTextNode("▯▷"));
-                toolbarElem.append(buttonElem);
-            }
+function appendToolbar(parent, id, parameters) {
+    let toolbarElem = document.createElement("div");
+    toolbarElem.setAttribute("class", "button-toolbar");
+    parent.append(toolbarElem);
+    let buttonElem, spanElem;
             
-            
-            
-            
-            /*
-             buttonElem = document.createElement("button");
-             buttonElem.setAttribute("type","button");
-             buttonElem.setAttribute("onclick","document.getElementById('"+id+"').virtualcube.wobble();");  
-             buttonElem.append(document.createTextNode("Wobble"));
-             toolbarElem.append(buttonElem);
-             buttonElem = document.createElement("button");
-             buttonElem.setAttribute("type","button");
-             buttonElem.setAttribute("onclick","document.getElementById('"+id+"').virtualcube.explode();");  
-             buttonElem.append(document.createTextNode("Explode"));
-             toolbarElem.append(buttonElem);
-             */
-    
+    if (parameters.script == null) {
+        appendButton(toolbarElem, "Scramble", "scramble-button", "document.getElementById('" + id + "').virtualcube.scramble();");
+        appendButton(toolbarElem, "Reset", "reset-button", "document.getElementById('" + id + "').virtualcube.reset();");
+        appendButton(toolbarElem, "Undo", "undo-button", "document.getElementById('" + id + "').virtualcube.undo();");
+        appendButton(toolbarElem, "Redo", "redo-button", "document.getElementById('" + id + "').virtualcube.redo();");
+    } else {
+        appendButton(toolbarElem, "Reset", "reset-button", "document.getElementById('" + id + "').virtualcube.reset();");
+        appendButton(toolbarElem, "Play", "play-button", "document.getElementById('" + id + "').virtualcube.play();");
+        appendButton(toolbarElem, "Previous", "step-backward-button", "document.getElementById('" + id + "').virtualcube.stepBackward();");
+        appendButton(toolbarElem, "Next", "step-forward-button", "document.getElementById('" + id + "').virtualcube.stepForward();");
+        appendButton(toolbarElem, "Undo", "undo-button", "document.getElementById('" + id + "').virtualcube.undo();");
+    }
 }
 
 /** 
