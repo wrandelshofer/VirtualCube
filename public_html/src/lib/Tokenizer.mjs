@@ -254,7 +254,7 @@
             if (foundNode != null) {
                 let commentEnd = foundNode.getCommentEnd();
                 if (commentEnd != null) {
-                    seekTo(commentEnd);
+                    this.seekTo(commentEnd);
                     continue loop;
                 }
 
@@ -331,7 +331,7 @@
     
     seekTo(str) {
         let i = this.input.indexOf(str, this.pos);
-        pos = (i == -1) ? this.input.length() : i + str.length();
+        this.pos = (i == -1) ? this.input.length() : i + str.length;
     }
 
 
