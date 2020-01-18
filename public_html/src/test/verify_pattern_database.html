@@ -217,6 +217,7 @@
         // parse the form contents
         let files=document.getElementById("fileInput").files;
         let hasHeaders=document.getElementById("hasHeadersInput").checked;
+        let filterRowsWithDifferences=document.getElementById("filterRowsWithDifferences").checked;
         let headers = document.getElementById("headersInput").value;
         headers = headers.trim().replace(/\s+/g,"\t");
         let layerCount = parseInt(document.getElementById("layerCount").value);
@@ -244,7 +245,9 @@
             }
             let computed = verifyPatternData(layerCount, data);
             if (mapsEquals(computed, data)) {
-              //addDataRowToTable(tbody, computed);
+                if (!filterRowsWithDifferences) {
+                    addDataRowToTable(tbody, computed);
+                }
               equalCount++;
             } else {
               addDataRowToTableWithDiff(tbody, data, computed);
@@ -288,8 +291,11 @@ category_de category_en sub_category_de sub_category_en name_en author descripti
       </textarea>
       </p>
       <p>
-        <input id="loadButton" type="button" name="load" value="Load">
-      </p>
+        <input id="filterRowsWithDifferences" type="checkbox" name="filterRowsWithDifferences">Only shows rows that have differences<br>
+        <p>
+        <p>
+            <input id="loadButton" type="button" name="load" value="Load">
+        </p>
     </form>
 
   <table id="table" class="w3-table-all">
