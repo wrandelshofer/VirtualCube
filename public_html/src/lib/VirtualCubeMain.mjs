@@ -132,10 +132,21 @@ function attachVirtualCube(parameters, element) {
         // => also attach to all applet elements
         for (let elem of document.getElementsByTagName("APPLET")) {
            let code = elem.getAttribute("code");
-           if (code !=null && (
-                code.startsWith("RubikPlayer") || code.startsWith("PocketPlayer")
-           )) {
-               htmlCollection.push(elem);
+           if (code != null) {
+               let p= code.indexOf('.');
+
+               if (p!=-1) {
+                   code = code.substring(0,p);
+               }
+              switch (code) {
+               case "RubikPlayer":
+               case "RubikPlayerFlat":
+               case "PocketPlayer":
+               case "PocketPlayerFlat":
+               case "VirtualRubiksCube":
+                  htmlCollection.push(elem);
+                  break;
+               }
            }
         }
         
@@ -222,11 +233,21 @@ function attachVirtualCube(parameters, element) {
             }
 
             let code = appletElem.getAttribute("code");
+            let p = code.indexOf('.');
+            if (p != -1) {
+                code = code.substring(0, p);
+            }
             let kind;
-            if (code.startsWith("PocketPlayer")) {
-                kind = "PocketCube";
-            } else {
-                kind = "RubiksCube";
+            switch (code) {
+                case "PocketPlayer":
+                case "PocketPlayerFlat":
+                    kind = "PocketCube";
+                    break;
+                case "RubiksPlayer":
+                case "RubiksPlayerFlat":
+                default:
+                    kind = "RubiksCube";
+                    break;
             }
             canvasElem.setAttribute("kind",kind);
             parameters["kind"] = kind;

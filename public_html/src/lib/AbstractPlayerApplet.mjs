@@ -1039,7 +1039,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
     readColorParameters(cube3d) {
         let a = cube3d.attributes;
         let p = this.parameters;
-        let deprecatedFaceIndices = [2, 0, 3, 5, 4, 1]; // maps FRDBLU to RUFLDB
+        let deprecatedFaceIndices = ["2", "0", "3", "5", "4", "1"]; // maps FRDBLU to RUFLDB
 
         // parse default colorMap
         // --------------
@@ -1063,11 +1063,11 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
             logger.log('.readParameters colortable:' + p.colortable);
             logger.warning('the parameter "colorTable" is deprecated, use "colorList" instead.');
             let parsedColorMap = parseColorMap(p.colortable);
-            for (let k in parsedColorMap) {
+            for (let [k,v] of parsedColorMap.entries()) {
                 if (0 <= k && k < deprecatedFaceIndices.length) {
-                    colorMap.set(deprecatedFaceIndices[k], parsedColorMap.get(k));
+                    colorMap.set(deprecatedFaceIndices[k], v);
                 } else {
-                    colorMap.set(k, parsedColorMap.get(k));
+                    colorMap.set(k, v);
                 }
             }
             deprecatedColorMap = colorMap;

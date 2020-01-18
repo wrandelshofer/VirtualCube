@@ -14,7 +14,7 @@
           <applet code="RubikPlayerFlat" archive="RubikPlayerFlat.jar" codebase="../lib" width="170" height="170">
             <p>Please install the Java plugin.</p>
           </applet>
-        <p>Default value.</p>
+        <p>RubikPlayerFlat default value.</p>
       </section>
     </article>
     <article>
@@ -28,7 +28,7 @@
           <param name="stickersDownList" value="w,w,w,w,w,w,w,w,w">
           <param name="stickersBackList" value="dg,dg,dg,o,o,o,o,o,o">
         </applet>
-        <p>With <kbd>colorlist</kbd> and <kbd>stickerslist</kbd> parameters</p>
+        <p>RubikPlayerFlat with <kbd>colorlist</kbd> and <kbd>stickerslist</kbd> parameters</p>
       </section>
     </article>
     <article>
@@ -40,7 +40,7 @@
           <param name="scriptType" value="solver">
           <param name="script" value="R U R' Dw2 L U2 L' Dw L' U' L [u']">
         </applet>
-        <p>With <kbd>resourceFile</kbd>, <kbd>cube</kbd>, <kbd>notation</kbd>, <kbd>script</kbd>
+        <p>RubikPlayerFlat with <kbd>resourceFile</kbd>, <kbd>cube</kbd>, <kbd>notation</kbd>, <kbd>script</kbd>
           and <kbd>scriptType</kbd> parameters</p>
       </section>
     </article>
@@ -72,7 +72,28 @@
           <a href="http://java.sun.com/getjava/" target="_blank"><img src="lib/PocketPlayerDefault.png" width="220" height="240" alt="Java Plug-in not installed!" border="0" /></a>
           <p><strong>Install the <a href="http://java.sun.com/getjava/" target="_blank">Java Plug-in</a> to see the cube pattern!</strong><br/><br/></p>
         </applet>
-        <p>Pocket Cube with script</p>
+        <p>PocketPlayerFlat with <kbd>script</kbd> attribute</p>
+      </section>
+    </article>
+    <article>
+      <section class="test">
+        <applet archive="lib/VirtualRubiksCube.jar" code="VirtualRubiksCube.class" codebase=".." width="170" height="170" mayscript>
+          <param name="locale" value="en"/>
+          <param name="colorTable" value="0xa57cda,0xf7f7f7,0xb90a0f">
+          <param name="faces" value="1,2,0,2,0,1">
+          <!-- <param name="stickersImage" value="images/DeLuxeCube_512.gif"> -->
+
+          <!-- BEGIN Parameters for Sun Java Plugin -->
+          <param name="codebase_lookup" value="false"/>
+          <param name="classloader_cache" value="false"/>
+          <param name="java_arguments" value="-Djnlp.packEnabled=true"/>
+          <param name="image" value="Splash.gif"/>
+          <param name="boxborder" value="false"/>
+          <param name="centerimage" value="true"/>
+          <!-- END Parameters for Sun Java Plugin -->
+
+        </applet>
+        <p>VirtualRubiksCube with <kbd>colorTable<kbd> and <kbd>faces</kbd> attributes</p>
       </section>
     </article>
   </body>
