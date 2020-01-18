@@ -218,7 +218,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
             colorlist: null, //rufldb
         };
         
-        this.playSequence = [];
+        this.scriptSequence = [];
         this.playIndex = 0;
         this.playToken = null;
     }
@@ -304,6 +304,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
         };
         this.world = new Node3D.Node3D();
         this.cube3d = this.createCube3D();
+        this.scriptProgress = NaN; // initial script progress on startup
         this.readParameters(this.cube3d);
         this.cube3d.repaintFunction = fRepaint;
         this.cubeSize = this.cube3d.partSize * this.cube3d.cube.layerCount; // size of a cube side in centimeters
@@ -342,13 +343,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
         this.rotationMatrix = new J3DIMath.J3DIMatrix4();
         this.viewportMatrix = new J3DIMath.J3DIMatrix4();
         this.forceColorUpdate = false;
-        
-        if (self.script != null) {
-            self.playSequence = Array.from(self.script.resolvedIterable());
-        } else {
-            self.playSequence = [];
-        }
-        
+
         this.reset(true);
     }
 
@@ -624,14 +619,22 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
             if (self.script != null) {
                 if (self.isSolver()) {
                     self.script.applyTo(self.cube, true);
-                    self.playIndex = 0;
+                    self.playIndex = (0 <= self.scriptProgress
+                                    && self.scriptProgress <= self.scriptSequence.length)
+                                 ? self.scriptProgress : 0;
                 } else {
                     if (initialReset) {
-                        self.script.applyTo(self.cube, false);
-                        self.playIndex = self.playSequence.length;
+                        self.playIndex = (0 <= self.scriptProgress
+                                            && self.scriptProgress <= self.scriptSequence.length)
+                                         ? self.scriptProgress : self.scriptSequence.length;
                     } else {
-                        self.playIndex = 0;
+                        self.playIndex = (0 <= self.scriptProgress
+                                            && self.scriptProgress <= self.scriptSequence.length)
+                                          ? self.scriptProgress : 0;
                     }
+                }
+                for (let i=0; i < self.playIndex; i++) {
+                    self.scriptSequence[i].applyTo(self.cube);
                 }
             } else {
                 self.playIndex = 0;
@@ -649,7 +652,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
      * Pushes a move for undoing. 
      * @param move twistNode. 
      * */
-    pushMove(move) {
+    pushMoveOnUndoList(move) {
         if (this.redoIndex < this.undoList.length) {
             this.undoList = this.undoList.splice(0, this.redoIndex);
         }
@@ -693,18 +696,16 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
            return;
        }
        
-       let playNodes;
-       if (this.playIndex < this.playSequence.length) {
-            playNodes = this.playSequence.slice(this.playIndex);
+       let moves;
+       if (this.playIndex < this.scriptSequence.length) {
+            moves = this.scriptSequence.slice(this.playIndex);
        } else {
            this.resetPlayback(true);
-           playNodes = this.playSequence;
+           moves = this.scriptSequence;
        }
-        this.playIndex = this.playSequence.length;
-        for (let move of playNodes) {
-            this.pushMove(move);
-        }
-        this.playMoves(playNodes, true, this.cube3d.attributes.getUserTwistDuration());
+       this.clearUndoRedo();
+        this.playIndex = this.scriptSequence.length;
+        this.playMoves(moves, true, this.cube3d.attributes.getUserTwistDuration());
     }
     
     stopPlayback() {
@@ -733,7 +734,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
                  if (!this.isSolver()) {
                     this.script.applyTo(this.cube, false);
                  }
-               this.playIndex = this.playSequence.length;
+               this.playIndex = this.scriptSequence.length;
            }
            this.cube3d.setRepainter(this);
            this.repaint();
@@ -749,12 +750,12 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
            return;
        }
        
-       if (this.playIndex < this.playSequence.length) {
-           let nextMove = this.playSequence[this.playIndex];
+       this.clearUndoRedo();
+       if (this.playIndex < this.scriptSequence.length) {
+           let nextMove = this.scriptSequence[this.playIndex];
            this.playIndex++;
-           let playNodes = [nextMove];
-           this.pushMove(nextMove);
-            this.playMoves(playNodes, true, this.cube3d.attributes.getUserTwistDuration());
+           let moves = [nextMove];
+           this.playMoves(moves, true, this.cube3d.attributes.getUserTwistDuration());
        } else {
            this.resetPlayback(true);
        }
@@ -770,25 +771,25 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
            return;
        }
        
+       this.clearUndoRedo();
        if (this.playIndex > 0) {
            this.playIndex--;
-           let nextMove = this.playSequence[this.playIndex].clone();
+           let nextMove = this.scriptSequence[this.playIndex].clone();
            nextMove.invert();
-           this.pushMove(nextMove);
-           let playNodes = [nextMove];
-           this.playMoves(playNodes, true, this.cube3d.attributes.getUserTwistDuration());
+           let moves = [nextMove];
+           this.playMoves(moves, true, this.cube3d.attributes.getUserTwistDuration());
        } else {
            this.resetPlayback();
-           this.playIndex = this.playSequence.length;
+           this.playIndex = this.scriptSequence.length;
        }
     }
 
-    playMoves(playNodes, animate, twistDuration=1000) {
+    playMoves(moves, animate, twistDuration=1000) {
         let self=this;
         
         if (!animate) {
             let f = function () {
-                // Cancel all other lenghty operations
+                // Cancel all other lengthy operations
                 self.cube.cancel = true;
                 // Wait until cube3d has finished twisting
                 if (self.cube3d.isTwisting) {
@@ -797,13 +798,13 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
                 }
 
                 self.cube3d.setRepainter(null);
-                for (let i = 0; i < playNodes.length; i++) {
-                    playNodes[i].applyTo(self.cube);
+                for (let i = 0; i < moves.length; i++) {
+                    moves[i].applyTo(self.cube);
                 }
                 self.cube3d.setRepainter(self);
                 self.cube3d.repaint();
 
-                // Other lenghty operations are go now
+                // Cancelling done - we can now create new lengthy operations
                 self.cube.cancel = false;
             };
             this.repaint(f);
@@ -839,12 +840,12 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
 
             if (self.cube.cancel) {
                 // => cancel? gently stop 
-                next = playNodes.length;
+                next = moves.length;
             }
 
             // Initiate the next move
-            if (next < playNodes.length) {
-                playNodes[next].applyTo(self.cube);
+            if (next < moves.length) {
+                moves[next].applyTo(self.cube);
                 next++;
                 self.repaint(f);
             } else {
@@ -1219,6 +1220,12 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
                 logger.error("illegal script:%s", p.script);
             }
         }
+        if (this.script != null) {
+            this.scriptSequence = Array.from(this.script.resolvedIterable());
+        } else {
+            this.scriptSequence = [];
+        }
+        
         // parse initscript
         // --------------
         if (p.initscript != null) {
@@ -1231,6 +1238,12 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
                 logger.error("illegal initscript:\"" + p.initscript + '"');
             }
         }
+        // parse scriptProgress
+        // --------------------
+        this.scriptProgress = parseInt(p.scriptprogress);
+        logger.log('.readParameters scriptprogress: "'+p.scriptprogress+'" interpreted as '+this.scriptProgress);
+        
+        
     }
 
     /** Reads the orientation parameters and applies them to the provided cube 3d.
@@ -1374,7 +1387,7 @@ class Cube3DHandler extends AbstractCanvas.AbstractHandler {
                         }
                         let cube = cube3d.getCube();
                         let move = new ScriptAST.MoveNode(cube.getLayerCount(), axis, layerMask, angle);
-                        this.canvas.pushMove(move);
+                        this.canvas.pushMoveOnUndoList(move);
                         move.applyTo(this.canvas.cube);
                         if (this.canvas.cube.isSolved()) {
                             this.canvas.wobble();
@@ -1468,7 +1481,7 @@ class Cube3DHandler extends AbstractCanvas.AbstractHandler {
             }
             let cube = cube3d.getCube();
             let move = new ScriptAST.MoveNode(cube.getLayerCount(), isect.axis, isect.layerMask, isect.angle);
-            this.canvas.pushMove(move);
+            this.canvas.pushMoveOnUndoList(move);
             move.applyTo(this.canvas.cube);
             if (this.canvas.cube.isSolved()) {
                 this.canvas.wobble();

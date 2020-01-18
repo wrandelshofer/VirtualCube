@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>scripttype</title>
+    <script type="module" src="../lib/virtualcube.mjs"></script>
+    <link href="../style/style.css" rel="stylesheet" type="text/css">
+    <link href="../style/virtualcube.css" rel="stylesheet" type="text/css">
+</head>
+  <body class="responsive">
+    <h1>Test of the <kbd>scripttype</kbd> parameter</h1>
+    <article>
+      <section class="test">
+        <div class="virtualcube"
+             script="MR MF- MR- MF"
+             ></div>
+        <p><kbd>script="MR MF- MR- MF"</kbd><br>With default <kbd>scripttype="generator"</kbd>.</p>
+      </section>
+    </article>
+    <article>
+      <section class="test">
+        <div class="virtualcube"
+             script="MR MF- MR- MF"
+             scripttype="generator"
+        ></div>
+        <p><kbd>script="MR MF- MR- MF"</kbd><br><kbd>scripttype="generator"</kbd></p>
+      </section>
+    </article>
+    <article>
+      <section class="test">
+        <div class="virtualcube"
+             script="MR MF- MR- MF"
+             scripttype="solver"
+        ></div>
+        <p><kbd>script="MR MF- MR- MF"</kbd><br><kbd>scripttype="solver"</kbd></p>
+      </section>
+    </article>
+  </body>
+</html>

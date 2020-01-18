@@ -83,7 +83,6 @@ function appendToolbar(parent, id, parameters) {
         appendButton(toolbarElem, "Play", "play-button", "document.getElementById('" + id + "').virtualcube.play();");
         appendButton(toolbarElem, "Previous", "step-backward-button", "document.getElementById('" + id + "').virtualcube.stepBackward();");
         appendButton(toolbarElem, "Next", "step-forward-button", "document.getElementById('" + id + "').virtualcube.stepForward();");
-        appendButton(toolbarElem, "Undo", "undo-button", "document.getElementById('" + id + "').virtualcube.undo();");
     }
 }
 

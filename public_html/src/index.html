@@ -90,7 +90,8 @@
         <tr><td><kbd>script</kbd></td> <td><kbd>string</kbd></td>  <td>Script. Default value: "".<td></tr>
         <tr><td><kbd>initscript</kbd></td> <td><kbd>string</kbd></td>  <td>This script is used to initialize the cube, and when the reset button is pressed. If you don't specify this parameter, no script is used.<td></tr>
         <tr><td><kbd>partlist</kbd></td> <td><kbd>name, ...</kbd></td>  <td>List of visible parts. Default: "urf,dfr,ubr,drb,ulb,dbl,ufl,dlf,ru,rf,rd,...,center"<td></tr>
-        <tr><td><kbd>scriptType</kbd></td> <td><kbd>string</kbd></td>  <td>The type of the script: "solver" or "generator". Default: "solver".<td></tr>
+        <tr><td><kbd>scriptProgress</kbd></td> <td><kbd>int</kbd></td>  <td>Position of the progress bar. Default value:  end of script if scriptType is 'generator', 0 if script type is "solver".<td></tr>
+        <tr><td><kbd>scriptType</kbd></td> <td><kbd>string</kbd></td>  <td>The type of the script: "solver" or "generator". Default: "generator".<td></tr>
         <tr><td><kbd>stickersRightList</kbd></td> <td><kbd>(name|int), ...</kbd></td>  <td>Maps colors from the color table to the stickers on the side of the cube; 9 names or indices. Default: "r r r, r r r, r r r"</td></tr>
         <tr><td><kbd>stickersUpList</kbd></td> <td><kbd>(name|int), ...</kbd></td>  <td>Maps colors from the color map to the stickers on the side of the cube; 9 names or indices. Default: "u u u, u u u, u u u"</td></tr>
         <tr><td><kbd>stickersFrontList</kbd></td> <td><kbd>(name|int), ...</kbd></td>  <td>Maps colors from the color map to the stickers on the side of the cube; 9 names or indices. Default: "f f f, f f f, f f f"</td></tr>
@@ -112,7 +113,6 @@
         <tr><td><kbd>locale</kbd></td> <td><kbd>language</kbd></td>  <td>Locale, for example "en", "de", "fr".<td></tr>
         <tr><td><kbd>resourceData</kbd></td> <td><kbd>xml</kbd></td>  <td>Cube Markup XML resource data.<td></tr>
         <tr><td><kbd>scaleFactor</kbd></td> <td><kbd>float</kbd></td>  <td>Scale factor. Default: "1.0"<td></tr>
-        <tr><td><kbd>scriptProgress</kbd></td> <td><kbd>int</kbd></td>  <td>Position of the progress bar. Default value:  end of script if scriptType is 'generator', 0 if script type is "solver".<td></tr>
         <tr><td><kbd>showPlayer</kbd></td> <td><kbd>boolean</kbd></td>  <td>Set this to false, to hide the player. Default: true<td></tr>
         <tr><td><kbd>showInfo</kbd></td> <td><kbd>boolean</kbd></td>  <td>Set this to true, to display an info field on the right of the player. Default: false<td></tr>
         <tr><td><kbd>showController</kbd></td> <td><kbd>boolean</kbd></td>  <td>Set this to false, to hide the controller of the player. Default: true<td></tr>
