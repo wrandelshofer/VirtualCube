@@ -1,11 +1,11 @@
-/* @(#)RubiksCubeS5Cube3D.mjs
+/* @(#)RubiksCubeS4Cube3D.mjs
  * Copyright (c) 2018 Werner Randelshofer, Switzerland. MIT License.
  */
 
 import AbstractRubiksCubeCube3D from './AbstractRubiksCubeCube3D.mjs';
 import CubeAttributes from './CubeAttributes.mjs';
 
-class RubiksCubeS5Cube3D extends AbstractRubiksCubeCube3D.AbstractRubiksCubeCube3D {
+class RubiksCubeS4Cube3D extends AbstractRubiksCubeCube3D.AbstractRubiksCubeCube3D {
   /** Constructor
    * Creates the 3D geometry of a Rubik's Cube.
    * You must call loadGeometry() after instantation. 
@@ -57,12 +57,12 @@ class RubiksCubeS5Cube3D extends AbstractRubiksCubeCube3D.AbstractRubiksCubeCube
   }
 }
 
-RubiksCubeS5Cube3D.prototype.relativeUrl = 'models/rubikscubes5/';
-RubiksCubeS5Cube3D.prototype.baseUrl = 'lib/';
+RubiksCubeS4Cube3D.prototype.relativeUrl = 'models/rubikscubes4/';
+RubiksCubeS4Cube3D.prototype.baseUrl = 'lib/';
 
 // ------------------
 // MODULE API    
 // ------------------
 export default {
-  Cube3D : RubiksCubeS5Cube3D,
+  Cube3D : RubiksCubeS4Cube3D,
 };
