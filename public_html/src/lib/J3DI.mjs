@@ -921,7 +921,11 @@ let doLoadObj = function (obj, text, callback, errorCallback) {
                         vtx = parseInt(f[0]) - 1;
                         nor = vtx;
                         tex = vtx;
-                    } else if (f.length = 3) {
+                    } else if (f.length == 2) {
+                        vtx = parseInt(f[0]) - 1;
+                        tex = parseInt(f[1]) - 1;
+                        nor = vtx;
+                    } else if (f.length == 3) {
                         vtx = parseInt(f[0]) - 1;
                         tex = parseInt(f[1]) - 1;
                         nor = parseInt(f[2]) - 1;
