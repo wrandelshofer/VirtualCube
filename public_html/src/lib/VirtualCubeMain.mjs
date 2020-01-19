@@ -50,7 +50,18 @@ function instantiateVirtualCube(canvasElem, parameters) {
     let vr = new VirtualCube(canvasElem);
     vr.parameters = Object.assign({}, parameters);
     vr.init();
-    canvasElem.virtualcube = vr;   
+    canvasElem.virtualcube = vr;
+
+    // Backwards compatibility with Java applet:
+    // We make the API methods directly available on the element object.
+    canvasElem.isPlaying = () => vr.isPlaying();
+    canvasElem.setScript = (script) => vr.setScript(script);
+    canvasElem.getScript = () => vr.getScript();
+    canvasElem.resetCube = () => vr.reset();
+    canvasElem.play      = () => vr.play();
+    canvasElem.getEndPosition      = () => vr.getEndPosition();
+    canvasElem.getCurrentPosition      = () => vr.getCurrentPosition();
+    canvasElem.setCurrentPosition      = (newValue) => vr.setCurrentPosition(newValue);
 }
 
 function appendButton(parent, text, styleClass, onclick) {
@@ -211,7 +222,7 @@ function attachVirtualCube(parameters, element) {
             let attrwidth = appletElem.getAttribute("width") != null ? appletElem.getAttribute("width") : "220";
             let attrheight = appletElem.getAttribute("height") != null ? appletElem.getAttribute("height") : "220";
 
-            let id = "virtualcube_" + nextId++;
+            let id = appletElem.getAttribute("id") != null ? appletElem.getAttribute("id") : "virtualcube_" + nextId++;
             canvasElem = document.createElement("canvas");
             canvasElem.setAttribute("class", "cube-canvas");
             canvasElem.setAttribute("id", id);
@@ -346,6 +357,24 @@ class VirtualCube {
     }
     setAutorotate(newValue) {
         this.canvas3d.setAutorotate(newValue);
+    }
+    isPlaying() {
+        return this.canvas3d.isPlaying();
+    }
+    setScript(script) {
+        this.canvas3d.setScript(script);
+    }
+    getScript() {
+        return this.canvas3d.getScript();
+    }
+    getCurrentPosition() {
+        return this.canvas3d.getCurrentPosition();
+    }
+    setCurrentPosition(newValue) {
+        this.canvas3d.getCurrentPosition(newValue);
+    }
+    getEndPosition() {
+        return this.canvas3d.getEndPosition();
     }
 }
 

@@ -684,6 +684,17 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
         this.redoIndex = 0;
     }
 
+    getEndPosition() {
+        return this.scriptSequence == null ? 0 : this.scriptSequence.length;
+    }
+    getCurrentPosition() {
+        return this.playIndex;
+    }
+    setCurrentPosition(newValue) {
+        // FIXME we must adjust the state of the player!
+        this.playIndex = newValue;
+    }
+
     /** Plays the script.
      * Plays the entire script if the playIndex is at the start or the end
      * of the script. Plays the remainder of the script otherwise.
@@ -713,7 +724,11 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
         this.playToken = null;
         return isPlaying;
     }
-    
+
+    isPlaying() {
+        return this.playToken != null;
+    }
+
     /**
      * Resets the playback header.
      * @param {type} forward if true resets to start of sequence, 
@@ -1185,6 +1200,39 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
             }
         }
     }
+
+    getScript() {
+        return this.parameters.script;
+    }
+
+    setScript(script) {
+        this.parameters.script = script;
+        this.readScriptParameters(this.cube3d);
+        /*
+        if (script == null) {
+            this.script = null;
+        } else {
+            let notation = p.scriptNotationObject != null
+                ? p.scriptNotationObject
+                : new ScriptNotation.DefaultNotation(cube3d.getCube().getLayerCount());
+            let parser = new ScriptParser.ScriptParser(notation);
+            try {
+                this.script = parser.parse(p.script);
+            } catch (e) {
+                this.script = null;
+                logger.error(e);
+                logger.error("illegal script:%s", p.script);
+            }
+        }
+        if (this.script != null) {
+            this.scriptSequence = Array.from(this.script.resolvedIterable());
+        } else {
+            this.scriptSequence = [];
+        }
+        this.playIndex = 0;
+        */
+    }
+
     /** Reads the script parameters and applies them to the provided cube 3d.
      *
      * Note:
@@ -1194,7 +1242,9 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
         let a = cube3d.attributes;
         let p = this.parameters;
 
-        let notation = p.scriptNotationObject != null ? p.scriptNotationObject : new ScriptNotation.DefaultNotation(cube3d.getCube().getLayerCount());
+        let notation = p.scriptNotationObject != null
+            ? p.scriptNotationObject
+            : new ScriptNotation.DefaultNotation(cube3d.getCube().getLayerCount());
         
         // parse scriptmacros
         // --------------

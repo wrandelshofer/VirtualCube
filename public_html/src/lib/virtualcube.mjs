@@ -78,18 +78,21 @@ import Cube from "./Cube.mjs";
 import RubiksCube from "./RubiksCube.mjs";
 import PocketCube from "./PocketCube.mjs";
 import SplineInterpolator from "./SplineInterpolator.mjs";
-import RubiksCubeS1Cube3D from "./RubiksCubeS1Cube3D.mjs";
 
+// import 3d models of the cubes
+import RubiksCubeS1Cube3D from "./RubiksCubeS1Cube3D.mjs";
 import RubiksCubeS4Cube3D from "./RubiksCubeS4Cube3D.mjs";
 import PocketCubeS1Cube3D from "./PocketCubeS1Cube3D.mjs";
 import PocketCubeS4Cube3D from "./PocketCubeS4Cube3D.mjs";
 import AbstractRubiksCubeCube3D from "./AbstractRubiksCubeCube3D.mjs";
 import AbstractPocketCubeCube3D from "./AbstractPocketCubeCube3D.mjs";
 
+// import cached .obj files for 3d models
 import PreloadRubiksCubeS1 from "./PreloadRubiksCubeS1.mjs";
 import PreloadRubiksCubeS4 from "./PreloadRubiksCubeS4.mjs";
 import PreloadPocketCubeS1 from "./PreloadPocketCubeS1.mjs";
 import PreloadPocketCubeS4 from "./PreloadPocketCubeS4.mjs";
+
 
 import AbstractCanvas from "./AbstractCanvas.mjs";
 import ScriptAST from "./ScriptAST.mjs";
