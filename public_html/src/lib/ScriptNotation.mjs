@@ -643,7 +643,7 @@ class DefaultNotation extends Notation {
 
             // Face twists
             this.addMoves(layerCount, outer, inner, angle, "", suffix);
-            this.addMoves(layerCount, outer, inner, -angle, "", suffix+"'");
+
             // Cube rotations
             this.addMoves(layerCount, all, all, angle, "C", suffix);
 
@@ -681,7 +681,7 @@ class DefaultNotation extends Notation {
             }
 
             // N-th layer twists
-            for (let layer = 0; layer < layerCount; layer++) {
+            for (let layer = 0; layer < layerCount - 1; layer++) {
                 let innerLayer = 1 << layer;
                 let outerLayer = 1 << (layerCount - layer - 1);
                 if (layer == 1) {
