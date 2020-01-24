@@ -643,6 +643,9 @@ class DefaultNotation extends Notation {
 
             // Face twists
             this.addMoves(layerCount, outer, inner, angle, "", suffix);
+            this.addMoves(layerCount, outer, inner, -angle, "", suffix+"'");
+            // Cube rotations
+            this.addMoves(layerCount, all, all, angle, "C", suffix);
 
             // Mid-layer twists
             for (let layer = 0; layer < layerCount - 2; layer++) {
@@ -733,9 +736,6 @@ class DefaultNotation extends Notation {
                     this.addMoves(layerCount, outerSlice, innerSlice, angle, "S" + (from + 1) + "-" + (to + 1), suffix);
                 }
             }
-
-            // Cube rotations
-            this.addMoves(layerCount, all, all, angle, "C", suffix);
         }
 
         this.symbolToSyntaxMap.set(Symbol.COMMUTATION, Syntax.PRECIRCUMFIX);
