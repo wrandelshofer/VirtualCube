@@ -77,50 +77,6 @@ class PocketCube extends Cube.Cube {
         }
     }
 
-    getPartSwipeAxis(part, orientation, swipeDirection) {
-        if (part < this.cornerLoc.length) {
-            // corner parts
-            let loc = this.getCornerLocation(part);
-            let ori = (3 - this.getPartOrientation(part) + orientation) % 3;
-            return this.CORNER_SWIPE_TABLE[loc][ori][swipeDirection][0];
-        } else {
-            // center part
-            return -1;
-        }
-    }
-
-    getPartSwipeLayerMask(part, orientation, swipeDirection) {
-        if (part < this.cornerLoc.length) {
-            // corner parts
-            let loc = this.getCornerLocation(part);
-            let ori = (3 - this.getPartOrientation(part) + orientation) % 3;
-            return this.CORNER_SWIPE_TABLE[loc][ori][swipeDirection][1];
-        } else {
-            // center part
-            return 0;
-        }
-    }
-
-    getPartSwipeAngle(part, orientation, swipeDirection) {
-        if (part < this.cornerLoc.length) {
-            // corner parts
-            let loc = this.getCornerLocation(part);
-            let ori = this.getPartOrientation(part);
-            let sori = (3 - ori + orientation) % 3;
-            let dir = swipeDirection;
-            let angle = this.CORNER_SWIPE_TABLE[loc][sori][dir][2];
-            if (ori == 2 && (sori == 0 || sori == 2)) {
-                angle = -angle;
-            } else if (ori == 1 && (sori == 1 || sori == 2)) {
-                angle = -angle;
-            }
-            return angle;
-        } else {
-            // center part
-            return 0;
-        }
-    }
-
     /**
      * Transforms the cube without firing an event.
      *
@@ -489,7 +445,7 @@ class PocketCube extends Cube.Cube {
 }
 
 /**
- * Set this letiable to true to get debug output when the cube is transformed.
+ * Set this field to true to get debug output when the cube is transformed.
  */
 PocketCube.prototype.DEBUG = false;
 /**
@@ -539,19 +495,6 @@ PocketCube.prototype.CORNER_TRANSLATION = [
     [1, 2, 2, 0, 3, 1], // 6 ufl
     [4, 0, 3, 3, 2, 2] // 7 dlf
 ];
-/**
- * First dimension: edge part index.
- * Second dimension: orientation.
- * Third dimension: swipe direction
- * Fourth dimension: axis,layermask,angle
- */
-PocketCube.prototype.EDGE_SWIPE_TABLE = [];
-/** Side swipe table.
- * First dimension: side part index.
- * Second dimension: swipe direction
- * Third dimension: axis,layermask,angle
- */
-PocketCube.prototype.SIDE_SWIPE_TABLE = [];
 
 // Construct the name to part map.
 let cornerParts = ["urf", "dfr", "ubr", "drb", "ulb", "dbl", "ufl", "dlf"]

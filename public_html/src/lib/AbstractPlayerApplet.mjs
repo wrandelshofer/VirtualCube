@@ -1001,9 +1001,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
         gl.clearColor(attr.backgroundColor[0] / 255.0, attr.backgroundColor[1] / 255.0,
           attr.backgroundColor[2] / 255.0, attr.backgroundColor[3] / 255.0);
     }
-    /**
-     * Hit test for mouse events.
-     */
+
     /**
      * Hit test for mouse events.
      */

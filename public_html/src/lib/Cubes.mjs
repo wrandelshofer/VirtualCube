@@ -508,158 +508,158 @@ function toSidePermutationString(cube, syntax,
 }
 
 
-    /**
-     * Returns a number that describes the order
-     * of the permutation of the supplied cube.
-     * <p>
-     * The order says how many times the permutation
-     * has to be applied to the cube to get the
-     * initial state.
-     *
-     * @param cube A cube
-     * @return the order of the permutation of the cube
-     */
-    function getOrder(cube) {
-        let cornerLoc = cube.getCornerLocations();
-        let cornerOrient = cube.getCornerOrientations();
-        let edgeLoc = cube.getEdgeLocations();
-        let edgeOrient = cube.getEdgeOrientations();
-        let sideLoc = cube.getSideLocations();
-        let sideOrient = cube.getSideOrientations();
+/**
+ * Returns a number that describes the order
+ * of the permutation of the supplied cube.
+ * <p>
+ * The order says how many times the permutation
+ * has to be applied to the cube to get the
+ * initial state.
+ *
+ * @param cube A cube
+ * @return the order of the permutation of the cube
+ */
+function getOrder(cube) {
+    let cornerLoc = cube.getCornerLocations();
+    let cornerOrient = cube.getCornerOrientations();
+    let edgeLoc = cube.getEdgeLocations();
+    let edgeOrient = cube.getEdgeOrientations();
+    let sideLoc = cube.getSideLocations();
+    let sideOrient = cube.getSideOrientations();
 
-        let order = 1;
+    let order = 1;
 
-        let visitedLocs;
-        let i, j, k, n, p;
-        let prevOrient;
-        let length;
+    let visitedLocs;
+    let i, j, k, n, p;
+    let prevOrient;
+    let length;
 
-        // determine cycle lengths of the current corner permutation
-        // and compute smallest common multiple
-        visitedLocs = new Array(cornerLoc.length);
+    // determine cycle lengths of the current corner permutation
+    // and compute smallest common multiple
+    visitedLocs = new Array(cornerLoc.length);
 
-        for (i = 0; i < 8; i++) {
-            if (!visitedLocs[i]) {
-                if (cornerLoc[i] == i && cornerOrient[i] == 0) {
-                    continue;
-                }
-
-                length = 1;
-
-                visitedLocs[i] = true;
-                prevOrient = 0;
-
-                for (j = 0; cornerLoc[j] != i; j++) {
-                }
-
-                while (!visitedLocs[j]) {
-                    visitedLocs[j] = true;
-                    prevOrient = (prevOrient + cornerOrient[j]) % 3;
-
-                    length++;
-
-                    for (k = 0; cornerLoc[k] != j; k++) {
-                    }
-                    j = k;
-                }
-
-                prevOrient = (prevOrient + cornerOrient[i]) % 3;
-                if (prevOrient != 0) {
-                    //order = scm(order, 3);
-                    length *= 3;
-                }
-                order = scm(order, length);
+    for (i = 0; i < 8; i++) {
+        if (!visitedLocs[i]) {
+            if (cornerLoc[i] == i && cornerOrient[i] == 0) {
+                continue;
             }
+
+            length = 1;
+
+            visitedLocs[i] = true;
+            prevOrient = 0;
+
+            for (j = 0; cornerLoc[j] != i; j++) {
+            }
+
+            while (!visitedLocs[j]) {
+                visitedLocs[j] = true;
+                prevOrient = (prevOrient + cornerOrient[j]) % 3;
+
+                length++;
+
+                for (k = 0; cornerLoc[k] != j; k++) {
+                }
+                j = k;
+            }
+
+            prevOrient = (prevOrient + cornerOrient[i]) % 3;
+            if (prevOrient != 0) {
+                //order = scm(order, 3);
+                length *= 3;
+            }
+            order = scm(order, length);
         }
+    }
 
-        // determine cycle lengths of the current edge permutation
-        // and compute smallest common multiple
-        visitedLocs = new Array(edgeLoc.length);
-        for (i = 0, n = edgeLoc.length; i < n; i++) {
-            if (!visitedLocs[i]) {
-                if (edgeLoc[i] == i && edgeOrient[i] == 0) {
-                    continue;
+    // determine cycle lengths of the current edge permutation
+    // and compute smallest common multiple
+    visitedLocs = new Array(edgeLoc.length);
+    for (i = 0, n = edgeLoc.length; i < n; i++) {
+        if (!visitedLocs[i]) {
+            if (edgeLoc[i] == i && edgeOrient[i] == 0) {
+                continue;
+            }
+
+            length = 1;
+
+            visitedLocs[i] = true;
+            prevOrient = 0;
+
+            for (j = 0; edgeLoc[j] != i; j++) {
+            }
+
+            while (!visitedLocs[j]) {
+                visitedLocs[j] = true;
+                prevOrient ^= edgeOrient[j];
+
+                length++;
+
+                for (k = 0; edgeLoc[k] != j; k++) {
                 }
+                j = k;
+            }
 
-                length = 1;
+            if ((prevOrient ^ edgeOrient[i]) == 1) {
+                //order = scm(order, 2);
+                length *= 2;
+            }
+            order = scm(order, length);
+        }
+    }
 
-                visitedLocs[i] = true;
-                prevOrient = 0;
+    // determine cycle lengths of the current side permutation
+    // and compute smallest common multiple
+    visitedLocs = new Array(sideLoc.length);
+    for (i = 0, n = sideLoc.length; i < n; i++) {
+        if (!visitedLocs[i]) {
+            if (sideLoc[i] == i && sideOrient[i] == 0) {
+                continue;
+            }
 
-                for (j = 0; edgeLoc[j] != i; j++) {
+            length = 1;
+
+            visitedLocs[i] = true;
+            prevOrient = 0;
+
+            for (j = 0; sideLoc[j] != i; j++) {
+            }
+
+            while (!visitedLocs[j]) {
+                visitedLocs[j] = true;
+
+                length++;
+
+                prevOrient = (prevOrient + sideOrient[j]) % 4;
+
+                for (k = 0; sideLoc[k] != j; k++) {
                 }
+                j = k;
+            }
 
-                while (!visitedLocs[j]) {
-                    visitedLocs[j] = true;
-                    prevOrient ^= edgeOrient[j];
-
-                    length++;
-
-                    for (k = 0; edgeLoc[k] != j; k++) {
-                    }
-                    j = k;
-                }
-
-                if ((prevOrient ^ edgeOrient[i]) == 1) {
+            prevOrient = (prevOrient + sideOrient[i]) % 4;
+            switch (prevOrient) {
+                case 0: // no sign
+                    break;
+                case 1: // '-' sign
+                    //order = scm(order, 4);
+                    length *= 4;
+                    break;
+                case 2: // '++' sign
                     //order = scm(order, 2);
                     length *= 2;
-                }
-                order = scm(order, length);
+                    break;
+                case 3: // '+' sign
+                    //order = scm(order, 4);
+                    length *= 4;
+                    break;
             }
+            order = scm(order, length);
         }
-
-        // determine cycle lengths of the current side permutation
-        // and compute smallest common multiple
-        visitedLocs = new Array(sideLoc.length);
-        for (i = 0, n = sideLoc.length; i < n; i++) {
-            if (!visitedLocs[i]) {
-                if (sideLoc[i] == i && sideOrient[i] == 0) {
-                    continue;
-                }
-
-                length = 1;
-
-                visitedLocs[i] = true;
-                prevOrient = 0;
-
-                for (j = 0; sideLoc[j] != i; j++) {
-                }
-
-                while (!visitedLocs[j]) {
-                    visitedLocs[j] = true;
-
-                    length++;
-
-                    prevOrient = (prevOrient + sideOrient[j]) % 4;
-
-                    for (k = 0; sideLoc[k] != j; k++) {
-                    }
-                    j = k;
-                }
-
-                prevOrient = (prevOrient + sideOrient[i]) % 4;
-                switch (prevOrient) {
-                    case 0: // no sign
-                        break;
-                    case 1: // '-' sign
-                        //order = scm(order, 4);
-                        length *= 4;
-                        break;
-                    case 2: // '++' sign
-                        //order = scm(order, 2);
-                        length *= 2;
-                        break;
-                    case 3: // '+' sign
-                        //order = scm(order, 4);
-                        length *= 4;
-                        break;
-                }
-                order = scm(order, length);
-            }
-        }
-
-        return order;
     }
+
+    return order;
+}
 
     /**
      * Returns a number that describes the order
@@ -682,132 +682,132 @@ function toSidePermutationString(cube, syntax,
      * @return the order of the permutation of the cube
      */
 function getVisibleOrder(cube) {
-        let cornerLoc = cube.getCornerLocations();
-        let cornerOrient = cube.getCornerOrientations();
-        let edgeLoc = cube.getEdgeLocations();
-        let edgeOrient = cube.getEdgeOrientations();
-        let sideLoc = cube.getSideLocations();
-        let sideOrient = cube.getSideOrientations();
-        let order = 1;
+    let cornerLoc = cube.getCornerLocations();
+    let cornerOrient = cube.getCornerOrientations();
+    let edgeLoc = cube.getEdgeLocations();
+    let edgeOrient = cube.getEdgeOrientations();
+    let sideLoc = cube.getSideLocations();
+    let sideOrient = cube.getSideOrientations();
+    let order = 1;
 
-        let visitedLocs;
-        let i, j, k, n, p;
-        let prevOrient;
-        let length;
+    let visitedLocs;
+    let i, j, k, n, p;
+    let prevOrient;
+    let length;
 
-        // determine cycle lengths of the current corner permutation
-        // and compute smallest common multiple
-        visitedLocs = new Array(cornerLoc.length);
+    // determine cycle lengths of the current corner permutation
+    // and compute smallest common multiple
+    visitedLocs = new Array(cornerLoc.length);
 
-        for (i = 0, n = cornerLoc.length; i < n; i++) {
-            if (!visitedLocs[i]) {
-                if (cornerLoc[i] == i && cornerOrient[i] == 0) {
-                    continue;
+    for (i = 0, n = cornerLoc.length; i < n; i++) {
+        if (!visitedLocs[i]) {
+            if (cornerLoc[i] == i && cornerOrient[i] == 0) {
+                continue;
+            }
+
+            length = 1;
+
+            visitedLocs[i] = true;
+            prevOrient = 0;
+
+            for (j = 0; cornerLoc[j] != i; j++) {
+            }
+
+            while (!visitedLocs[j]) {
+                visitedLocs[j] = true;
+                prevOrient = (prevOrient + cornerOrient[j]) % 3;
+
+                length++;
+
+                for (k = 0; cornerLoc[k] != j; k++) {
+                }
+                j = k;
+            }
+
+            prevOrient = (prevOrient + cornerOrient[i]) % 3;
+            if (prevOrient != 0) {
+                //order = scm(order, 3);
+                length *= 3;
+            }
+            order = scm(order, length);
+        }
+    }
+
+    // determine cycle lengths of the current edge permutation
+    // and compute smallest common multiple
+    visitedLocs = new Array(edgeLoc.length);
+    for (i = 0, n = edgeLoc.length; i < n; i++) {
+        if (!visitedLocs[i]) {
+            if (edgeLoc[i] == i && edgeOrient[i] == 0) {
+                continue;
+            }
+
+            length = 1;
+
+            visitedLocs[i] = true;
+            prevOrient = 0;
+
+            for (j = 0; edgeLoc[j] != i; j++) {
+            }
+
+            while (!visitedLocs[j]) {
+                visitedLocs[j] = true;
+                prevOrient ^= edgeOrient[j];
+
+                length++;
+
+                for (k = 0; edgeLoc[k] != j; k++) {
+                }
+                j = k;
+            }
+
+            if ((prevOrient ^ edgeOrient[i]) == 1) {
+                //order = scm(order, 2);
+                length *= 2;
+            }
+            order = scm(order, length);
+        }
+    }
+
+    // Determine cycle lengths of the current side permutation
+    // and compute smallest common multiple.
+    // Ignore changes of orientation.
+    // Ignore side permutations which are entirely on same face.
+    visitedLocs = new Array(sideLoc.length);
+    for (i = 0, n = sideLoc.length; i < n; i++) {
+        if (!visitedLocs[i]) {
+            if (sideLoc[i] == i && sideOrient[i] == 0) {
+                continue;
+            }
+
+            length = 1;
+
+            visitedLocs[i] = true;
+            let firstFace = sideLoc[i] % 6;
+            let allPartsAreOnSameFace = true;
+
+            for (j = 0; sideLoc[j] != i; j++) {
+            }
+
+            while (!visitedLocs[j]) {
+                visitedLocs[j] = true;
+
+                length++;
+                if (firstFace != sideLoc[j] % 6) {
+                    allPartsAreOnSameFace = false;
                 }
 
-                length = 1;
-
-                visitedLocs[i] = true;
-                prevOrient = 0;
-
-                for (j = 0; cornerLoc[j] != i; j++) {
+                for (k = 0; sideLoc[k] != j; k++) {
                 }
-
-                while (!visitedLocs[j]) {
-                    visitedLocs[j] = true;
-                    prevOrient = (prevOrient + cornerOrient[j]) % 3;
-
-                    length++;
-
-                    for (k = 0; cornerLoc[k] != j; k++) {
-                    }
-                    j = k;
-                }
-
-                prevOrient = (prevOrient + cornerOrient[i]) % 3;
-                if (prevOrient != 0) {
-                    //order = scm(order, 3);
-                    length *= 3;
-                }
+                j = k;
+            }
+            if (!allPartsAreOnSameFace) {
                 order = scm(order, length);
             }
         }
+    }
 
-        // determine cycle lengths of the current edge permutation
-        // and compute smallest common multiple
-        visitedLocs = new Array(edgeLoc.length);
-        for (i = 0, n = edgeLoc.length; i < n; i++) {
-            if (!visitedLocs[i]) {
-                if (edgeLoc[i] == i && edgeOrient[i] == 0) {
-                    continue;
-                }
-
-                length = 1;
-
-                visitedLocs[i] = true;
-                prevOrient = 0;
-
-                for (j = 0; edgeLoc[j] != i; j++) {
-                }
-
-                while (!visitedLocs[j]) {
-                    visitedLocs[j] = true;
-                    prevOrient ^= edgeOrient[j];
-
-                    length++;
-
-                    for (k = 0; edgeLoc[k] != j; k++) {
-                    }
-                    j = k;
-                }
-
-                if ((prevOrient ^ edgeOrient[i]) == 1) {
-                    //order = scm(order, 2);
-                    length *= 2;
-                }
-                order = scm(order, length);
-            }
-        }
-
-        // Determine cycle lengths of the current side permutation
-        // and compute smallest common multiple.
-        // Ignore changes of orientation.
-        // Ignore side permutations which are entirely on same face.
-        visitedLocs = new Array(sideLoc.length);
-        for (i = 0, n = sideLoc.length; i < n; i++) {
-            if (!visitedLocs[i]) {
-                if (sideLoc[i] == i && sideOrient[i] == 0) {
-                    continue;
-                }
-
-                length = 1;
-
-                visitedLocs[i] = true;
-                let firstFace = sideLoc[i] % 6;
-                let allPartsAreOnSameFace = true;
-
-                for (j = 0; sideLoc[j] != i; j++) {
-                }
-
-                while (!visitedLocs[j]) {
-                    visitedLocs[j] = true;
-
-                    length++;
-                    if (firstFace != sideLoc[j] % 6) {
-                        allPartsAreOnSameFace = false;
-                    }
-
-                    for (k = 0; sideLoc[k] != j; k++) {
-                    }
-                    j = k;
-                }
-                if (!allPartsAreOnSameFace) {
-                    order = scm(order, length);
-                }
-            }
-        }
-
-        return order;
+    return order;
     }
 
 // ------------------

@@ -144,7 +144,7 @@ class RubiksCube extends Cube.Cube {
      * Returns 0 if no mask can be determined (the center part).
      */
     getPartLayerMask(part, orientation) {
-        var face = this.getPartFace(part, orientation);
+        let face = this.getPartFace(part, orientation);
         if (part < this.cornerLoc.length) {
             // corner parts
             return (face < 3) ? 4 : 1;
@@ -159,87 +159,7 @@ class RubiksCube extends Cube.Cube {
             return 0;
         }
     }
-
-    getPartSwipeAxis(part, orientation, swipeDirection) {
-        if (part < this.cornerLoc.length) {
-            // corner parts
-            var loc = this.getCornerLocation(part);
-            var ori = (3 - this.getPartOrientation(part) + orientation) % 3;
-            return this.CORNER_SWIPE_TABLE[loc][ori][swipeDirection][0];
-        } else if (part < this.cornerLoc.length + this.edgeLoc.length) {
-            // edge parts
-            var edgeIndex = part - this.cornerLoc.length;
-            var loc = this.getEdgeLocation(edgeIndex);
-            var ori = (2 - this.getPartOrientation(part) + orientation) % 2;
-            return this.EDGE_SWIPE_TABLE[loc][ori][swipeDirection][0];
-        } else if (part < this.cornerLoc.length + this.edgeLoc.length + this.sideLoc.length) {
-            // side parts
-            var loc = this.getSideLocation(part - this.cornerLoc.length - this.edgeLoc.length);
-            var ori = (4 - this.getPartOrientation(part) + swipeDirection) % 4;
-            return this.SIDE_SWIPE_TABLE[loc][ori][0];
-        } else {
-            // center part
-            return -1;
-        }
-    }
-
-    getPartSwipeLayerMask(part, orientation, swipeDirection) {
-        if (part < this.cornerLoc.length) {
-            // corner parts
-            var loc = this.getCornerLocation(part);
-            var ori = (3 - this.getPartOrientation(part) + orientation) % 3;
-            return this.CORNER_SWIPE_TABLE[loc][ori][swipeDirection][1];
-        } else if (part < this.cornerLoc.length + this.edgeLoc.length) {
-            // edge parts
-            var edgeIndex = part - this.cornerLoc.length;
-            var loc = this.getEdgeLocation(edgeIndex);
-            var ori = (2 - this.getPartOrientation(part) + orientation) % 2;
-            return this.EDGE_SWIPE_TABLE[loc][ori][swipeDirection][1];
-        } else if (part < this.cornerLoc.length + this.edgeLoc.length + this.sideLoc.length) {
-            // side parts
-            var loc = this.getSideLocation(part - this.cornerLoc.length - this.edgeLoc.length);
-            var ori = (4 - this.getPartOrientation(part) + swipeDirection) % 4;
-            return this.SIDE_SWIPE_TABLE[loc][ori][1];
-        } else {
-            // center part
-            return 0;
-        }
-    }
-
-    getPartSwipeAngle(part, orientation, swipeDirection) {
-        if (part < this.cornerLoc.length) {
-            // corner parts
-            var loc = this.getCornerLocation(part);
-            var ori = this.getPartOrientation(part);
-            var sori = (3 - ori + orientation) % 3;
-            var dir = swipeDirection;
-            var angle = this.CORNER_SWIPE_TABLE[loc][sori][dir][2];
-            if (ori == 2 && (sori == 0 || sori == 2)) {
-                angle = -angle;
-            } else if (ori == 1 && (sori == 1 || sori == 2)) {
-                angle = -angle;
-            }
-            return angle;
-        } else if (part < this.cornerLoc.length + this.edgeLoc.length) {
-            // edge parts
-            var edgeIndex = part - this.cornerLoc.length;
-            var loc = this.getEdgeLocation(edgeIndex);
-            var ori = this.getEdgeOrientation(edgeIndex);
-            var sori = (2 - ori + orientation) % 2;
-            var dir = swipeDirection;
-            var angle = this.EDGE_SWIPE_TABLE[loc][sori][dir][2];
-            return angle;
-        } else if (part < this.cornerLoc.length + this.edgeLoc.length + this.sideLoc.length) {
-            // side parts
-            var loc = this.getSideLocation(part - this.cornerLoc.length - this.edgeLoc.length);
-            var ori = (4 - this.getPartOrientation(part) + swipeDirection) % 4;
-            return this.SIDE_SWIPE_TABLE[loc][ori][2];
-        } else {
-            // center part
-            return 0;
-        }
-    }
-
+    
     /**
      * Transforms the cube without firing an event.
      *
@@ -258,182 +178,98 @@ class RubiksCube extends Cube.Cube {
      *               2=180 degrees
      */
     transform0(axis, layerMask, angle) {
-        module.log("RubiksCube#" + (this) + ".transform(ax=" + axis + ",msk=" + layerMask + ",ang:" + angle + ")");
-        {
-            if (axis < 0 || axis > 2) {
-                throw ("axis: " + axis);
-            }
+        if (axis < 0 || axis > 2) {
+            throw ("axis: " + axis);
+        }
 
-            if (layerMask < 0 || layerMask >= 1 << this.layerCount) {
-                throw ("layerMask: " + layerMask);
-            }
+        if (layerMask < 0 || layerMask >= 1 << this.layerCount) {
+            throw ("layerMask: " + layerMask);
+        }
 
-            if (angle < -2 || angle > 2) {
-                throw ("angle: " + angle);
-            }
+        if (angle < -2 || angle > 2) {
+            throw ("angle: " + angle);
+        }
 
-            if (angle == 0) {
-                return; // NOP
-            }
+        if (angle == 0) {
+            return; // NOP
+        }
 
-            // Convert angle -2 to 2 to simplify the switch statements
-            var an = (angle == -2) ? 2 : angle;
+        // Convert angle -2 to 2 to simplify the switch statements
+        var an = (angle == -2) ? 2 : angle;
 
-            if ((layerMask & 1) != 0) {
-                // twist at left, bottom, back
-                switch (axis) {
-                    case 0: // x
-                        switch (an) {
-                            case - 1:
-                                this.twistL();
-                                break;
-                            case 1:
-                                this.twistL();
-                                this.twistL();
-                                this.twistL();
-                                break;
-                            case 2:
-                                this.twistL();
-                                this.twistL();
-                                break;
-                        }
-                        break;
-                    case 1: // y
-                        switch (an) {
-                            case - 1:
-                                this.twistD();
-                                break;
-                            case 1:
-                                this.twistD();
-                                this.twistD();
-                                this.twistD();
-                                break;
-                            case 2:
-                                this.twistD();
-                                this.twistD();
-                                break;
-                        }
-                        break;
-                    case 2: // z
-                    switch (an) {
-                        case - 1:
-                            this.twistB();
-                            break;
-                        case 1:
-                            this.twistB();
-                            this.twistB();
-                            this.twistB();
-                            break;
-                        case 2:
-                            this.twistB();
-                            this.twistB();
-                            break;
-                    }
+        if ((layerMask & 1) != 0) {
+            // twist at left, bottom, back
+            switch (axis) {
+            case 0: // x
+                switch (an) {
+                case -1: this.twistL(); break;
+                case  1: this.twistL(); this.twistL(); this.twistL(); break;
+                case  2: this.twistL(); this.twistL(); break;
+                }
+                break;
+            case 1: // y
+                switch (an) {
+                case -1: this.twistD(); break;
+                case  1: this.twistD(); this.twistD(); this.twistD(); break;
+                case  2:  this.twistD(); this.twistD(); break;
+                }
+                break;
+            case 2: // z
+                switch (an) {
+                case -1: this.twistB(); break;
+                case  1: this.twistB(); this.twistB(); this.twistB(); break;
+                case  2: this.twistB(); this.twistB(); break;
                 }
             }
-            if ((layerMask & 2) != 0) {
-                // twist at left middle, bottom middle, back middle
-                switch (axis) {
-                    case 0: // x
-                        switch (an) {
-                            case 1:
-                                this.twistMR();
-                                break;
-                            case - 1:
-                                this.twistMR();
-                                this.twistMR();
-                                this.twistMR();
-                                break;
-                            case 2:
-                                this.twistMR();
-                                this.twistMR();
-                                break;
-                        }
-                        break;
-                    case 1: // y
-                        switch (an) {
-                            case 1:
-                                this.twistMU();
-                                break;
-                            case - 1:
-                                this.twistMU();
-                                this.twistMU();
-                                this.twistMU();
-                                break;
-                            case 2:
-                                this.twistMU();
-                                this.twistMU();
-                                break;
-                        }
-                        break;
-                    case 2: // z
-                    switch (an) {
-                        case 1:
-                            this.twistMF();
-                            break;
-                        case - 1:
-                            this.twistMF();
-                            this.twistMF();
-                            this.twistMF();
-                            break;
-                        case 2:
-                            this.twistMF();
-                            this.twistMF();
-                            break;
-                    }
+        }
+        if ((layerMask & 2) != 0) {
+            // twist at left middle, bottom middle, back middle
+            switch (axis) {
+            case 0: // x
+                switch (an) {
+                case  1: this.twistMR(); break;
+                case -1: this.twistMR(); this.twistMR(); this.twistMR(); break;
+                case  2: this.twistMR(); this.twistMR(); break;
+                }
+                break;
+            case 1: // y
+                switch (an) {
+                case  1: this.twistMU(); break;
+                case -1: this.twistMU(); this.twistMU(); this.twistMU(); break;
+                case  2: this.twistMU(); this.twistMU(); break;
+                }
+                break;
+            case 2: // z
+                switch (an) {
+                case  1: this.twistMF(); break;
+                case -1: this.twistMF(); this.twistMF(); this.twistMF(); break;
+                case  2: this.twistMF(); this.twistMF(); break;
                 }
             }
+        }
 
-            if ((layerMask & 4) != 0) {
-                // twist at right, top, front
-                switch (axis) {
-                    case 0: // x
-                        switch (an) {
-                            case 1:
-                                this.twistR();
-                                break;
-                            case - 1:
-                                this.twistR();
-                                this.twistR();
-                                this.twistR();
-                                break;
-                            case 2:
-                                this.twistR();
-                                this.twistR();
-                                break;
-                        }
-                        break;
-                    case 1: // y
-                        switch (an) {
-                            case 1:
-                                this.twistU();
-                                break;
-                            case - 1:
-                                this.twistU();
-                                this.twistU();
-                                this.twistU();
-                                break;
-                            case 2:
-                                this.twistU();
-                                this.twistU();
-                                break;
-                        }
-                        break;
-                    case 2: // z
-                    switch (an) {
-                        case 1:
-                            this.twistF();
-                            break;
-                        case - 1:
-                            this.twistF();
-                            this.twistF();
-                            this.twistF();
-                            break;
-                        case 2:
-                            this.twistF();
-                            this.twistF();
-                            break;
-                    }
+        if ((layerMask & 4) != 0) {
+            // twist at right, top, front
+            switch (axis) {
+            case 0: // x
+                switch (an) {
+                case  1: this.twistR(); break;
+                case -1: this.twistR(); this.twistR(); this.twistR(); break;
+                case  2: this.twistR(); this.twistR(); break;
+                }
+                break;
+            case 1: // y
+                switch (an) {
+                case  1: this.twistU(); break;
+                case -1: this.twistU(); this.twistU(); this.twistU(); break;
+                case  2: this.twistU(); this.twistU(); break;
+                }
+                break;
+            case 2: // z
+                switch (an) {
+                case  1: this.twistF(); break;
+                case -1: this.twistF(); this.twistF(); this.twistF(); break;
+                case  2: this.twistF(); this.twistF(); break;
                 }
             }
         }
@@ -739,21 +575,21 @@ class RubiksCube extends Cube.Cube {
      * Second dimension: sticker index on the faces.
      */
     toStickers() {
-        var stickers = new Array(6);
-        for (var i = 0; i < 6; i++) {
+        let stickers = new Array(6);
+        for (let i = 0; i < 6; i++) {
             stickers[i] = new Array(9);
         }
 
         // Map face parts onto stickers.
-        for (var i = 0; i < 6; i++) {
-            var loc = this.sideLoc[i];
+        for (let i = 0; i < 6; i++) {
+            let loc = this.sideLoc[i];
             stickers[this.SIDE_TRANSLATION[i][0]][this.SIDE_TRANSLATION[i][1]] = this.SIDE_TRANSLATION[loc][0];
         }
 
         // Map edge parts onto stickers
-        for (var i = 0; i < 12; i++) {
-            var loc = this.edgeLoc[i];
-            var orient = this.edgeOrient[i];
+        for (let i = 0; i < 12; i++) {
+            let loc = this.edgeLoc[i];
+            let orient = this.edgeOrient[i];
             stickers[this.EDGE_TRANSLATION[i][0]][this.EDGE_TRANSLATION[i][1]] =
               (orient == 0) ? this.EDGE_TRANSLATION[loc][0] : this.EDGE_TRANSLATION[loc][2];
             stickers[this.EDGE_TRANSLATION[i][2]][this.EDGE_TRANSLATION[i][3]] =
@@ -761,9 +597,9 @@ class RubiksCube extends Cube.Cube {
         }
 
         // Map corner parts onto stickers
-        for (var i = 0; i < 8; i++) {
-            var loc = this.cornerLoc[i];
-            var orient = this.cornerOrient[i];
+        for (let i = 0; i < 8; i++) {
+            let loc = this.cornerLoc[i];
+            let orient = this.cornerOrient[i];
             stickers[this.CORNER_TRANSLATION[i][0]][this.CORNER_TRANSLATION[i][1]] =
               (orient == 0)
               ? this.CORNER_TRANSLATION[loc][0]
@@ -784,13 +620,13 @@ class RubiksCube extends Cube.Cube {
                 : this.CORNER_TRANSLATION[loc][2]);
         }
         /*
-         for (var i = 0; i < stickers.length; i++) {
-         System.out.prvar("  " + i + ":");
-         for (var j = 0; j < stickers[i].length; j++) {
+         for (let i = 0; i < stickers.length; i++) {
+         System.out.prlet("  " + i + ":");
+         for (let j = 0; j < stickers[i].length; j++) {
          if (j != 0) {
-         System.out.prvar(',');
+         System.out.prlet(',');
          }
-         System.out.prvar(stickers[i][j]);
+         System.out.prlet(stickers[i][j]);
          }
          module.log();
          }*/
@@ -809,14 +645,14 @@ class RubiksCube extends Cube.Cube {
      *                 left, down, back.
      */
     setToStickers(stickers) {
-        var i = 0, j = 0, cube;
+        let i = 0, j = 0, cube;
 
-        var tempSideLoc = new Array(6);
-        var tempSideOrient = new Array(6);
-        var tempEdgeLoc = new Array(12);
-        var tempEdgeOrient = new Array(12);
-        var tempCornerLoc = new Array(8);
-        var tempCornerOrient = new Array(8);
+        let tempSideLoc = new Array(6);
+        let tempSideOrient = new Array(6);
+        let tempEdgeLoc = new Array(12);
+        let tempEdgeOrient = new Array(12);
+        let tempCornerLoc = new Array(8);
+        let tempCornerOrient = new Array(8);
 
         // Translate face cubes to match stickers.
         try {
@@ -842,8 +678,8 @@ class RubiksCube extends Cube.Cube {
         }
         // Translate edge cubes to match stickers.
         for (i = 0; i < 12; i++) {
-            var f0 = stickers[this.EDGE_TRANSLATION[i][0]][this.EDGE_TRANSLATION[i][1]];
-            var f1 = stickers[this.EDGE_TRANSLATION[i][2]][this.EDGE_TRANSLATION[i][3]];
+            let f0 = stickers[this.EDGE_TRANSLATION[i][0]][this.EDGE_TRANSLATION[i][1]];
+            let f1 = stickers[this.EDGE_TRANSLATION[i][2]][this.EDGE_TRANSLATION[i][3]];
             for (cube = 0; cube < 12; cube++) {
                 if (this.EDGE_TRANSLATION[cube][0] == f0
                   && this.EDGE_TRANSLATION[cube][2] == f1) {
@@ -873,9 +709,9 @@ class RubiksCube extends Cube.Cube {
 
         // Translate corner cubes to match stickers.
         for (i = 0; i < 8; i++) {
-            var f0 = stickers[this.CORNER_TRANSLATION[i][0]][this.CORNER_TRANSLATION[i][1]];
-            var f1 = stickers[this.CORNER_TRANSLATION[i][2]][this.CORNER_TRANSLATION[i][3]];
-            var f2 = stickers[this.CORNER_TRANSLATION[i][4]][this.CORNER_TRANSLATION[i][5]];
+            let f0 = stickers[this.CORNER_TRANSLATION[i][0]][this.CORNER_TRANSLATION[i][1]];
+            let f1 = stickers[this.CORNER_TRANSLATION[i][2]][this.CORNER_TRANSLATION[i][3]];
+            let f2 = stickers[this.CORNER_TRANSLATION[i][4]][this.CORNER_TRANSLATION[i][5]];
             for (cube = 0; cube < 8; cube++) {
                 if (this.CORNER_TRANSLATION[cube][0] == f0
                   && this.CORNER_TRANSLATION[cube][2] == f1
@@ -923,14 +759,14 @@ class RubiksCube extends Cube.Cube {
     }
 
     clone() {
-        var that = new RubiksCube();
+        let that = new RubiksCube();
         that.setTo(this);
         return that;
     }
 }
 
 /**
- * Set this variable to true to get debug output when the cube is transformed.
+ * Set this letiable to true to get debug output when the cube is transformed.
  */
 RubiksCube.prototype.DEBUG = false;
 /**
@@ -999,256 +835,6 @@ RubiksCube.prototype.CORNER_TRANSLATION = [
     [4, 6, 5, 8, 3, 6], // 5 dbl
     [1, 6, 2, 0, 3, 2], // 6 ufl
     [4, 0, 3, 8, 2, 6] // 7 dlf
-];
-/**
- * First dimension: edge part index.
- * Second dimension: orientation.
- * Third dimension: swipe direction
- * Fourth dimension: axis,layermask,angle
- * <pre>
- *             +---+---+---+
- *             |   |3.1|   |
- *             +--- --- ---+
- *             |6.0| 1 |0.0|
- *             +--- --- ---+
- *             |   |9.1|   |
- * +---+---+---+---+---+---+---+---+---+---+---+---+
- * |   |6.1|   |   |9.0|   |   |0.1|   |   |3.0|   |
- * +--- --- ---+--- --- ---+--- --- ---+--- --- ---+
- * |7.0| 3 10.0|10.1 2 |1.1|1.0| 0 |4.0|4.1| 5 |7.1|
- * +--- --- ---+--- --- ---+--- --- ---+--- --- ---+
- * |   |8.1|   |   |11.0   |   |2.1|   |   |5.0|   |
- * +---+---+---+---+---+---+---+---+---+---+---+---+
- *             |   |11.1   |
- *             +--- --- ---+
- *             |8.0| 4 |2.0|
- *             +--- --- ---+
- *             |   |5.1|   |
- *             +---+---+---+
- * </pre>
- */
-RubiksCube.prototype.EDGE_SWIPE_TABLE = [
-    [// edge 0 ur
-        [//u
-            [2, 2, 1], // axis, layerMask, angle
-            [0, 4, -1],
-            [2, 2, -1],
-            [0, 4, 1]
-        ],
-        [//r
-            [2, 2, -1], // axis, layerMask, angle
-            [1, 4, -1],
-            [2, 2, 1],
-            [1, 4, 1]
-        ], ],
-    [//      1 rf
-        [//r
-            [1, 2, 1], // axis, layerMask, angle
-            [2, 4, -1],
-            [1, 2, -1],
-            [2, 4, 1]
-        ],
-        [//f
-            [1, 2, -1], // axis, layerMask, angle
-            [0, 4, -1],
-            [1, 2, 1],
-            [0, 4, 1]
-        ], ],
-    [//      2 dr
-        [//d
-            [2, 2, -1], // axis, layerMask, angle
-            [0, 4, -1],
-            [2, 2, 1],
-            [0, 4, 1]
-        ],
-        [//r
-            [2, 2, 1], // axis, layerMask, angle
-            [1, 1, 1],
-            [2, 2, -1],
-            [1, 1, -1]
-        ], ],
-    [//      3 bu
-        [//b
-            [0, 2, -1], // axis, layerMask, angle
-            [1, 4, -1],
-            [0, 2, 1],
-            [1, 4, 1]
-        ],
-        [//u
-            [0, 2, 1], // axis, layerMask, angle
-            [2, 1, 1],
-            [0, 2, -1],
-            [2, 1, -1]
-        ], ],
-    [//      4 rb
-        [//r
-            [1, 2, -1], // axis, layerMask, angle
-            [2, 1, 1],
-            [1, 2, 1],
-            [2, 1, -1]
-        ],
-        [//b
-            [1, 2, 1], // axis, layerMask, angle
-            [0, 4, -1],
-            [1, 2, -1],
-            [0, 4, 1]
-        ], ],
-    [//      5 bd
-        [//b
-            [0, 2, 1], // axis, layerMask, angle
-            [1, 1, 1],
-            [0, 2, -1],
-            [1, 1, -1]
-        ],
-        [//d
-            [0, 2, -1], // axis, layerMask, angle
-            [2, 1, 1],
-            [0, 2, 1],
-            [2, 1, -1]
-        ], ],
-    [//      6 ul
-        [//u
-            [2, 2, -1], // axis, layerMask, angle
-            [0, 1, 1],
-            [2, 2, 1],
-            [0, 1, -1]
-        ],
-        [//l
-            [2, 2, 1], // axis, layerMask, angle
-            [1, 4, -1],
-            [2, 2, -1],
-            [1, 4, 1]
-        ], ],
-    [//      7 lb
-        [//l
-            [1, 2, 1], // axis, layerMask, angle
-            [2, 1, 1],
-            [1, 2, -1],
-            [2, 1, -1]
-        ],
-        [//b
-            [1, 2, -1], // axis, layerMask, angle
-            [0, 1, 1],
-            [1, 2, 1],
-            [0, 1, -1]
-        ], ],
-    [//      8 dl
-        [//d
-            [2, 2, 1], // axis, layerMask, angle
-            [0, 1, 1],
-            [2, 2, -1],
-            [0, 1, -1]
-        ],
-        [//l
-            [2, 2, -1], // axis, layerMask, angle
-            [1, 1, 1],
-            [2, 2, 1],
-            [1, 1, -1]
-        ], ],
-    [//      9 fu
-        [//f
-            [0, 2, 1], // axis, layerMask, angle
-            [1, 4, -1],
-            [0, 2, -1],
-            [1, 4, 1]
-        ],
-        [//u
-            [0, 2, -1], // axis, layerMask, angle
-            [2, 4, -1],
-            [0, 2, 1],
-            [2, 4, 1]
-        ], ],
-    [//     10 lf
-        [//l
-            [1, 2, -1], // axis, layerMask, angle
-            [2, 4, -1],
-            [1, 2, 1],
-            [2, 4, 1]
-        ],
-        [//f
-            [1, 2, 1], // axis, layerMask, angle
-            [0, 1, 1],
-            [1, 2, -1],
-            [0, 1, -1]
-        ], ],
-    [//     11 fd
-        [//f
-            [0, 2, -1], // axis, layerMask, angle
-            [1, 1, 1],
-            [0, 2, 1],
-            [1, 1, -1]
-        ],
-        [//d
-            [0, 2, 1], // axis, layerMask, angle
-            [2, 4, -1],
-            [0, 2, -1],
-            [2, 4, 1]
-        ], ]
-];
-/** Side swipe table.
- * First dimension: side part index.
- * Second dimension: swipe direction
- * Third dimension: axis,layermask,angle
- *
- * <pre>
- *             +------------+
- *             |     .1     |
- *             |    ---     |
- *             | .0| 1 |.2  |
- *             |    ---     |
- *             |     .3     |
- * +-----------+------------+-----------+-----------+
- * |     .0    |     .2     |     .3    |    .1     |
- * |    ---    |    ---     |    ---    |    ---    |
- * | .3| 3 |.1 | .1| 2 |.3  | .2| 0 |.0 | .0| 5 |.2 |
- * |    ---    |    ---     |    ---    |    ---    |
- * |     .2    |    .0      |     .1    |     .3    |
- * +-----------+------------+-----------+-----------+
- *             |     .0     |
- *             |    ---     |
- *             | .3| 4 |.1  |
- *             |    ---     |
- *             |     .2     |
- *             +------------+
- * </pre>
- */
-RubiksCube.prototype.SIDE_SWIPE_TABLE = [
-    [// 0 r
-        [1, 2, -1], // axis, layerMask, angle
-        [2, 2, 1],
-        [1, 2, 1],
-        [2, 2, -1]
-    ],
-    [// 1 u
-        [2, 2, -1],
-        [0, 2, 1],
-        [2, 2, 1],
-        [0, 2, -1]
-    ],
-    [// 2 f
-        [0, 2, -1],
-        [1, 2, 1],
-        [0, 2, 1],
-        [1, 2, -1]
-    ],
-    [// 3 l
-        [2, 2, 1],
-        [1, 2, -1],
-        [2, 2, -1],
-        [1, 2, 1]
-    ],
-    [// 4 d
-        [0, 2, 1],
-        [2, 2, -1],
-        [0, 2, -1],
-        [2, 2, 1]
-    ],
-    [// 5 b
-        [1, 2, 1],
-        [0, 2, -1],
-        [1, 2, -1],
-        [0, 2, 1]
-    ]
 ];
 
 // Construct the name to part map.
