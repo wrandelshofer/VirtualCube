@@ -336,10 +336,10 @@ function toEdgePermutationString(cube, syntax,
                         buf += (edges[j % 12][1]);
                     }
                     if (hasEvenLayerCount) {
-                        buf += (j / 12 + 1);
+                        buf += Math.floor(j / 12 + 1);
                     } else {
                         if (j >= 12) {
-                            buf += (j / 12);
+                            buf += Math.floor(j / 12);
                         }
                     }
                 }
@@ -474,10 +474,10 @@ function toSidePermutationString(cube, syntax,
                                     buf += (sideOrients[prevOrient]);
                                 }
                                 if (hasEvenLayerCount) {
-                                    buf += (j / 6 + 1);
+                                    buf += Math.floor(j / 6 + 1);
                                 } else {
                                     if (j >= 6) {
-                                        buf += (j / 6);
+                                        buf += Math.floor(j / 6);
                                     }
                                 }
                             }
