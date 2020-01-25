@@ -5,7 +5,7 @@
     <title>Verify JavaScript against the pattern database</title>
     <link href="../style/style.css" rel="stylesheet" type="text/css">
     <link href="../style/virtualcube.css" rel="stylesheet" type="text/css">
-<script type="module">
+    <script type="module">
       import ScriptParser   from '../lib/ScriptParser.mjs';
       import ScriptNotation from '../lib/ScriptNotation.mjs';
       import MoveMetrics    from '../lib/MoveMetrics.mjs';
@@ -40,9 +40,19 @@
           return;
          }
 
-        if (layerCount != 2) { // PocketCube database has no value in ltm_or_btm
-          let ltm_or_btm = MoveMetrics.getLayerTurnCount(ast,false);
-          computed.set("ltm_or_btm",ltm_or_btm+(data.get("ltm_or_btm").endsWith("*")?"*":""));
+        switch (layerCount) {
+          case 2:
+            break; // PocketCube database has no value in ltm_or_btm
+          case 3: {
+            let ltm_or_btm = MoveMetrics.getLayerTurnCount(ast,false);
+            computed.set("ltm_or_btm",ltm_or_btm+(data.get("ltm_or_btm").endsWith("*")?"*":""));
+            break;
+          }
+          default: {
+            let ltm_or_btm = MoveMetrics.getBlockTurnCount(ast,false);
+            computed.set("ltm_or_btm",ltm_or_btm+(data.get("ltm_or_btm").endsWith("*")?"*":""));
+            break;
+          }
         }
 
         let ftm = MoveMetrics.getFaceTurnCount(ast,false);
@@ -59,17 +69,17 @@
         // only set permutation string if the given permutation does not match the script
         let permCube = Cube.createCube(layerCount);
         let permAst;
-        let permutation = Cubes.toPermutationString(cube, notation);
+        let computedPermutation = Cubes.toPermutationString(cube, notation);
         try {
-          permAst = parser.parse(data.get("permutation"));
-          permAst.applyTo(permCube);
-          if (!permCube.equals(cube)) {
-            computed.set("permutation",permutation);
-          }
-         } catch (e) {
-            //computed.set("permutation", "Error parsing permutation. "+e.message);
-            computed.set("permutation",permutation);
-         }
+            permAst = parser.parse(data.get("permutation"));
+            permAst.applyTo(permCube);
+            if (!permCube.equals(cube)) {
+                computed.set("permutation",computedPermutation);
+            }
+        } catch (e) {
+         computed.set("permutation",computedPermutation);
+        }
+
         return computed;
       }
 
@@ -84,6 +94,17 @@
           return true;
         }
         return false;
+      }
+      /** Returns true if map 'a' contains all non-empty values of map 'b'. */
+      function mapContainsAllNonEmpty(a,b) {
+        for (let [key, value] of b.entries()) {
+          if (value != null && value.length > 0) {
+            if (!a.has(key) || a.get(key)!=value) {
+                return false;
+            }
+          }
+        }
+        return true;
       }
       /** Returns a String representation of the map. */
       function mapToString(map) {
@@ -209,6 +230,7 @@
         headers = headers.trim().replace(/\s+/g,"\t");
         let layerCount = parseInt(document.getElementById("layerCount").value);
         let skipColumns = document.getElementById("skipColumns").value;
+        let ignoreEmptyInputValues = document.getElementById("ignoreEmptyInputValues").value;
         skipColumns = skipColumns.trim().replace(/\s+/g,"\t").split("\t");
 
 
@@ -231,7 +253,7 @@
               document.getElementById("table").replaceWith(table);
             }
             let computed = verifyPatternData(layerCount, data);
-            if (mapsEquals(computed, data)) {
+            if (ignoreEmptyInputValues ? mapContainsAllNonEmpty(computed,data) : mapsEquals(computed, data)) {
                 if (!filterRowsWithDifferences) {
                     addDataRowToTable(tbody, computed);
                 }
@@ -279,6 +301,7 @@ category_de category_en sub_category_de sub_category_en name_en author descripti
       </p>
       <p>
         <input id="filterRowsWithDifferences" type="checkbox" name="filterRowsWithDifferences">Only shows rows that have differences<br>
+        <input id="ignoreEmptyInputValues" type="checkbox" name="ignoreEmptyInputValues">Ignore empty input values<br>
         <p>
         <p>
             <input id="loadButton" type="button" name="load" value="Load">

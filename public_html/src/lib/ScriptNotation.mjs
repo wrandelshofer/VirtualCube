@@ -648,13 +648,14 @@ class DefaultNotation extends Notation {
             this.addMoves(layerCount, all, all, angle, "C", suffix);
 
             // Mid-layer twists
+            let midLayer = Math.floor(layerCount / 2);
             for (let layer = 0; layer < layerCount - 2; layer++) {
                 let innerMiddle = (layerCount % 2 == 0)
-                        ? ((1 << (layer + 1)) - 1) << (layerCount / 2 - (layer + 1) / 2 - (layer + 1) % 2)
-                        : ((1 << (layer + 1)) - 1) << (layerCount / 2 - (layer + 1) / 2);
+                        ? ((1 << (layer + 1)) - 1) << (midLayer - Math.floor((layer + 1) / 2) - (layer + 1) % 2)
+                        : ((1 << (layer + 1)) - 1) << (midLayer - Math.floor((layer + 1) / 2));
                 let outerMiddle = (layerCount % 2 == 0)
-                        ? ((1 << (layer + 1)) - 1) << (layerCount / 2 - (layer + 1) / 2)
-                        : ((1 << (layer + 1)) - 1) << (layerCount / 2 - (layer + 1) / 2);
+                        ? ((1 << (layer + 1)) - 1) << (midLayer - Math.floor((layer + 1) / 2))
+                        : ((1 << (layer + 1)) - 1) << (midLayer - Math.floor((layer + 1) / 2));
                 if (innerMiddle == all) {
                     continue;
                 }
