@@ -654,8 +654,8 @@ class DefaultNotation extends Notation {
                         ? ((1 << (layer + 1)) - 1) << (midLayer - Math.floor((layer + 1) / 2) - (layer + 1) % 2)
                         : ((1 << (layer + 1)) - 1) << (midLayer - Math.floor((layer + 1) / 2));
                 let outerMiddle = (layerCount % 2 == 0)
-                        ? ((1 << (layer + 1)) - 1) << (midLayer - Math.floor((layer + 1) / 2))
-                        : ((1 << (layer + 1)) - 1) << (midLayer - Math.floor((layer + 1) / 2));
+                        ? innerMiddle<<1
+                        : innerMiddle;
                 if (innerMiddle == all) {
                     continue;
                 }
