@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Cubes module: order function</title>
+    <link href="../style/style.css" rel="stylesheet" type="text/css">
+    <link href="../style/virtualcube.css" rel="stylesheet" type="text/css">
+    <script type="module">
+      import Cube from '../lib/Cube.mjs';
+      import Cubes from '../lib/Cubes.mjs';
+      import ScriptNotation from '../lib/ScriptNotation.mjs';
+      import ScriptParser from '../lib/ScriptParser.mjs';
+
+      let tests = document.getElementsByClassName("unittest");
+      let inputs = document.getElementsByClassName("input");
+      let expecteds = document.getElementsByClassName("expected");
+      let actuals = document.getElementsByClassName("actual");
+
+
+      for (let i = 0; i < tests.length; i++) {
+        let input = inputs[i].innerText.split(":");
+        let layerCount = parseInt(input[0]);
+        let script = input[1];
+        let expected = expecteds[i].innerText;
+
+      //  try {
+          let notation = new ScriptNotation.DefaultNotation(layerCount);
+          let parser = new ScriptParser.ScriptParser(notation)
+          let ast = parser.parse(script);
+          let cube = Cube.createCube(layerCount);
+          ast.applyTo(cube);
+          
+          let actual = Cubes.getVisibleOrder(cube)+"v, "+Cubes.getOrder(cube)+"r";
+          actuals[i].innerText = actual;
+          tests[i].classList.add(actual == expected ? "pass" : "fail");
+       /* } catch (err) {
+          actuals[i].innerText = err;
+          tests[i].classList.add("fail");
+        }*/
+      }
+    </script>
+  </head>
+  <body class="responsive">
+  <h1>Tests <code>Cubes.getOrder()</code> and <code>Cubes.getVisibleOrder()</code> functions</h1>
+    <article>
+      <section class="unittest">
+        <p class="input">4:MU2 F2 WR- WF- WR F2 MU2 WR- WF WR</p>
+        <p class="expected">2v, 4r</p>
+        <p class="actual"></p>
+      </section>
+    </article>
+  </body>
+</html>

@@ -661,26 +661,26 @@ function getOrder(cube) {
     return order;
 }
 
-    /**
-     * Returns a number that describes the order
-     * of the permutation of the supplied cube,
-     * assuming that all stickers only have a solid
-     * color, and that all stickers on the same face
-     * have the same color.
-     * <p>
-     * On a cube with such stickers, we can
-     * not visually determine the orientation of its
-     * side parts, and we can not visually determine
-     * a permutation of side parts of which all side
-     * parts are on the same face of the cube.
-     * <p>
-     * The order says how many times the permutation
-     * has to be applied to the cube to get the
-     * initial state.
-     *
-     * @param cube A cube
-     * @return the order of the permutation of the cube
-     */
+/**
+ * Returns a number that describes the order
+ * of the permutation of the supplied cube,
+ * assuming that all stickers only have a solid
+ * color, and that all stickers on the same face
+ * have the same color.
+ * <p>
+ * On a cube with such stickers, we can
+ * not visually determine the orientation of its
+ * side parts, and we can not visually determine
+ * a permutation of side parts of which all side
+ * parts are on the same face of the cube.
+ * <p>
+ * The order says how many times the permutation
+ * has to be applied to the cube to get the
+ * initial state.
+ *
+ * @param cube A cube
+ * @return the order of the permutation of the cube
+ */
 function getVisibleOrder(cube) {
     let cornerLoc = cube.getCornerLocations();
     let cornerOrient = cube.getCornerOrientations();
@@ -711,6 +711,7 @@ function getVisibleOrder(cube) {
             prevOrient = 0;
 
             for (j = 0; cornerLoc[j] != i; j++) {
+                    // search first permuted part
             }
 
             while (!visitedLocs[j]) {
@@ -726,7 +727,6 @@ function getVisibleOrder(cube) {
 
             prevOrient = (prevOrient + cornerOrient[i]) % 3;
             if (prevOrient != 0) {
-                //order = scm(order, 3);
                 length *= 3;
             }
             order = scm(order, length);
@@ -748,6 +748,7 @@ function getVisibleOrder(cube) {
             prevOrient = 0;
 
             for (j = 0; edgeLoc[j] != i; j++) {
+                    // search first permuted part
             }
 
             while (!visitedLocs[j]) {
@@ -762,7 +763,6 @@ function getVisibleOrder(cube) {
             }
 
             if ((prevOrient ^ edgeOrient[i]) == 1) {
-                //order = scm(order, 2);
                 length *= 2;
             }
             order = scm(order, length);
@@ -771,8 +771,8 @@ function getVisibleOrder(cube) {
 
     // Determine cycle lengths of the current side permutation
     // and compute smallest common multiple.
-    // Ignore changes of orientation.
-    // Ignore side permutations which are entirely on same face.
+    // - Ignore changes of orientation.
+    // - Ignore side permutations which are entirely on same face.
     visitedLocs = new Array(sideLoc.length);
     for (i = 0, n = sideLoc.length; i < n; i++) {
         if (!visitedLocs[i]) {
@@ -783,26 +783,48 @@ function getVisibleOrder(cube) {
             length = 1;
 
             visitedLocs[i] = true;
-            let firstFace = sideLoc[i] % 6;
-            let allPartsAreOnSameFace = true;
+            let facesInPermutation = new Array();
+            facesInPermutation.push(sideLoc[i] % 6);
 
             for (j = 0; sideLoc[j] != i; j++) {
+                    // search first permuted part
             }
 
             while (!visitedLocs[j]) {
                 visitedLocs[j] = true;
 
                 length++;
-                if (firstFace != sideLoc[j] % 6) {
-                    allPartsAreOnSameFace = false;
-                }
+                    facesInPermutation.push(sideLoc[j] % 6);
 
                 for (k = 0; sideLoc[k] != j; k++) {
+                        // search next permuted part
                 }
                 j = k;
             }
-            if (!allPartsAreOnSameFace) {
-                order = scm(order, length);
+                if (length > 0) {
+                    // If all parts at a distance of 3 are on the same face, the length can be divided by 3.
+                    // If all parts at a distance of 2 are on the same face, the length can be divided by 2
+                    // If all parts are in the same face, the length can be reduced to 1
+                    let reducedLength = length;
+                    SubcycleSearch:
+                    for (let subcycleLength = 1; subcycleLength < length; subcycleLength++) {
+                        if (subcycleLength > 0 && length % subcycleLength == 0) {
+                            let canReduceLength = true;
+                            for (j = subcycleLength; j < length; j += subcycleLength) {
+                                for (k = 0; k < subcycleLength; k++) {
+                                    if (facesInPermutation[j + k - subcycleLength] != facesInPermutation[j + k]) {
+                                        canReduceLength = false;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (canReduceLength) {
+                                reducedLength = subcycleLength;
+                                break SubcycleSearch;
+                            }
+                        }
+                    }
+                    order = scm(order, reducedLength);
             }
         }
     }
