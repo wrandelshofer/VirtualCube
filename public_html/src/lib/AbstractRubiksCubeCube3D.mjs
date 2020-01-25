@@ -3,7 +3,7 @@
  */
 
 import Cube3D from './Cube3D.mjs';
-import RubiksCube from './RubiksCube.mjs';
+import Cube from './Cube.mjs';
 import CubeAttributes from './CubeAttributes.mjs';
 import SplineInterpolator from './SplineInterpolator.mjs';
 import J3DI from './J3DI.mjs';
@@ -39,7 +39,7 @@ class AbstractRubiksCubeCube3D extends Cube3D.Cube3D {
         this.sideOffset = 8 + 12;
         this.centerOffset = 8 + 12 + 6;
 
-        this.cube = new RubiksCube.RubiksCube();
+        this.cube = Cube.createCube(3);
         this.cube.addCubeListener(this);
         this.attributes = this.createAttributes();
 

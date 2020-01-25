@@ -7,7 +7,7 @@
 // require.js
 // --------------
 import Cube3D from './Cube3D.mjs';
-import PocketCube from './PocketCube.mjs';
+import Cube from './Cube.mjs';
 import CubeAttributes from './CubeAttributes.mjs';
 import SplineInterpolator from './SplineInterpolator.mjs';
 import J3DI from './J3DI.mjs';
@@ -34,7 +34,7 @@ class AbstractPocketCubeCube3D extends Cube3D.Cube3D {
         this.centerOffset = 8;
         this.stickerCount = 4 * 6;
 
-        this.cube = new PocketCube.PocketCube();
+        this.cube = Cube.createCube(2);
         this.cube.addCubeListener(this);
         this.attributes = this.createAttributes();
 

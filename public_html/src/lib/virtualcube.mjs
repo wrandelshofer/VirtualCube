@@ -75,8 +75,6 @@ import Tokenizer from "./Tokenizer.mjs";
 
 import Cube3D from "./Cube3D.mjs";
 import Cube from "./Cube.mjs";
-import RubiksCube from "./RubiksCube.mjs";
-import PocketCube from "./PocketCube.mjs";
 import SplineInterpolator from "./SplineInterpolator.mjs";
 
 // import 3d models of the cubes
