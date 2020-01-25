@@ -15,10 +15,8 @@ import ScriptNotation from './ScriptNotation.mjs';
 import ScriptAST from './ScriptAST.mjs';
 import ScriptParser from './ScriptParser.mjs';
 import Tokenizer from './Tokenizer.mjs';
-import RubiksCubeS1Cube3D from './RubiksCubeS1Cube3D.mjs';
-import RubiksCubeS4Cube3D from './RubiksCubeS4Cube3D.mjs';
-import PocketCubeS1Cube3D from './PocketCubeS1Cube3D.mjs';
-import PocketCubeS4Cube3D from './PocketCubeS4Cube3D.mjs';
+import RubiksCubeCube3D from './RubiksCubeCube3D.mjs';
+import PocketCubeCube3D from './PocketCubeCube3D.mjs';
 
 let logger = {
     log: (false) ? console.log : () => {
@@ -234,40 +232,25 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
         if (isParts) {
             cname = cname.substring(0, cname.length - 6);
         }
-        let isSpecificModel = (cname.lastIndexOf(" s") == cname.length - 3);
-        if (!isSpecificModel) {
-            if (this.useFullModel) {
-                cname = cname + ' s4';
-            } else {
-                cname = cname + ' s2';
-            }
+        let levelOfDetail = parseInt(this.canvas.getAttribute("levelofdetail"));
+        if (isNaN(levelOfDetail)) {
+            levelOfDetail = this.useFullModel ? 4 : 1;
         }
 
         let c3d = null;
         switch (cname) {
-            case "RubiksCube s1" :
-            case "RubiksCube s2" :
-                c3d = new RubiksCubeS1Cube3D.Cube3D();
+            case "RubiksCube" :
+                c3d = RubiksCubeCube3D.createCube3D(levelOfDetail);
                 break;
-            case "RubiksCube s3" :
-            case "RubiksCube s4" :
-            case "RubiksCube s5" :
-                c3d = new RubiksCubeS4Cube3D.Cube3D();
-                break;
-            case "PocketCube s1" :
-            case "PocketCube s2" :
-                c3d = new PocketCubeS1Cube3D.Cube3D();
-                break;
-            case "PocketCube s3" :
-            case "PocketCube s4" :
-                c3d = new PocketCubeS4Cube3D.Cube3D();
+            case "PocketCube" :
+                c3d = PocketCubeCube3D.createCube3D(levelOfDetail);
                 break;
             default :
                 logger.error('illegal cube attribute :' + cname);
                 if (this.useFullModel) {
-                    c3d = new RubiksCubeS4Cube3D.Cube3D();
+                    c3d = RubiksCubeCube3D.createCube(levelOfDetail);
                 } else {
-                    c3d = new RubiksCubeS1Cube3D.Cube3D();
+                    c3d = RubiksCubeCube3D.createCube(levelOfDetail);
                 }
         }
         if (c3d != null) {

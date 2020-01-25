@@ -9,21 +9,8 @@
       import ScriptParser   from '../lib/ScriptParser.mjs';
       import ScriptNotation from '../lib/ScriptNotation.mjs';
       import MoveMetrics    from '../lib/MoveMetrics.mjs';
-      import RubiksCube     from '../lib/RubiksCube.mjs';
-      import PocketCube     from '../lib/PocketCube.mjs';
+      import Cube           from '../lib/Cube.mjs';
       import Cubes          from '../lib/Cubes.mjs';
-
-      /** Creates a cube with the specified number of layers. */
-      function createCube(layerCount) {
-        switch (layerCount) {
-          case 2:
-            return new PocketCube.PocketCube();
-          case 3:
-            return new RubiksCube.RubiksCube();
-          default:
-            throw "Cannot create a cube with "+layerCount+" layers.";
-        }
-      }
 
       /**
        * Verifies if the JavaScript functions compute the same
@@ -64,13 +51,13 @@
         let qtm = MoveMetrics.getQuarterTurnCount(ast,false);
         computed.set("qtm",qtm+(data.get("qtm").endsWith("*")?"*":""));
 
-        let cube = createCube(layerCount);
+        let cube = Cube.createCube(layerCount);
         ast.applyTo(cube);
         let order = Cubes.getVisibleOrder(cube);
         computed.set("order",order+"");
 
         // only set permutation string if the given permutation does not match the script
-        let permCube = createCube(layerCount);
+        let permCube = Cube.createCube(layerCount);
         let permAst;
         let permutation = Cubes.toPermutationString(cube, notation);
         try {

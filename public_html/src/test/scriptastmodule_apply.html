@@ -6,7 +6,7 @@
     <link href="../style/style.css" rel="stylesheet" type="text/css">
     <link href="../style/virtualcube.css" rel="stylesheet" type="text/css">
 <script type="module">
-      import RubiksCube from '../lib/RubiksCube.mjs';
+      import Cube from '../lib/Cube.mjs';
       import Cubes from '../lib/Cubes.mjs';
       import ScriptParser from '../lib/ScriptParser.mjs';
       import ScriptNotation from '../lib/ScriptNotation.mjs';
@@ -18,7 +18,7 @@
 
       let notation = new ScriptNotation.DefaultNotation();
       let parser = new ScriptParser.ScriptParser(notation);
-      let cube = new RubiksCube.RubiksCube();
+      let cube = Cube.createCube(3);
 
       for (let i = 0; i < tests.length; i++) {
       let input = inputs[i].innerText;

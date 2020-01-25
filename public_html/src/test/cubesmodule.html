@@ -6,7 +6,7 @@
     <link href="../style/style.css" rel="stylesheet" type="text/css">
     <link href="../style/virtualcube.css" rel="stylesheet" type="text/css">
 <script type="module">
-      import RubiksCube from '../lib/RubiksCube.mjs';
+      import Cube from '../lib/Cube.mjs';
       import Cubes from '../lib/Cubes.mjs';
       import ScriptNotation from '../lib/ScriptNotation.mjs';
       import ScriptParser from '../lib/ScriptParser.mjs';
@@ -16,7 +16,7 @@
       let expecteds = document.getElementsByClassName("expected");
       let actuals = document.getElementsByClassName("actual");
 
-      let cube = new RubiksCube.RubiksCube();
+      let cube = Cube.createCube(3);
 
       for (let i = 0; i < tests.length; i++) {
         let input = inputs[i].innerText.split(/\s*,\s/);

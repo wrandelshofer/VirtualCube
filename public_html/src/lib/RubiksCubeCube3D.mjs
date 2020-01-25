@@ -1158,12 +1158,76 @@ AbstractRubiksCubeCube3D.prototype.stickerOffsets = [
     6, 7, 7, 7, 8, 7,
     6, 8, 7, 8, 8, 8
 ];
+// ------------------
+class RubiksCubeCube3D extends AbstractRubiksCubeCube3D {
+    /** Constructor
+     * Creates the 3D geometry of a "Rubik's Cube".
+     * You must call loadGeometry() after constructing a new instance.
+     */
+    constructor() {
+        super(1.8);
+    }
+    loadGeometry() {
+        super.loadGeometry();
+    }
 
+    getModelUrl() {
+        return this.baseUrl + '/' + this.relativeUrl;
+    }
+    createAttributes() {
+        let a = new CubeAttributes.CubeAttributes(this.partCount, 6 * 9, [9, 9, 9, 9, 9, 9]);
+        let partsPhong = [0.5, 0.6, 0.4, 16.0];//shiny plastic [ambient, diffuse, specular, shininess]
+        for (let i = 0; i < this.partCount; i++) {
+            a.partsFillColor[i] = [24, 24, 24, 255];
+            a.partsPhong[i] = partsPhong;
+        }
+        a.partsFillColor[this.centerOffset] = [240, 240, 240, 255];
+
+        let faceColors = [//Right, Up, Front, Left, Down, Back
+            [255, 210, 0, 255], // Yellow
+            [0, 51, 115, 255], // Blue
+            [140, 0, 15, 255], // Red
+            [248, 248, 248, 255], // White
+            [0, 115, 47, 255], // Green
+            [255, 70, 0, 255], // Orange
+        ];
+
+        let stickersPhong = [0.8, 0.2, 0.1, 8.0];//shiny paper [ambient, diffuse, specular, shininess]
+
+        for (let i = 0; i < 6; i++) {
+            for (let j = 0; j < 9; j++) {
+                a.stickersFillColor[i * 9 + j] = faceColors[i];
+                a.stickersPhong[i * 9 + j] = stickersPhong;
+            }
+        }
+
+        a.faceCount = 6;
+        a.stickerOffsets = [0, 9, 18, 27, 36, 45];
+        a.stickerCounts = [9, 9, 9, 9, 9, 9];
+
+        return a;
+    }
+}
 
 // ------------------
-// MODULE API    
+function createCube3D(levelOfDetail) {
+  const c = new RubiksCubeCube3D();
+  c.baseUrl = 'lib/';
+  switch (levelOfDetail) {
+    case 1: c.relativeUrl = 'models/rubikscubes1/'; break; // low-res model that should not be taken apart
+    case 2: c.relativeUrl = 'models/rubikscubes4/'; break; // med-res model that should not be taken apart
+    case 3: c.relativeUrl = 'models/rubikscubes4/'; break; // high-res model that should not be taken apart
+    case 4: c.relativeUrl = 'models/rubikscubes4/'; break; // low-res model that can be taken apart
+    case 5: c.relativeUrl = 'models/rubikscubes5/'; break; // med-res model that can be taken apart
+    default: c.relativeUrl = 'models/rubikscubes5/'; break; // high-res model that can be taken apart
+  }
+  return c;
+}
+// ------------------
+// MODULE API
 // ------------------
 export default {
-    AbstractRubiksCubeCube3D: AbstractRubiksCubeCube3D
+    AbstractRubiksCubeCube3D: AbstractRubiksCubeCube3D,
+    createCube3D: createCube3D,
 };
 

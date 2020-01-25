@@ -1,11 +1,7 @@
-/* @(#)AbstractPocketCubeCube3D.mjs  1.0  2014-01-17
- * Copyright (c) 2014 Werner Randelshofer, Switzerland. MIT License.
+/* @(#)PocketCubeCube3D.mjs
+ * Copyright (c) 2018 Werner Randelshofer, Switzerland. MIT License.
  */
-"use strict";
 
-// --------------
-// require.js
-// --------------
 import Cube3D from './Cube3D.mjs';
 import Cube from './Cube.mjs';
 import CubeAttributes from './CubeAttributes.mjs';
@@ -17,7 +13,7 @@ import Node3D from './Node3D.mjs';
 
 /** Constructor
  * Creates the 3D geometry of a Rubik's Cube.
- *  Subclasses must call initAbstractPocketCubeCube3D(). 
+ *  Subclasses must call initAbstractPocketCubeCube3D().
  */
 class AbstractPocketCubeCube3D extends Cube3D.Cube3D {
     constructor(partSize) {
@@ -103,7 +99,7 @@ class AbstractPocketCubeCube3D extends Cube3D.Cube3D {
          */
         let cornerOffset = this.cornerOffset;
 
-        // Move all corner parts to up right front (= position of corner[0]). 
+        // Move all corner parts to up right front (= position of corner[0]).
         // nothing to do
 
         // Rotate the corner parts into place
@@ -128,7 +124,7 @@ class AbstractPocketCubeCube3D extends Cube3D.Cube3D {
         // 7:dlf
         this.identityPartLocations[cornerOffset + 7].rotate(180, 0, 0, 1);
 
-        // ----------------------------         
+        // ----------------------------
         // Reset all rotations
         for (let i = 0; i < this.partCount; i++) {
             this.partLocations[i].matrix.load(this.identityPartLocations[i]);
@@ -136,7 +132,7 @@ class AbstractPocketCubeCube3D extends Cube3D.Cube3D {
     }
 
     loadGeometry() {
-        // ----------------------------         
+        // ----------------------------
         // Load geometry
         let self = this;
         let fRepaint = function () {
@@ -399,7 +395,7 @@ class AbstractPocketCubeCube3D extends Cube3D.Cube3D {
         };
         this.repainter.repaint(f);
     }
-    
+
     /* Immediately completes the current twisting animation. */
      finishTwisting() {
        this.isTwisting=null;
@@ -416,7 +412,7 @@ class AbstractPocketCubeCube3D extends Cube3D.Cube3D {
  * <pre>
  *         +---+---+
  *      ulb|1,0|1,1|ubr
- *         +--- ---+ 
+ *         +--- ---+
  *  ulb ufl|1,2|1,3|urf ubr ubr ubl
  * +---+---+---+---+---+---+---+---+
  * |3,0|3,1|2,0|2,1|0,0|0,1|5,0|5,1|
@@ -432,7 +428,7 @@ class AbstractPocketCubeCube3D extends Cube3D.Cube3D {
  * <pre>
  *         +---+---+
  *      ulb| 4 | 5 |ubr
- *         +--- ---+ 
+ *         +--- ---+
  *  ulb ufl| 6 | 7 |urf ubr ubr ubl
  * +---+---+---+---+---+---+---+---+
  * |12 |13 | 8 | 9 | 0 | 1 |20 |21 |
@@ -449,8 +445,8 @@ class AbstractPocketCubeCube3D extends Cube3D.Cube3D {
  * <pre>
  *         +---+---+
  *      ulb|4.0|2.0|ubr
- *         +--- ---+ 
- *  ulb ufl|6.0|0.0|urf ubr ubr ubl 
+ *         +--- ---+
+ *  ulb ufl|6.0|0.0|urf ubr ubr ubl
  * +---+---+---+---+---+---+---+---+
  * |4.1|6.2|6.1|0.2|0.1|2.2|2.1|4.2|
  * +--- ---+--- ---+--- ---+--- ---+
@@ -473,7 +469,7 @@ AbstractPocketCubeCube3D.prototype.stickerToPartMap = [
 
 /** Maps parts to stickers. This is a two dimensional array. The first
  * dimension is the part index, the second dimension the orientation of
- * the part. 
+ * the part.
  * This map is filled in by the init method!!
  */
 AbstractPocketCubeCube3D.prototype.partToStickerMap = null;
@@ -484,7 +480,7 @@ AbstractPocketCubeCube3D.prototype.partToStickerMap = null;
  * <pre>
  *         +---+---+
  *      ulb|1,0|1,1|ubr
- *         +--- ---+ 
+ *         +--- ---+
  *  ulb ufl|1,2|1,3|urf ubr ubr ubl
  * +---+---+---+---+---+---+---+---+
  * |3,0|3,1|2,0|2,1|0,0|0,1|5,0|5,1|
@@ -500,8 +496,8 @@ AbstractPocketCubeCube3D.prototype.partToStickerMap = null;
  * <pre>
  *         +---+---+
  *      ulb|4.0|2.0|ubr
- *         +--- ---+ 
- *  ulb ufl|6.0|0.0|urf ubr ubr ubl 
+ *         +--- ---+
+ *  ulb ufl|6.0|0.0|urf ubr ubr ubl
  * +---+---+---+---+---+---+---+---+
  * |4.1|6.2|6.1|0.2|0.1|2.2|2.1|4.2|
  * +--- ---+--- ---+--- ---+--- ---+
@@ -584,7 +580,7 @@ AbstractPocketCubeCube3D.prototype.boxSwipeToLayerMap = [
  * the 3D model being used.
  * <pre>
  *   0 1 2 3 4 5
- *      +---+ 
+ *      +---+
  * 0    | U |
  * 1    |   |
  *  +---+---+---+
@@ -616,10 +612,77 @@ AbstractPocketCubeCube3D.prototype.stickerOffsets = [
     4, 5, 5, 5
 ];
 
+/** Constructor
+ * Creates the 3D geometry of a "Pocket Cube".
+ */
+class PocketCubeCube3D extends AbstractPocketCubeCube3D {
+  constructor(loadGeometry) {
+    super(1.8);
+  }
+  loadGeometry() {
+    super.loadGeometry();
+    this.isDrawTwoPass=false;
+  }
+
+  getModelUrl() {
+    return this.baseUrl+'/'+this.relativeUrl;
+  }
+  
+  
+  createAttributes() {
+    let a=new CubeAttributes.CubeAttributes(this.partCount, 6*4, [4,4,4,4,4,4]);
+    let partsPhong=[0.5,0.6,0.4,16.0];//shiny plastic [ambient, diffuse, specular, shininess]
+    for (let i=0;i<this.partCount;i++) {
+      a.partsFillColor[i]=[24,24,24,255];
+      a.partsPhong[i]=partsPhong;
+    }
+    a.partsFillColor[this.centerOffset]=[240,240,240,255];
+    
+  let faceColors=[//Right, Up, Front, Left, Down, Back
+      [255, 210, 0,255], // Yellow
+      [0, 51, 115,255], // Blue
+      [140, 0, 15,255], // Red
+      [248, 248, 248,255], // White
+      [0, 115, 47,255], // Green
+      [255, 70, 0,255], // Orange
+  ];
+    
+    let stickersPhong=[0.8,0.2,0.1,8.0];//shiny paper [ambient, diffuse, specular, shininess]
+   
+    for (let i=0;i<6;i++) {
+      for (let j=0;j<4;j++) {
+        a.stickersFillColor[i*4+j]=faceColors[i];
+        a.stickersPhong[i*4+j]=stickersPhong;
+      }
+    }
+    
+    a.faceCount=6;
+    a.stickerOffsets=[0,4,8,12,16,20];
+    a.stickerCounts=[4,4,4,4,4,4];
+    
+   return a;
+  }
+}
+
+
+function createCube3D(levelOfDetail) {
+  const c = new PocketCubeCube3D();
+  c.baseUrl = 'lib/';
+  switch (levelOfDetail) {
+    case 1: c.relativeUrl = 'models/pocketcubes1/'; break; // low-res model that should not be taken apart
+    case 2: c.relativeUrl = 'models/pocketcubes4/'; break; // med-res model that should not be taken apart
+    case 3: c.relativeUrl = 'models/pocketcubes4/'; break; // high-res model that should not be taken apart
+    case 4: c.relativeUrl = 'models/pocketcubes4/'; break; // low-res model that can be taken apart
+    case 5: c.relativeUrl = 'models/pocketcubes4/'; break; // med-res model that can be taken apart
+    default: c.relativeUrl = 'models/pocketcubes4/'; break; // high-res model that can be taken apart
+  }
+  return c;
+}
 
 // ------------------
 // MODULE API    
 // ------------------
 export default {
-    AbstractPocketCubeCube3D: AbstractPocketCubeCube3D
+  AbstractPocketCubeCube3D: AbstractPocketCubeCube3D,
+  createCube3D : createCube3D,
 };
