@@ -350,10 +350,73 @@ class Cube3D extends Node3D.Node3D {
      }
 }
 
+/**
+ * This function computes sticker offsets for
+ * a texture map which is structured as follows:
+ * <pre>
+ *   0 1 2 3 4 5 6 7 8
+ *        +-----+
+ * 0      |     |
+ * 1      |  U  |
+ * 2      |     |
+ *  +-----+-----+-----+
+ * 3|     |     |     |
+ * 4|  L  |  F  |  R  |
+ * 5|     |     |     |
+ *  +-----+-----+-----+
+ * 6      |     |     |
+ * 7      |  D  |  B  |
+ * 8      |     |     |
+ *        +-----+-----+
+ * </pre>
+ * For a 3x3 cube this function yields the following output:
+ * stickerOffsets = [
+ *   6,3, 7,3, 8,3, //right
+ *   6,4, 7,4, 8,4,
+ *   6,5, 7,5, 8,5,
+ *
+ *   3,0, 4,0, 5,0, //up
+ *   3,1, 4,1, 5,1, //
+ *   3,2, 4,2, 5,2,
+ *
+ *   3,3, 4,3, 5,3, //front
+ *   3,4, 4,4, 5,4,
+ *   3,5, 4,5, 5,5,
+ *
+ *   0,3, 1,3, 2,3, //left
+ *   0,4, 1,4, 2,4,
+ *   0,5, 1,5, 2,5,
+ *
+ *   3,6, 4,6, 5,6, //down
+ *   3,7, 4,7, 5,7,
+ *   3,8, 4,8, 5,8,
+ *
+ *   6,6, 7,6, 8,6, //back
+ *  6,7, 7,7, 8,7,
+ *  6,8, 7,8, 8,8
+ */
+let computeStickerOffsets = function(layerCount) {
+  //                right,  up,    front, left,  down,  back
+  let faceOffsets=[ [2,1],  [1,0], [1,1], [0,1], [1,2], [2,2] ];
+  let a=new Array(6*layerCount*layerCount*2);
+  let i=0;
+  for (let face=0;face<6;face++) {
+    let [offx,offy] = faceOffsets[face];
+    for (let y=0;y<layerCount;y++) {
+      for (let x=0;x<layerCount;x++) {
+        a[i++] = offx*layerCount+x;
+        a[i++] = offy*layerCount+y;
+      }
+    }
+  }
+  return a;
+}
+
 // ------------------
 // MODULE API    
 // ------------------
 export default {
-    Cube3D: Cube3D
+    Cube3D: Cube3D,
+    computeStickerOffsets: computeStickerOffsets,
 };
 

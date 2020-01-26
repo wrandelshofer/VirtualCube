@@ -19,12 +19,13 @@ class AbstractPocketCubeCube3D extends Cube3D.Cube3D {
     constructor(partSize) {
         super();
 
-        this.cubeSize = partSize * 2.2;
+        this.partSize = partSize;
+        this.cubeSize = partSize * 2;
         this.cornerCount = 8;
         this.edgeCount = 0;
         this.sideCount = 0;
         this.centerCount = 1;
-        this.partCount = 8 + 0 + 0 + 1;
+        this.partCount = this.cornerCount + this.edgeCount + this.sideCount + this.centerCount;
         this.cornerOffset = 0;
         this.edgeOffset = 8;
         this.sideOffset = 8;
@@ -73,8 +74,6 @@ class AbstractPocketCubeCube3D extends Cube3D.Cube3D {
             //this.currentDevelopedMatrix[i]=new J3DIMath.J3DIMatrix4();
             this.identityStickerLocations[i] = new J3DIMath.J3DIMatrix4();
         }
-
-        this.partSize = 2.0;
 
         /*
          * Corners
@@ -181,14 +180,14 @@ class AbstractPocketCubeCube3D extends Cube3D.Cube3D {
         s180.setTo(s);
         s180.rotateTexture(180);
 
-        this.stickerObjs[ 0] = s.clone();
-        this.stickerObjs[ 3] = s180.clone();
-        this.stickerObjs[ 8] = s.clone();
-        this.stickerObjs[11] = s180.clone();
-        this.stickerObjs[12] = s.clone();
-        this.stickerObjs[15] = s180.clone();
-        this.stickerObjs[20] = s.clone();
-        this.stickerObjs[23] = s180.clone();
+        this.stickerObjs[ this.partToStickerMap[0][1] ] = s.clone();
+        this.stickerObjs[ this.partToStickerMap[1][1] ] = s180.clone();
+        this.stickerObjs[ this.partToStickerMap[2][1] ] = s.clone();
+        this.stickerObjs[ this.partToStickerMap[3][1] ] = s180.clone();
+        this.stickerObjs[ this.partToStickerMap[4][1] ] = s.clone();
+        this.stickerObjs[ this.partToStickerMap[5][1] ] = s180.clone();
+        this.stickerObjs[ this.partToStickerMap[6][1] ] = s.clone();
+        this.stickerObjs[ this.partToStickerMap[7][1] ] = s180.clone();
 
         this.initAbstractPocketCubeCube3D_textureScales();
     }
@@ -198,14 +197,14 @@ class AbstractPocketCubeCube3D extends Cube3D.Cube3D {
         s180.setTo(s);
         s180.rotateTexture(180);
 
-        this.stickerObjs[ 1] = s.clone();
-        this.stickerObjs[ 2] = s180.clone();
-        this.stickerObjs[ 9] = s.clone();
-        this.stickerObjs[10] = s180.clone();
-        this.stickerObjs[13] = s.clone();
-        this.stickerObjs[14] = s180.clone();
-        this.stickerObjs[21] = s.clone();
-        this.stickerObjs[22] = s180.clone();
+        this.stickerObjs[ this.partToStickerMap[0][2] ] = s.clone();
+        this.stickerObjs[ this.partToStickerMap[1][2] ] = s180.clone();
+        this.stickerObjs[ this.partToStickerMap[2][2] ] = s.clone();
+        this.stickerObjs[ this.partToStickerMap[3][2] ] = s180.clone();
+        this.stickerObjs[ this.partToStickerMap[4][2] ] = s.clone();
+        this.stickerObjs[ this.partToStickerMap[5][2] ] = s180.clone();
+        this.stickerObjs[ this.partToStickerMap[6][2] ] = s.clone();
+        this.stickerObjs[ this.partToStickerMap[7][2] ] = s180.clone();
 
         this.initAbstractPocketCubeCube3D_textureScales();
     }
@@ -221,14 +220,14 @@ class AbstractPocketCubeCube3D extends Cube3D.Cube3D {
         s270.setTo(s);
         s270.rotateTexture(270);
 
-        this.stickerObjs[ 4] = s180.clone();
-        this.stickerObjs[ 5] = s90.clone();
-        this.stickerObjs[ 6] = s270.clone();
-        this.stickerObjs[ 7] = s.clone();
-        this.stickerObjs[16] = s180.clone();
-        this.stickerObjs[17] = s90.clone();
-        this.stickerObjs[18] = s270.clone();
-        this.stickerObjs[19] = s.clone();
+        this.stickerObjs[ this.partToStickerMap[0][0] ] = s.clone();
+        this.stickerObjs[ this.partToStickerMap[1][0] ] = s90.clone();
+        this.stickerObjs[ this.partToStickerMap[2][0] ] = s90.clone();
+        this.stickerObjs[ this.partToStickerMap[3][0] ] = s.clone();
+        this.stickerObjs[ this.partToStickerMap[4][0] ] = s180.clone();
+        this.stickerObjs[ this.partToStickerMap[5][0] ] = s270.clone();
+        this.stickerObjs[ this.partToStickerMap[6][0] ] = s270.clone();
+        this.stickerObjs[ this.partToStickerMap[7][0] ] = s180.clone();
 
         this.initAbstractPocketCubeCube3D_textureScales();
     }
@@ -357,9 +356,9 @@ class AbstractPocketCubeCube3D extends Cube3D.Cube3D {
         let angle = evt.angle;
         let model = this.cube;
 
-        let partIndices = new Array(27);
-        let locations = new Array(27);
-        let orientations = new Array(27);
+        let partIndices = new Array(this.partCount);
+        let locations = new Array(this.partCount);
+        let orientations = new Array(this.partCount);
         let count = 0;
 
         let affectedParts = evt.getAffectedLocations();
@@ -593,32 +592,14 @@ AbstractPocketCubeCube3D.prototype.boxSwipeToLayerMap = [
  *      +---+---+
  * </pre>
  */
-AbstractPocketCubeCube3D.prototype.stickerOffsets = [
-    4, 2, 5, 2, //right
-    4, 3, 5, 3,
-
-    2, 0, 3, 0, //up
-    2, 1, 3, 1,
-
-    2, 2, 3, 2, //front
-    2, 3, 3, 3,
-
-    0, 2, 1, 2, //left
-    0, 3, 1, 3,
-
-    2, 4, 3, 4, //down
-    2, 5, 3, 5,
-
-    4, 4, 5, 4, //back
-    4, 5, 5, 5
-];
+AbstractPocketCubeCube3D.prototype.stickerOffsets = Cube3D.computeStickerOffsets(2);
 
 /** Constructor
  * Creates the 3D geometry of a "Pocket Cube".
  */
 class PocketCubeCube3D extends AbstractPocketCubeCube3D {
   constructor(loadGeometry) {
-    super(1.8);
+    super(2.0);
   }
   loadGeometry() {
     super.loadGeometry();
@@ -650,16 +631,14 @@ class PocketCubeCube3D extends AbstractPocketCubeCube3D {
     
     let stickersPhong=[0.8,0.2,0.1,8.0];//shiny paper [ambient, diffuse, specular, shininess]
    
+    let layerCount = this.cube.getLayerCount();
+    let stickersPerFace = layerCount*layerCount;
     for (let i=0;i<6;i++) {
-      for (let j=0;j<4;j++) {
-        a.stickersFillColor[i*4+j]=faceColors[i];
-        a.stickersPhong[i*4+j]=stickersPhong;
+      for (let j=0;j<stickersPerFace;j++) {
+        a.stickersFillColor[i*stickersPerFace+j]=faceColors[i];
+        a.stickersPhong[i*stickersPerFace+j]=stickersPhong;
       }
     }
-    
-    a.faceCount=6;
-    a.stickerOffsets=[0,4,8,12,16,20];
-    a.stickerCounts=[4,4,4,4,4,4];
     
    return a;
   }

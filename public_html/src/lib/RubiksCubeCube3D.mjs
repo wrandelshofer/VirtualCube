@@ -29,6 +29,8 @@ let module = {
 class AbstractRubiksCubeCube3D extends Cube3D.Cube3D {
     constructor(partSize) {
         super();
+
+        this.partSize = partSize;
         this.cubeSize = partSize * 3;
 
         this.cornerCount = 8;
@@ -84,7 +86,6 @@ class AbstractRubiksCubeCube3D extends Cube3D.Cube3D {
             //this.currentDevelopedMatrix[i]=new J3DIMath.J3DIMatrix4();
             this.identityStickerLocations[i] = new J3DIMath.J3DIMatrix4();
         }
-        this.partSize = (partSize === undefined) ? 2.0 : partSize;
 
         /* Corners
          *             +---+---+---+
@@ -135,135 +136,6 @@ class AbstractRubiksCubeCube3D extends Cube3D.Cube3D {
         // 7:dlf
         this.identityPartLocations[cornerOffset + 7].rotate(180, 0, 0, 1);
 
-        // Move all corner stickers to 0.0 (to up at the urf corner)
-        // 0:urf
-        //this.stickers[17].matrix.makeIdentity();
-        this.stickers[0].matrix.rotate(-90, 0, 1, 0);
-        this.stickers[0].matrix.rotate(90, 0, 0, 1);
-        this.stickers[20].matrix.rotate(90, 0, 1, 0);
-        this.stickers[20].matrix.rotate(90, 1, 0, 0);
-        // 1:dfr
-        //this.stickers[38].matrix.makeIdentity();
-        this.stickers[26].matrix.rotate(-90, 0, 1, 0);
-        this.stickers[26].matrix.rotate(90, 0, 0, 1);
-        this.stickers[ 6].matrix.rotate(90, 0, 1, 0);
-        this.stickers[ 6].matrix.rotate(90, 1, 0, 0);
-        // 2:ubr
-        //this.stickers[11].matrix.makeIdentity();
-        this.stickers[45].matrix.rotate(-90, 0, 1, 0);
-        this.stickers[45].matrix.rotate(90, 0, 0, 1);
-        this.stickers[2].matrix.rotate(90, 0, 1, 0);
-        this.stickers[2].matrix.rotate(90, 1, 0, 0);
-        // 3:drb
-        //this.stickers[44].matrix.makeIdentity();
-        this.stickers[8].matrix.rotate(-90, 0, 1, 0);
-        this.stickers[8].matrix.rotate(90, 0, 0, 1);
-        this.stickers[51].matrix.rotate(90, 0, 1, 0);
-        this.stickers[51].matrix.rotate(90, 1, 0, 0);
-        // 4:ulb
-        //this.stickers[9].matrix.makeIdentity();
-        this.stickers[27].matrix.rotate(-90, 0, 1, 0);
-        this.stickers[27].matrix.rotate(90, 0, 0, 1);
-        this.stickers[47].matrix.rotate(90, 0, 1, 0);
-        this.stickers[47].matrix.rotate(90, 1, 0, 0);
-        // 5:dbl
-        //this.stickers[42].matrix.makeIdentity();
-        this.stickers[53].matrix.rotate(-90, 0, 1, 0);
-        this.stickers[53].matrix.rotate(90, 0, 0, 1);
-        this.stickers[33].matrix.rotate(90, 0, 1, 0);
-        this.stickers[33].matrix.rotate(90, 1, 0, 0);
-        // 6:ufl
-        //this.stickers[15].matrix.makeIdentity();
-        this.stickers[18].matrix.rotate(-90, 0, 1, 0);
-        this.stickers[18].matrix.rotate(90, 0, 0, 1);
-        this.stickers[29].matrix.rotate(90, 0, 1, 0);
-        this.stickers[29].matrix.rotate(90, 1, 0, 0);
-        // 7:dlf
-        //this.stickers[36].matrix.makeIdentity();
-        this.stickers[35].matrix.rotate(-90, 0, 1, 0);
-        this.stickers[35].matrix.rotate(90, 0, 0, 1);
-        this.stickers[24].matrix.rotate(90, 0, 1, 0);
-        this.stickers[24].matrix.rotate(90, 1, 0, 0);
-
-
-        // Move the corner stickers into place
-        // 0:urf
-        this.identityStickerLocations[17].translate(0, ps * 3, 0);
-        this.identityStickerLocations[17].rotate(-90, 1, 0, 0);
-        this.identityStickerLocations[ 0].translate(ps * 3, 0, 0);
-        this.identityStickerLocations[ 0].rotate(180, 0, 0, 1);
-        this.identityStickerLocations[ 0].rotate(-90, 1, 0, 0);
-        this.identityStickerLocations[20].rotate(-90, 1, 0, 0);
-        this.identityStickerLocations[20].rotate(-90, 0, 1, 0);
-
-        // 1:dfr
-        this.identityStickerLocations[38].translate(0, ps * -3, 0);
-        this.identityStickerLocations[38].rotate(90, 0, 0, 1);
-        this.identityStickerLocations[38].rotate(-90, 1, 0, 0);
-        this.identityStickerLocations[26].rotate(-90, 1, 0, 0);
-        this.identityStickerLocations[ 6].translate(ps * 3, 0, 0);
-        this.identityStickerLocations[ 6].rotate(-90, 0, 0, 1);
-        this.identityStickerLocations[ 6].rotate(-90, 1, 0, 0);
-
-        // 2:ubr
-        this.identityStickerLocations[11].translate(0, ps * 3, 0);
-        this.identityStickerLocations[11].rotate(90, 0, 0, 1);
-        this.identityStickerLocations[11].rotate(-90, 1, 0, 0);
-        this.identityStickerLocations[45].translate(ps * 6, 0, 0);
-        this.identityStickerLocations[45].rotate(180, 0, 0, 1);
-        this.identityStickerLocations[45].rotate(-90, 1, 0, 0);
-        this.identityStickerLocations[ 2].translate(ps * 3, 0, 0);
-        this.identityStickerLocations[ 2].rotate(90, 0, 0, 1);
-        this.identityStickerLocations[ 2].rotate(-90, 1, 0, 0);
-
-        // 3:drb
-        this.identityStickerLocations[44].translate(0, ps * -3, 0);
-        this.identityStickerLocations[44].rotate(-90, 1, 0, 0);
-        this.identityStickerLocations[ 8].translate(ps * 3, 0, 0);
-        this.identityStickerLocations[ 8].rotate(-90, 1, 0, 0);
-        this.identityStickerLocations[51].translate(ps * 6, 0, 0);
-        this.identityStickerLocations[51].rotate(-90, 0, 0, 1);
-        this.identityStickerLocations[51].rotate(-90, 1, 0, 0);
-
-        // 4:ulb
-        this.identityStickerLocations[ 9].translate(0, ps * 3, 0);
-        this.identityStickerLocations[ 9].rotate(180, 0, 0, 1);
-        this.identityStickerLocations[ 9].rotate(-90, 1, 0, 0);
-        this.identityStickerLocations[27].translate(ps * -3, 0, 0);
-        this.identityStickerLocations[27].rotate(180, 0, 0, 1);
-        this.identityStickerLocations[27].rotate(-90, 1, 0, 0);
-        this.identityStickerLocations[47].translate(ps * 6, 0, 0);
-        this.identityStickerLocations[47].rotate(90, 0, 0, 1);
-        this.identityStickerLocations[47].rotate(-90, 1, 0, 0);
-
-        // 5:dbl
-        this.identityStickerLocations[42].translate(0, ps * -3, 0);
-        this.identityStickerLocations[42].rotate(-90, 0, 0, 1);
-        this.identityStickerLocations[42].rotate(-90, 1, 0, 0);
-        this.identityStickerLocations[53].translate(ps * 6, 0, 0);
-        this.identityStickerLocations[53].rotate(-90, 1, 0, 0);
-        this.identityStickerLocations[33].translate(ps * -3, 0, 0);
-        this.identityStickerLocations[33].rotate(-90, 0, 0, 1);
-        this.identityStickerLocations[33].rotate(-90, 1, 0, 0);
-
-        // 6:ufl
-        this.identityStickerLocations[15].translate(0, ps * 3, 0);
-        this.identityStickerLocations[15].rotate(-90, 0, 0, 1);
-        this.identityStickerLocations[15].rotate(-90, 1, 0, 0);
-        this.identityStickerLocations[18].rotate(180, 0, 0, 1);
-        this.identityStickerLocations[18].rotate(-90, 1, 0, 0);
-        this.identityStickerLocations[29].translate(ps * -3, 0, 0);
-        this.identityStickerLocations[29].rotate(90, 0, 0, 1);
-        this.identityStickerLocations[29].rotate(-90, 1, 0, 0);
-
-        // 7:dlf
-        this.identityStickerLocations[36].translate(0, ps * -3, 0);
-        this.identityStickerLocations[36].rotate(180, 0, 0, 1);
-        this.identityStickerLocations[36].rotate(-90, 1, 0, 0);
-        this.identityStickerLocations[35].translate(ps * -3, 0, 0);
-        this.identityStickerLocations[35].rotate(-90, 1, 0, 0);
-        this.identityStickerLocations[24].rotate(-90, 0, 0, 1);
-        this.identityStickerLocations[24].rotate(-90, 1, 0, 0);
         //
         /* Edges
          *             +---+---+---+
@@ -326,120 +198,6 @@ class AbstractRubiksCubeCube3D extends Cube3D.Cube3D {
         this.identityPartLocations[edgeOffset + 11].rotate(90, 0, 0, -1);
         this.identityPartLocations[edgeOffset + 11].rotate(-90, 1, 0, 0);
 
-        // Move all edge stickers to 0.0 (to up at the ur corner)
-        // ur
-        this.stickers[1].matrix.rotate(180, 0, 1, 0);
-        this.stickers[1].matrix.rotate(90, 0, 0, 1);
-        // rf
-        this.stickers[23].matrix.rotate(180, 0, 1, 0);
-        this.stickers[23].matrix.rotate(90, 0, 0, 1);
-        // dr
-        this.stickers[7].matrix.rotate(180, 0, 1, 0);
-        this.stickers[7].matrix.rotate(90, 0, 0, 1);
-        // bu
-        this.stickers[10].matrix.rotate(180, 0, 1, 0);
-        this.stickers[10].matrix.rotate(90, 0, 0, 1);
-        // rb
-        this.stickers[48].matrix.rotate(180, 0, 1, 0);
-        this.stickers[48].matrix.rotate(90, 0, 0, 1);
-        // bd
-        this.stickers[43].matrix.rotate(180, 0, 1, 0);
-        this.stickers[43].matrix.rotate(90, 0, 0, 1);
-        // ul
-        this.stickers[28].matrix.rotate(180, 0, 1, 0);
-        this.stickers[28].matrix.rotate(90, 0, 0, 1);
-        // lb
-        this.stickers[50].matrix.rotate(180, 0, 1, 0);
-        this.stickers[50].matrix.rotate(90, 0, 0, 1);
-        // dl
-        this.stickers[34].matrix.rotate(180, 0, 1, 0);
-        this.stickers[34].matrix.rotate(90, 0, 0, 1);
-        // fu
-        this.stickers[16].matrix.rotate(180, 0, 1, 0);
-        this.stickers[16].matrix.rotate(90, 0, 0, 1);
-        // lf
-        this.stickers[21].matrix.rotate(180, 0, 1, 0);
-        this.stickers[21].matrix.rotate(90, 0, 0, 1);
-        // fd
-        this.stickers[37].matrix.rotate(180, 0, 1, 0);
-        this.stickers[37].matrix.rotate(90, 0, 0, 1);
-
-        // Rotate the edge stickers into place
-        // ur
-        this.identityStickerLocations[14].translate(0, ps * 3, 0);
-        this.identityStickerLocations[14].rotate(-90, 1, 0, 0); // @23
-        this.identityStickerLocations[ 1].translate(ps * 3, 0, 0);
-        this.identityStickerLocations[ 1].rotate(90, 0, 0, 1); // @19
-        this.identityStickerLocations[ 1].rotate(-90, 1, 0, 0); // @23
-        // rf
-        this.identityStickerLocations[ 3].translate(ps * 3, 0, 0);
-        this.identityStickerLocations[ 3].rotate(180, 0, 0, 1); // 
-        this.identityStickerLocations[ 3].rotate(-90, 1, 0, 0); // @23
-        this.identityStickerLocations[23].rotate(-90, 1, 0, 0); // @23
-        // dr
-        this.identityStickerLocations[41].translate(0, ps * -3, 0);
-        this.identityStickerLocations[41].rotate(-90, 1, 0, 0); // @23
-        this.identityStickerLocations[ 7].translate(ps * 3, 0, 0);
-        this.identityStickerLocations[ 7].rotate(-90, 0, 0, 1); // @25
-        this.identityStickerLocations[ 7].rotate(-90, 1, 0, 0); // @23 
-        // bu
-        this.identityStickerLocations[46].translate(ps * 6, ps * 0, 0);
-        this.identityStickerLocations[46].rotate(90, 0, 0, 1); // @19
-        this.identityStickerLocations[46].rotate(-90, 1, 0, 0); // @23
-        this.identityStickerLocations[10].translate(ps * 0, ps * 3, 0);
-        this.identityStickerLocations[10].rotate(90, 0, 0, 1); // @19
-        this.identityStickerLocations[10].rotate(-90, 1, 0, 0); // @23
-        // rb
-        this.identityStickerLocations[ 5].translate(ps * 3, 0, 0);
-        this.identityStickerLocations[ 5].rotate(-90, 1, 0, 0); // @23
-        this.identityStickerLocations[48].translate(ps * 6, 0, 0);
-        this.identityStickerLocations[48].rotate(180, 0, 0, 1); // @21
-        this.identityStickerLocations[48].rotate(-90, 1, 0, 0); // @23
-        // bd
-        this.identityStickerLocations[52].translate(ps * 6, ps * 0, 0);
-        this.identityStickerLocations[52].rotate(90, 0, 0, -1); // @25
-        this.identityStickerLocations[52].rotate(-90, 1, 0, 0); // @23
-        this.identityStickerLocations[43].translate(ps * 0, ps * -3, 0);
-        this.identityStickerLocations[43].rotate(-90, 0, 0, 1); // @25
-        this.identityStickerLocations[43].rotate(-90, 1, 0, 0); // @23
-        // ul
-        this.identityStickerLocations[12].translate(ps * 0, ps * 3, 0);
-        this.identityStickerLocations[12].rotate(180, 0, 0, 1); // @21
-        this.identityStickerLocations[12].rotate(-90, 1, 0, 0); // @23
-        this.identityStickerLocations[28].translate(ps * -3, ps * 0, 0);
-        this.identityStickerLocations[28].rotate(90, 0, 0, 1); // @19
-        this.identityStickerLocations[28].rotate(-90, 1, 0, 0); // @23
-        // lb
-        this.identityStickerLocations[30].translate(ps * -3, ps * 0, 0);
-        this.identityStickerLocations[30].rotate(180, 0, 0, 1); // @21
-        this.identityStickerLocations[30].rotate(-90, 1, 0, 0); // @23
-        this.identityStickerLocations[50].translate(ps * 6, ps * 0, 0);
-        this.identityStickerLocations[50].rotate(-90, 1, 0, 0); // @23
-        // dl
-        this.identityStickerLocations[39].translate(ps * 0, ps * -3, 0);
-        this.identityStickerLocations[39].rotate(180, 0, 0, 1); // @21
-        this.identityStickerLocations[39].rotate(-90, 1, 0, 0); // @23
-        this.identityStickerLocations[34].translate(ps * -3, ps * 0, 0);
-        this.identityStickerLocations[34].rotate(-90, 0, 0, 1); // @25
-        this.identityStickerLocations[34].rotate(-90, 1, 0, 0); // @23
-        // fu
-        this.identityStickerLocations[19].translate(ps * 0, ps * -0, 0);
-        this.identityStickerLocations[19].rotate(90, 0, 0, 1); // @19
-        this.identityStickerLocations[19].rotate(-90, 1, 0, 0); // @23
-        this.identityStickerLocations[16].translate(ps * 0, ps * 3, 0);
-        this.identityStickerLocations[16].rotate(-90, 0, 0, 1); // @25
-        this.identityStickerLocations[16].rotate(-90, 1, 0, 0); // @23
-        // lf
-        this.identityStickerLocations[32].translate(ps * -3, ps * -0, 0);
-        this.identityStickerLocations[32].rotate(-90, 1, 0, 0); // @23
-        this.identityStickerLocations[21].rotate(180, 0, 0, 1); // @21
-        this.identityStickerLocations[21].rotate(-90, 1, 0, 0); // @23
-        // fd
-        this.identityStickerLocations[25].rotate(90, 0, 0, -1); // @21
-        this.identityStickerLocations[25].rotate(-90, 1, 0, 0); // @23
-        this.identityStickerLocations[37].translate(ps * 0, ps * -3, 0);
-        this.identityStickerLocations[37].rotate(90, 0, 0, 1); // @19
-        this.identityStickerLocations[37].rotate(-90, 1, 0, 0); // @23
         /* Sides
          *             +------------+
          *             |     .1     |
@@ -485,38 +243,6 @@ class AbstractRubiksCubeCube3D extends Cube3D.Cube3D {
         this.identityPartLocations[sideOffset + 5].rotate(90, 0, -1, 0);
         this.identityPartLocations[sideOffset + 5].rotate(180, 1, 0, 0);
 
-        // Rotate the side stickers into place
-        // r
-        this.identityStickerLocations[4].translate(3 * partSize, 0, 0);
-        this.identityStickerLocations[4].rotate(90, 0, 1, 0);
-        // u
-        this.identityStickerLocations[13].translate(0, 3 * partSize, 0);
-        this.identityStickerLocations[13].rotate(90, 0, 1, 0);
-        this.identityStickerLocations[13].rotate(180, 1, 0, 0);
-        // f
-        this.identityStickerLocations[22].rotate(90, 0, 1, 0);
-        this.identityStickerLocations[22].rotate(90, 1, 0, 0);
-        // l
-        this.identityStickerLocations[31].translate(-3 * partSize, 0, 0);
-        this.identityStickerLocations[31].rotate(90, 0, 1, 0);
-        this.identityStickerLocations[31].rotate(-90, 1, 0, 0);
-        // d
-        this.identityStickerLocations[40].translate(0, -3 * partSize, 0);
-        this.identityStickerLocations[40].rotate(90, 0, 1, 0);
-        this.identityStickerLocations[40].rotate(-90, 1, 0, 0);
-        // b
-        this.identityStickerLocations[49].translate(6 * partSize, 0, 0);
-        this.identityStickerLocations[49].rotate(90, 0, 1, 0);
-        this.identityStickerLocations[49].rotate(180, 1, 0, 0);
-
-        // ----------------------------         
-        // Reset all rotations
-        for (let i = 0; i < this.partCount; i++) {
-            this.partLocations[i].matrix.load(this.identityPartLocations[i]);
-        }
-        for (let i = 0; i < this.stickerCount; i++) {
-            this.stickerLocations[i].matrix.load(this.identityStickerLocations[i]);
-        }
     }
 
     loadGeometry() {
@@ -584,14 +310,15 @@ class AbstractRubiksCubeCube3D extends Cube3D.Cube3D {
         s180.setTo(s);
         s180.rotateTexture(180);
 
-        this.stickerObjs[ 0] = s.clone();
-        this.stickerObjs[ 8] = s180.clone();
-        this.stickerObjs[18] = s.clone();
-        this.stickerObjs[26] = s180.clone();
-        this.stickerObjs[27] = s.clone();
-        this.stickerObjs[35] = s180.clone();
-        this.stickerObjs[45] = s.clone();
-        this.stickerObjs[53] = s180.clone();
+        let o=this.cornerOffset;
+        this.stickerObjs[ this.partToStickerMap[o+0][1] ] = s.clone();
+        this.stickerObjs[ this.partToStickerMap[o+1][1] ] = s180.clone();
+        this.stickerObjs[ this.partToStickerMap[o+2][1] ] = s.clone();
+        this.stickerObjs[ this.partToStickerMap[o+3][1] ] = s180.clone();
+        this.stickerObjs[ this.partToStickerMap[o+4][1] ] = s.clone();
+        this.stickerObjs[ this.partToStickerMap[o+5][1] ] = s180.clone();
+        this.stickerObjs[ this.partToStickerMap[o+6][1] ] = s.clone();
+        this.stickerObjs[ this.partToStickerMap[o+7][1] ] = s180.clone();
 
         this.initAbstractRubiksCubeCube3D_textureScales();
     }
@@ -601,14 +328,15 @@ class AbstractRubiksCubeCube3D extends Cube3D.Cube3D {
         s180.setTo(s);
         s180.rotateTexture(180);
 
-        this.stickerObjs[ 2] = s.clone();
-        this.stickerObjs[ 6] = s180.clone();
-        this.stickerObjs[20] = s.clone();
-        this.stickerObjs[24] = s180.clone();
-        this.stickerObjs[29] = s.clone();
-        this.stickerObjs[33] = s180.clone();
-        this.stickerObjs[47] = s.clone();
-        this.stickerObjs[51] = s180.clone();
+        let o=this.cornerOffset;
+        this.stickerObjs[ this.partToStickerMap[o+0][2] ] = s.clone();
+        this.stickerObjs[ this.partToStickerMap[o+1][2] ] = s180.clone();
+        this.stickerObjs[ this.partToStickerMap[o+2][2] ] = s.clone();
+        this.stickerObjs[ this.partToStickerMap[o+3][2] ] = s180.clone();
+        this.stickerObjs[ this.partToStickerMap[o+4][2] ] = s.clone();
+        this.stickerObjs[ this.partToStickerMap[o+5][2] ] = s180.clone();
+        this.stickerObjs[ this.partToStickerMap[o+6][2] ] = s.clone();
+        this.stickerObjs[ this.partToStickerMap[o+7][2] ] = s180.clone();
 
         this.initAbstractRubiksCubeCube3D_textureScales();
     }
@@ -624,14 +352,15 @@ class AbstractRubiksCubeCube3D extends Cube3D.Cube3D {
         s270.setTo(s);
         s270.rotateTexture(270);
 
-        this.stickerObjs[ 9] = s180.clone();
-        this.stickerObjs[11] = s90.clone();
-        this.stickerObjs[15] = s270.clone();
-        this.stickerObjs[17] = s.clone();
-        this.stickerObjs[36] = s180.clone();
-        this.stickerObjs[38] = s90.clone();
-        this.stickerObjs[42] = s270.clone();
-        this.stickerObjs[44] = s.clone();
+        let o=this.cornerOffset;
+        this.stickerObjs[ this.partToStickerMap[o+0][0] ] = s.clone();
+        this.stickerObjs[ this.partToStickerMap[o+1][0] ] = s90.clone();
+        this.stickerObjs[ this.partToStickerMap[o+2][0] ] = s90.clone();
+        this.stickerObjs[ this.partToStickerMap[o+3][0] ] = s.clone();
+        this.stickerObjs[ this.partToStickerMap[o+4][0] ] = s180.clone();
+        this.stickerObjs[ this.partToStickerMap[o+5][0] ] = s270.clone();
+        this.stickerObjs[ this.partToStickerMap[o+6][0] ] = s270.clone();
+        this.stickerObjs[ this.partToStickerMap[o+7][0] ] = s180.clone();
 
         this.initAbstractRubiksCubeCube3D_textureScales();
     }
@@ -647,18 +376,19 @@ class AbstractRubiksCubeCube3D extends Cube3D.Cube3D {
         s270.setTo(s);
         s270.rotateTexture(270);
 
-        this.stickerObjs[12] = s180.clone();
-        this.stickerObjs[14] = s.clone();
-        this.stickerObjs[19] = s90.clone();
-        this.stickerObjs[46] = s90.clone();
-        this.stickerObjs[30] = s180.clone();
-        this.stickerObjs[32] = s.clone();
-        this.stickerObjs[ 3] = s180.clone();
-        this.stickerObjs[ 5] = s.clone();
-        this.stickerObjs[25] = s270.clone();
-        this.stickerObjs[52] = s270.clone();
-        this.stickerObjs[39] = s180.clone();
-        this.stickerObjs[41] = s.clone();
+        let o=this.edgeOffset;
+        this.stickerObjs[ this.partToStickerMap[o+0][0] ] = s.clone();
+        this.stickerObjs[ this.partToStickerMap[o+1][0] ] = s180.clone();
+        this.stickerObjs[ this.partToStickerMap[o+2][0] ] = s.clone();
+        this.stickerObjs[ this.partToStickerMap[o+3][0] ] = s90.clone();
+        this.stickerObjs[ this.partToStickerMap[o+4][0] ] = s.clone();
+        this.stickerObjs[ this.partToStickerMap[o+5][0] ] = s270.clone();
+        this.stickerObjs[ this.partToStickerMap[o+6][0] ] = s180.clone();
+        this.stickerObjs[ this.partToStickerMap[o+7][0] ] = s180.clone();
+        this.stickerObjs[ this.partToStickerMap[o+8][0] ] = s180.clone();
+        this.stickerObjs[ this.partToStickerMap[o+9][0] ] = s90.clone();
+        this.stickerObjs[ this.partToStickerMap[o+10][0] ] = s.clone();
+        this.stickerObjs[ this.partToStickerMap[o+11][0] ] = s270.clone();
 
         this.initAbstractRubiksCubeCube3D_textureScales();
     }
@@ -674,18 +404,19 @@ class AbstractRubiksCubeCube3D extends Cube3D.Cube3D {
         s270.setTo(s);
         s270.rotateTexture(270);
 
-        this.stickerObjs[ 1] = s.clone();
-        this.stickerObjs[10] = s.clone();
-        this.stickerObjs[16] = s180.clone();
-        this.stickerObjs[28] = s.clone();
-        this.stickerObjs[34] = s180.clone();
-        this.stickerObjs[ 7] = s180.clone();
-        this.stickerObjs[21] = s90.clone();
-        this.stickerObjs[23] = s270.clone();
-        this.stickerObjs[48] = s90.clone();
-        this.stickerObjs[50] = s270.clone();
-        this.stickerObjs[37] = s.clone();
-        this.stickerObjs[43] = s180.clone();
+        let o=this.edgeOffset;
+        this.stickerObjs[ this.partToStickerMap[o+0][1] ] = s.clone();
+        this.stickerObjs[ this.partToStickerMap[o+1][1] ] = s270.clone();
+        this.stickerObjs[ this.partToStickerMap[o+2][1] ] = s180.clone();
+        this.stickerObjs[ this.partToStickerMap[o+3][1] ] = s.clone();
+        this.stickerObjs[ this.partToStickerMap[o+4][1] ] = s90.clone();
+        this.stickerObjs[ this.partToStickerMap[o+5][1] ] = s180.clone();
+        this.stickerObjs[ this.partToStickerMap[o+6][1] ] = s.clone();
+        this.stickerObjs[ this.partToStickerMap[o+7][1] ] = s270.clone();
+        this.stickerObjs[ this.partToStickerMap[o+8][1] ] = s180.clone();
+        this.stickerObjs[ this.partToStickerMap[o+9][1] ] = s180.clone();
+        this.stickerObjs[ this.partToStickerMap[o+10][1] ] = s90.clone();
+        this.stickerObjs[ this.partToStickerMap[o+11][1] ] = s.clone();
 
         this.initAbstractRubiksCubeCube3D_textureScales();
     }
@@ -861,9 +592,9 @@ class AbstractRubiksCubeCube3D extends Cube3D.Cube3D {
         let angle = evt.angle;
         let model = this.cube;
 
-        let partIndices = new Array(27);
-        let locations = new Array(27);
-        let orientations = new Array(27);
+        let partIndices = new Array(this.partCount);
+        let locations = new Array(this.partCount);
+        let orientations = new Array(this.partCount);
         let count = 0;
 
         let affectedParts = evt.getAffectedLocations();
@@ -1135,31 +866,8 @@ AbstractRubiksCubeCube3D.prototype.boxSwipeToLayerMap = [
  *        +-----+-----+
  * </pre>
  */
-AbstractRubiksCubeCube3D.prototype.stickerOffsets = [
-    6, 3, 7, 3, 8, 3, //right
-    6, 4, 7, 4, 8, 4,
-    6, 5, 7, 5, 8, 5,
+AbstractRubiksCubeCube3D.prototype.stickerOffsets = Cube3D.computeStickerOffsets(3);
 
-    3, 0, 4, 0, 5, 0, //up
-    3, 1, 4, 1, 5, 1, //
-    3, 2, 4, 2, 5, 2,
-
-    3, 3, 4, 3, 5, 3, //front
-    3, 4, 4, 4, 5, 4,
-    3, 5, 4, 5, 5, 5,
-
-    0, 3, 1, 3, 2, 3, //left
-    0, 4, 1, 4, 2, 4,
-    0, 5, 1, 5, 2, 5,
-
-    3, 6, 4, 6, 5, 6, //down
-    3, 7, 4, 7, 5, 7,
-    3, 8, 4, 8, 5, 8,
-
-    6, 6, 7, 6, 8, 6, //back
-    6, 7, 7, 7, 8, 7,
-    6, 8, 7, 8, 8, 8
-];
 // ------------------
 class RubiksCubeCube3D extends AbstractRubiksCubeCube3D {
     /** Constructor
@@ -1202,10 +910,6 @@ class RubiksCubeCube3D extends AbstractRubiksCubeCube3D {
                 a.stickersPhong[i * 9 + j] = stickersPhong;
             }
         }
-
-        a.faceCount = 6;
-        a.stickerOffsets = [0, 9, 18, 27, 36, 45];
-        a.stickerCounts = [9, 9, 9, 9, 9, 9];
 
         return a;
     }

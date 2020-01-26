@@ -13,7 +13,7 @@
  * Holds the attributes of a Rubik's Cube like puzzle.
  */
 class CubeAttributes {
-  constructor(partCount, stickerCount, stickerCountPerFace) {
+  constructor(partCount, stickerCount, stickerCounts) {
     this. alpha = (-25 / 180.0 * Math.PI);
     this. beta = (45  / 180.0 * Math.PI);
 
@@ -23,7 +23,7 @@ class CubeAttributes {
     this.stickersVisible = new Array(stickerCount);//boolean
     this.stickersFillColor = new Array(stickerCount);//[r,g,b,a]
     this.stickersPhong = new Array(stickerCount);//[ambient, diffuse, specular, shininess]
-    this.stickerCountPerFace = stickerCountPerFace;//integer
+    this.stickerCounts = stickerCounts;//integer array for each face
     this.partExplosion = new Array(partCount);//float
     this.stickerExplosion = new Array(stickerCount);//float
     this.xRot=-25;
@@ -44,20 +44,23 @@ class CubeAttributes {
     
     // The twist duration that will be set on twistDuration when the program
     // performs a scramble operation.
-    this.scrambleTwistDuration=500/3;
+    this.scrambleTwistDuration=500;
     
     this.backgroundColor=[0, 0, 0, 0]; //[r,g,b,a]
     
-    for (var i=0;i<partCount;i++) {
+    for (let i=0;i<partCount;i++) {
       this.partsVisible[i]=true;
       this.stickersVisible[i]=true;
       this.partExplosion[i]=0;
     }
     
     // The following values must be initialized explicitly
-    this.faceCount=undefined;
-    this.stickerOffsets=[];
-    this.stickerCounts=[];
+    this.faceCount=stickerCounts.length;
+    this.stickerOffsets=new Array(stickerCounts);
+    this.stickerOffsets[0]=0;
+    for (let i=0;i<stickerCounts-1;i++) {
+      this.stickerOffsets[i+1]=this.stickerOffsets[i]+stickerCounts[i];
+    }
   }
   
   getFaceCount() {
