@@ -1,4 +1,4 @@
-/* @(#)RubiksCubeCube3D.mjs
+/* @(#)Cube6Cube3D.mjs
  * Copyright (c) 2018 Werner Randelshofer, Switzerland. MIT License.
  */
 
@@ -24,12 +24,17 @@ let module = {
 
 /** Constructor
  * Creates the 3D geometry of a Rubik's Cube.
- *  Subclasses must call initAbstractRubiksCubeCube3D(). 
+ *  Subclasses must call initAbstractCube6Cube3D(). 
  */
-class AbstractRubiksCubeCube3D extends Cube3D.Cube3D {
+class AbstractCube6Cube3D extends Cube3D.Cube3D {
     constructor(partSize) {
         super();
-        this.cubeSize = partSize * 3;
+
+        // The internal coordinates are given in millimeters
+        // We must scale them down here so that the entire
+        // scene fits into a cube of size 1.
+        this.cubeSize = partSize * 0.6;
+        this.matrix.scale(0.1);
 
         this.cornerCount = 8;
         this.edgeCount = 12;
@@ -542,27 +547,27 @@ class AbstractRubiksCubeCube3D extends Cube3D.Cube3D {
                 this.stickerObjs[i] = new J3DI.J3DIObj();
             }
             this.corner_rObj = J3DI.loadObj(null, baseUrl + "corner_r.obj", function () {
-                self.initAbstractRubiksCubeCube3D_corner_r();
+                self.initAbstractCube6Cube3D_corner_r();
                 self.repaint();
             });
             this.corner_uObj = J3DI.loadObj(null, baseUrl + "corner_u.obj", function () {
-                self.initAbstractRubiksCubeCube3D_corner_u();
+                self.initAbstractCube6Cube3D_corner_u();
                 self.repaint();
             });
             this.corner_fObj = J3DI.loadObj(null, baseUrl + "corner_f.obj", function () {
-                self.initAbstractRubiksCubeCube3D_corner_f();
+                self.initAbstractCube6Cube3D_corner_f();
                 self.repaint();
             });
             this.edge_rObj = J3DI.loadObj(null, baseUrl + "edge_r.obj", function () {
-                self.initAbstractRubiksCubeCube3D_edge_r();
+                self.initAbstractCube6Cube3D_edge_r();
                 self.repaint();
             });
             this.edge_uObj = J3DI.loadObj(null, baseUrl + "edge_u.obj", function () {
-                self.initAbstractRubiksCubeCube3D_edge_u();
+                self.initAbstractCube6Cube3D_edge_u();
                 self.repaint();
             });
             this.side_rObj = J3DI.loadObj(null, baseUrl + "side_r.obj", function () {
-                self.initAbstractRubiksCubeCube3D_side_r();
+                self.initAbstractCube6Cube3D_side_r();
                 self.repaint();
             });
         }
@@ -578,7 +583,7 @@ class AbstractRubiksCubeCube3D extends Cube3D.Cube3D {
         }
     }
 
-    initAbstractRubiksCubeCube3D_corner_r() {
+    initAbstractCube6Cube3D_corner_r() {
         let s = this.corner_rObj;
         let s180 = new J3DI.J3DIObj();
         s180.setTo(s);
@@ -593,9 +598,9 @@ class AbstractRubiksCubeCube3D extends Cube3D.Cube3D {
         this.stickerObjs[45] = s.clone();
         this.stickerObjs[53] = s180.clone();
 
-        this.initAbstractRubiksCubeCube3D_textureScales();
+        this.initAbstractCube6Cube3D_textureScales();
     }
-    initAbstractRubiksCubeCube3D_corner_f() {
+    initAbstractCube6Cube3D_corner_f() {
         let s = this.corner_fObj;
         let s180 = new J3DI.J3DIObj();
         s180.setTo(s);
@@ -610,9 +615,9 @@ class AbstractRubiksCubeCube3D extends Cube3D.Cube3D {
         this.stickerObjs[47] = s.clone();
         this.stickerObjs[51] = s180.clone();
 
-        this.initAbstractRubiksCubeCube3D_textureScales();
+        this.initAbstractCube6Cube3D_textureScales();
     }
-    initAbstractRubiksCubeCube3D_corner_u() {
+    initAbstractCube6Cube3D_corner_u() {
         let s = this.corner_uObj;
         let s90 = new J3DI.J3DIObj();
         s90.setTo(s);
@@ -633,9 +638,9 @@ class AbstractRubiksCubeCube3D extends Cube3D.Cube3D {
         this.stickerObjs[42] = s270.clone();
         this.stickerObjs[44] = s.clone();
 
-        this.initAbstractRubiksCubeCube3D_textureScales();
+        this.initAbstractCube6Cube3D_textureScales();
     }
-    initAbstractRubiksCubeCube3D_edge_u() {
+    initAbstractCube6Cube3D_edge_u() {
         let s = this.edge_uObj;
         let s90 = new J3DI.J3DIObj();
         s90.setTo(s);
@@ -660,9 +665,9 @@ class AbstractRubiksCubeCube3D extends Cube3D.Cube3D {
         this.stickerObjs[39] = s180.clone();
         this.stickerObjs[41] = s.clone();
 
-        this.initAbstractRubiksCubeCube3D_textureScales();
+        this.initAbstractCube6Cube3D_textureScales();
     }
-    initAbstractRubiksCubeCube3D_edge_r() {
+    initAbstractCube6Cube3D_edge_r() {
         let s = this.edge_rObj;
         let s90 = new J3DI.J3DIObj();
         s90.setTo(s);
@@ -687,9 +692,9 @@ class AbstractRubiksCubeCube3D extends Cube3D.Cube3D {
         this.stickerObjs[37] = s.clone();
         this.stickerObjs[43] = s180.clone();
 
-        this.initAbstractRubiksCubeCube3D_textureScales();
+        this.initAbstractCube6Cube3D_textureScales();
     }
-    initAbstractRubiksCubeCube3D_side_r() {
+    initAbstractCube6Cube3D_side_r() {
         let s = this.side_rObj;
         let s90 = s.clone();
         s90.rotateTexture(90);
@@ -705,9 +710,9 @@ class AbstractRubiksCubeCube3D extends Cube3D.Cube3D {
         this.stickerObjs[40] = s90.clone();
         this.stickerObjs[49] = s180.clone();
 
-        this.initAbstractRubiksCubeCube3D_textureScales();
+        this.initAbstractCube6Cube3D_textureScales();
     }
-    initAbstractRubiksCubeCube3D_textureScales() {
+    initAbstractCube6Cube3D_textureScales() {
         let attr = this.attributes;
 
         for (let i = 0; i < this.stickerObjs.length; i++) {
@@ -987,7 +992,7 @@ class AbstractRubiksCubeCube3D extends Cube3D.Cube3D {
  *                +----+----+----+
  * </pre>
  */
-AbstractRubiksCubeCube3D.prototype.stickerToPartMap = [
+AbstractCube6Cube3D.prototype.stickerToPartMap = [
     0, 8, 2, 9, 20, 12, 1, 10, 3, // right
     4, 11, 2, 14, 21, 8, 6, 17, 0, // up
     6, 17, 0, 18, 22, 9, 7, 19, 1, // front
@@ -1001,7 +1006,7 @@ AbstractRubiksCubeCube3D.prototype.stickerToPartMap = [
  * the part. 
  * This map is filled in by the init method!!
  */
-AbstractRubiksCubeCube3D.prototype.partToStickerMap = null;
+AbstractCube6Cube3D.prototype.partToStickerMap = null;
 
 /**
  * Gets the face of the part which holds the indicated sticker.
@@ -1050,7 +1055,7 @@ AbstractRubiksCubeCube3D.prototype.partToStickerMap = null;
  *                +----+----+----+
  * </pre>
  */
-AbstractRubiksCubeCube3D.prototype.stickerToFaceMap = [
+AbstractCube6Cube3D.prototype.stickerToFaceMap = [
     1, 1, 2, 0, 0, 0, 2, 1, 1, // right
     0, 1, 0, 0, 0, 0, 0, 1, 0, // up
     1, 0, 2, 1, 0, 1, 2, 0, 1, // front
@@ -1059,7 +1064,7 @@ AbstractRubiksCubeCube3D.prototype.stickerToFaceMap = [
     1, 0, 2, 1, 0, 1, 2, 0, 1 // back
 ];
 
-AbstractRubiksCubeCube3D.prototype.boxClickToLocationMap = [
+AbstractCube6Cube3D.prototype.boxClickToLocationMap = [
     [[7, 10 + 8, 6], [8 + 8, 3 + 8 + 12, 6 + 8], [5, 7 + 8, 4]], // left
     [[7, 8 + 8, 5], [11 + 8, 4 + 8 + 12, 5 + 8], [1, 2 + 8, 3]], // down
     [[7, 10 + 8, 6], [11 + 8, 2 + 8 + 12, 9 + 8], [1, 1 + 8, 0]], // front
@@ -1067,7 +1072,7 @@ AbstractRubiksCubeCube3D.prototype.boxClickToLocationMap = [
     [[6, 6 + 8, 4], [9 + 8, 1 + 8 + 12, 3 + 8], [0, 0 + 8, 2]], // up
     [[5, 7 + 8, 4], [5 + 8, 5 + 8 + 12, 3 + 8], [3, 4 + 8, 2]], // back
 ];
-AbstractRubiksCubeCube3D.prototype.boxClickToAxisMap = [
+AbstractCube6Cube3D.prototype.boxClickToAxisMap = [
     [[0, 1, 0], [2, 0, 2], [0, 1, 0]], // left
     [[1, 2, 1], [0, 1, 0], [1, 2, 1]], // down
     [[2, 1, 2], [0, 2, 0], [2, 1, 2]], // front
@@ -1075,7 +1080,7 @@ AbstractRubiksCubeCube3D.prototype.boxClickToAxisMap = [
     [[1, 2, 1], [0, 1, 0], [1, 2, 1]], // up
     [[2, 1, 2], [0, 2, 0], [2, 1, 2]], // back
 ];
-AbstractRubiksCubeCube3D.prototype.boxClickToAngleMap = [
+AbstractCube6Cube3D.prototype.boxClickToAngleMap = [
     [[-1, -1, -1], [-1, -1, 1], [-1, 1, -1]],
     [[-1, 1, -1], [1, -1, -1], [-1, -1, -1]],
     [[1, 1, 1], [-1, 1, 1], [1, -1, 1]],
@@ -1083,7 +1088,7 @@ AbstractRubiksCubeCube3D.prototype.boxClickToAngleMap = [
     [[1, -1, 1], [-1, 1, 1], [1, 1, 1]],
     [[-1, -1, -1], [1, -1, -1], [-1, 1, -1]],
 ];
-AbstractRubiksCubeCube3D.prototype.boxClickToLayerMap = [
+AbstractCube6Cube3D.prototype.boxClickToLayerMap = [
     [[1, 2, 1], [2, 1, 2], [1, 2, 1]],
     [[1, 2, 1], [2, 1, 2], [1, 2, 1]],
     [[4, 2, 4], [2, 4, 2], [4, 2, 4]],
@@ -1091,7 +1096,7 @@ AbstractRubiksCubeCube3D.prototype.boxClickToLayerMap = [
     [[4, 2, 4], [2, 4, 2], [4, 2, 4]],
     [[1, 2, 1], [2, 1, 2], [1, 2, 1]],
 ];
-AbstractRubiksCubeCube3D.prototype.boxSwipeToAxisMap = [
+AbstractCube6Cube3D.prototype.boxSwipeToAxisMap = [
     [1, 2, 1, 2], // left
     [2, 0, 2, 0], // down
     [1, 0, 1, 0], // front
@@ -1099,7 +1104,7 @@ AbstractRubiksCubeCube3D.prototype.boxSwipeToAxisMap = [
     [2, 0, 2, 0], // up
     [1, 0, 1, 0], // back
 ];
-AbstractRubiksCubeCube3D.prototype.boxSwipeToAngleMap = [
+AbstractCube6Cube3D.prototype.boxSwipeToAngleMap = [
     [-1, -1, 1, 1], // left
     [1, 1, -1, -1], // down
     [1, -1, -1, 1], // front
@@ -1107,7 +1112,7 @@ AbstractRubiksCubeCube3D.prototype.boxSwipeToAngleMap = [
     [-1, -1, 1, 1], // up
     [-1, 1, 1, -1], // back
 ];
-AbstractRubiksCubeCube3D.prototype.boxSwipeToLayerMap = [
+AbstractCube6Cube3D.prototype.boxSwipeToLayerMap = [
     [[[1, 4, 1, 4], [2, 4, 2, 4], [4, 4, 4, 4]], [[1, 2, 1, 2], [2, 2, 2, 2], [4, 2, 4, 2]], [[1, 1, 1, 1], [2, 1, 2, 1], [4, 1, 4, 1]]], // left
     [[[4, 1, 4, 1], [2, 1, 2, 1], [1, 1, 1, 1]], [[4, 2, 4, 2], [2, 2, 2, 2], [1, 2, 1, 2]], [[4, 4, 4, 4], [2, 4, 2, 4], [1, 4, 1, 4]]], // down
     [[[1, 1, 1, 1], [2, 1, 2, 1], [4, 1, 4, 1]], [[1, 2, 1, 2], [2, 2, 2, 2], [4, 2, 4, 2]], [[1, 4, 1, 4], [2, 4, 2, 4], [4, 4, 4, 4]]], // front
@@ -1135,7 +1140,7 @@ AbstractRubiksCubeCube3D.prototype.boxSwipeToLayerMap = [
  *        +-----+-----+
  * </pre>
  */
-AbstractRubiksCubeCube3D.prototype.stickerOffsets = [
+AbstractCube6Cube3D.prototype.stickerOffsets = [
     6, 3, 7, 3, 8, 3, //right
     6, 4, 7, 4, 8, 4,
     6, 5, 7, 5, 8, 5,
@@ -1161,13 +1166,13 @@ AbstractRubiksCubeCube3D.prototype.stickerOffsets = [
     6, 8, 7, 8, 8, 8
 ];
 // ------------------
-class RubiksCubeCube3D extends AbstractRubiksCubeCube3D {
+class Cube6Cube3D extends AbstractCube6Cube3D {
     /** Constructor
      * Creates the 3D geometry of a "Rubik's Cube".
      * You must call loadGeometry() after constructing a new instance.
      */
     constructor() {
-        super(1.8);
+        super(11);
     }
     loadGeometry() {
         super.loadGeometry();
@@ -1213,15 +1218,15 @@ class RubiksCubeCube3D extends AbstractRubiksCubeCube3D {
 
 // ------------------
 function createCube3D(levelOfDetail) {
-  const c = new RubiksCubeCube3D();
+  const c = new Cube6Cube3D();
   c.baseUrl = 'lib/';
   switch (levelOfDetail) {
-    case 1: c.relativeUrl = 'models/rubikscubes1/'; break; // low-res model that should not be taken apart
-    case 2: c.relativeUrl = 'models/rubikscubes4/'; break; // med-res model that should not be taken apart
-    case 3: c.relativeUrl = 'models/rubikscubes4/'; break; // high-res model that should not be taken apart
-    case 4: c.relativeUrl = 'models/rubikscubes4/'; break; // low-res model that can be taken apart
-    case 5: c.relativeUrl = 'models/rubikscubes5/'; break; // med-res model that can be taken apart
-    default: c.relativeUrl = 'models/rubikscubes5/'; break; // high-res model that can be taken apart
+    case 1: c.relativeUrl = 'models/cube6s1/'; break; // low-res model that should not be taken apart
+    case 2: c.relativeUrl = 'models/cube6s1/'; break; // med-res model that should not be taken apart
+    case 3: c.relativeUrl = 'models/cube6s1/'; break; // high-res model that should not be taken apart
+    case 4: c.relativeUrl = 'models/cube6s1/'; break; // low-res model that can be taken apart
+    case 5: c.relativeUrl = 'models/cube6s1/'; break; // med-res model that can be taken apart
+    default: c.relativeUrl = 'models/cube6s1/'; break; // high-res model that can be taken apart
   }
   return c;
 }
@@ -1229,7 +1234,7 @@ function createCube3D(levelOfDetail) {
 // MODULE API
 // ------------------
 export default {
-    AbstractRubiksCubeCube3D: AbstractRubiksCubeCube3D,
+    AbstractCube6Cube3D: AbstractCube6Cube3D,
     createCube3D: createCube3D,
 };
 

@@ -17,6 +17,10 @@ import ScriptParser from './ScriptParser.mjs';
 import Tokenizer from './Tokenizer.mjs';
 import RubiksCubeCube3D from './RubiksCubeCube3D.mjs';
 import PocketCubeCube3D from './PocketCubeCube3D.mjs';
+import RevengeCubeCube3D from './RevengeCubeCube3D.mjs';
+import ProfessorCubeCube3D from './ProfessorCubeCube3D.mjs';
+import Cube6Cube3D from './Cube6Cube3D.mjs';
+import Cube7Cube3D from './Cube7Cube3D.mjs';
 
 let logger = {
     log: (false) ? console.log : () => {
@@ -228,10 +232,6 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
         if (cname.length == 0) {
             cname = "RubiksCube";
         }
-        let isParts = (cname.lastIndexOf(" parts") == cname.length - 6);
-        if (isParts) {
-            cname = cname.substring(0, cname.length - 6);
-        }
         let levelOfDetail = parseInt(this.canvas.getAttribute("levelofdetail"));
         if (isNaN(levelOfDetail)) {
             levelOfDetail = this.useFullModel ? 4 : 1;
@@ -245,24 +245,29 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
             case "PocketCube" :
                 c3d = PocketCubeCube3D.createCube3D(levelOfDetail);
                 break;
+            case "RevengeCube" :
+                c3d = RevengeCubeCube3D.createCube3D(levelOfDetail);
+                break;
+            case "ProfessorCube" :
+                c3d = ProfessorCubeCube3D.createCube3D(levelOfDetail);
+                break;
+            case "Cube6" :
+                c3d = Cube6Cube3D.createCube3D(levelOfDetail);
+                break;
+            case "Cube7" :
+                c3d = Cube7Cube3D.createCube3D(levelOfDetail);
+                break;
             default :
                 logger.error('illegal cube attribute :' + cname);
                 if (this.useFullModel) {
-                    c3d = RubiksCubeCube3D.createCube(levelOfDetail);
+                    c3d = RubiksCubeCube3D.createCube3D(levelOfDetail);
                 } else {
-                    c3d = RubiksCubeCube3D.createCube(levelOfDetail);
+                    c3d = RubiksCubeCube3D.createCube3D(levelOfDetail);
                 }
         }
         if (c3d != null) {
             c3d.baseUrl = this.parameters.baseurl;
             c3d.loadGeometry();
-            if (isParts) {
-                let a = c3d.attributes;
-                for (let i = 0; i < a.stickersFillColor.length; i++) {
-                    a.stickersFillColor[i] = a.partsFillColor[0];
-                    a.stickersPhong[i] = a.partsPhong[0];
-                }
-            }
             return c3d;
         }
     }
@@ -295,7 +300,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
         this.cube = this.cube3d.cube;
         this.cube3d.addChangeListener(this);
         let attr = this.cube3d.attributes;
-        this.cubeSize = this.cube3d.partSize * this.cube3d.cube.layerCount; // size of a cube side in centimeters
+        this.cubeSize = this.cube3d.getCubeSize();
         this.currentAngle = 0;
         this.xRot = attr.xRot;
         this.yRot = attr.yRot;

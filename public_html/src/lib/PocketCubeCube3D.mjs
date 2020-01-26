@@ -19,6 +19,7 @@ class AbstractPocketCubeCube3D extends Cube3D.Cube3D {
     constructor(partSize) {
         super();
 
+        this.cubeSize = partSize * 2.2;
         this.cornerCount = 8;
         this.edgeCount = 0;
         this.sideCount = 0;

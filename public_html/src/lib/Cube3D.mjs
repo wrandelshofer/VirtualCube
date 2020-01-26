@@ -58,6 +58,7 @@ class Cube3D extends Node3D.Node3D {
         //                            moved to position 0 and orientation 0.
 
         this.cube = null;
+        this.cubeSize = 5; // cube size in centimeters
         this.cornerCount = 0;
         this.edgeCount = 0;
         this.sideCount = 0;
@@ -342,6 +343,10 @@ class Cube3D extends Node3D.Node3D {
      }
      getRepainter() {
          return this.repainter;
+     }
+     /** Gets the size of the cube in centimeters. */
+     getCubeSize() {
+        return this.cubeSize;
      }
 }
 
