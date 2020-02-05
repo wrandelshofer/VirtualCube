@@ -24,229 +24,253 @@ let module = {
 
 /** Constructor
  * Creates the 3D geometry of a Rubik's Cube.
- *  Subclasses must call initAbstractRubiksCubeCube3D(). 
+ *  Subclasses must call initAbstractRubiksCubeCube3D().
  */
 class AbstractRubiksCubeCube3D extends Cube3D.Cube3D {
-    constructor(partSize) {
-        super();
+  constructor(partSize) {
+    super();
 
-        this.partSize = partSize;
-        this.cubeSize = partSize * 3;
-
-        this.cornerCount = 8;
-        this.edgeCount = 12;
-        this.sideCount = 6;
-        this.centerCount = 1;
-        this.partCount = 8 + 12 + 6 + 1;
-        this.cornerOffset = 0;
-        this.edgeOffset = 8;
-        this.sideOffset = 8 + 12;
-        this.centerOffset = 8 + 12 + 6;
-
-        this.cube = Cube.createCube(3);
-        this.cube.addCubeListener(this);
-        this.attributes = this.createAttributes();
-
-        this.partToStickerMap = new Array(this.partCount);
-        for (let i = 0; i < this.partCount; i++) {
-            this.parts[i] = new Node3D.Node3D();
-            this.partOrientations[i] = new Node3D.Node3D();
-            this.partExplosions[i] = new Node3D.Node3D();
-            this.partLocations[i] = new Node3D.Node3D();
-
-            this.partOrientations[i].add(this.parts[i]);
-            this.partExplosions[i].add(this.partOrientations[i]);
-            this.partLocations[i].add(this.partExplosions[i]);
-            this.add(this.partLocations[i]);
-
-            this.identityPartLocations[i] = new J3DIMath.J3DIMatrix4();
-            this.partToStickerMap[i] = new Array(3);
-        }
-
-        this.stickerCount = 9 * 6;
-        for (let i = 0; i < this.stickerCount; i++) {
-            this.partToStickerMap[this.stickerToPartMap[i]][this.stickerToFaceMap[i]] = i;
-
-            this.stickers[i] = new Node3D.Node3D();
-            this.stickerOrientations[i] = new Node3D.Node3D();
-            this.stickerExplosions[i] = new Node3D.Node3D();
-            this.stickerLocations[i] = new Node3D.Node3D();
-            this.stickerTranslations[i] = new Node3D.Node3D();
-
-            this.stickerOrientations[i].add(this.stickers[i]);
-            this.stickerExplosions[i].add(this.stickerOrientations[i]);
-            this.stickerLocations[i].add(this.stickerExplosions[i]);
-            this.stickerTranslations[i].add(this.stickerLocations[i]);
-            this.add(this.stickerTranslations[i]);
-
-            this.developedStickers[i] = new Node3D.Node3D();
-
-            this.currentStickerTransforms[i] = new Node3D.Node3D();
-            this.add(this.currentStickerTransforms[i]);
-            //this.currentDevelopedMatrix[i]=new J3DIMath.J3DIMatrix4();
-            this.identityStickerLocations[i] = new J3DIMath.J3DIMatrix4();
-        }
-
-        /* Corners
-         *             +---+---+---+
-         *          ulb|4.0|   |2.0|ubr
-         *             +---+   +---+
-         *             |     1     |
-         *             +---+   +---+
-         *          ufl|6.0|   |0.0|urf
-         * +---+---+---+---+---+---+---+---+---+---+---+---+
-         * |4.1|   |6.2|6.1|   |0.2|0.1|   |2.2|2.1|   |4.2|
-         * +---+   +---+---+   +---+---+   +---+---+   +---+
-         * |     3     |     2     |     0     |     5     |
-         * +---+   +---+---+   +---+---+   +---+---+   +---+
-         * |5.2|   |7.1|7.2|   |1.1|1.2|   |3.1|3.2|   |5.1|
-         * +---+---+---+---+---+---+---+---+---+---+---+---+
-         *          dlf|7.0|   |1.0|dfr
-         *             +---+   +---+
-         *             |     4     |
-         *             +---+   +---+
-         *          dbl|5.0|   |3.0|drb
-         *             +---+---+---+
-         */
-        let cornerOffset = this.cornerOffset;
-        let ps = this.partSize;
-
-        // Move all corner parts to up right front (= position of corner[0]). 
-        // nothing to do
-
-        // Rotate the corner parts into place
-
-        // 0:urf
-        //--no transformation---
-        // 1:dfr
-        this.identityPartLocations[cornerOffset + 1].rotate(180, 0, 0, 1);
-        this.identityPartLocations[cornerOffset + 1].rotate(90, 0, 1, 0);
-        // 2:ubr
-        this.identityPartLocations[cornerOffset + 2].rotate(270, 0, 1, 0);
-        // 3:drb
-        this.identityPartLocations[cornerOffset + 3].rotate(180, 0, 0, 1);
-        this.identityPartLocations[cornerOffset + 3].rotate(180, 0, 1, 0);
-        // 4:ulb
-        this.identityPartLocations[cornerOffset + 4].rotate(180, 0, 1, 0);
-        // 5:dbl
-        this.identityPartLocations[cornerOffset + 5].rotate(180, 1, 0, 0);
-        this.identityPartLocations[cornerOffset + 5].rotate(90, 0, 1, 0);
-        // 6:ufl
-        this.identityPartLocations[cornerOffset + 6].rotate(90, 0, 1, 0);
-        // 7:dlf
-        this.identityPartLocations[cornerOffset + 7].rotate(180, 0, 0, 1);
-
-        //
-        /* Edges
-         *             +---+---+---+
-         *             |   |3.1|   |
-         *             +--- --- ---+
-         *             |6.0| u |0.0|
-         *             +--- --- ---+
-         *             |   |9.1|   |
-         * +---+---+---+---+---+---+---+---+---+---+---+---+
-         * |   |6.1|   |   |9.0|   |   |0.1|   |   |3.0|   |
-         * +--- --- ---+--- --- ---+--- --- ---+--- --- ---+
-         * |7.0| l 10.0|10.1 f |1.1|1.0| r |4.0|4.1| b |7.1|
-         * +--- --- ---+--- --- ---+--- --- ---+--- --- ---+
-         * |   |8.1|   |   |11.0   |   |2.1|   |   |5.0|   |
-         * +---+---+---+---+---+---+---+---+---+---+---+---+
-         *             |   |11.1   |
-         *             +--- --- ---+
-         *             |8.0| d |2.0|
-         *             +--- --- ---+
-         *             |   |5.1|   |
-         *             +---+---+---+
-         */
-        let edgeOffset = this.edgeOffset;
-
-        // Move all edge parts to up right (ur) 
-        // nothing to do
-
-        // Rotate edge parts into place
-        // ur
-        //--no transformation--
-        // rf
-        this.identityPartLocations[edgeOffset + 1].rotate(90, 0, 0, -1);
-        this.identityPartLocations[edgeOffset + 1].rotate(90, 0, 1, 0);
-        // dr
-        this.identityPartLocations[edgeOffset + 2].rotate(180, 1, 0, 0);
-        // bu
-        this.identityPartLocations[edgeOffset + 3].rotate(90, 0, 0, 1);
-        this.identityPartLocations[edgeOffset + 3].rotate(90, 1, 0, 0);
-        // rb
-        this.identityPartLocations[edgeOffset + 4].rotate(90, 0, 0, -1);
-        this.identityPartLocations[edgeOffset + 4].rotate(90, 0, -1, 0);
-        // bd
-        this.identityPartLocations[edgeOffset + 5].rotate(90, 1, 0, 0);
-        this.identityPartLocations[edgeOffset + 5].rotate(90, 0, -1, 0);
-        // ul
-        this.identityPartLocations[edgeOffset + 6].rotate(180, 0, 1, 0);
-        // lb
-        this.identityPartLocations[edgeOffset + 7].rotate(90, 0, 0, 1);
-        this.identityPartLocations[edgeOffset + 7].rotate(90, 0, -1, 0);
-        // dl
-        this.identityPartLocations[edgeOffset + 8].rotate(180, 0, 1, 0);
-        this.identityPartLocations[edgeOffset + 8].rotate(180, 1, 0, 0);
-        // fu
-        this.identityPartLocations[edgeOffset + 9].rotate(-90, 1, 0, 0);
-        this.identityPartLocations[edgeOffset + 9].rotate(90, 0, -1, 0);
-        // lf
-        this.identityPartLocations[edgeOffset + 10].rotate(90, 0, 1, 0);
-        this.identityPartLocations[edgeOffset + 10].rotate(-90, 1, 0, 0);
-        // fd
-        this.identityPartLocations[edgeOffset + 11].rotate(90, 0, 0, -1);
-        this.identityPartLocations[edgeOffset + 11].rotate(-90, 1, 0, 0);
-
-        /* Sides
-         *             +------------+
-         *             |     .1     |
-         *             |    ---     |
-         *             | .0| 1 |.2  |
-         *             |    ---     |
-         *             |     .3     |
-         * +-----------+------------+-----------+-----------+
-         * |     .0    |     .2     |     .3    |    .1     |
-         * |    ---    |    ---     |    ---    |    ---    |
-         * | .3| 3 |.1 | .1| 2 |.3  | .2| 0 |.0 | .0| 5 |.2 |
-         * |    ---    |    ---     |    ---    |    ---    |
-         * |     .2    |    .0      |     .1    |     .3    |
-         * +-----------+------------+-----------+-----------+
-         *             |     .0     |
-         *             |    ---     |
-         *             | .3| 4 |.1  |
-         *             |    ---     |
-         *             |     .2     |
-         *             +------------+
-         */
-        let sideOffset = this.sideOffset;
-
-        // Move all side parts to right (= position of side[0]
-        // nothing to do
-
-        // Rotate the side parts into place
-        // r
-        // --no transformation--
-        // u
-        this.identityPartLocations[sideOffset + 1].rotate(90, 0, 0, 1);
-        this.identityPartLocations[sideOffset + 1].rotate(-90, 1, 0, 0);
-        // f
-        this.identityPartLocations[sideOffset + 2].rotate(90, 0, 1, 0);
-        this.identityPartLocations[sideOffset + 2].rotate(90, 1, 0, 0);
-        // l
-        this.identityPartLocations[sideOffset + 3].rotate(180, 0, 1, 0);
-        this.identityPartLocations[sideOffset + 3].rotate(-90, 1, 0, 0);
-        // d
-        this.identityPartLocations[sideOffset + 4].rotate(90, 0, 0, -1);
-        this.identityPartLocations[sideOffset + 4].rotate(180, 1, 0, 0);
-        // b
-        this.identityPartLocations[sideOffset + 5].rotate(90, 0, -1, 0);
-        this.identityPartLocations[sideOffset + 5].rotate(180, 1, 0, 0);
-
+    this.partSize = partSize;
+    if (partSize > 2) {
+      // The internal coordinates are given in millimeters
+      // We must scale them down here so that the entire
+      // scene fits into a cube of size 1.
+      this.cubeSize = partSize * 0.3;
+      this.matrix.scale(0.1);
+    } else {
+      this.cubeSize = partSize * 3;
     }
 
+    this.cornerCount = 8;
+    this.edgeCount = 12;
+    this.sideCount = 6;
+    this.centerCount = 1;
+    this.partCount = 8 + 12 + 6 + 1;
+    this.cornerOffset = 0;
+    this.edgeOffset = 8;
+    this.sideOffset = 8 + 12;
+    this.centerOffset = 8 + 12 + 6;
+
+    this.cube = Cube.createCube(3);
+    this.cube.addCubeListener(this);
+    this.attributes = this.createAttributes();
+
+    this.partToStickerMap = new Array(this.partCount);
+    for (let i = 0; i < this.partCount; i++) {
+        this.parts[i] = new Node3D.Node3D();
+        this.partOrientations[i] = new Node3D.Node3D();
+        this.partExplosions[i] = new Node3D.Node3D();
+        this.partLocations[i] = new Node3D.Node3D();
+
+        this.partOrientations[i].add(this.parts[i]);
+        this.partExplosions[i].add(this.partOrientations[i]);
+        this.partLocations[i].add(this.partExplosions[i]);
+        this.add(this.partLocations[i]);
+
+        this.identityPartLocations[i] = new J3DIMath.J3DIMatrix4();
+        this.partToStickerMap[i] = new Array(3);
+    }
+
+    this.stickerCount = 9 * 6;
+    for (let i = 0; i < this.stickerCount; i++) {
+        this.partToStickerMap[this.stickerToPartMap[i]][this.stickerToFaceMap[i]] = i;
+
+        this.stickers[i] = new Node3D.Node3D();
+        this.stickerOrientations[i] = new Node3D.Node3D();
+        this.stickerExplosions[i] = new Node3D.Node3D();
+        this.stickerLocations[i] = new Node3D.Node3D();
+        this.stickerTranslations[i] = new Node3D.Node3D();
+
+        this.stickerOrientations[i].add(this.stickers[i]);
+        this.stickerExplosions[i].add(this.stickerOrientations[i]);
+        this.stickerLocations[i].add(this.stickerExplosions[i]);
+        this.stickerTranslations[i].add(this.stickerLocations[i]);
+        this.add(this.stickerTranslations[i]);
+
+        this.developedStickers[i] = new Node3D.Node3D();
+
+        this.currentStickerTransforms[i] = new Node3D.Node3D();
+        this.add(this.currentStickerTransforms[i]);
+        //this.currentDevelopedMatrix[i]=new J3DIMath.J3DIMatrix4();
+        this.identityStickerLocations[i] = new J3DIMath.J3DIMatrix4();
+    }
+
+    /* Corners
+     *             +---+---+---+
+     *          ulb|4.0|   |2.0|ubr
+     *             +---+   +---+
+     *             |     1     |
+     *             +---+   +---+
+     *          ufl|6.0|   |0.0|urf
+     * +---+---+---+---+---+---+---+---+---+---+---+---+
+     * |4.1|   |6.2|6.1|   |0.2|0.1|   |2.2|2.1|   |4.2|
+     * +---+   +---+---+   +---+---+   +---+---+   +---+
+     * |     3     |     2     |     0     |     5     |
+     * +---+   +---+---+   +---+---+   +---+---+   +---+
+     * |5.2|   |7.1|7.2|   |1.1|1.2|   |3.1|3.2|   |5.1|
+     * +---+---+---+---+---+---+---+---+---+---+---+---+
+     *          dlf|7.0|   |1.0|dfr
+     *             +---+   +---+
+     *             |     4     |
+     *             +---+   +---+
+     *          dbl|5.0|   |3.0|drb
+     *             +---+---+---+
+     */
+    let o = this.cornerOffset;
+    let ps = this.partSize;
+
+    // Move all corner parts to up right front (= position of corner[0]).
+    // nothing to do
+    // Move all corner parts to up right front (urf)
+
+    // Rotate the corner parts into place
+
+    // 0:urf
+    //--no transformation---
+    // 1:dfr
+    this.identityPartLocations[o + 1].rotateZ(180);
+    this.identityPartLocations[o + 1].rotateY(90);
+    // 2:ubr
+    this.identityPartLocations[o + 2].rotateY(270);
+    // 3:drb
+    this.identityPartLocations[o + 3].rotateZ(180);
+    this.identityPartLocations[o + 3].rotateY(180);
+    // 4:ulb
+    this.identityPartLocations[o + 4].rotateY(180);
+    // 5:dbl
+    this.identityPartLocations[o + 5].rotateX(180);
+    this.identityPartLocations[o + 5].rotateY(90);
+    // 6:ufl
+    this.identityPartLocations[o + 6].rotateY(90);
+    // 7:dlf
+    this.identityPartLocations[o + 7].rotateZ(180);
+
+    if (partSize > 2) {
+      for (let i = 0; i < this.cornerCount; i++) {
+           this.identityPartLocations[o + i].translate(ps*1.0,ps*1.0,-ps*1.0);
+      }
+    }
+    //
+    /* Edges
+     *             +---+---+---+
+     *             |   |3.1|   |
+     *             +--- --- ---+
+     *             |6.0| u |0.0|
+     *             +--- --- ---+
+     *             |   |9.1|   |
+     * +---+---+---+---+---+---+---+---+---+---+---+---+
+     * |   |6.1|   |   |9.0|   |   |0.1|   |   |3.0|   |
+     * +--- --- ---+--- --- ---+--- --- ---+--- --- ---+
+     * |7.0| l 10.0|10.1 f |1.1|1.0| r |4.0|4.1| b |7.1|
+     * +--- --- ---+--- --- ---+--- --- ---+--- --- ---+
+     * |   |8.1|   |   |11.0   |   |2.1|   |   |5.0|   |
+     * +---+---+---+---+---+---+---+---+---+---+---+---+
+     *             |   |11.1   |
+     *             +--- --- ---+
+     *             |8.0| d |2.0|
+     *             +--- --- ---+
+     *             |   |5.1|   |
+     *             +---+---+---+
+     */
+    o = this.edgeOffset;
+
+    // Move all edge parts to up right (ur)
+    // nothing to do
+
+    // Rotate edge parts into place
+    // ur
+    //--no transformation--
+    // rf
+    this.identityPartLocations[o + 1].rotateZ(-90);
+    this.identityPartLocations[o + 1].rotateY(90);
+    // dr
+    this.identityPartLocations[o + 2].rotateX(180);
+    // bu
+    this.identityPartLocations[o + 3].rotateZ(90);
+    this.identityPartLocations[o + 3].rotateX(90);
+    // rb
+    this.identityPartLocations[o + 4].rotateZ(-90);
+    this.identityPartLocations[o + 4].rotateY(-90);
+    // bd
+    this.identityPartLocations[o + 5].rotateX(90);
+    this.identityPartLocations[o + 5].rotateY(-90);
+    // ul
+    this.identityPartLocations[o + 6].rotateY(180);
+    // lb
+    this.identityPartLocations[o + 7].rotateZ(90);
+    this.identityPartLocations[o + 7].rotateY(-90);
+    // dl
+    this.identityPartLocations[o + 8].rotateY(180);
+    this.identityPartLocations[o + 8].rotateX(180);
+    // fu
+    this.identityPartLocations[o + 9].rotateX(-90);
+    this.identityPartLocations[o + 9].rotateY(-90);
+    // lf
+    this.identityPartLocations[o + 10].rotateY(90);
+    this.identityPartLocations[o + 10].rotateX(-90);
+    // fd
+    this.identityPartLocations[o + 11].rotateZ(-90);
+    this.identityPartLocations[o + 11].rotateX(-90);
+
+    if (partSize > 2) {
+      for (let i = 0; i < this.edgeCount; i++) {
+           this.identityPartLocations[o + i].translate(ps*1.0,ps*1.0,0);
+      }
+    }
+    /* Sides
+     *             +------------+
+     *             |     .1     |
+     *             |    ---     |
+     *             | .0| 1 |.2  |
+     *             |    ---     |
+     *             |     .3     |
+     * +-----------+------------+-----------+-----------+
+     * |     .0    |     .2     |     .3    |    .1     |
+     * |    ---    |    ---     |    ---    |    ---    |
+     * | .3| 3 |.1 | .1| 2 |.3  | .2| 0 |.0 | .0| 5 |.2 |
+     * |    ---    |    ---     |    ---    |    ---    |
+     * |     .2    |    .0      |     .1    |     .3    |
+     * +-----------+------------+-----------+-----------+
+     *             |     .0     |
+     *             |    ---     |
+     *             | .3| 4 |.1  |
+     *             |    ---     |
+     *             |     .2     |
+     *             +------------+
+     */
+    o = this.sideOffset;
+
+    // Move all side parts to right (= position of side[0]
+    // nothing to do
+
+    // Rotate the side parts into place
+    // r
+    // --no transformation--
+    // u
+    this.identityPartLocations[o + 1].rotate(90, 0, 0, 1);
+    this.identityPartLocations[o + 1].rotate(-90, 1, 0, 0);
+    // f
+    this.identityPartLocations[o + 2].rotate(90, 0, 1, 0);
+    this.identityPartLocations[o + 2].rotate(90, 1, 0, 0);
+    // l
+    this.identityPartLocations[o + 3].rotate(180, 0, 1, 0);
+    this.identityPartLocations[o + 3].rotate(-90, 1, 0, 0);
+    // d
+    this.identityPartLocations[o + 4].rotate(90, 0, 0, -1);
+    this.identityPartLocations[o + 4].rotate(180, 1, 0, 0);
+    // b
+    this.identityPartLocations[o + 5].rotate(90, 0, -1, 0);
+    this.identityPartLocations[o + 5].rotate(180, 1, 0, 0);
+
+    if (partSize > 2) {
+      for (let i = 0; i < this.sideCount; i++) {
+           this.identityPartLocations[o + i].translate(ps*1.0,0,0);
+      }
+    }
+  }
+
     loadGeometry() {
-        // ----------------------------         
+        // ----------------------------
         // Load geometry
         let self = this;
         let fRepaint = function () {
@@ -498,7 +522,7 @@ class AbstractRubiksCubeCube3D extends Cube3D.Cube3D {
 
         return a;
     }
-
+/*
     updateExplosionFactor(factor) {
         if (factor == null) {
             factor = this.attributes.explosionFactor;
@@ -622,7 +646,7 @@ class AbstractRubiksCubeCube3D extends Cube3D.Cube3D {
             if (self.isTwisting!==token) {
                 // Twisting was aborted. Complete this twisting animation.
                 self.validateTwist(partIndices, locations, orientations, finalCount, axis, angle, 1.0);
-                return; 
+                return;
             }
             let now = new Date().getTime();
             let elapsed = now - start;
@@ -639,12 +663,12 @@ class AbstractRubiksCubeCube3D extends Cube3D.Cube3D {
             this.repainter.repaint(f);
         }
     }
-    
-    /* Immediately completes the current twisting animation. */
+
+    / * Immediately completes the current twisting animation. * /
      finishTwisting() {
        this.isTwisting=null;
      }
-    
+    */
 }
 
 /**
@@ -719,17 +743,17 @@ class AbstractRubiksCubeCube3D extends Cube3D.Cube3D {
  * </pre>
  */
 AbstractRubiksCubeCube3D.prototype.stickerToPartMap = [
-    0, 8, 2, 9, 20, 12, 1, 10, 3, // right
-    4, 11, 2, 14, 21, 8, 6, 17, 0, // up
-    6, 17, 0, 18, 22, 9, 7, 19, 1, // front
-    4, 14, 6, 15, 23, 18, 5, 16, 7, // left
-    7, 19, 1, 16, 24, 10, 5, 13, 3, // down
-    2, 11, 4, 12, 25, 15, 3, 13, 5  // back
+    0, 8, 2,/**/ 9, 20, 12,/**/ 1, 10, 3, // right
+    4, 11, 2,/**/ 14, 21, 8,/**/ 6, 17, 0, // up
+    6, 17, 0,/**/ 18, 22, 9,/**/ 7, 19, 1, // front
+    4, 14, 6,/**/ 15, 23, 18,/**/ 5, 16, 7, // left
+    7, 19, 1,/**/ 16, 24, 10,/**/ 5, 13, 3, // down
+    2, 11, 4,/**/ 12, 25, 15,/**/ 3, 13, 5  // back
 ];
 
 /** Maps parts to stickers. This is a two dimensional array. The first
  * dimension is the part index, the second dimension the orientation of
- * the part. 
+ * the part.
  * This map is filled in by the init method!!
  */
 AbstractRubiksCubeCube3D.prototype.partToStickerMap = null;
@@ -782,19 +806,19 @@ AbstractRubiksCubeCube3D.prototype.partToStickerMap = null;
  * </pre>
  */
 AbstractRubiksCubeCube3D.prototype.stickerToFaceMap = [
-    1, 1, 2, 0, 0, 0, 2, 1, 1, // right
-    0, 1, 0, 0, 0, 0, 0, 1, 0, // up
-    1, 0, 2, 1, 0, 1, 2, 0, 1, // front
-    1, 1, 2, 0, 0, 0, 2, 1, 1, // left
-    0, 1, 0, 0, 0, 0, 0, 1, 0, // down
-    1, 0, 2, 1, 0, 1, 2, 0, 1 // back
+    1, 1, 2,/**/ 0, 0, 0,/**/ 2, 1, 1, // right
+    0, 1, 0,/**/ 0, 0, 0,/**/ 0, 1, 0, // up
+    1, 0, 2,/**/ 1, 0, 1,/**/ 2, 0, 1, // front
+    1, 1, 2,/**/ 0, 0, 0,/**/ 2, 1, 1, // left
+    0, 1, 0,/**/ 0, 0, 0,/**/ 0, 1, 0, // down
+    1, 0, 2,/**/ 1, 0, 1,/**/ 2, 0, 1 // back
 ];
 
 AbstractRubiksCubeCube3D.prototype.boxClickToLocationMap = [
     [[7, 10 + 8, 6], [8 + 8, 3 + 8 + 12, 6 + 8], [5, 7 + 8, 4]], // left
     [[7, 8 + 8, 5], [11 + 8, 4 + 8 + 12, 5 + 8], [1, 2 + 8, 3]], // down
     [[7, 10 + 8, 6], [11 + 8, 2 + 8 + 12, 9 + 8], [1, 1 + 8, 0]], // front
-    [[1, 1 + 8, 0], [2 + 8, 0 + 8 + 12, 0 + 8], [3, 4 + 8, 2]], // right
+    [[1, 1 + 8, 0], [2 + 8, 0 + 8 + 12, 0 + 8], [3, 4 + 8, 2]], // right ←
     [[6, 6 + 8, 4], [9 + 8, 1 + 8 + 12, 3 + 8], [0, 0 + 8, 2]], // up
     [[5, 7 + 8, 4], [5 + 8, 5 + 8 + 12, 3 + 8], [3, 4 + 8, 2]], // back
 ];
@@ -851,7 +875,7 @@ AbstractRubiksCubeCube3D.prototype.boxSwipeToLayerMap = [
  * the 3D model being used.
  * <pre>
  *   0 1 2 3 4 5 6 7 8
- *        +-----+ 
+ *        +-----+
  * 0      |     |
  * 1      |  U  |
  * 2      |     |
@@ -874,8 +898,8 @@ class RubiksCubeCube3D extends AbstractRubiksCubeCube3D {
      * Creates the 3D geometry of a "Rubik's Cube".
      * You must call loadGeometry() after constructing a new instance.
      */
-    constructor() {
-        super(1.8);
+    constructor(partSize) {
+        super(partSize);
     }
     loadGeometry() {
         super.loadGeometry();
@@ -917,16 +941,20 @@ class RubiksCubeCube3D extends AbstractRubiksCubeCube3D {
 
 // ------------------
 function createCube3D(levelOfDetail) {
-  const c = new RubiksCubeCube3D();
-  c.baseUrl = 'lib/';
+  let partSize=1.8;
+  let relativeUrl;
   switch (levelOfDetail) {
-    case 1: c.relativeUrl = 'models/rubikscubes1/'; break; // low-res model that should not be taken apart
-    case 2: c.relativeUrl = 'models/rubikscubes4/'; break; // med-res model that should not be taken apart
-    case 3: c.relativeUrl = 'models/rubikscubes4/'; break; // high-res model that should not be taken apart
-    case 4: c.relativeUrl = 'models/rubikscubes4/'; break; // low-res model that can be taken apart
-    case 5: c.relativeUrl = 'models/rubikscubes5/'; break; // med-res model that can be taken apart
-    default: c.relativeUrl = 'models/rubikscubes5/'; break; // high-res model that can be taken apart
+  case 4:
+    case 1: relativeUrl = 'models/genericcubes1/'; partSize=18; break; // low-res model that should not be taken apart
+    case 2: relativeUrl = 'models/rubikscubes4/'; break; // med-res model that should not be taken apart
+    case 3: relativeUrl = 'models/rubikscubes4/'; break; // high-res model that should not be taken apart
+    //case 4: relativeUrl = 'models/rubikscubes4/'; break; // low-res model that can be taken apart
+    case 5: relativeUrl = 'models/rubikscubes5/'; break; // med-res model that can be taken apart
+    default: relativeUrl = 'models/rubikscubes6/'; break; // high-res model that can be taken apart
   }
+  const c = new RubiksCubeCube3D(partSize);
+  c.baseUrl = 'lib/';
+  c.relativeUrl = relativeUrl;
   return c;
 }
 // ------------------

@@ -2,7 +2,7 @@
  * Copyright (c) 2018 Werner Randelshofer, Switzerland. MIT License.
  */
 
-/** Base class for objects which can render a Cube3D into an HTML 5 canvas 
+/** Base class for objects which can render a Cube3D into an HTML 5 canvas
  using one of its contexts (3D or 2D context). And which can handle
  input events and forward them to the Cube3D.
  */
@@ -32,7 +32,7 @@ let logger = {
     error: (true) ? console.error : () => {
     }
 }
-// 
+//
 // ===============================
 //
 // Module functions
@@ -43,7 +43,7 @@ let logger = {
 /** Parses an indexed or named color list into an array.
  *
  * EBNF: (|)=choice, []=optional, {}=zero or more, (* *)=comment
- * 
+ *
  *  colormap = entry, { [','] , {' '} , entry } ;
  *  entry = [ key, {' '} , '=', {' '} ] , value ;
  *  key = (* word *) ;
@@ -98,7 +98,7 @@ let parseColorMap = function (str) {
 /** Parses a comma or space separated list into an array.
  *
  *  EBNF: (|)=choice, []=optional, {}=zero or more, (* *)=comment
- * 
+ *
  *  list = value, { [','] , {' '} , value } ;
  *  value = (* word *) ;
  */
@@ -125,7 +125,7 @@ let parseCommaOrSpaceSeparatedList = function (str) {
 /** Parses a list of script macro definitions.
  *
  * EBNF: (|)=choice, []=optional, {}=zero or more, (* *)=comment
- * 
+ *
  *  definitions = {' '}, entry, { {' '}, [','] , {' '} , entry } ;
  *  entry = optionallyQuotedId , {' '},  '=', {' '} , optionallyQuotedValue ;
  *  optionallyQuotedId = (* words *) | (* quote *), (* characters *), (* quote *) ;
@@ -191,7 +191,7 @@ let parseMacroDefinitions = function (str) {
 //
 // ===============================
 
-/** Creates a AbstractPlayerApplet. 
+/** Creates a AbstractPlayerApplet.
  Subclasses must call initCube3DCanvas(). */
 class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
     constructor() {
@@ -219,7 +219,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
             colortable: null, //frdblu (deprecated)
             colorlist: null, //rufldb
         };
-        
+
         this.scriptSequence = [];
         this.playIndex = 0;
         this.playToken = null;
@@ -230,7 +230,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
         let c = this.canvas.getAttribute("kind");
         let cname = c == null || c == "null" ? "" : c.trim();
         if (cname.length == 0) {
-            cname = "RubiksCube";
+            cname = "rubikscube";
         }
         let levelOfDetail = parseInt(this.canvas.getAttribute("levelofdetail"));
         if (isNaN(levelOfDetail)) {
@@ -238,23 +238,23 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
         }
 
         let c3d = null;
-        switch (cname) {
-            case "RubiksCube" :
+        switch (cname.toLowerCase()) {
+            case "rubikscube" :
                 c3d = RubiksCubeCube3D.createCube3D(levelOfDetail);
                 break;
-            case "PocketCube" :
+            case "pocketcube" :
                 c3d = PocketCubeCube3D.createCube3D(levelOfDetail);
                 break;
-            case "RevengeCube" :
+            case "revengecube" :
                 c3d = RevengeCubeCube3D.createCube3D(levelOfDetail);
                 break;
-            case "ProfessorCube" :
+            case "professorcube" :
                 c3d = ProfessorCubeCube3D.createCube3D(levelOfDetail);
                 break;
-            case "Cube6" :
+            case "cube6" :
                 c3d = Cube6Cube3D.createCube3D(levelOfDetail);
                 break;
-            case "Cube7" :
+            case "cube7" :
                 c3d = Cube7Cube3D.createCube3D(levelOfDetail);
                 break;
             default :
@@ -571,7 +571,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
          tri[i].draw(g);
          }*/
     }
-    
+
     /**
      * Returns true if the script type is "solver",
      * false otherwise. When false, the script type is
@@ -637,8 +637,8 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
         return;
     }
     /**
-     * Pushes a move for undoing. 
-     * @param move twistNode. 
+     * Pushes a move for undoing.
+     * @param move twistNode.
      * */
     pushMoveOnUndoList(move) {
         if (this.redoIndex < this.undoList.length) {
@@ -694,7 +694,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
        if (this.stopPlayback()) {
            return;
        }
-       
+
        let moves;
        if (this.playIndex < this.scriptSequence.length) {
             moves = this.scriptSequence.slice(this.playIndex);
@@ -706,7 +706,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
         this.playIndex = this.scriptSequence.length;
         this.playMoves(moves, true, this.cube3d.attributes.getUserTwistDuration());
     }
-    
+
     stopPlayback() {
         let isPlaying = this.playToken != null;
         this.playToken = null;
@@ -719,7 +719,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
 
     /**
      * Resets the playback header.
-     * @param {type} forward if true resets to start of sequence, 
+     * @param {type} forward if true resets to start of sequence,
      * if false resets to end of sequence
      */
     resetPlayback(forward) {
@@ -742,7 +742,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
            this.cube3d.setRepainter(this);
            this.repaint();
     }
-    
+
     /** Plays the next step of the script.
      */
     stepForward() {
@@ -752,7 +752,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
        if (this.stopPlayback()) {
            return;
        }
-       
+
        this.clearUndoRedo();
        if (this.playIndex < this.scriptSequence.length) {
            let nextMove = this.scriptSequence[this.playIndex];
@@ -773,7 +773,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
        if (this.stopPlayback()) {
            return;
        }
-       
+
        this.clearUndoRedo();
        if (this.playIndex > 0) {
            this.playIndex--;
@@ -789,7 +789,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
 
     playMoves(moves, animate, twistDuration=1000) {
         let self=this;
-        
+
         if (!animate) {
             let f = function () {
                 // Cancel all other lengthy operations
@@ -829,7 +829,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
                 self.cube.unlock(owner);
                 return;
             }
-            
+
             // Wait until cube3d has finished twisting
             if (self.cube3d.isTwisting) {
                 self.repaint(f);// busy loop
@@ -837,12 +837,12 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
             }
 
             if (next == 0) {
-                // => First move: Speed the cube up 
+                // => First move: Speed the cube up
                 self.cube3d.attributes.setTwistDuration(twistDuration);
             }
 
             if (self.cube.cancel) {
-                // => cancel? gently stop 
+                // => cancel? gently stop
                 next = moves.length;
             }
 
@@ -862,7 +862,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
         };
         this.repaint(f);
     }
-    
+
     /** Scrambles the cube.
      * @param scrambleCount Number > 1.
      * @param animate       Boolean. Whether to animate to cube or just snap
@@ -1116,7 +1116,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
                 }
             }
         }
-        
+
         // Set the colors for each sticker on each side of the cube.
         // XXX - This does only work correctly with 6-faced cubes
         let deprecatedParameterNames = [
@@ -1231,7 +1231,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
         let notation = p.scriptNotationObject != null
             ? p.scriptNotationObject
             : new ScriptNotation.DefaultNotation(cube3d.getCube().getLayerCount());
-        
+
         // parse scriptmacros
         // --------------
         if (p.scriptmacros != null) {
@@ -1261,7 +1261,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
         } else {
             this.scriptSequence = [];
         }
-        
+
         // parse initscript
         // --------------
         if (p.initscript != null) {
@@ -1278,8 +1278,8 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
         // --------------------
         this.scriptProgress = parseInt(p.scriptprogress);
         logger.log('.readParameters scriptprogress: "'+p.scriptprogress+'" interpreted as '+this.scriptProgress);
-        
-        
+
+
     }
 
     /** Reads the orientation parameters and applies them to the provided cube 3d.
@@ -1533,7 +1533,7 @@ class Cube3DHandler extends AbstractCanvas.AbstractHandler {
 
 
 // ------------------
-// MODULE API    
+// MODULE API
 // ------------------
 export default {
     AbstractPlayerApplet: AbstractPlayerApplet,

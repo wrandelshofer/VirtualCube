@@ -44,7 +44,7 @@ class CubeAttributes {
     
     // The twist duration that will be set on twistDuration when the program
     // performs a scramble operation.
-    this.scrambleTwistDuration=500;
+    this.scrambleTwistDuration=200;
     
     this.backgroundColor=[0, 0, 0, 0]; //[r,g,b,a]
     

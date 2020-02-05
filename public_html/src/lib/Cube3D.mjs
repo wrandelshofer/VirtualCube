@@ -7,6 +7,7 @@
 // --------------
 import Node3D from './Node3D.mjs';
 import J3DIMath from './J3DIMath.mjs';
+import SplineInterpolator from './SplineInterpolator.mjs';
 
 /** Change event. */
 class ChangeEvent {
@@ -16,7 +17,7 @@ class ChangeEvent {
 }
 
 /** Constructor
- * Base class for classes which implement the geometry of a 
+ * Base class for classes which implement the geometry of a
  * Rubik's Cube like puzzle.
  *
  *
@@ -105,8 +106,109 @@ class Cube3D extends Node3D.Node3D {
         this.updateCube();
     }
     cubeTwisted(evt) {
-        this.updateCube();
+        if (this.repainter == null) {
+            this.updateCube();
+            return;
+        }
+
+        let axis = evt.getAxis();
+        let angle = evt.getAngle();
+        let model = this.getCube();
+
+        let partIndices = new Array(this.partCount);
+        let orientations = new Array(this.partCount);
+        let locations = evt.getAffectedLocations();
+        let count = locations.length;
+
+        for (let i = 0; i < count; i++) {
+            partIndices[i] = model.getPartAt(locations[i]);
+            orientations[i] = model.getPartOrientation(partIndices[i]);
+        }
+
+        let finalCount = count;
+        let self = this;
+        let interpolator = new SplineInterpolator.SplineInterpolator(0, 0, 1, 1);
+        let start = new Date().getTime();
+        let duration = this.attributes.getTwistDuration() * Math.abs(angle);
+        let token=new Object();
+        this.isTwisting = token;
+        let f = function () {
+            if (self.isTwisting!==token) {
+                // Twisting was aborted. Complete this twisting animation.
+                self.validateTwist(partIndices, locations, orientations, finalCount, axis, angle, 1.0);
+                return;
+            }
+            let now = new Date().getTime();
+            let elapsed = now - start;
+            let value = elapsed / duration;
+            if (value < 1) {
+                self.validateTwist(partIndices, locations, orientations, finalCount, axis, angle, interpolator.getFraction(value));
+                self.repainter.repaint(f);
+            } else {
+                self.validateTwist(partIndices, locations, orientations, finalCount, axis, angle, 1.0);
+                self.isTwisting = null;
+            }
+        };
+        if (this.repainter != null) {
+            this.repainter.repaint(f);
+        }
     }
+    validateTwist(partIndices, locations, orientations, partCount, axis, angle, alpha) {
+        let rotation = this.updateTwistRotation;
+        rotation.makeIdentity();
+        let rad = (90 * angle * (1 - alpha));
+        switch (axis) {
+            case 0:
+                rotation.rotate(rad, -1, 0, 0);
+                break;
+            case 1:
+                rotation.rotate(rad, 0, -1, 0);
+                break;
+            case 2:
+                rotation.rotate(rad, 0, 0, 1);
+                break;
+        }
+
+        let orientationMatrix = this.updateTwistOrientation;
+        for (let i = 0; i < partCount; i++) {
+            orientationMatrix.makeIdentity();
+            if (partIndices[i] < this.edgeOffset) { //=> part is a corner
+                // Base location of a corner part is urf. (= corner part 0)
+                switch (orientations[i]) {
+                    case 0:
+                        break;
+                    case 1:
+                        orientationMatrix.rotate(90, 0, 0, 1);
+                        orientationMatrix.rotate(90, -1, 0, 0);
+                        break;
+                    case 2:
+                        orientationMatrix.rotate(90, 0, 0, -1);
+                        orientationMatrix.rotate(90, 0, 1, 0);
+                        break;
+                }
+            } else if (partIndices[i] < this.sideOffset) { //=> part is an edge
+                if (orientations[i] == 1) {
+                    // Base location of an edge part is ur. (= edge part 0)
+                    orientationMatrix.rotateZ(90);
+                    orientationMatrix.rotateX(180);
+                }
+            } else if (partIndices[i] < this.centerOffset) {//=> part is a side
+                if (orientations[i] > 0) {
+                    // Base location of a side part is r. (= side part 0)
+                    orientationMatrix.rotate(90 * orientations[i], -1, 0, 0);
+                }
+            }
+            this.partOrientations[partIndices[i]].matrix.load(orientationMatrix);
+            let transform = this.partLocations[partIndices[i]].matrix;
+            transform.load(rotation);
+            transform.multiply(this.identityPartLocations[locations[i]]);
+        }
+    }
+
+    /* Immediately completes the current twisting animation. */
+     finishTwisting() {
+       this.isTwisting=null;
+     }
 
     updateCube() {
         //this.stopAnimation();
@@ -114,7 +216,7 @@ class Cube3D extends Node3D.Node3D {
         this.validateCube();
         this.fireStateChanged();
     }
-    
+
     validateCube() {
         if (!this.isCubeValid) {
             this.isCubeValid = true;
@@ -215,12 +317,12 @@ class Cube3D extends Node3D.Node3D {
         }
     }
 
-    /** Intersection test for a ray with the cube. 
+    /** Intersection test for a ray with the cube.
      * The ray must be given as an object with {point:J3DIVector3, dir:J3DIVector3}
      * in the model coordinates of the cube.
      *
-     * Returns null if no intersection, or the intersection data: 
-     * {point:J3DIVector3, uv:J3DIVector3, t:float, axis:int, layerMask:int, 
+     * Returns null if no intersection, or the intersection data:
+     * {point:J3DIVector3, uv:J3DIVector3, t:float, axis:int, layerMask:int,
      *  angle:int, ...}
      *
      * @return point Intersection point: 3D vector.
@@ -246,7 +348,7 @@ class Cube3D extends Node3D.Node3D {
             isect.axis = this.boxClickToAxisMap[face][u][v];
             isect.layerMask = this.boxClickToLayerMap[face][u][v];
             isect.angle = this.boxClickToAngleMap[face][u][v];
-
+console.log("intersect face:"+face+ " u:"+u+" v:"+v+" "+isect.location+" "+isect.axis+" "+isect.layerMask+" "+isect.angle);
             isect.part = this.cube.getPartAt(isect.location);
             if (!this.attributes.isPartVisible(isect.part)) {
                 isect = null;
@@ -255,11 +357,11 @@ class Cube3D extends Node3D.Node3D {
 
         return isect;
     }
-    /** Intersection test for a ray with a developed cube. 
+    /** Intersection test for a ray with a developed cube.
      * The ray must be given as an object with {point:J3DIVector3, dir:J3DIVector3}
      * in the model coordinates of the cube.
      *
-     * Returns null if no intersection, or the intersection data: 
+     * Returns null if no intersection, or the intersection data:
      * {point:J3DIVector3, uv:J3DIVector3, t:float, axis:int, layerMask:int, angle:int,
      *  ...}
      *
@@ -328,13 +430,13 @@ class Cube3D extends Node3D.Node3D {
     getCube() {
         return this.cube;
     }
-    
+
      /* Immediately completes the current twisting animation. */
      finishTwisting() {
         // subclasses can override this methods
      }
-     
-     /** Sets the repainter for animation. Set this value to null to prevent animation. 
+
+     /** Sets the repainter for animation. Set this value to null to prevent animation.
       *  Set this value to an object which has a repaint() method. The repaint() method
       *  must paint the current state of the Cube3D.
       */
@@ -348,6 +450,35 @@ class Cube3D extends Node3D.Node3D {
      getCubeSize() {
         return this.cubeSize;
      }
+
+    updateExplosionFactor(factor) {
+        if (factor == null) {
+            factor = this.attributes.explosionFactor;
+        }
+        let explosionShift = this.partSize * 1.5;
+        let baseShift = explosionShift * factor;
+        let shift = 0;
+        let a = this.attributes;
+        for (let i = 0; i < this.cornerCount; i++) {
+            let index = this.cornerOffset + i;
+            shift = baseShift + a.partExplosion[index];
+            this.partExplosions[index].matrix.makeIdentity();
+            this.partExplosions[index].matrix.translate(shift, shift, -shift);//ruf
+        }
+        for (let i = 0; i < this.edgeCount; i++) {
+            let index = this.edgeOffset + i;
+            shift = baseShift + a.partExplosion[index];
+            this.partExplosions[index].matrix.makeIdentity();
+            this.partExplosions[index].matrix.translate(shift, shift, 0);//ru
+        }
+        for (let i = 0; i < this.sideCount; i++) {
+            let index = this.sideOffset + i;
+            shift = baseShift + a.partExplosion[index];
+            this.partExplosions[index].matrix.makeIdentity();
+            this.partExplosions[index].matrix.translate(shift, 0, 0);//r
+        }
+        this.fireStateChanged();
+    }
 }
 
 /**
@@ -413,7 +544,7 @@ let computeStickerOffsets = function(layerCount) {
 }
 
 // ------------------
-// MODULE API    
+// MODULE API
 // ------------------
 export default {
     Cube3D: Cube3D,

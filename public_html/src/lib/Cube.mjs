@@ -276,7 +276,10 @@ class CubeEvent {
     this.angle = angle;
     this.layerMask = layerMask;
   }
-
+  getSource() { return this.source; }
+  getAxis() { return this.axis; }
+  getAngle() { return this.angle; }
+  getLayerMask() { return this.layerMask; }
   /**
    * Returns a list of part ID's, for each part location which is affected
    * if a cube is transformed using the axis, layerMaska and angle
@@ -560,7 +563,7 @@ class Cube {
    * Gets the location of the specified corner part.
    */
 
-  getCornerLocation(corner) {
+  getCornerLocation(corner) {7
     let i;
     if (this.cornerLoc[corner] == corner) {
       return corner;
@@ -1078,7 +1081,6 @@ class Cube {
     } else {
       result = this.cornerLoc.length + this.edgeLoc.length + this.sideLoc.length;
     }
-    module.log('getPartAt(' + location + "):" + result);
     return result;
   }
 

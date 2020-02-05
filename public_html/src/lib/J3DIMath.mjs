@@ -471,6 +471,15 @@ class J3DIMatrix4 {
         return this;
     }
 
+    rotateX(angle) {
+      this.rotate(angle,1,0,0);
+    }
+    rotateY(angle) {
+      this.rotate(angle,0,1,0);
+    }
+    rotateZ(angle) {
+      this.rotate(angle,0,0,1);
+    }
     rotate(angle, x, y, z) {
         // Forms are (angle, x,y,z), (angle,vector), (angleX, angleY, angleZ), (angle)
         if (typeof x == 'object' && "length" in x) {
@@ -589,41 +598,44 @@ class J3DIMatrix4 {
                 return this;
             }
 
-            let m11 = (mat.$matrix.m11 * this.$matrix.m11 + mat.$matrix.m12 * this.$matrix.m21
-              + mat.$matrix.m13 * this.$matrix.m31 + mat.$matrix.m14 * this.$matrix.m41);
-            let m12 = (mat.$matrix.m11 * this.$matrix.m12 + mat.$matrix.m12 * this.$matrix.m22
-              + mat.$matrix.m13 * this.$matrix.m32 + mat.$matrix.m14 * this.$matrix.m42);
-            let m13 = (mat.$matrix.m11 * this.$matrix.m13 + mat.$matrix.m12 * this.$matrix.m23
-              + mat.$matrix.m13 * this.$matrix.m33 + mat.$matrix.m14 * this.$matrix.m43);
-            let m14 = (mat.$matrix.m11 * this.$matrix.m14 + mat.$matrix.m12 * this.$matrix.m24
-              + mat.$matrix.m13 * this.$matrix.m34 + mat.$matrix.m14 * this.$matrix.m44);
+            let a = mat.$matrix;
+            let b = this.$matrix;
 
-            let m21 = (mat.$matrix.m21 * this.$matrix.m11 + mat.$matrix.m22 * this.$matrix.m21
-              + mat.$matrix.m23 * this.$matrix.m31 + mat.$matrix.m24 * this.$matrix.m41);
-            let m22 = (mat.$matrix.m21 * this.$matrix.m12 + mat.$matrix.m22 * this.$matrix.m22
-              + mat.$matrix.m23 * this.$matrix.m32 + mat.$matrix.m24 * this.$matrix.m42);
-            let m23 = (mat.$matrix.m21 * this.$matrix.m13 + mat.$matrix.m22 * this.$matrix.m23
-              + mat.$matrix.m23 * this.$matrix.m33 + mat.$matrix.m24 * this.$matrix.m43);
-            let m24 = (mat.$matrix.m21 * this.$matrix.m14 + mat.$matrix.m22 * this.$matrix.m24
-              + mat.$matrix.m23 * this.$matrix.m34 + mat.$matrix.m24 * this.$matrix.m44);
+            let m11 = (a.m11 * b.m11 + a.m12 * b.m21
+              + a.m13 * b.m31 + a.m14 * b.m41);
+            let m12 = (a.m11 * b.m12 + a.m12 * b.m22
+              + a.m13 * b.m32 + a.m14 * b.m42);
+            let m13 = (a.m11 * b.m13 + a.m12 * b.m23
+              + a.m13 * b.m33 + a.m14 * b.m43);
+            let m14 = (a.m11 * b.m14 + a.m12 * b.m24
+              + a.m13 * b.m34 + a.m14 * b.m44);
 
-            let m31 = (mat.$matrix.m31 * this.$matrix.m11 + mat.$matrix.m32 * this.$matrix.m21
-              + mat.$matrix.m33 * this.$matrix.m31 + mat.$matrix.m34 * this.$matrix.m41);
-            let m32 = (mat.$matrix.m31 * this.$matrix.m12 + mat.$matrix.m32 * this.$matrix.m22
-              + mat.$matrix.m33 * this.$matrix.m32 + mat.$matrix.m34 * this.$matrix.m42);
-            let m33 = (mat.$matrix.m31 * this.$matrix.m13 + mat.$matrix.m32 * this.$matrix.m23
-              + mat.$matrix.m33 * this.$matrix.m33 + mat.$matrix.m34 * this.$matrix.m43);
-            let m34 = (mat.$matrix.m31 * this.$matrix.m14 + mat.$matrix.m32 * this.$matrix.m24
-              + mat.$matrix.m33 * this.$matrix.m34 + mat.$matrix.m34 * this.$matrix.m44);
+            let m21 = (a.m21 * b.m11 + a.m22 * b.m21
+              + a.m23 * b.m31 + a.m24 * b.m41);
+            let m22 = (a.m21 * b.m12 + a.m22 * b.m22
+              + a.m23 * b.m32 + a.m24 * b.m42);
+            let m23 = (a.m21 * b.m13 + a.m22 * b.m23
+              + a.m23 * b.m33 + a.m24 * b.m43);
+            let m24 = (a.m21 * b.m14 + a.m22 * b.m24
+              + a.m23 * b.m34 + a.m24 * b.m44);
 
-            let m41 = (mat.$matrix.m41 * this.$matrix.m11 + mat.$matrix.m42 * this.$matrix.m21
-              + mat.$matrix.m43 * this.$matrix.m31 + mat.$matrix.m44 * this.$matrix.m41);
-            let m42 = (mat.$matrix.m41 * this.$matrix.m12 + mat.$matrix.m42 * this.$matrix.m22
-              + mat.$matrix.m43 * this.$matrix.m32 + mat.$matrix.m44 * this.$matrix.m42);
-            let m43 = (mat.$matrix.m41 * this.$matrix.m13 + mat.$matrix.m42 * this.$matrix.m23
-              + mat.$matrix.m43 * this.$matrix.m33 + mat.$matrix.m44 * this.$matrix.m43);
-            let m44 = (mat.$matrix.m41 * this.$matrix.m14 + mat.$matrix.m42 * this.$matrix.m24
-              + mat.$matrix.m43 * this.$matrix.m34 + mat.$matrix.m44 * this.$matrix.m44);
+            let m31 = (a.m31 * b.m11 + a.m32 * b.m21
+              + a.m33 * b.m31 + a.m34 * b.m41);
+            let m32 = (a.m31 * b.m12 + a.m32 * b.m22
+              + a.m33 * b.m32 + a.m34 * b.m42);
+            let m33 = (a.m31 * b.m13 + a.m32 * b.m23
+              + a.m33 * b.m33 + a.m34 * b.m43);
+            let m34 = (a.m31 * b.m14 + a.m32 * b.m24
+              + a.m33 * b.m34 + a.m34 * b.m44);
+
+            let m41 = (a.m41 * b.m11 + a.m42 * b.m21
+              + a.m43 * b.m31 + a.m44 * b.m41);
+            let m42 = (a.m41 * b.m12 + a.m42 * b.m22
+              + a.m43 * b.m32 + a.m44 * b.m42);
+            let m43 = (a.m41 * b.m13 + a.m42 * b.m23
+              + a.m43 * b.m33 + a.m44 * b.m43);
+            let m44 = (a.m41 * b.m14 + a.m42 * b.m24
+              + a.m43 * b.m34 + a.m44 * b.m44);
 
             this.$matrix.m11 = m11;
             this.$matrix.m12 = m12;
@@ -670,52 +682,52 @@ class J3DIMatrix4 {
     }
 
     premultiply(mat) {
-        if (typeof mx2 == 'object' && "$matrix" in mat) {
+        if (typeof mat == 'object' && "$matrix" in mat) {
 
             if (J3DIHasCSSMatrix) {
                 this.$matrix = mat.$matrix.multiply(this.$matrix);
-                return mx1;
+                return this;
             }
 
-            let mx1 = mat;
-            let mx2 = this;
+            let b = mat.$matrix;
+            let a = this.$matrix;
 
-            let m11 = (mx2.$matrix.m11 * mx1.$matrix.m11 + mx2.$matrix.m12 * mx1.$matrix.m21
-              + mx2.$matrix.m13 * mx1.$matrix.m31 + mx2.$matrix.m14 * mx1.$matrix.m41);
-            let m12 = (mx2.$matrix.m11 * mx1.$matrix.m12 + mx2.$matrix.m12 * mx1.$matrix.m22
-              + mx2.$matrix.m13 * mx1.$matrix.m32 + mx2.$matrix.m14 * mx1.$matrix.m42);
-            let m13 = (mx2.$matrix.m11 * mx1.$matrix.m13 + mx2.$matrix.m12 * mx1.$matrix.m23
-              + mx2.$matrix.m13 * mx1.$matrix.m33 + mx2.$matrix.m14 * mx1.$matrix.m43);
-            let m14 = (mx2.$matrix.m11 * mx1.$matrix.m14 + mx2.$matrix.m12 * mx1.$matrix.m24
-              + mx2.$matrix.m13 * mx1.$matrix.m34 + mx2.$matrix.m14 * mx1.$matrix.m44);
+            let m11 = (a.m11 * b.m11 + a.m12 * b.m21
+              + a.m13 * b.m31 + a.m14 * b.m41);
+            let m12 = (a.m11 * b.m12 + a.m12 * b.m22
+              + a.m13 * b.m32 + a.m14 * b.m42);
+            let m13 = (a.m11 * b.m13 + a.m12 * b.m23
+              + a.m13 * b.m33 + a.m14 * b.m43);
+            let m14 = (a.m11 * b.m14 + a.m12 * b.m24
+              + a.m13 * b.m34 + a.m14 * b.m44);
 
-            let m21 = (mx2.$matrix.m21 * mx1.$matrix.m11 + mx2.$matrix.m22 * mx1.$matrix.m21
-              + mx2.$matrix.m23 * mx1.$matrix.m31 + mx2.$matrix.m24 * mx1.$matrix.m41);
-            let m22 = (mx2.$matrix.m21 * mx1.$matrix.m12 + mx2.$matrix.m22 * mx1.$matrix.m22
-              + mx2.$matrix.m23 * mx1.$matrix.m32 + mx2.$matrix.m24 * mx1.$matrix.m42);
-            let m23 = (mx2.$matrix.m21 * mx1.$matrix.m13 + mx2.$matrix.m22 * mx1.$matrix.m23
-              + mx2.$matrix.m23 * mx1.$matrix.m33 + mx2.$matrix.m24 * mx1.$matrix.m43);
-            let m24 = (mx2.$matrix.m21 * mx1.$matrix.m14 + mx2.$matrix.m22 * mx1.$matrix.m24
-              + mx2.$matrix.m23 * mx1.$matrix.m34 + mx2.$matrix.m24 * mx1.$matrix.m44);
+            let m21 = (a.m21 * b.m11 + a.m22 * b.m21
+              + a.m23 * b.m31 + a.m24 * b.m41);
+            let m22 = (a.m21 * b.m12 + a.m22 * b.m22
+              + a.m23 * b.m32 + a.m24 * b.m42);
+            let m23 = (a.m21 * b.m13 + a.m22 * b.m23
+              + a.m23 * b.m33 + a.m24 * b.m43);
+            let m24 = (a.m21 * b.m14 + a.m22 * b.m24
+              + a.m23 * b.m34 + a.m24 * b.m44);
 
-            let m31 = (mx2.$matrix.m31 * mx1.$matrix.m11 + mx2.$matrix.m32 * mx1.$matrix.m21
-              + mx2.$matrix.m33 * mx1.$matrix.m31 + mx2.$matrix.m34 * mx1.$matrix.m41);
-            let m32 = (mx2.$matrix.m31 * mx1.$matrix.m12 + mx2.$matrix.m32 * mx1.$matrix.m22
-              + mx2.$matrix.m33 * mx1.$matrix.m32 + mx2.$matrix.m34 * mx1.$matrix.m42);
-            let m33 = (mx2.$matrix.m31 * mx1.$matrix.m13 + mx2.$matrix.m32 * mx1.$matrix.m23
-              + mx2.$matrix.m33 * mx1.$matrix.m33 + mx2.$matrix.m34 * mx1.$matrix.m43);
-            let m34 = (mx2.$matrix.m31 * mx1.$matrix.m14 + mx2.$matrix.m32 * mx1.$matrix.m24
-              + mx2.$matrix.m33 * mx1.$matrix.m34 + mx2.$matrix.m34 * mx1.$matrix.m44);
+            let m31 = (a.m31 * b.m11 + a.m32 * b.m21
+              + a.m33 * b.m31 + a.m34 * b.m41);
+            let m32 = (a.m31 * b.m12 + a.m32 * b.m22
+              + a.m33 * b.m32 + a.m34 * b.m42);
+            let m33 = (a.m31 * b.m13 + a.m32 * b.m23
+              + a.m33 * b.m33 + a.m34 * b.m43);
+            let m34 = (a.m31 * b.m14 + a.m32 * b.m24
+              + a.m33 * b.m34 + a.m34 * b.m44);
 
-            let m41 = (mx2.$matrix.m41 * mx1.$matrix.m11 + mx2.$matrix.m42 * mx1.$matrix.m21
-              + mx2.$matrix.m43 * mx1.$matrix.m31 + mx2.$matrix.m44 * mx1.$matrix.m41);
-            let m42 = (mx2.$matrix.m41 * mx1.$matrix.m12 + mx2.$matrix.m42 * mx1.$matrix.m22
-              + mx2.$matrix.m43 * mx1.$matrix.m32 + mx2.$matrix.m44 * mx1.$matrix.m42);
-            let m43 = (mx2.$matrix.m41 * mx1.$matrix.m13 + mx2.$matrix.m42 * mx1.$matrix.m23
-              + mx2.$matrix.m43 * mx1.$matrix.m33 + mx2.$matrix.m44 * mx1.$matrix.m43);
-            let m44 = (mx2.$matrix.m41 * mx1.$matrix.m14 + mx2.$matrix.m42 * mx1.$matrix.m24
-              + mx2.$matrix.m43 * mx1.$matrix.m34 + mx2.$matrix.m44 * mx1.$matrix.m44);
-
+            let m41 = (a.m41 * b.m11 + a.m42 * b.m21
+              + a.m43 * b.m31 + a.m44 * b.m41);
+            let m42 = (a.m41 * b.m12 + a.m42 * b.m22
+              + a.m43 * b.m32 + a.m44 * b.m42);
+            let m43 = (a.m41 * b.m13 + a.m42 * b.m23
+              + a.m43 * b.m33 + a.m44 * b.m43);
+            let m44 = (a.m41 * b.m14 + a.m42 * b.m24
+              + a.m43 * b.m34 + a.m44 * b.m44);
+              
             this.$matrix.m11 = m11;
             this.$matrix.m12 = m12;
             this.$matrix.m13 = m13;
@@ -735,7 +747,7 @@ class J3DIMatrix4 {
             this.$matrix.m42 = m42;
             this.$matrix.m43 = m43;
             this.$matrix.m44 = m44;
-        } else {
+      } else {
             this.$matrix.m11 *= mat;
             this.$matrix.m12 *= mat;
             this.$matrix.m13 *= mat;
