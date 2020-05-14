@@ -39,6 +39,31 @@ let logger = {
 //
 // ===============================
 
+/** Returns an array of script nodes. */
+let createRandomScript = function (layerCount, scrambleCount, scrambleMinCount) {
+  if (scrambleCount == null)
+    scrambleCount = 21;
+  if (scrambleMinCount == null)
+    scrambleMinCount = 6;
+  let scrambler = new Array(Math.floor(Math.random() * scrambleCount - scrambleMinCount) + scrambleMinCount);
+  // Keep track of previous axis,  avoid two subsequent moves on
+  // the same axis.
+  let prevAxis = -1;
+  let axis, layerMask, angle;
+  for (let i = 0; i < scrambleCount; i++) {
+    while ((axis = Math.floor(Math.random() * 3)) == prevAxis) {
+    }
+    prevAxis = axis;
+//  while ((layerMask = Math.floor(Math.random()*(1 << this.layerCount))) == 0) {    }
+    layerMask = 1 << Math.floor(Math.random() * layerCount);
+    while ((angle = Math.floor(Math.random() * 5) - 2) == 0) {
+    }
+    scrambler[i] = new ScriptAST.MoveNode(layerCount, axis, layerMask, angle);
+  }
+
+  return scrambler;
+}
+
 
 /** Parses an indexed or named color list into an array.
  *
@@ -155,11 +180,11 @@ let parseMacroDefinitions = function (str) {
     t.skipWhitespace();
     let equal = t.read();
     if (equal != '=')
-      throw new ScriptParser.ParseException("= expected, ch:" + equal, t.getPosition() - 1, t.getPosition())
+      throw new Tokenizer.ParseException("= expected, ch:" + equal, t.getPosition() - 1, t.getPosition())
     t.skipWhitespace();
     quote = t.read();
     if (quote == null)
-      throw new ScriptParser.ParseException("quote around value expected, ch:" + ch, t.getPosition() - 1, t.getPosition())
+      throw new Tokenizer.ParseException("quote around value expected, ch:" + ch, t.getPosition() - 1, t.getPosition())
     let value = '';
     if (/\w/.test(quote)) {// => value is not quoted
       value = quote;
@@ -878,7 +903,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
     this.clearUndoRedo();
     // Create random moves
     let layerCount = this.cube3d.cube.layerCount;
-    let scrambleNodes = ScriptParser.createRandomScript(layerCount, scrambleCount);
+    let scrambleNodes = createRandomScript(layerCount, scrambleCount);
     this.playMoves(scrambleNodes, animate,this.cube3d.attributes.getScrambleTwistDuration());
   }
 

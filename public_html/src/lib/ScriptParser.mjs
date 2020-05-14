@@ -18,26 +18,6 @@ let module = {
   }
 }
 
-class ParseException extends Error {
-  constructor(msg, start, end) {
-    super(msg);
-    this.start = start;
-    this.end = end;
-  }
-
-  getStartPosition() {
-    return this.start;
-  }
-  getEndPosition() {
-    return this.end;
-  }
-
-  toString() {
-    return this.message + " at:" + this.start + ".." + this.end+".";
-  }
-}
-
-
 const UNKNOWN_MASK = 0;
 const GROUPING_MASK = 1;
 const CONJUGATION_MASK = 2;
@@ -46,16 +26,47 @@ const ROTATION_MASK = 8;
 const PERMUTATION_MASK = 16;
 const INVERSION_MASK = 32;
 const REFLECTION_MASK = 64;
+
+/**
+ * Defines the API for a ScriptParser.
+ * Clients of this module may only use methods defined in this interface.
+ */
+class ScriptParserInterface {
+  /**
+   * Creates a new parser.
+   * @param {Notation.ScriptNotation} notation, must be non-null
+   * @param {Map<String,String>} localMacros, must be non-null
+   */
+  constructor(notation, localMacros) {
+  	// This constructor is abstract.
+  	// EcmaScript 2019 does not support abstract constructors, so this is a constructor with empty body.
+  	// Subclasses must call super (this is enforced by EcmaScript).
+  }
+
+  /**
+   * Parses a Script.
+   * @param {string} input, must be non-null
+   * @return {AST.Node} abstract syntax tree, is non-null
+   * @throws {Tokenizer.ParseException} if parsing failed
+   */
+  parse(input) {
+  	// EcmaScript 2019 does not support abstract method, so this is a method with empty body.
+  	// Subclasses should not call super, because this implementation just throws a ParseException.
+  	throw new Tokenizer.ParseException("The ScriptParserInterface cannot parse anything.",0,0)
+  }
+}
+
 /**
  * Implements a parser for a specific notation.
  */
-class ScriptParser {
+class ScriptParser extends ScriptParserInterface {
   /**
    * Creates a new parser.
    * @param {Notation} notation
    * @param {Map<String,String>} localMacros
    */
   constructor(notation, localMacros) {
+  	super(notation, localMacros);
     this.notation = notation;
     this.macros = new Map();
     if (localMacros != null) {
@@ -109,7 +120,7 @@ class ScriptParser {
   }
 
   createException(tt, msg) {
-    return new ParseException(msg + " Found \"" + tt.getStringValue() + "\".", tt.getStartPosition(), tt.getEndPosition());
+    return new Tokenizer.ParseException(msg + " Found \"" + tt.getStringValue() + "\".", tt.getStartPosition(), tt.getEndPosition());
   }
 
   createRepetitionNode(tt, operand1, operand2) {
@@ -291,7 +302,7 @@ class ScriptParser {
    *
    * @param tt   the tokenizer
    * @param parent Node the parent of the statement
-   * @throws ParseException
+   * @throws Tokenizer.ParseException
    */
   parseNonSuffixOrBacktrack(tt, parent) {
     if (tt.nextToken() != Tokenizer.TT_KEYWORD) {
@@ -310,7 +321,7 @@ class ScriptParser {
         // Parse was successful
         return;
       } catch (pe) {
-        if (!(pe instanceof ParseException)) {
+        if (!(pe instanceof Tokenizer.ParseException)) {
           throw pe;
         }
         // Parse failed: backtrack and try with another symbol.
@@ -539,7 +550,7 @@ class ScriptParser {
     let node = undefined;
     if (symbol.getCompositeSymbol() == Symbol.REPETITION) {
       if (tt.nextToken() != Tokenizer.TT_NUMBER) {
-        throw new ParseException("Repetition: Repetition count expected.", tt.getStartPosition(), tt.getEndPosition());
+        throw new Tokenizer.ParseException("Repetition: Repetition count expected.", tt.getStartPosition(), tt.getEndPosition());
       }
       node = this.createCompositeNode(tt, symbol, operand2, null);
       node.setRepeatCount(tt.getNumericValue());
@@ -630,7 +641,7 @@ class ScriptParser {
           macroNode.add(macroScript);
           child = macroNode;
         } catch (e) {
-          throw new ParseException("Error in macro \"" + token + "\":" + e.getMessage()
+          throw new Tokenizer.ParseException("Error in macro \"" + token + "\":" + e.getMessage()
             + " at " + e.getStartPosition() + ".." + e.getEndPosition(),
             tt.getStartPosition(), tt.getEndPosition());
         }
@@ -651,7 +662,7 @@ class ScriptParser {
    */
   parseRepetition(tt, parent) {
     if (tt.nextToken() != Tokenizer.TT_NUMBER) {
-      throw new ParseException("Repetition: Number expected.", tt.getStartPosition(), tt.getEndPosition());
+      throw new Tokenizer.ParseException("Repetition: Number expected.", tt.getStartPosition(), tt.getEndPosition());
     }
     let start = tt.getStartPosition();
     let repeatCount = tt.getNumericValue();
@@ -686,7 +697,7 @@ class ScriptParser {
       case Notation.Syntax.PRECIRCUMFIX:
       case Notation.Syntax.POSTCIRCUMFIX:
       {
-        throw new ParseException("Repetition: Illegal syntax: " + syntax, tt.getStartPosition(), tt.getEndPosition());
+        throw new Tokenizer.ParseException("Repetition: Illegal syntax: " + syntax, tt.getStartPosition(), tt.getEndPosition());
       }
     }
     let repetitionNode = new AST.RepetitionNode();
@@ -716,7 +727,7 @@ class ScriptParser {
    *
    * @param tt   the tokenizer
    * @param parent the parent of the statement
-   * @throws ParseException
+   * @throws Tokenizer.ParseException
    */
   parseStatement(tt, parent) {
     switch (tt.nextToken()) {
@@ -747,7 +758,7 @@ class ScriptParser {
    */
   parseSuffix(tt, parent, symbol) {
     if (parent.getChildCount() < 1) {
-      throw new ParseException("Suffix: No sibling for suffix.", tt.getStartPosition(), tt.getEndPosition());
+      throw new Tokenizer.ParseException("Suffix: No sibling for suffix.", tt.getStartPosition(), tt.getEndPosition());
     }
     let sibling = parent.getChildAt(parent.getChildCount() - 1);
     let startPosition = sibling.getStartPosition();
@@ -818,36 +829,14 @@ class ScriptParser {
   }
 }
 
-/** Returns an array of script nodes. */
-let createRandomScript = function (layerCount, scrambleCount, scrambleMinCount) {
-  if (scrambleCount == null)
-    scrambleCount = 21;
-  if (scrambleMinCount == null)
-    scrambleMinCount = 6;
-  let scrambler = new Array(Math.floor(Math.random() * scrambleCount - scrambleMinCount) + scrambleMinCount);
-  // Keep track of previous axis,  avoid two subsequent moves on
-  // the same axis.
-  let prevAxis = -1;
-  let axis, layerMask, angle;
-  for (let i = 0; i < scrambleCount; i++) {
-    while ((axis = Math.floor(Math.random() * 3)) == prevAxis) {
-    }
-    prevAxis = axis;
-//  while ((layerMask = Math.floor(Math.random()*(1 << this.layerCount))) == 0) {    }
-    layerMask = 1 << Math.floor(Math.random() * layerCount);
-    while ((angle = Math.floor(Math.random() * 5) - 2) == 0) {
-    }
-    scrambler[i] = new AST.MoveNode(layerCount, axis, layerMask, angle);
-  }
-
-  return scrambler;
-}
 
 // ------------------
 // MODULE API
 // ------------------
 export default {
-  ParseException: ParseException,
-  ScriptParser: ScriptParser,
-  createRandomScript: createRandomScript,
+  /* Provides a class that implements ScriptParserInterface.
+   * This model gives no guarantee, that ScriptParser provides other constructors or
+   * methods than the ones defined in ScriptParserInterface.
+   */
+  ScriptParser: ScriptParser
 };

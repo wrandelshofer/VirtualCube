@@ -444,6 +444,25 @@ class PushBackReader {
   }
 }
 
+class ParseException extends Error {
+  constructor(msg, start, end) {
+    super(msg);
+    this.start = start;
+    this.end = end;
+  }
+
+  getStartPosition() {
+    return this.start;
+  }
+  getEndPosition() {
+    return this.end;
+  }
+
+  toString() {
+    return this.message + " at:" + this.start + ".." + this.end+".";
+  }
+}
+
 // ------------------
 // MODULE API
 // ------------------
@@ -454,6 +473,7 @@ export default {
   TT_NUMBER: TT_NUMBER,
   TT_SPECIAL: TT_SPECIAL,
   Tokenizer: GreedyTokenizer,
-  PushBackReader:PushBackReader
-  };
+  PushBackReader:PushBackReader,
+  ParseException:ParseException
+};
 
