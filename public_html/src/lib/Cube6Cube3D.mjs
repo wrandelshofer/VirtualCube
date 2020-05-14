@@ -24,7 +24,7 @@ let module = {
 
 /** Constructor
  * Creates the 3D geometry of a Rubik's Cube.
- *  Subclasses must call initAbstractCube6Cube3D(). 
+ *  Subclasses must call initAbstractCube6Cube3D().
  */
 class AbstractCube6Cube3D extends Cube3D.Cube3D {
     constructor(partSize) {
@@ -115,7 +115,7 @@ class AbstractCube6Cube3D extends Cube3D.Cube3D {
         let cornerOffset = this.cornerOffset;
         let ps = this.partSize;
 
-        // Move all corner parts to up right front (= position of corner[0]). 
+        // Move all corner parts to up right front (= position of corner[0]).
         // nothing to do
 
         // Rotate the corner parts into place
@@ -293,7 +293,7 @@ class AbstractCube6Cube3D extends Cube3D.Cube3D {
          */
         let edgeOffset = this.edgeOffset;
 
-        // Move all edge parts to up right (ur) 
+        // Move all edge parts to up right (ur)
         // nothing to do
 
         // Rotate edge parts into place
@@ -378,7 +378,7 @@ class AbstractCube6Cube3D extends Cube3D.Cube3D {
         this.identityStickerLocations[ 1].rotate(-90, 1, 0, 0); // @23
         // rf
         this.identityStickerLocations[ 3].translate(ps * 3, 0, 0);
-        this.identityStickerLocations[ 3].rotate(180, 0, 0, 1); // 
+        this.identityStickerLocations[ 3].rotate(180, 0, 0, 1); //
         this.identityStickerLocations[ 3].rotate(-90, 1, 0, 0); // @23
         this.identityStickerLocations[23].rotate(-90, 1, 0, 0); // @23
         // dr
@@ -386,7 +386,7 @@ class AbstractCube6Cube3D extends Cube3D.Cube3D {
         this.identityStickerLocations[41].rotate(-90, 1, 0, 0); // @23
         this.identityStickerLocations[ 7].translate(ps * 3, 0, 0);
         this.identityStickerLocations[ 7].rotate(-90, 0, 0, 1); // @25
-        this.identityStickerLocations[ 7].rotate(-90, 1, 0, 0); // @23 
+        this.identityStickerLocations[ 7].rotate(-90, 1, 0, 0); // @23
         // bu
         this.identityStickerLocations[46].translate(ps * 6, ps * 0, 0);
         this.identityStickerLocations[46].rotate(90, 0, 0, 1); // @19
@@ -514,7 +514,7 @@ class AbstractCube6Cube3D extends Cube3D.Cube3D {
         this.identityStickerLocations[49].rotate(90, 0, 1, 0);
         this.identityStickerLocations[49].rotate(180, 1, 0, 0);
 
-        // ----------------------------         
+        // ----------------------------
         // Reset all rotations
         for (let i = 0; i < this.partCount; i++) {
             this.partLocations[i].matrix.load(this.identityPartLocations[i]);
@@ -525,7 +525,7 @@ class AbstractCube6Cube3D extends Cube3D.Cube3D {
     }
 
     loadGeometry() {
-        // ----------------------------         
+        // ----------------------------
         // Load geometry
         let self = this;
         let fRepaint = function () {
@@ -896,7 +896,7 @@ class AbstractCube6Cube3D extends Cube3D.Cube3D {
             if (self.isTwisting!==token) {
                 // Twisting was aborted. Complete this twisting animation.
                 self.validateTwist(partIndices, locations, orientations, finalCount, axis, angle, 1.0);
-                return; 
+                return;
             }
             let now = new Date().getTime();
             let elapsed = now - start;
@@ -913,12 +913,12 @@ class AbstractCube6Cube3D extends Cube3D.Cube3D {
             this.repainter.repaint(f);
         }
     }
-    
+
     /* Immediately completes the current twisting animation. */
      finishTwisting() {
        this.isTwisting=null;
      }
-    
+
 }
 
 /**
@@ -1003,7 +1003,7 @@ AbstractCube6Cube3D.prototype.stickerToPartMap = [
 
 /** Maps parts to stickers. This is a two dimensional array. The first
  * dimension is the part index, the second dimension the orientation of
- * the part. 
+ * the part.
  * This map is filled in by the init method!!
  */
 AbstractCube6Cube3D.prototype.partToStickerMap = null;
@@ -1125,7 +1125,7 @@ AbstractCube6Cube3D.prototype.boxSwipeToLayerMap = [
  * the 3D model being used.
  * <pre>
  *   0 1 2 3 4 5 6 7 8
- *        +-----+ 
+ *        +-----+
  * 0      |     |
  * 1      |  U  |
  * 2      |     |
@@ -1221,12 +1221,12 @@ function createCube3D(levelOfDetail) {
   const c = new Cube6Cube3D();
   c.baseUrl = 'lib/';
   switch (levelOfDetail) {
-    case 1: c.relativeUrl = 'models/cube6s1/'; break; // low-res model that should not be taken apart
-    case 2: c.relativeUrl = 'models/cube6s1/'; break; // med-res model that should not be taken apart
-    case 3: c.relativeUrl = 'models/cube6s1/'; break; // high-res model that should not be taken apart
-    case 4: c.relativeUrl = 'models/cube6s1/'; break; // low-res model that can be taken apart
-    case 5: c.relativeUrl = 'models/cube6s1/'; break; // med-res model that can be taken apart
-    default: c.relativeUrl = 'models/cube6s1/'; break; // high-res model that can be taken apart
+    case 1: c.relativeUrl = 'models/cube6-1/'; break; // low-res model that should not be taken apart
+    case 2: c.relativeUrl = 'models/cube6-1/'; break; // med-res model that should not be taken apart
+    case 3: c.relativeUrl = 'models/cube6-1/'; break; // high-res model that should not be taken apart
+    case 4: c.relativeUrl = 'models/cube6-1/'; break; // low-res model that can be taken apart
+    case 5: c.relativeUrl = 'models/cube6-1/'; break; // med-res model that can be taken apart
+    default: c.relativeUrl = 'models/cube6-1/'; break; // high-res model that can be taken apart
   }
   return c;
 }

@@ -299,6 +299,9 @@ class CubeEvent {
 //
 // ===============================
 
+/**
+ * Abstract base class for cubes.
+ */
 class Cube {
   /**
    * Creates a new instance.
@@ -326,7 +329,8 @@ class Cube {
     }
 
     // The owner is used to coordinate series of transformations (such as twisting)
-    // that may only be performed by one entity at a time.
+    // that may only be performed by one owner at a time - for example, either by
+    // the playback function for a script, or by a gesture performed by the user.
     this.owner = null;
 
     // This is set to true if a series of transformations shall be canceled.
@@ -473,7 +477,7 @@ class Cube {
     }
   }
   /**
-   * Notify all listeners that have registered varerest for
+   * Notify all listeners that have registered interest for
    * notification on this event type.
    */
   fireCubeTwisted(event) {
@@ -489,7 +493,7 @@ class Cube {
   }
 
   /**
-   * Notify all listeners that have registered varerest for
+   * Notify all listeners that have registered interest for
    * notification on this event type.
    */
   fireCubeChanged(event) {
@@ -524,7 +528,6 @@ class Cube {
   /**
    * Returns the locations of all corner parts.
    */
-
   getCornerLocations() {
     return this.cornerLoc;
   }
@@ -532,7 +535,6 @@ class Cube {
   /**
    * Returns the orientations of all corner parts.
    */
-
   getCornerOrientations() {
     return this.cornerOrient;
   }
@@ -554,7 +556,6 @@ class Cube {
   /**
    * Gets the corner part at the specified location.
    */
-
   getCornerAt(location) {
     return this.cornerLoc[location];
   }
@@ -562,7 +563,6 @@ class Cube {
   /**
    * Gets the location of the specified corner part.
    */
-
   getCornerLocation(corner) {7
     let i;
     if (this.cornerLoc[corner] == corner) {
@@ -579,7 +579,6 @@ class Cube {
   /**
    * Returns the number of corner parts.
    */
-
   getCornerCount() {
     return this.cornerLoc.length;
   }
@@ -587,7 +586,6 @@ class Cube {
   /**
    * Returns the number of edge parts.
    */
-
   getEdgeCount() {
     return this.edgeLoc.length;
   }
@@ -595,7 +593,6 @@ class Cube {
   /**
    * Returns the number of side parts.
    */
-
   getSideCount() {
     return this.sideLoc.length;
   }
@@ -603,7 +600,6 @@ class Cube {
   /**
    * Gets the orientation of the specified corner part.
    */
-
   getCornerOrientation(corner) {
     return this.cornerOrient[this.getCornerLocation(corner)];
   }
@@ -611,7 +607,6 @@ class Cube {
   /**
    * Returns the locations of all edge parts.
    */
-
   getEdgeLocations() {
     return this.edgeLoc;
   }
@@ -619,7 +614,6 @@ class Cube {
   /**
    * Returns the orientations of all edge parts.
    */
-
   getEdgeOrientations() {
     return this.edgeOrient;
   }
@@ -1858,7 +1852,7 @@ class PocketCube extends Cube {
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Represents the state of a 3-times sliced cube (Rubik's Cube) by the location 
+ * Represents the state of a 3-times sliced cube (Rubik's Cube) by the location
  * and orientation of its parts.
  * <p>
  * A Rubik's Cube has 8 corner parts, 12 edge parts, 6 face parts and one
@@ -1866,7 +1860,7 @@ class PocketCube extends Cube {
  * <p>
  * <b>Corner parts</b>
  * <p>
- * The following diagram shows the initial orientations and locations of 
+ * The following diagram shows the initial orientations and locations of
  * the corner parts:
  * <pre>
  *             +---+---+---+
@@ -1892,7 +1886,7 @@ class PocketCube extends Cube {
  * <p>
  * <b>Edge parts</b>
  * <p>
- * The following diagram shows the initial orientations and locations of 
+ * The following diagram shows the initial orientations and locations of
  * the edge parts:
  * <pre>
  *             +---+---+---+
@@ -1918,7 +1912,7 @@ class PocketCube extends Cube {
  * <p>
  * <b>Side parts</b>
  * <p>
- * The following diagram shows the initial orientation and location of 
+ * The following diagram shows the initial orientation and location of
  * the face parts:
  * <pre>
  *             +------------+
@@ -2121,7 +2115,7 @@ class RubiksCube extends Cube {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Cube4
 /**
- * Represents the state of a 4-times sliced cube (Revenge Cube) by the location 
+ * Represents the state of a 4-times sliced cube (Revenge Cube) by the location
  * and orientation of its parts.
  * <p>
  * A Revenge Cube has 8 corner parts, 24 edge parts, 24 side parts and one
@@ -2129,7 +2123,7 @@ class RubiksCube extends Cube {
  * <p>
  * <b>Corner parts</b>
  * <p>
- * The following diagram shows the initial orientations and locations of 
+ * The following diagram shows the initial orientations and locations of
  * the corner parts:
  * <pre>
  *                 +---+---+---+---+
@@ -2161,7 +2155,7 @@ class RubiksCube extends Cube {
  * <p>
  * <b>Edge parts</b>
  * <p>
- * The following diagram shows the initial orientations and locations of 
+ * The following diagram shows the initial orientations and locations of
  * the edge parts. The first 12 edges are located near the origins of the
  * x-, y- and z-axis. The second 12 edges are located far from the origin
  * of the x-, y- and z-axis.
@@ -2195,7 +2189,7 @@ class RubiksCube extends Cube {
  * <p>
  * <b>Side parts</b>
  * <p>
- * The following diagram shows the initial orientation and location of 
+ * The following diagram shows the initial orientation and location of
  * the face parts:
  * <pre>
  *                 +---+---+---+---+
@@ -2395,6 +2389,44 @@ class RevengeCube extends Cube {
       that.setTo(this);
       return that;
   }
+}
+// Construct the name to part map.
+{
+  let cornerParts = ["urf", "dfr", "ubr", "drb", "ulb", "dbl", "ufl", "dlf"];
+  let edgeParts = ["ur", "rf", "dr", "bu", "rb", "bd", "ul", "lb", "dl", "fu", "lf", "fd"];
+  let sideParts = ["r", "u", "f", "l", "d", "b"];
+  let partMap = {center: 8 + 12*2 + 6*4};
+  for (let i = 0; i < cornerParts.length; i++) {
+      let name = cornerParts[i];
+      let key1 = name.charAt(0) + name.charAt(1) + name.charAt(2);
+      let key2 = name.charAt(0) + name.charAt(2) + name.charAt(1);
+      let key3 = name.charAt(1) + name.charAt(0) + name.charAt(2);
+      let key4 = name.charAt(1) + name.charAt(2) + name.charAt(0);
+      let key5 = name.charAt(2) + name.charAt(0) + name.charAt(1);
+      let key6 = name.charAt(2) + name.charAt(1) + name.charAt(0);
+      partMap[key1] = i;
+      partMap[key2] = i;
+      partMap[key3] = i;
+      partMap[key4] = i;
+      partMap[key5] = i;
+      partMap[key6] = i;
+  }
+  for (let i = 0; i < edgeParts.length*2; i++) {
+      let name = edgeParts[i%12];
+      let key1 = name.charAt(0) + name.charAt(1)+(Math.floor(i/12)+1);
+      let key2 = name.charAt(1) + name.charAt(0)+(Math.floor(i/12)+1);
+      partMap[key1] = i + 8;
+      partMap[key2] = i + 8;
+  }
+  for (let i = 0; i < sideParts.length*4; i++) {
+      let name = sideParts[i%6]+(Math.floor(i/6)+1);
+      let key1 = name;
+      partMap[key1] = i + 8 + 12*2;
+  }
+  /**
+   * Maps the name of a part to its part index.
+   */
+  RevengeCube.prototype.NAME_PART_MAP = partMap;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Cube5
@@ -2759,7 +2791,7 @@ class ProfessorCube extends Cube {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Cube6
 /**
- * Represents the state of a 6-times sliced cube (such as a V-Cube 6) by the 
+ * Represents the state of a 6-times sliced cube (such as a V-Cube 6) by the
  * location and orientation of its parts.
  * <p>
  * A V-Cube 6 has 8 corner parts, 48 edge parts, 96 side parts and one
@@ -2767,7 +2799,7 @@ class ProfessorCube extends Cube {
  * <p>
  * <b>Corner parts</b>
  * <p>
- * The following diagram shows the initial orientations and locations of 
+ * The following diagram shows the initial orientations and locations of
  * the corner parts:
  * <pre>
  *                         +---+---+---+---+---+---+
@@ -2811,18 +2843,18 @@ class ProfessorCube extends Cube {
  * <p>
  * <b>Edge parts</b>
  * <p>
- * The following diagram shows the initial orientations and locations of 
+ * The following diagram shows the initial orientations and locations of
  * the edge parts. The first 12 edges are located near the origins of the
  * x-, y- and z-axis. The second 12 edges are located far from the origin
  * of the x-, y- and z-axis. The third 12 edges are located near the origins of
- * the axes. The fourth 12 edges are again located near the origins of the axes. 
+ * the axes. The fourth 12 edges are again located near the origins of the axes.
  * <pre>
  *                                     X---&gt;
  *                           +---+---+---+---+---+---+
  *                           |   |27 |3.1|15 |39 |   |
  *                           +---+---+---+---+---+---+
  *                           |30 |               |24 |
- *                           +---+               +---+  
+ *                           +---+               +---+
  *                           |6.0|               |0.0|
  *                         Z +---+       u       +---+ Z
  *                         | |18 |               |12 | |
@@ -2837,8 +2869,8 @@ class ProfessorCube extends Cube {
  * ^ +---+               +---+---+               +---+---+               +---+---+               +---+ ^
  * | |19 |               |22 |22 |               |13 |13 |               |16 |16 |               |19 | |
  * Y +---+       l       +---+---+       f       +---+---+       r       +---+---+       b       +---+ Y
- *   |7.0|               10.0|10.1               |1.1|1.0|               |4.0|4.1|               |7.1| 
- *   +---+               +---+---+               +---+---+               +---+---+               +---+  
+ *   |7.0|               10.0|10.1               |1.1|1.0|               |4.0|4.1|               |7.1|
+ *   +---+               +---+---+               +---+---+               +---+---+               +---+
  *   |31 |               |34 |34 |               |25 |25 |               |28 |28 |               |31 |
  *   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
  *   |   |32 |8.1|20 |44 |   |   |35 11.0|23 |47 |   |   |38 |14 |2.1|26 |   |   |41 |17 |5.0|29 |   |
@@ -2849,8 +2881,8 @@ class ProfessorCube extends Cube {
  *                           +---+               +---+ ^
  *                           |20 |               |14 | |
  *                           +---+       d       +---+ Z
- *                           |8.0|               |2.0| 
- *                           +---+               +---+  
+ *                           |8.0|               |2.0|
+ *                           +---+               +---+
  *                           |32 |               |26 |
  *                           +---+---+---+---+---+---+
  *                           |   |29 |5.1|17 |41 |   |
@@ -2860,7 +2892,7 @@ class ProfessorCube extends Cube {
  * <p>
  * <b>Side parts</b>
  * <p>
- * The following diagram shows the initial orientation and location of 
+ * The following diagram shows the initial orientation and location of
  * the side parts:
  * <pre>
  *                         +---+---+---+---+---+---+
@@ -3168,7 +3200,7 @@ class Cube6 extends Cube {
  * <p>
  * <b>Corner parts</b>
  * <p>
- * The following diagram shows the initial orientations and locations of 
+ * The following diagram shows the initial orientations and locations of
  * the corner parts:
  * <pre>
  *                             +---+---+---+---+---+---+---+
@@ -3218,7 +3250,7 @@ class Cube6 extends Cube {
  * <p>
  * <b>Edge parts</b>
  * <p>
- * The following diagram shows the initial orientations and locations of 
+ * The following diagram shows the initial orientations and locations of
  * the edge parts. The first 12 edges are located at the center of the x-, y-,
  * and z-axis. The second 12 edges are located near the origins of the
  * x-, y- and z-axis. The last 12 edges are located far from the origin
@@ -3229,27 +3261,27 @@ class Cube6 extends Cube {
  *                               |   |39 |15 |3.1| 27|51 |   |
  *                               +---+---+---+---+---+---+---+
  *                               |42 |                   |36 |
- *                               +---+                   +---+ 
+ *                               +---+                   +---+
  *                               |18 |                   |12 |
  *                             Z +---+                   +---+ Z
  *                             | |6.0|         u         |0.0| |
  *                             V +---+                   +---+ V
  *                               |30 |                   |24 |
- *                               +---+                   +---+ 
+ *                               +---+                   +---+
  *                               |54 |                   |48 |
  *                               +---+---+---+---+---+---+---+
- *               Z---&gt;           |   |45 |21 |9.1|33 |57 |   |           &lt;---Z                       &lt;---X    
+ *               Z---&gt;           |   |45 |21 |9.1|33 |57 |   |           &lt;---Z                       &lt;---X
  *   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
  *   |   |42 |18 |6.1|30 |54 |   |   |45 |21 |9.0|33 |57 |   |   |48 |24 |0.1|12 |36 |   |   |51 |27 |3.0|15 |39 |   |
  *   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
  *   |55 |                   |58 |58 |                   |49 |49 |                   |52 |52 |                   |55 |
- *   +---+                   +---+---+                   +---+---+                   +---+---+                   +---+  
+ *   +---+                   +---+---+                   +---+---+                   +---+---+                   +---+
  *   |31 |                   |34 |34 |                   |25 |25 |                   |28 |28 |                   |31 |
  * ^ +---+                   +---+---+                   +---+---+                   +---+---+                   +---+ ^
  * | |7.0|        l          10.0|10.1         f         |1.1|1.0|         r         |4.0|4.1|         b         |7.1| |
  * Y +---+                   +---+---+                   +---+---+                   +---+---+                   +---+ Y
  *   |19 |                   |22 |22 |                   |13 |13 |                   |16 |16 |                   |19 |
- *   +---+                   +---+---+                   +---+---+                   +---+---+                   +---+  
+ *   +---+                   +---+---+                   +---+---+                   +---+---+                   +---+
  *   |43 |                   |46 |46 |                   |37 |37 |                   |40 |40 |                   |43 |
  *   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
  *   |   |44 |20 |8.1|32 |56 |   |   |47 |23 11.0|35 |59 |   |   |50 |26 |2.1|14 |38 |   |   |53 |29 |5.0| 17|41 |   |
@@ -3257,13 +3289,13 @@ class Cube6 extends Cube {
  *                               |   |47 |23 11.1|35 |59 |   |           &lt;---Z                       &lt;---X
  *                               +---+---+---+---+---+---+---+
  *                               |56 |                   |50 |
- *                               +---+                   +---+ 
+ *                               +---+                   +---+
  *                               |32 |                   |26 |
  *                               +---+                   +---+ ^
  *                               |8.0|         d         |2.0| |
  *                               +---+                   +---+ Z
  *                               |20 |                   |14 |
- *                               +---+                   +---+ 
+ *                               +---+                   +---+
  *                               |44 |                   |38 |
  *                               +---+---+---+---+---+---+---+
  *                               |   |41 |17 |5.1|29 |53 |   |
@@ -3273,7 +3305,7 @@ class Cube6 extends Cube {
  * <p>
  * <b>Side parts</b>
  * <p>
- * The following diagram shows the initial orientation and location of 
+ * The following diagram shows the initial orientation and location of
  * the side parts:
  * <pre>
  *                             +---+---+---+---+---+---+---+
@@ -3664,7 +3696,7 @@ function createCube(layerCount) {
   }
 }
 // ------------------
-// MODULE API    
+// MODULE API
 // ------------------
 export default {
   Cube: Cube,
