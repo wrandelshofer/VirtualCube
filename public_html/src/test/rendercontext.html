@@ -11,14 +11,14 @@
     <h1>Test of the <code>rendercontext</code>  parameter</h1>
     <article>
     <section class="test">
-      <div class="virtualcube small" 
+      <div class="virtualcube"
            ></div>
       <p>Default value.</p>
     </section>
     </article>
     <article>
     <section class="test">
-      <div class="virtualcube small" 
+      <div class="virtualcube"
            rendercontext="webgl"
            ></div>
       <p><code>rendercontext="webgl"</code> (default)</p>
@@ -26,11 +26,47 @@
     </article>
     <article>
     <section class="test">
-      <div class="virtualcube small" 
+      <div class="virtualcube"
            rendercontext="2d"
            ></div>
       <p><code>rendercontext="2d"</code></p>
     </section>
+    </article>
+    <article>
+      <section class="test">
+        <div class="virtualcube"
+             kind="pocketcube"
+             rendercontext="webgl"
+        ></div>
+        <p><code>kind="pocketcube" rendercontext="webgl"</code> (default)</p>
+      </section>
+    </article>
+    <article>
+      <section class="test">
+        <div class="virtualcube"
+             kind="pocketcube"
+             rendercontext="2d"
+        ></div>
+        <p><code>kind="pocketcube" rendercontext="2d"</code></p>
+      </section>
+    </article>
+    <article>
+      <section class="test">
+        <div class="virtualcube"
+             kind="revengecube"
+             rendercontext="webgl"
+        ></div>
+        <p><code>kind="revengecube" rendercontext="webgl"</code> (default)</p>
+      </section>
+    </article>
+    <article>
+      <section class="test">
+        <div class="virtualcube"
+             kind="revengecube"
+             rendercontext="2d"
+        ></div>
+        <p><code>kind="revengecube" rendercontext="2d"</code></p>
+      </section>
     </article>
   </body>
 </html>

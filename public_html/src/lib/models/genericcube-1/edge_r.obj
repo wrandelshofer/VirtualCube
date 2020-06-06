@@ -15,7 +15,7 @@ vt 0.96 0.96 0
 vt 0.96 0.04 0
 # 4 texture coordinates
 
-o side_r
+o edge_r
 usemtl default
 f 2/4/1 4/3/1 3/2/1 1/1/1
 

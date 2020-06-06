@@ -42,7 +42,7 @@ class AbstractCanvas {
       onMouseUp: function (event) {},
       onMouseMove: function (event) {}
     };
-    var self = this;
+    let self = this;
     this.selectStartListener = function (event) {
       return false;
     };
@@ -84,7 +84,7 @@ class AbstractCanvas {
     }
     this.canvas = canvas;
     if (this.canvas != null) {
-      var success = this.openCanvas();
+      let success = this.openCanvas();
       if (success) {
         this.canvas.addEventListener("selectstart", this.selectStartListener, false);
         this.canvas.addEventListener("touchstart", this.touchStartListener, false);
@@ -134,22 +134,22 @@ class AbstractCanvas {
 
     if (this.willRepaint == false) {
       this.willRepaint = true;
-      var self = this;
-      var f = function () {
+      let self = this;
+      let f = function () {
         self.willRepaint = false;
-        var start = new Date().getTime();
+        let start = new Date().getTime();
 
         // invoke all callbacks
-        var callbacks = self.repaintCallbacks;
+        let callbacks = self.repaintCallbacks;
         self.repaintCallbacks = [];
-        for (var i = 0; i < callbacks.length; i++) {
+        for (let i = 0; i < callbacks.length; i++) {
           callbacks[i]();
         }
-        var middle = new Date().getTime();
+        let middle = new Date().getTime();
 
         // draw the cube
         self.draw();
-        var end = new Date().getTime();
+        let end = new Date().getTime();
         //module.log('AbstractCanvas.draw elapsed:'+(end-start)+' m:'+(middle-start)+' cbs:'+callbacks.length+' new:'+self.repaintCallbacks.length);
       };
       J3DI.requestAnimFrame(f, this.canvas);
@@ -170,19 +170,21 @@ class AbstractCanvas {
 
   /** Draws an individual object of the scene. */
   drawObjectCanvas2D(obj, mvMatrix, color, phong, forceColorUpdate) {
-    if (obj == null || !obj.visible)
+    if (obj == null || !obj.visible) {
       return;
+    }
     if (obj.polyIndexArray) {
       this.faceCount += obj.polyIndexArray.length;
     }
 
-    if (obj.vertexArray === null)
+    if (obj.vertexArray === null) {
       return;
+    }
 
     // Compute a new texture array
     if (obj.textureScale != null) {
-      var textureArray = new Array(obj.textureArray.length);
-      for (var i = 0; i < textureArray.length; i += 2) {
+      let textureArray = new Array(obj.textureArray.length);
+      for (let i = 0; i < textureArray.length; i += 2) {
         textureArray[i] = (obj.textureArray[i] + obj.textureOffsetX) * obj.textureScale;
         textureArray[i + 1] = (obj.textureArray[i + 1] + obj.textureOffsetY) * obj.textureScale;
       }
@@ -190,92 +192,93 @@ class AbstractCanvas {
       obj.textureScale = null;
     }
 
-    var g = this.g;
+    let g = this.g;
 
     this.mvpMatrix.load(this.viewportMatrix);
     this.mvpMatrix.multiply(this.perspectiveMatrix);
     this.mvpMatrix.multiply(mvMatrix);
 
     // Draw the object
-    var mvp = this.mvpVertexArray;
+    let mvp = this.mvpVertexArray;
     mvp.load(obj.vertexArray);
     mvp.multVecMatrix(this.mvpMatrix);
 
-    var mv = this.mvVertexArray;
+    let mv = this.mvVertexArray;
     mv.load(obj.vertexArray);
     mv.multVecMatrix(this.mvMatrix);
-
     if (obj.polyIndexArray !== undefined) {
-      for (var j = 0; j < obj.polyIndexArray.length; j++) {
-        var poly = obj.polyIndexArray[j];
-
-        var i1 = poly[0];
-        var i2 = poly[1];
-        var i3 = poly[poly.length - 1];
-        var z = mvp.rawZ(i1, i2, i3);
-        if (z > 0) {
-          var light = Math.max(0, mv.normal(i1, i2, i3).dot(this.lightNormal));
-          var t = this.deferredFaces[this.deferredFaceCount++];
-          if (t === undefined) {
-            t = new Face();
-            this.deferredFaces.push(t);
-          }
-          t.loadPoly(
-            mvp,
-            obj.textureArray, obj.hasTexture ? this.stickersTexture : null, poly);
-          this.applyFillStyle(t, mv.normal(i1, i2, i3), this.lightNormal, this.observerNormal, phong, color);
+      for (let j of obj.polyObjects.keys()) {
+        if (obj.selectedObject != null && obj.selectedObject!=j) {
+          continue; // only render selected object
         }
-      }
-    } else {
-      for (var j in obj.groups) {
-        var isQuad = obj.groups[j][1] == 6;
-
-        if (isQuad) {
-          var i = (obj.groups[j][0]);
-          var i1 = obj.indexArray[i];
-          var i2 = obj.indexArray[i + 1];
-          var i3 = obj.indexArray[i + 2];
-          var i4 = obj.indexArray[i + 3];
-          var z = mvp.rawZ(i1, i2, i3);
+        let offset=obj.polyObjects.get(j)[0];
+        let count=obj.polyObjects.get(j)[1];
+        for (let k = 0; k < count; k++) {
+          let i = k+offset;
+          let poly = obj.polyIndexArray[i];
+          let i1 = poly[0];
+          let i2 = poly[1];
+          let i3 = poly[poly.length - 1];
+          let z = mvp.rawZ(i1, i2, i3);
           if (z > 0) {
-            var light = Math.max(0, mv.normal(i1, i2, i3).dot(this.lightNormal));
-            //g.fillStyle='rgb('+color[0]*light+','+color[1]*light+','+color[2]*light+')';
-            var t = this.deferredFaces[this.deferredFaceCount++];
+            let light = Math.max(0, mv.normal(i1, i2, i3).dot(this.lightNormal));
+            let t = this.deferredFaces[this.deferredFaceCount++];
             if (t === undefined) {
               t = new Face();
               this.deferredFaces.push(t);
             }
-            t.loadQuad(
+            t.loadPoly(
               mvp,
-              obj.textureArray, obj.hasTexture ? this.stickersTexture : null,
-              i1, i2, i3, i4);
+              obj.textureArray, obj.hasTexture ? this.stickersTexture : null, poly);
             this.applyFillStyle(t, mv.normal(i1, i2, i3), this.lightNormal, this.observerNormal, phong, color);
           }
-        } else {
-          for (var k = 0; k < obj.groups[j][1]; k += 3) {
-            var i = (obj.groups[j][0] + k);
-            var i1 = obj.indexArray[i];
-            var i2 = obj.indexArray[i + 1];
-            var i3 = obj.indexArray[i + 2];
-            var z = mvp.rawZ(i1, i2, i3);
-            if (z > 0) {
-              //var light = Math.max(0,mv.normal(i1,i2,i3).dot(this.lightNormal));
-              //g.fillStyle='rgb('+color[0]*light+','+color[1]*light+','+color[2]*light+')';
-              var t = this.deferredFaces[this.deferredFaceCount++];
-              if (t === undefined) {
-                t = new Face();
-                this.deferredFaces.push(t);
-              }
-              t.loadTriangle(
-                mvp,
-                obj.textureArray, obj.hasTexture ? this.stickersTexture : null,
-                i1, i2, i3);
-              this.applyFillStyle(t, mv.normal(i1, i2, i3), this.lightNormal, this.observerNormal, phong, color);
+        }
+      }
+    } else if (obj.objects !== undefined) {
+      for (let j of obj.objects.keys()) {
+        if (obj.selectedObject != null && obj.selectedObject!=j) {
+          continue; // only render selected object
+        }
+        let offset=obj.objects.get(j)[0];
+        let count=obj.objects.get(j)[1];
+        for (let k = 0; k < count; k += 3) {
+          let i = k+offset;
+          let i1 = obj.indexArray[i];
+          let i2 = obj.indexArray[i + 1];
+          let i3 = obj.indexArray[i + 2];
+          let z = mvp.rawZ(i1, i2, i3);
+          if (z > 0) {
+            //let light = Math.max(0,mv.normal(i1,i2,i3).dot(this.lightNormal));
+            //g.fillStyle='rgb('+color[0]*light+','+color[1]*light+','+color[2]*light+')';
+            let t = this.deferredFaces[this.deferredFaceCount++];
+            if (t === undefined) {
+              t = new Face();
+              this.deferredFaces.push(t);
             }
+            t.loadTriangle(
+              mvp,
+              obj.textureArray, obj.hasTexture ? this.stickersTexture : null,
+              i1, i2, i3);
+            this.applyFillStyle(t, mv.normal(i1, i2, i3), this.lightNormal, this.observerNormal, phong, color);
           }
         }
       }
     }
+  }
+  flushCanvas2D() {
+    let g = this.g;
+
+    // The steps above only collect triangles
+    // we sort them by depth, and draw them
+    let tri = this.deferredFaces.splice(0, this.deferredFaceCount);
+    tri.sort(function (a, b) {
+        return b.depth - a.depth
+    });
+    for (let i = 0; i < tri.length; i++) {
+        tri[i].draw(g);
+    }
+
+    this.deferredFaceCount = 0;
   }
 
   /** @param n J3DIVec3 surface normal
@@ -287,12 +290,12 @@ class AbstractCanvas {
     //vec3 wi = normalize(lightPos - fPos.xyz); // direction to light source
     //vec3 wo = normalize(camPos - fPos.xyz); // direction to observer
     //vec3 n = normalize(fNormal.xyz);
-    var specular = Math.pow(Math.max(0.0, -(new J3DIMath.J3DIVector3(wi).reflect(n).dot(wo))), phong[3]) * phong[2];
-    var diffuse = Math.max(0.0, wi.dot(n)) * phong[1];
-    var ambient = phong[0];
-    var newColor = new Array(3);
-    var fs = 'rgb(';
-    for (var i = 0; i < 3; i++) {
+    let specular = Math.pow(Math.max(0.0, -(new J3DIMath.J3DIVector3(wi).reflect(n).dot(wo))), phong[3]) * phong[2];
+    let diffuse = Math.max(0.0, wi.dot(n)) * phong[1];
+    let ambient = phong[0];
+    let newColor = new Array(3);
+    let fs = 'rgb(';
+    for (let i = 0; i < 3; i++) {
       if (i != 0)
         fs += ',';
       fs += Math.round(color[i] * (diffuse + ambient) + 255 * specular);
@@ -300,7 +303,7 @@ class AbstractCanvas {
     fs += ')';
     triangle.fillStyle = fs;
 
-    var brightness = (diffuse + ambient) + specular;
+    let brightness = (diffuse + ambient) + specular;
     if (brightness >= 1.0) {
       fs = 'rgba(255,255,255,' + (brightness - 1) + ')';
     } else {
@@ -419,7 +422,7 @@ class Face {
   loadPoly(v, txc, txi, indices) {
     this.length = indices.length * 2;
     this.depth = 0;
-    for (var i = 0; i < indices.length; i++) {
+    for (let i = 0; i < indices.length; i++) {
       this.vertices[i * 2] = v[indices[i] * 3];
       this.vertices[i * 2 + 1] = v[indices[i] * 3 + 1];
       this.depth += v[indices[i] * 3 + 2];
@@ -432,23 +435,23 @@ class Face {
 
   /** Draws by extending the polygon by 0.5 pixels.
    *
-   *        /+-----+\
-   *  +----+    +     +
-   *  |  |  =>  |     |
-   *  +----+    +     +
-   *        \+-----+/
+   *             /+-----+\
+   *  +----+     +       +
+   *  |    |  => |       |
+   *  +----+     +       +
+   *             \+-----+/
    */
   draw(g) {
-    if (this.txImage != null) {
+    if (false&&this.txImage != null) {
       this.drawTexturedFaceTriangulated(g);
     } else {
       this.drawColoredFace(g);
     }
   }
   drawTexturedFaceTriangulated(g) {
-    var v = this.vertices;
-    var t = this.txCoords;
-    for (var i = 5; i < this.length; i += 2) {
+    let v = this.vertices;
+    let t = this.txCoords;
+    for (let i = 5; i < this.length; i += 2) {
       this.drawTexturedTriangle(g, this.txImage.image,
         v[0], v[1], v[i - 3], v[i - 2], v[i - 1], v[i],
         t[0], t[1], t[i - 3], t[i - 2], t[i - 1], t[i]);
@@ -463,19 +466,19 @@ class Face {
     g.fill();
   }
   applyExtendedPath(g) {
-    var v = this.vertices;
-    var extra = -0.25;
+    let v = this.vertices;
+    let extra = -0.25;
     g.beginPath();
-    for (var i = 0; i < this.length; i += 2) {
-      var j = (i - 2 + this.length) % this.length; // vector j points from previous point to i
-      var k = (i + 2) % this.length; // vector k points from next point to i
-      var jx = v[i] - v[j];
-      var jy = v[i + 1] - v[j + 1];
-      var jlen = Math.sqrt(jx * jx + jy * jy);
+    for (let i = 0; i < this.length; i += 2) {
+      let j = (i - 2 + this.length) % this.length; // vector j points from previous point to i
+      let k = (i + 2) % this.length; // vector k points from next point to i
+      let jx = v[i] - v[j];
+      let jy = v[i + 1] - v[j + 1];
+      let jlen = Math.sqrt(jx * jx + jy * jy);
 
-      var kx = v[i] - v[k];
-      var ky = v[i + 1] - v[k + 1];
-      var klen = Math.sqrt(kx * kx + ky * ky);
+      let kx = v[i] - v[k];
+      let ky = v[i + 1] - v[k + 1];
+      let klen = Math.sqrt(kx * kx + ky * ky);
 
       if (i == 0) {
         g.moveTo(v[i] + jy * extra / jlen, v[i + 1] - jx * extra / jlen);
@@ -487,22 +490,22 @@ class Face {
     }
   }
   applySimplePath(g) {
-    var v = this.vertices;
+    let v = this.vertices;
     g.beginPath();
     g.moveTo(v[0], v[1]);
-    for (var i = 2; i < this.length; i += 2) {
+    for (let i = 2; i < this.length; i += 2) {
       g.lineTo(v[i], v[i + 1]);
     }
   }
   /** Simpler and faster drawing method, produces cracks between faces due
-   to antialias renderer of canvas2d.
+   to antialiasing renderer of canvas2d.
    */
   drawColoredFaceSimple(g) {
-    var v = this.vertices;
+    let v = this.vertices;
     g.fillStyle = this.fillStyle;
     g.beginPath();
     g.moveTo(v[0], v[1]);
-    for (var i = 2; i < this.length; i += 2) {
+    for (let i = 2; i < this.length; i += 2) {
       g.lineTo(v[i], v[i + 1]);
     }
     //g.closePath();
@@ -532,15 +535,17 @@ class Face {
     u0, v0, u1, v1, u2, v2) {
 
     // abort if one of the variables is NaN
-    if (x0 != x0 || y0 != y0 || x1 != x1 || y1 != y1 || x2 != x2 || y2 != y2)
+    if (x0 != x0 || y0 != y0 || x1 != x1 || y1 != y1 || x2 != x2 || y2 != y2) {
       return;
-    if (u0 != u0 || v0 != v0 || u1 != u1 || v1 != v1 || u2 != u2 || v2 != v2)
+    }
+    if (u0 != u0 || v0 != v0 || u1 != u1 || v1 != v1 || u2 != u2 || v2 != v2) {
       return;
+    }
 
     // store clipping coordinates
-    var cx0 = x0, cy0 = y0, cx1 = x1, cy1 = y1, cx2 = x2, cy2 = y2;
+    let cx0 = x0, cy0 = y0, cx1 = x1, cy1 = y1, cx2 = x2, cy2 = y2;
     // store texture coordinates
-    var cu0 = u0, cv0 = v0, cu1 = u1, cv1 = v1, cu2 = u2, cv2 = v2;
+    let cu0 = u0, cv0 = v0, cu1 = u1, cv1 = v1, cu2 = u2, cv2 = v2;
 
     // scale u,v coordinates
     u0 *= img.width;
@@ -561,7 +566,7 @@ class Face {
     u2 -= u0;
     v2 -= v0;
 
-    var det = 1 / (u1 * v2 - u2 * v1),
+    let det = 1 / (u1 * v2 - u2 * v1),
       // linear transformation
       a = (v2 * x1 - v1 * x2) * det,
       b = (v2 * y1 - v1 * y2) * det,
@@ -586,20 +591,20 @@ class Face {
      */
 
     // FATTER
-    var v = [cx0, cy0, cx1, cy1, cx2, cy2];
-    var extra = -0.3;
-    var len = 6;
+    let v = [cx0, cy0, cx1, cy1, cx2, cy2];
+    let extra = -0.3;
+    let len = 6;
     g.beginPath();
-    for (var i = 0; i < len; i += 2) {
-      var j = (i - 2 + len) % len; // vector j points from previous point to i
-      var k = (i + 2) % len; // vector k points from next point to i
-      var jx = v[i] - v[j];
-      var jy = v[i + 1] - v[j + 1];
-      var jlen = Math.sqrt(jx * jx + jy * jy);
+    for (let i = 0; i < len; i += 2) {
+      let j = (i - 2 + len) % len; // vector j points from previous point to i
+      let k = (i + 2) % len; // vector k points from next point to i
+      let jx = v[i] - v[j];
+      let jy = v[i + 1] - v[j + 1];
+      let jlen = Math.sqrt(jx * jx + jy * jy);
 
-      var kx = v[i] - v[k];
-      var ky = v[i + 1] - v[k + 1];
-      var klen = Math.sqrt(kx * kx + ky * ky);
+      let kx = v[i] - v[k];
+      let ky = v[i + 1] - v[k + 1];
+      let klen = Math.sqrt(kx * kx + ky * ky);
 
       if (i == 0) {
         g.moveTo(v[i] + jy * extra / jlen, v[i + 1] - jx * extra / jlen);

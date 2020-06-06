@@ -320,20 +320,25 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
     this.scriptProgress = NaN; // initial script progress on startup
     this.readParameters(this.cube3d);
     this.cube3d.repaintFunction = fRepaint;
-    this.cubeSize = this.cube3d.partSize * this.cube3d.cube.layerCount; // size of a cube side in centimeters
     this.world.add(this.cube3d);
     this.cube = this.cube3d.cube;
     this.cube3d.addChangeListener(this);
     let attr = this.cube3d.attributes;
     this.cubeSize = this.cube3d.getCubeSize();
+
+    // Make sure that scene fits into range of [-1,+1], so that webGL does not clip it!
+    let webglFactor = 2/this.cubeSize;
+    this.cubeSize = this.cubeSize * webglFactor;
+    this.cube3d.matrix.scale(webglFactor);
+
     this.currentAngle = 0;
     this.xRot = attr.xRot;
     this.yRot = attr.yRot;
-    this.camPos = new J3DIMath.J3DIVector3(0, 0, -this.cubeSize * 1.35);
+    this.camPos = new J3DIMath.J3DIVector3(0, 0, -this.cubeSize * 3.5);
     this.lookAtPos = new J3DIMath.J3DIVector3(0, 0, 0);
     this.up = new J3DIMath.J3DIVector3(0, 1, 0);
-    this.lightPos = new J3DIMath.J3DIVector3(4, -4, 8);
-    this.lightNormal = new J3DIMath.J3DIVector3(-4, 4, -8).normalize();
+    this.lightPos = new J3DIMath.J3DIVector3(4,this.cubeSize* -4, this.cubeSize*8);
+    this.lightNormal = new J3DIMath.J3DIVector3(this.cubeSize*-4, this.cubeSize*4, this.cubeSize*-8).normalize();
     this.observerNormal = new J3DIMath.J3DIVector3(this.camPos).normalize();
     let stickersImageURL = this.canvas.getAttribute('stickersImage');
     if (stickersImageURL != null && stickersImageURL != 'null') {
@@ -373,14 +378,12 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
     flip.multiply(this.cameraMatrix);
     this.cameraMatrix.load(flip);
     this.perspectiveMatrix.makeIdentity();
-
     this.perspectiveMatrix.perspective(30, this.width / this.height, 1, 12);
     this.perspectiveMatrix.multiply(this.cameraMatrix);
     if (this.width < this.height) {
       let factor = this.width / this.height;
       this.perspectiveMatrix.scale(factor, factor, 1);
     }
-    logger.log('updateMatrix w:' + this.width + " h:" + this.height);
     logger.log('updateMatrix w:' + this.width + " h:" + this.height);
 
     this.invCameraMatrix.load(this.cameraMatrix);
@@ -395,7 +398,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
     wvMatrix.rotate(attr.xRot, 1, 0, 0);
     wvMatrix.rotate(attr.yRot, 0, -1, 0);
     wvMatrix.rotate(this.currentAngle, 1, 1, 1);
-    let scaleFactor = 0.4 * attr.scaleFactor;
+    let scaleFactor = attr.scaleFactor;
     wvMatrix.scale(scaleFactor, scaleFactor, scaleFactor);
   }
 
@@ -537,14 +540,6 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
         this.cube3d.parts[cube3d.cornerOffset + i].transform(mvMatrix);
         this.drawObject(cube3d.cornerObj, mvMatrix, cparts, attr.partsPhong[this.cube3d.cornerOffset + i], this.forceColorUpdate);
       }
-      /*
-       // The steps above only collect triangles
-       // we sort them by depth, and draw them
-       let tri = this.deferredFaces.splice(0,this.deferredFaceCount);
-       tri.sort(function(a,b){return b.depth - a.depth});
-       for (let i=0;i<tri.length;i++) {
-       tri[i].draw(g);
-       }*/
       this.flushCanvas();
     }
     if (true) {

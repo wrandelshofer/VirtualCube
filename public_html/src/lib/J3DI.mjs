@@ -128,7 +128,9 @@ class J3DIObj {
     this.numIndices = that.numIndices;
     this.indexArray = that.indexArray;
     this.polyIndexArray = that.polyIndexArray;
-    this.groups = that.groups;
+    this.objects = that.objects;
+    this.polyObjects = that.polyObjects;
+    this.selectedObject = that.selectedObject;
   }
   clone() {
     let that = new J3DIObj();
@@ -385,8 +387,6 @@ let initWebGL = function (canvasName, vshader, fshader, attribs, uniforms, clear
     }
   );
 
-
-
   checkGLError(gl, 'easywebgl.initWebGL before clear');
 
   gl.clearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
@@ -445,7 +445,8 @@ let loadShader = function (ctx, shaderId, shaderScript, shaderType) {
   return shader;
 };
 
-let fileData = {}; // associative array
+let fileData = new Map(); // key=url, value=file content
+let fileCallbacks = new Map(); // key=url, value=list of [callback function, error callback function]
 
 /** Sets file data.
  * If file data is set for a specify URL, function loadFile() will
@@ -457,9 +458,9 @@ let fileData = {}; // associative array
 let setFileData = function (url, data) {
   module.log('.setFileData ' + url);
   if (data === null) {
-    delete fileData[url];
+    fileData.delete(url);
   } else {
-    fileData[url] = data;
+    fileData.set(url, data);
   }
 }
 
@@ -467,20 +468,19 @@ let setFileData = function (url, data) {
  * Loads a text file.
  *
  * @param url   The URL of the text file or the Id of a script element.
- * @param data  Data to be passed to the callback function.
  * @param callback On success, the callback function is called with callback(text,data).
  * @param errorCallback On failure, the callback function is called with
  *         errorCallback(msg).
  *
  * Original code by David Roe.
  */
-let loadFile = function (url, data, callback, errorCallback) {
-  for (let key in fileData) {
+let loadFile = function (url, callback, errorCallback) {
+  for (let key of fileData.keys()) {
     if (url.endsWith(key)) {
       module.log('.loadFile url:' + url + ' using preloaded data');
       if (callback) {
         let f = function () {
-          callback(fileData[key], data);
+          callback(fileData.get(key));
         }
         requestAnimFrame(f);
       }
@@ -504,6 +504,15 @@ let loadFile = function (url, data, callback, errorCallback) {
       url = scriptElem.src;
     }
   }
+
+  if (fileCallbacks.has(url)) {
+    // a request is already on its way. add callback to the list
+    fileCallbacks.get(url).push([callback,errorCallback]);
+    return;
+  } else {
+    fileCallbacks.set(url, [[callback,errorCallback]]);
+  }
+
   module.log('.loadFile url:' + url + ' requesting data...');
 
   // Set up an asynchronous request
@@ -517,13 +526,22 @@ let loadFile = function (url, data, callback, errorCallback) {
       // If we got HTTP status 200 (OK) or file status 0 (OK)
       if (request.status == 200 || request.status == 0) {
         module.log('.loadFile url:' + url + ' done, request.status:' + request.status);
-        if (callback) {
-          callback(request.responseText, data)
+        fileData.set(url, request.responseText); // we have new preloaded data
+        let callbackArray = fileCallbacks.get(url);
+        fileCallbacks.delete(url);
+        for (let i in callbackArray) {
+          let callbackFunction = callbackArray[i][0];
+          callbackFunction(request.responseText);
         }
       } else { // Failed
+        let callbackArray=fileCallbacks.get(url);
+        fileCallbacks.delete(url);
         module.log('.loadFile url:' + url + ' failed, request.status:' + request.status);
-        if (errorCallback) {
-          errorCallback(url);
+        for (let i in callbackArray) {
+          let errorCallbackFunction = callbackArray[i][1];
+          if (errorCallbackFunction) {
+            errorCallbackFunction(url);
+          }
         }
       }
     }
@@ -583,19 +601,18 @@ let loadFiles = function (urls, callback, errorCallback) {
   let numComplete = 0;
   let result = [];
 
-  // Callback for a single file
-  function partialCallback(text, urlIndex) {
-    result[urlIndex] = text;
-    numComplete++;
-
-    // When all files have downloaded
-    if (numComplete == numUrls) {
-      callback(result);
-    }
-  }
 
   for (let i = 0; i < numUrls; i++) {
-    loadFile(urls[i], i, partialCallback, errorCallback);
+    // Callback for a single file
+    function partialCallback(text) {
+      result[i] = text;
+      numComplete++;
+      // When all files have downloaded
+      if (numComplete == numUrls) {
+        callback(result);
+      }
+    }
+    loadFile(urls[i], partialCallback, errorCallback);
   }
 };
 
@@ -794,18 +811,17 @@ let makeSphere = function (ctx, radius, lats, longs) {
 };
 
 /**
- // loadObj
- //
- // Load a .obj file from the passed URL. Return an object with a 'loaded' property set to false.
- // When the object load is complete, the 'loaded' property becomes true and the following
- // properties are set:
- //
- //  normalBuffer    WebGLBuffer object for normals
- //  texCoordObject    WebGLBuffer object for texCoords
- //  vertexBuffer    WebGLBuffer object for vertices
- //  indexBuffer     WebGLBuffer object for indices
- //  numIndices      The number of indices in the indexBuffer
- //
+ * loadObj
+ *
+ * Load a .obj file from the passed URL. Return an object with a 'loaded' property set to false.
+ * When the object load is complete, the 'loaded' property becomes true and the following
+ * properties are set:
+ *
+ *  normalBuffer    WebGLBuffer object for normals
+ *  texCoordObject    WebGLBuffer object for texCoords
+ *  vertexBuffer    WebGLBuffer object for vertices
+ *  indexBuffer     WebGLBuffer object for indices
+ *  numIndices      The number of indices in the indexBuffer
  *
  * Original code by Apple Inc.
  */
@@ -815,17 +831,16 @@ let loadObj = function (ctx, url, callback, errorCallback) {
   obj.gl = ctx;
   obj.url = url;
 
-  let f = function (responseText, obj) {
+  let f = function (responseText) {
     if (responseText == null) {
       module.log('.loadObj error no text for url:' + url);
       if (errorCallback) {
         errorCallback();
       }
     }
-
     doLoadObj(obj, responseText, callback, errorCallback);
   };
-  loadFile(url, obj, f, errorCallback)
+  loadFile(url, f, errorCallback)
 
   return obj;
 }
@@ -916,15 +931,20 @@ let doLoadObj = function (obj, text, callback, errorCallback) {
   }
 
   if (obj.gl != null) {
-    checkGLError(obj.gl, 'easywebgl.doLoadObj... ' + obj.url);
+    checkGLError(obj.gl, '.doLoadObj... ' + obj.url);
   }
 
   let invertFaces = false;
+  // Vertex array, This is a flattened array with x,y,z coordinates for each vertex.
   let vertexArray = [];
+  // Normal array, This is a flattened array with x,y,z normal coordinates for each vertex.
   let normalArray = [];
+  // Texture array, This is a flattened array with u,v texture coordinates for each vertex.
   let textureArray = [];
+  // Face indices array, This is a flattened array with a,b,c indices for each triangle.
   let indexArray = [];
-  let polyIndexArray = []; // two dimensional array with indices for each polygon
+  // Polygon array, This is a two-dimensional array with [a,b,c,...] indices for each polygon.
+  let polyIndexArray = [];
 
   let vertex = [];
   let normal = [];
@@ -934,17 +954,19 @@ let doLoadObj = function (obj, text, callback, errorCallback) {
   let tempIndexArray = new Array(4);
 
   // This is a map which associates a range of indices with a name
-  // The name comes from the 'g' tag (of the form "g NAME"). Indices
-  // are part of one group until another 'g' tag is seen. If any indices
-  // come before a 'g' tag, it is given the group name "_unnamed"
-  // 'group' is an object whose property names are the group name and
+  // The name comes from the 'o' tag (of the form "o NAME"). Indices
+  // are part of one object until another 'o' tag is seen. If any indices
+  // come before a 'o' tag, it is given the object name "_unnamed"
+  // 'object' is an object whose property names are the object name and
   // whose value is a 2 element array with [<first index>, <num indices>]
-  let groups = {};
-  let currentGroup = [0, 0];
-  groups["_unnamed"] = currentGroup;
+  let objects = new Map();
+  let currentObject = [0, 0];
+  objects.set("_unnamed", currentObject);
+  let polyObjects = new Map();
+  let currentPolyObject = [0, 0];
+  polyObjects.set("_unnamed", currentPolyObject);
 
   let needsRecomputeNormals = false;
-
   let lines = text.split("\n");
   for (let lineIndex in lines) {
     let line = lines[lineIndex].replace(/[ \t]+/g, " ").replace(/\s\s*$/, "");
@@ -954,18 +976,20 @@ let doLoadObj = function (obj, text, callback, errorCallback) {
       continue;
 
     let array = line.split(" ");
-    if (array[0] == "g") {
-      // new group
-      currentGroup = [indexArray.length, 0];
-      if (array[1] in groups) {
-        array[1] += ' $' + lineIndex;
+    if (array[0] == "o") {
+      // new object
+      if (array[1] in objects) {
+        array[1] += '$' + lineIndex;
       }
-      groups[array[1]] = currentGroup;
+      currentObject = [indexArray.length, 0];
+      objects.set(array[1], currentObject);
+      currentPolyObject = [polyIndexArray.length, 0];
+      polyObjects.set(array[1], currentPolyObject);
     } else if (array[0] == "v") {
       // vertex
       vertex.push(parseFloat(array[1]));
       vertex.push(parseFloat(array[2]));
-      vertex.push(-parseFloat(array[3]));// Wavefront format flips z-coodinate
+      vertex.push(-parseFloat(array[3]));// Wavefront format flips z-coordinate
     } else if (array[0] == "vt") {
       // texture
       texture.push(parseFloat(array[1]));
@@ -982,28 +1006,40 @@ let doLoadObj = function (obj, text, callback, errorCallback) {
         continue;
       }
 
+      let poly = new Array(array.length - 1);
       for (let i = 1; i < array.length; i++) {
-        if (!(array[i] in facemap)) {
-          // add a new entry to the map and arrays
           let f = array[i].split("/");
           let vtx, nor, tex;
 
           if (f.length == 1) {
-            vtx = parseInt(f[0]) - 1;
+            vtx = parseInt(f[0]);
             nor = null;
             tex = null;
           } else if (f.length == 2) {
-            vtx = parseInt(f[0]) - 1;
-            tex = parseInt(f[1]) - 1;
+            vtx = parseInt(f[0]);
+            tex = parseInt(f[1]);
             nor = null;
           } else if (f.length == 3) {
-            vtx = parseInt(f[0]) - 1;
-            tex = parseInt(f[1]) - 1;
-            nor = parseInt(f[2]) - 1;
+            vtx = parseInt(f[0]);
+            tex = parseInt(f[1]);
+            nor = parseInt(f[2]);
           } else {
             module.error("did not understand face '" + array[i] + "' in " + obj.url);
             return null;
           }
+
+          // Convert vtx, nor, tex into absolute indices.
+          // If vtx,nor,tex is a value v >= 1, then the index is index=value - 1.
+          // else if vtx,nor,tex is a value <= -1, then the index is index=vertex.length / 3 + value.
+          if (vtx >= 1) vtx = vtx - 1;
+          else if (vtx <= -1) vtx = vertex.length / 3 + vtx;
+          if (nor >= 1) nor = nor - 1;
+          else if (nor <= -1) nor = normal.length / 3 + nor;
+          if (tex >= 1) tex = tex - 1;
+          else if (tex <= -1) tex = texture.length / 2 + tex;
+
+        if (!(vtx+"/"+nor+"/"+tex in facemap)) {
+          // add a new entry to the map and arrays
 
           // do the vertices
           let x = 0;
@@ -1043,23 +1079,20 @@ let doLoadObj = function (obj, text, callback, errorCallback) {
           normalArray.push(y);
           normalArray.push(z);
 
-          facemap[array[i]] = index++;
+          facemap[vtx+"/"+nor+"/"+tex] = index++;
         }
 
-        tempIndexArray[i - 1] = facemap[array[i]];
-      }
-      let poly = new Array(array.length - 1);
-      for (let j = 0; j < array.length - 1; j++) {
-        poly[j] = tempIndexArray[j];
+        poly[i - 1] = facemap[vtx+"/"+nor+"/"+tex];
       }
       polyIndexArray.push(poly);
+      currentPolyObject[1] += 1;
 
       // triangulate
-      for (let j = 2; j < array.length - 1; j++) {
-        indexArray.push(tempIndexArray[0]);
-        indexArray.push(tempIndexArray[j - 1]);
-        indexArray.push(tempIndexArray[j]);
-        currentGroup[1] += 3;
+      for (let j = 2; j < poly.length; j++) {
+        indexArray.push(poly[0]);
+        indexArray.push(poly[j - 1]);
+        indexArray.push(poly[j]);
+        currentObject[1] += 3;
       }
     }
   }
@@ -1076,8 +1109,10 @@ let doLoadObj = function (obj, text, callback, errorCallback) {
   obj.numIndices = indexArray.length;
   obj.indexArray = indexArray;
   obj.polyIndexArray = polyIndexArray;
-  obj.groups = groups;
+  obj.objects = objects;
+  obj.polyObjects = polyObjects;
   obj.loaded = true;
+  obj.selectedObject=null; // will render all objects
   obj.updateGL();
 
   if (callback) {

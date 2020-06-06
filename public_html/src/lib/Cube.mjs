@@ -15,7 +15,7 @@ let module = {
 * This class provides support for event listeners, and it defines the variables
 * which hold the location and orientation of the cube parts.
 */
-/** <p>
+/**
 * <b>Faces and Axes</b>
 * <p>
 * This class defines the location of the six faces of the cube, as shown below:
@@ -93,62 +93,13 @@ let module = {
 * <p>
 * The orientations of the corner parts are symmetric along the axis from the
 * right-up-front corner through the left-down-back corner of the cube.
-* <pre>
-*       +-----------+              +-----------+
-*      /4.0/   /2.0/|             /1.0/   /3.0/|
-*     +---     ---+.2            +---     ---+.2
-*    /     u     /|/|           /     d     /|/|
-*   +---     ---+   +          +---     ---+   +
-*  /6.0/   /0.0/|  /|         /7.0/   /5.0/|  /|
-* +---+---+---*.1  .1        +---+---+---*.1  .1
-* | .1|   | .2|/ r|/         | .1|   | .2|/ b|/
-* +---     ---+   +          +---     ---+   +
-* |     f     |/|/           |     l     |/|/
-* +---     ---+.2            +---     ---+.2
-* | .2|   | .1|/             |.2 |   | .1|/
-* +---+---+---+              +---+---+---+
-* </pre>
-* <p>
-* Here is an alternative representation of the initial locations and
-* orientations of the corner parts as a list:
-* <ul>
-* <li>0: urf</li><li>1: dfr</li><li>2: ubr</li><li>3: drb</li>
-* <li>4: ulb</li><li>5: dbl</li><li>6: ufl</li><li>7: dlf</li>
-* </ul>
-* <p>
 */
 /** <b>Edge parts</b>
 * <p>
 * This class defines the orientations of the edge parts and the location
 * of the first 12 edges.
 * (The locations of additional edge parts are defined by subclasses):
-* <pre>
-*               +----+---+----+
-*               |    |3.1|    |
-*               |    +---+    |
-*               +---+     +---+
-*             ul|6.0|  u  |0.0|ur
-*               +---+     +---+
-*               |    +---+    |
-*               |    |9.1|    |
-* +----+---+----+----+---+----+----+---+----+----+---+----+
-* |    |6.1|    |    |9.0|fu  |    |0.1|    |    |3.0|bu  |
-* |    +---+    |    +---+    |    +---+    |    +---+    |
-* +---+     +---+---+     +---+---+     +---+---+     +---+
-* |7.0|  l  10.0|10.1  f  |1.1|1.0|  r  |4.0|4.1|  b  |7.1|
-* +---+     +---+---+     +---+---+     +---+---+     +---+
-* |lb  +---+  lf|    +---+    |rf  +---+  rb|    +---+    |
-* |    |8.1|    |    11.0|fd  |    |2.1|    |    |5.0|bd  |
-* +----+---+----+----+---+----+----+---+----+----+---+----+
-*               |    11.1|    |
-*               |    +---+    |
-*               +---+     +---+
-*             dl|8.0|  d  |2.0|dr
-*               +---+     +---+
-*               |    +---+    |
-*               |    |5.1|    |
-*               +----+---+----+
-* </pre>
+* <p>
 * The numbers after the dots indicate the orientations of the edge parts.
 * Each edge part can have two different orientations: 0=initial, 1=flipped.
 * <pre>
@@ -181,31 +132,6 @@ let module = {
 * <p>
 * The orientations of the edge parts are symmetric along the axis from the
 * front-up edge through the back-down edge of the cube.
-* <pre>
-*       +-----------+      +-----------+
-*      /   / 3 /   /|      |\   \11 \   \
-*     +--- --- ---+ +      + +--- --- ---+
-*    /6.0/ u /0.0/|/|      |\|\8.0\ d \2.0\
-*   +--- --- ---+  4.0   10.0  +--- --- ---+
-*  /   / 9 /   /| |/|      |\ \|\   \ 5 \   \
-* +---+-*-+---+  r  +      +  l  +---+-*-+---+
-* |   |9.0|   |/| |/        \|\ \|   |5.0|   |
-* +--- --- ---+  2.1        6.1  +--- --- ---+
-* |10 | f | 1 |/|/            \|\| 7 | b | 4 |
-* +--- --- ---+ +              + +--- --- ---+
-* |   11.0|   |/                \|   |3.0|   |
-* +---+---+---+                  +---+---+---+
-* </pre>
-* <p>
-* Here is an alternative representation of the initial locations and
-* orientations of the edge parts as a list:
-* <ul>
-* <li> 0: ur</li><li> 1: rf</li><li> 2: dr</li>
-* <li> 3: bu</li><li> 4: rb</li><li> 5: bd</li>
-* <li> 6: ul</li><li> 7: lb</li><li> 8: dl</li>
-* <li> 9: fu</li><li>10: lf</li><li>11: fd</li>
-* </ul>
-* <p>
 */
 /** <b>Side parts</b>
 * <p>
@@ -238,28 +164,6 @@ let module = {
 * <p>
 * The orientations of the side parts are symmetric along the axis from the
 * right-up-front corner through the left-down-back corner of the cube.
-* <pre>
-*       +-----------+              +-----------+
-*      /     .1    /|             /     .1    /|
-*     +    ---    +r+            +    ---    +b+
-*    / .0/ 1 /.2 /  |           / .0/ 4 /.2 /  |
-*   +    ---    +.3 +          +    ---    +.3 +
-*  / u   .3    / /|.0         / d   .3    / /|.0
-* +---+---+---*  0  +        +---+---+---*  5  +
-* | f   .2    .2|/ /         | l   .2    .2|/ /
-* +    ---    + .1+          +    ---    + .1+
-* | .1| 2 |.3 |  /           | .1| 3 |.3 |  /
-* +    ---    + +            +    ---    + +
-* |     .0    |/             |     .0    |/
-* +---+---+---+              +---+---+---+
-* </pre>
-* <p>
-* Here is an alternative representation of the initial locations and
-* orientations of the side parts as a list:
-* <ul>
-* <li>0: r</li> <li>1: u</li> <li>2: f</li>
-* <li>3: l</li> <li>4: d</li> <li>5: b</li>
-* </ul>
 */
 
 // ===============================
@@ -777,40 +681,38 @@ class Cube {
    */
   transform(axis, layerMask, angle) {
     // Update transform type
-    {
-      switch (this.transformType) {
-        case this.IDENTITY_TRANSFORM:
-          this.transformAxis = axis;
-          this.transformMask = layerMask;
-          this.transformAngle = angle;
-          this.transformType = this.SINGLE_AXIS_TRANSFORM;
-          break;
-        case this.SINGLE_AXIS_TRANSFORM:
-          if (this.transformAxis == axis) {
-            if (this.transformAngle == angle) {
-              if (this.transformMask == layerMask) {
-                this.transformAngle = (this.transformAngle + angle) % 3;
-              } else if ((this.transformMask & layerMask) == 0) {
-                this.transformMask |= layerMask;
-              } else {
-                this.transformType = this.GENERAL_TRANSFORM;
-              }
+    switch (this.transformType) {
+      case this.IDENTITY_TRANSFORM:
+        this.transformAxis = axis;
+        this.transformMask = layerMask;
+        this.transformAngle = angle;
+        this.transformType = this.SINGLE_AXIS_TRANSFORM;
+        break;
+      case this.SINGLE_AXIS_TRANSFORM:
+        if (this.transformAxis == axis) {
+          if (this.transformAngle == angle) {
+            if (this.transformMask == layerMask) {
+              this.transformAngle = (this.transformAngle + angle) % 3;
+            } else if ((this.transformMask & layerMask) == 0) {
+              this.transformMask |= layerMask;
             } else {
-              if (this.transformMask == layerMask) {
-                this.transformAngle = (this.transformAngle + angle) % 3;
-              } else {
-                this.transformType = this.GENERAL_TRANSFORM;
-              }
+              this.transformType = this.GENERAL_TRANSFORM;
             }
           } else {
-            this.transformType = this.GENERAL_TRANSFORM;
+            if (this.transformMask == layerMask) {
+              this.transformAngle = (this.transformAngle + angle) % 3;
+            } else {
+              this.transformType = this.GENERAL_TRANSFORM;
+            }
           }
-          break;
-      }
-
-      // Perform the transform
-      this.transform0(axis, layerMask, angle);
+        } else {
+          this.transformType = this.GENERAL_TRANSFORM;
+        }
+        break;
     }
+
+    // Perform the transform
+    this.transform0(axis, layerMask, angle);
 
     // Inform listeners.
     if (!this.isQuiet()) {
@@ -855,55 +757,51 @@ class Cube {
     }
 
     let taxis = 0, tangle = 0, tmask = 0;
-    {
-      {
-        {
-          let atx = tx;
-          switch (atx.transformType) {
-            case this.IDENTITY_TRANSFORM:
-              return; // nothing to do
-            case SINGLE_AXIS_TRANSFORM:
-              taxis = atx.transformAxis;
-              tangle = atx.transformAngle;
-              tmask = atx.transformMask;
-              break;
-          }
-        }
 
-        if (tmask == 0) {
-          this.transformType = this.UNKNOWN_TRANSFORM;
-          let tempLoc;
-          let tempOrient;
+    let atx = tx;
+    switch (atx.transformType) {
+      case this.IDENTITY_TRANSFORM:
+        return; // nothing to do
+      case SINGLE_AXIS_TRANSFORM:
+        taxis = atx.transformAxis;
+        tangle = atx.transformAngle;
+        tmask = atx.transformMask;
+        break;
+    }
 
-          tempLoc = this.cornerLoc.slice(0);
-          tempOrient = this.cornerOrient.slice(0);
-          let txLoc = tx.getCornerLocations();
-          let txOrient = tx.getCornerOrientations();
-          for (let i = 0; i < txLoc.length; i++) {
-            this.cornerLoc[i] = tempLoc[txLoc[i]];
-            this.cornerOrient[i] = (tempOrient[txLoc[i]] + txOrient[i]) % 3;
-          }
+    if (tmask == 0) {
+      this.transformType = this.UNKNOWN_TRANSFORM;
+      let tempLoc;
+      let tempOrient;
 
-          tempLoc = this.edgeLoc.slice(0);
-          tempOrient = this.edgeOrient.slice(0);
-          txLoc = tx.getEdgeLocations();
-          txOrient = tx.getEdgeOrientations();
-          for (let i = 0; i < txLoc.length; i++) {
-            this.edgeLoc[i] = tempLoc[txLoc[i]];
-            this.edgeOrient[i] = (tempOrient[txLoc[i]] + txOrient[i]) % 2;
-          }
+      tempLoc = this.cornerLoc.slice(0);
+      tempOrient = this.cornerOrient.slice(0);
+      let txLoc = tx.getCornerLocations();
+      let txOrient = tx.getCornerOrientations();
+      for (let i = 0; i < txLoc.length; i++) {
+        this.cornerLoc[i] = tempLoc[txLoc[i]];
+        this.cornerOrient[i] = (tempOrient[txLoc[i]] + txOrient[i]) % 3;
+      }
 
-          tempLoc = this.sideLoc.slice(0);
-          tempOrient = this.sideOrient.slice(0);
-          txLoc = tx.getSideLocations();
-          txOrient = tx.getSideOrientations();
-          for (let i = 0; i < txLoc.length; i++) {
-            this.sideLoc[i] = tempLoc[txLoc[i]];
-            this.sideOrient[i] = (tempOrient[txLoc[i]] + txOrient[i]) % 4;
-          }
-        }
+      tempLoc = this.edgeLoc.slice(0);
+      tempOrient = this.edgeOrient.slice(0);
+      txLoc = tx.getEdgeLocations();
+      txOrient = tx.getEdgeOrientations();
+      for (let i = 0; i < txLoc.length; i++) {
+        this.edgeLoc[i] = tempLoc[txLoc[i]];
+        this.edgeOrient[i] = (tempOrient[txLoc[i]] + txOrient[i]) % 2;
+      }
+
+      tempLoc = this.sideLoc.slice(0);
+      tempOrient = this.sideOrient.slice(0);
+      txLoc = tx.getSideLocations();
+      txOrient = tx.getSideOrientations();
+      for (let i = 0; i < txLoc.length; i++) {
+        this.sideLoc[i] = tempLoc[txLoc[i]];
+        this.sideOrient[i] = (tempOrient[txLoc[i]] + txOrient[i]) % 4;
       }
     }
+
     if (tmask == 0) {
       this.fireCubeChanged(new CubeEvent(this, 0, 0, 0));
     } else {
@@ -1514,27 +1412,7 @@ Cube.prototype.CENTER_TO_SIDE_MAP = [
 * Second dimension: orientation.
 * Third dimension: swipe direction
 * Fourth dimension: axis,layermask,angle
-* <pre>
-*             +---+---+---+
-*             |4.0|   |2.0|
-*             +---     ---+
-*             |     1     |
-*             +---     ---+
-*             |6.0|   |0.0|
-* +---+---+---+---+---+---+---+---+---+---+---+---+
-* |4.1|   |6.2|6.1|   |0.2|0.1|   |2.2|2.1|   |4.2|
-* +---     ---+---     ---+---    +---+---     ---+
-* |     3     |     2     |     0     |     5     |
-* +---     ---+---     ---+---    +---+---     ---+
-* |5.2|   |7.1|7.2|   |1.1|1.2|   |3.1|3.2|   |5.1|
-* +---+---+---+---+---+---+---+---+---+---+---+---+
-*             |7.0|   |1.0|
-*             +---     ---+
-*             |     4     |
-*             +---     ---+
-*             |5.0|   |3.0|
-*             +---+---+---+
-* </pre>*/
+*/
 Cube.prototype.CORNER_SWIPE_TABLE = [
 [// 0 urf
   [//u
@@ -1710,7 +1588,7 @@ function arraysEquals(a, b) {
     }
     return true;
 }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * Represents the state of a 2-times sliced cube (Pocket Cube) by the location
  * and orientation of its parts.
@@ -1743,23 +1621,6 @@ class PocketCube extends Cube {
     this.reset();
   }
 
-  /**
-   * Transforms the cube without firing an event.
-   *
-   * @param  axis  0=x, 1=y, 2=z axis.
-   * @param  layerMask A bitmask specifying the layers to be transformed.
-   *           The size of the layer mask depends on the value returned by
-   *           <code>getLayerCount(axis)</code>. The layer mask has the
-   *           following meaning:
-   *           7=rotate the whole cube;<br>
-   *           1=twist slice near the axis (left, down, back)<br>
-   *           2=twist slice in the middle of the axis<br>
-   *           4=twist slice far away from the axis (right, top, up)
-   * @param  angle  positive values=clockwise rotation<br>
-   *                negative values=counterclockwise rotation<br>
-   *               1=90 degrees<br>
-   *               2=180 degrees
-   */
   transform0(axis, layerMask, angle) {
     if (angle == 0) {
         return; // NOP
@@ -1769,61 +1630,61 @@ class PocketCube extends Cube {
     let an = (angle == -2) ? 2 : angle;
 
     if ((layerMask & 1) != 0) {
-        let repeat;
-        switch (an) {
-        case -1: repeat=1; break;
-        case  1: repeat=3; break;
-        case  2: repeat=2; break;
+      let repeat;
+      switch (an) {
+      case -1: repeat=1; break;
+      case  1: repeat=3; break;
+      case  2: repeat=2; break;
+      }
+      for (let i=0;i<repeat;i++) {
+        // twist at left, bottom, back
+        switch (axis) {
+        case 0: this.twistL(); break;
+        case 1: this.twistD(); break;
+        case 2: this.twistB(); break;
         }
-        for (let i=0;i<repeat;i++) {
-            // twist at left, bottom, back
-            switch (axis) {
-            case 0: this.twistL(); break;
-            case 1: this.twistD(); break;
-            case 2: this.twistB(); break;
-            }
-        }
+      }
     }
     if ((layerMask & 2) != 0) {
-        let repeat;
-        switch (an) {
-        case -1: repeat=3; break;
-        case  1: repeat=1; break;
-        case  2: repeat=2; break;
+      let repeat;
+      switch (an) {
+      case -1: repeat=3; break;
+      case  1: repeat=1; break;
+      case  2: repeat=2; break;
+      }
+      for (let i=0;i<repeat;i++) {
+        // twist at right, top, front
+        switch (axis) {
+        case 0: this.twistR(); break;
+        case 1: this.twistU(); break;
+        case 2: this.twistF(); break;
         }
-        for (let i=0;i<repeat;i++) {
-            // twist at right, top, front
-            switch (axis) {
-            case 0: this.twistR(); break;
-            case 1: this.twistU(); break;
-            case 2: this.twistF(); break;
-            }
-        }
+      }
     }
   }
   twistR() {
-      this.fourCycle(this.cornerLoc, 0, 1, 3, 2, this.cornerOrient, 1, 2, 1, 2, 3);
+    this.fourCycle(this.cornerLoc, 0, 1, 3, 2, this.cornerOrient, 1, 2, 1, 2, 3);
   }
   twistU() {
-      this.fourCycle(this.cornerLoc, 0, 2, 4, 6, this.cornerOrient, 0, 0, 0, 0, 3);
+    this.fourCycle(this.cornerLoc, 0, 2, 4, 6, this.cornerOrient, 0, 0, 0, 0, 3);
   }
   twistF() {
-      this.fourCycle(this.cornerLoc, 6, 7, 1, 0, this.cornerOrient, 1, 2, 1, 2, 3);
+    this.fourCycle(this.cornerLoc, 6, 7, 1, 0, this.cornerOrient, 1, 2, 1, 2, 3);
   }
   twistL() {
-      this.fourCycle(this.cornerLoc, 6, 4, 5, 7, this.cornerOrient, 2, 1, 2, 1, 3);
+    this.fourCycle(this.cornerLoc, 6, 4, 5, 7, this.cornerOrient, 2, 1, 2, 1, 3);
   }
   twistD() {
-      this.fourCycle(this.cornerLoc, 7, 5, 3, 1, this.cornerOrient, 0, 0, 0, 0, 3);
+    this.fourCycle(this.cornerLoc, 7, 5, 3, 1, this.cornerOrient, 0, 0, 0, 0, 3);
   }
   twistB() {
-      this.fourCycle(this.cornerLoc, 2, 3, 5, 4, this.cornerOrient, 1, 2, 1, 2, 3);
+    this.fourCycle(this.cornerLoc, 2, 3, 5, 4, this.cornerOrient, 1, 2, 1, 2, 3);
   }
 
   clone() {
-      let that = new PocketCube();
-      that.setTo(this);
-      return that;
+    let that = new PocketCube();
+    that.setTo(this);
+    return that;
   }
 }
 // Construct the name to part map.
@@ -1831,26 +1692,26 @@ class PocketCube extends Cube {
   let cornerParts = ["urf", "dfr", "ubr", "drb", "ulb", "dbl", "ufl", "dlf"]
   let partMap = {center: 8};
   for (let i = 0; i < cornerParts.length; i++) {
-      let name = cornerParts[i];
-      let key1 = name.charAt(0) + name.charAt(1) + name.charAt(2);
-      let key2 = name.charAt(0) + name.charAt(2) + name.charAt(1);
-      let key3 = name.charAt(1) + name.charAt(0) + name.charAt(2);
-      let key4 = name.charAt(1) + name.charAt(2) + name.charAt(0);
-      let key5 = name.charAt(2) + name.charAt(0) + name.charAt(1);
-      let key6 = name.charAt(2) + name.charAt(1) + name.charAt(0);
-      partMap[key1] = i;
-      partMap[key2] = i;
-      partMap[key3] = i;
-      partMap[key4] = i;
-      partMap[key5] = i;
-      partMap[key6] = i;
+    let name = cornerParts[i];
+    let key1 = name.charAt(0) + name.charAt(1) + name.charAt(2);
+    let key2 = name.charAt(0) + name.charAt(2) + name.charAt(1);
+    let key3 = name.charAt(1) + name.charAt(0) + name.charAt(2);
+    let key4 = name.charAt(1) + name.charAt(2) + name.charAt(0);
+    let key5 = name.charAt(2) + name.charAt(0) + name.charAt(1);
+    let key6 = name.charAt(2) + name.charAt(1) + name.charAt(0);
+    partMap[key1] = i;
+    partMap[key2] = i;
+    partMap[key3] = i;
+    partMap[key4] = i;
+    partMap[key5] = i;
+    partMap[key6] = i;
   }
   /**
    * Maps the name of a part to its part index.
    */
   PocketCube.prototype.NAME_PART_MAP = partMap;
 }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * Represents the state of a 3-times sliced cube (Rubik's Cube) by the location
  * and orientation of its parts.
@@ -1943,23 +1804,6 @@ class RubiksCube extends Cube {
     this.reset();
   }
 
-  /**
-  * Transforms the cube without firing an event.
-  *
-  * @param  axis  0=x, 1=y, 2=z axis.
-  * @param  layerMask A bitmask specifying the layers to be transformed.
-  *           The size of the layer mask depends on the value returned by
-  *           <code>getLayerCount(axis)</code>. The layer mask has the
-  *           following meaning:
-  *           7=rotate the whole cube;<br>
-  *           1=twist slice near the axis (left, down, back)<br>
-  *           2=twist slice in the middle of the axis<br>
-  *           4=twist slice far away from the axis (right, top, up)
-  * @param  angle  positive values=clockwise rotation<br>
-  *                negative values=counterclockwise rotation<br>
-  *               1=90 degrees<br>
-  *               2=180 degrees
-  */
   transform0(axis, layerMask, angle) {
     if (angle == 0) {
       return; // NOP
@@ -2081,38 +1925,38 @@ class RubiksCube extends Cube {
   let sideParts = ["r", "u", "f", "l", "d", "b"];
   let partMap = {center: 8 + 12 + 6};
   for (let i = 0; i < cornerParts.length; i++) {
-      let name = cornerParts[i];
-      let key1 = name.charAt(0) + name.charAt(1) + name.charAt(2);
-      let key2 = name.charAt(0) + name.charAt(2) + name.charAt(1);
-      let key3 = name.charAt(1) + name.charAt(0) + name.charAt(2);
-      let key4 = name.charAt(1) + name.charAt(2) + name.charAt(0);
-      let key5 = name.charAt(2) + name.charAt(0) + name.charAt(1);
-      let key6 = name.charAt(2) + name.charAt(1) + name.charAt(0);
-      partMap[key1] = i;
-      partMap[key2] = i;
-      partMap[key3] = i;
-      partMap[key4] = i;
-      partMap[key5] = i;
-      partMap[key6] = i;
+    let name = cornerParts[i];
+    let key1 = name.charAt(0) + name.charAt(1) + name.charAt(2);
+    let key2 = name.charAt(0) + name.charAt(2) + name.charAt(1);
+    let key3 = name.charAt(1) + name.charAt(0) + name.charAt(2);
+    let key4 = name.charAt(1) + name.charAt(2) + name.charAt(0);
+    let key5 = name.charAt(2) + name.charAt(0) + name.charAt(1);
+    let key6 = name.charAt(2) + name.charAt(1) + name.charAt(0);
+    partMap[key1] = i;
+    partMap[key2] = i;
+    partMap[key3] = i;
+    partMap[key4] = i;
+    partMap[key5] = i;
+    partMap[key6] = i;
   }
   for (let i = 0; i < edgeParts.length; i++) {
-      let name = edgeParts[i];
-      let key1 = name.charAt(0) + name.charAt(1);
-      let key2 = name.charAt(1) + name.charAt(0);
-      partMap[key1] = i + 8;
-      partMap[key2] = i + 8;
+    let name = edgeParts[i];
+    let key1 = name.charAt(0) + name.charAt(1);
+    let key2 = name.charAt(1) + name.charAt(0);
+    partMap[key1] = i + 8;
+    partMap[key2] = i + 8;
   }
   for (let i = 0; i < sideParts.length; i++) {
-      let name = sideParts[i];
-      let key1 = name;
-      partMap[key1] = i + 8 + 12;
+    let name = sideParts[i];
+    let key1 = name;
+    partMap[key1] = i + 8 + 12;
   }
   /**
    * Maps the name of a part to its part index.
    */
   RubiksCube.prototype.NAME_PART_MAP = partMap;
 }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 //Cube4
 /**
  * Represents the state of a 4-times sliced cube (Revenge Cube) by the location
@@ -2223,32 +2067,11 @@ class RubiksCube extends Cube {
  * {@link Cube}.
  */
 class RevengeCube extends Cube {
-  /** Creates a new instance. */
   constructor() {
     super(4);
     this.reset();
   }
 
-  /**
-  * Transforms the cube and fires a cubeTwisted event.
-  *
-  * @param  axis  0=x, 1=y, 2=z axis.
-  * @param  layerMask A bitmask specifying the layers to be transformed.
-  *           The size of the layer mask depends on the value returned by
-  *           <code>getLayerCount(axis)</code>. For a 3x3x3 cube, the layer mask has the
-  *           following meaning:
-  *           15=rotate the whole cube;<br>
-  *           1=twist slice near the axis (left, down, back)<br>
-  *           2=twist slice in the near middle of the axis<br>
-  *           4=twist slice in the far middle of the axis<br>
-  *           8=twist slice far away from the axis (right, up, front)
-  * @param  angle  positive values=clockwise rotation<br>
-  *                negative values=counterclockwise rotation<br>
-  *               1=90 degrees<br>
-  *               2=180 degrees
-  *
-  * @see #getLayerCount()
-  */
   transform0(axis, layerMask, angle) {
     if (angle == 0) {
       return; // NOP
@@ -2397,38 +2220,38 @@ class RevengeCube extends Cube {
   let sideParts = ["r", "u", "f", "l", "d", "b"];
   let partMap = {center: 8 + 12*2 + 6*4};
   for (let i = 0; i < cornerParts.length; i++) {
-      let name = cornerParts[i];
-      let key1 = name.charAt(0) + name.charAt(1) + name.charAt(2);
-      let key2 = name.charAt(0) + name.charAt(2) + name.charAt(1);
-      let key3 = name.charAt(1) + name.charAt(0) + name.charAt(2);
-      let key4 = name.charAt(1) + name.charAt(2) + name.charAt(0);
-      let key5 = name.charAt(2) + name.charAt(0) + name.charAt(1);
-      let key6 = name.charAt(2) + name.charAt(1) + name.charAt(0);
-      partMap[key1] = i;
-      partMap[key2] = i;
-      partMap[key3] = i;
-      partMap[key4] = i;
-      partMap[key5] = i;
-      partMap[key6] = i;
+    let name = cornerParts[i];
+    let key1 = name.charAt(0) + name.charAt(1) + name.charAt(2);
+    let key2 = name.charAt(0) + name.charAt(2) + name.charAt(1);
+    let key3 = name.charAt(1) + name.charAt(0) + name.charAt(2);
+    let key4 = name.charAt(1) + name.charAt(2) + name.charAt(0);
+    let key5 = name.charAt(2) + name.charAt(0) + name.charAt(1);
+    let key6 = name.charAt(2) + name.charAt(1) + name.charAt(0);
+    partMap[key1] = i;
+    partMap[key2] = i;
+    partMap[key3] = i;
+    partMap[key4] = i;
+    partMap[key5] = i;
+    partMap[key6] = i;
   }
   for (let i = 0; i < edgeParts.length*2; i++) {
-      let name = edgeParts[i%12];
-      let key1 = name.charAt(0) + name.charAt(1)+(Math.floor(i/12)+1);
-      let key2 = name.charAt(1) + name.charAt(0)+(Math.floor(i/12)+1);
-      partMap[key1] = i + 8;
-      partMap[key2] = i + 8;
+    let name = edgeParts[i%12];
+    let key1 = name.charAt(0) + name.charAt(1)+(Math.floor(i/12)+1);
+    let key2 = name.charAt(1) + name.charAt(0)+(Math.floor(i/12)+1);
+    partMap[key1] = i + 8;
+    partMap[key2] = i + 8;
   }
   for (let i = 0; i < sideParts.length*4; i++) {
-      let name = sideParts[i%6]+(Math.floor(i/6)+1);
-      let key1 = name;
-      partMap[key1] = i + 8 + 12*2;
+    let name = sideParts[i%6]+(Math.floor(i/6)+1);
+    let key1 = name;
+    partMap[key1] = i + 8 + 12*2;
   }
   /**
    * Maps the name of a part to its part index.
    */
   RevengeCube.prototype.NAME_PART_MAP = partMap;
 }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 //Cube5
   /**
   * Represents the state of a 5-times sliced cube (Professor Cube) by the
@@ -2557,33 +2380,11 @@ class RevengeCube extends Cube {
   * </pre>
   */
 class ProfessorCube extends Cube {
-    /** Creates a new instance. */
-    constructor() {
-        super(5);
-        this.reset();
-    }
+  constructor() {
+      super(5);
+      this.reset();
+  }
 
-    /**
-     * Transforms the cube and fires a cubeTwisted event.
-     *
-     * @param  axis  0=x, 1=y, 2=z axis.
-     * @param  layerMask A bitmask specifying the layers to be transformed.
-     *           The size of the layer mask depends on the value returned by
-     *           <code>getLayerCount(axis)</code>. For a 3x3x3 cube, the layer mask has the
-     *           following meaning:
-     *           31=rotate the whole cube;<br>
-     *           1=twist slice near the axis (left, down, back)<br>
-     *           2=twist slice in the near middle of the axis<br>
-     *           4=twist slice in the middle of the axis<br>
-     *           8=twist slice in the far middle of the axis<br>
-     *           16=twist slice far away from the axis (right, up, front)
-     * @param  angle  positive values=clockwise rotation<br>
-     *                negative values=counterclockwise rotation<br>
-     *               1=90 degrees<br>
-     *               2=180 degrees
-     *
-     * @see #getLayerCount()
-     */
   transform0(axis, layerMask, angle) {
     if (angle == 0) {
       return; // NOP
@@ -2788,7 +2589,7 @@ class ProfessorCube extends Cube {
       return that;
   }
 }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 //Cube6
 /**
  * Represents the state of a 6-times sliced cube (such as a V-Cube 6) by the
@@ -2935,7 +2736,6 @@ class ProfessorCube extends Cube {
  * </pre>
  */
 class Cube6 extends Cube {
-  /** Creates a new instance. */
   constructor() {
     super(6);
     this.reset();
@@ -3189,7 +2989,7 @@ class Cube6 extends Cube {
       return that;
   }
 }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 //Cube7
 /**
  * Represents the state of a 7-times sliced cube (such as a V-Cube 7) by the
@@ -3354,7 +3154,6 @@ class Cube6 extends Cube {
  * </pre>
  */
 class Cube7 extends Cube {
-  /** Creates a new instance. */
   constructor() {
     super(7);
     this.reset();
@@ -3678,21 +3477,21 @@ class Cube7 extends Cube {
     this.fourCycle(this.sideLoc, 54, 70, 75, 61, this.sideOrient, 2, 1, 2, 3, 4);
   }
   clone() {
-      let that = new Cube7();
-      that.setTo(this);
-      return that;
+    let that = new Cube7();
+    that.setTo(this);
+    return that;
   }
 }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 function createCube(layerCount) {
   switch (layerCount) {
-    case 2: return new PocketCube();
-    case 3: return new RubiksCube();
-    case 4: return new RevengeCube();
-    case 5: return new ProfessorCube();
-    case 6: return new Cube6();
-    case 7: return new Cube7();
-    default: throw "Cannot create a cube with "+layerCount+" layers.";
+  case 2: return new PocketCube();
+  case 3: return new RubiksCube();
+  case 4: return new RevengeCube();
+  case 5: return new ProfessorCube();
+  case 6: return new Cube6();
+  case 7: return new Cube7();
+  default: throw "Cannot create a cube with "+layerCount+" layers.";
   }
 }
 // ------------------

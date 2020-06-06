@@ -71,7 +71,6 @@ class AbstractPocketCubeCube3D extends Cube3D.Cube3D {
 
       this.currentStickerTransforms[i] = new Node3D.Node3D();
       this.add(this.currentStickerTransforms[i]);
-      //this.currentDevelopedMatrix[i]=new J3DIMath.J3DIMatrix4();
       this.identityStickerLocations[i] = new J3DIMath.J3DIMatrix4();
     }
 
@@ -107,22 +106,29 @@ class AbstractPocketCubeCube3D extends Cube3D.Cube3D {
     // 0:urf
     //--no transformation---
     // 1:dfr
-    this.identityPartLocations[cornerOffset + 1].rotate(180, 0, 0, 1);
-    this.identityPartLocations[cornerOffset + 1].rotate(90, 0, 1, 0);
+    this.identityPartLocations[cornerOffset + 1].rotateZ(180);
+    this.identityPartLocations[cornerOffset + 1].rotateY(90);
     // 2:ubr
-    this.identityPartLocations[cornerOffset + 2].rotate(270, 0, 1, 0);
+    this.identityPartLocations[cornerOffset + 2].rotateY(270);
     // 3:drb
-    this.identityPartLocations[cornerOffset + 3].rotate(180, 0, 0, 1);
-    this.identityPartLocations[cornerOffset + 3].rotate(180, 0, 1, 0);
+    this.identityPartLocations[cornerOffset + 3].rotateZ(180);
+    this.identityPartLocations[cornerOffset + 3].rotateY(180);
     // 4:ulb
-    this.identityPartLocations[cornerOffset + 4].rotate(180, 0, 1, 0);
+    this.identityPartLocations[cornerOffset + 4].rotateY(180);
     // 5:dbl
-    this.identityPartLocations[cornerOffset + 5].rotate(180, 1, 0, 0);
-    this.identityPartLocations[cornerOffset + 5].rotate(90, 0, 1, 0);
+    this.identityPartLocations[cornerOffset + 5].rotateX(180);
+    this.identityPartLocations[cornerOffset + 5].rotateY(90);
     // 6:ufl
-    this.identityPartLocations[cornerOffset + 6].rotate(90, 0, 1, 0);
+    this.identityPartLocations[cornerOffset + 6].rotateY(90);
     // 7:dlf
-    this.identityPartLocations[cornerOffset + 7].rotate(180, 0, 0, 1);
+    this.identityPartLocations[cornerOffset + 7].rotateZ(180);
+
+    // Move all corner parts to up right front (urf)
+    /*
+    let ps= this.partSize;
+    for (let i = 0; i < this.cornerCount; i++) {
+         this.identityPartLocations[cornerOffset + i].translate(ps*0.5,ps*0.5,ps*-0.5);
+    }*/
 
     // ----------------------------
     // Reset all rotations
@@ -141,27 +147,43 @@ class AbstractPocketCubeCube3D extends Cube3D.Cube3D {
 
     let modelUrl = this.getModelUrl();
 
+    // create the parts
+    this.centerObj = new J3DI.J3DIObj();
+    this.cornerObj = new J3DI.J3DIObj();
+    this.stickerObjs = new Array(this.stickerCount);
+    for (let i = 0; i < this.stickerObjs.length; i++) {
+      this.stickerObjs[i] = new J3DI.J3DIObj();
+    }
+
+    // load the 3d model
+    J3DI.loadObj(null, modelUrl, function(obj) {
+      self.onObjLoaded(obj);
+      self.repaint();
+    });
+
+  /*
     // parts
-    this.centerObj = J3DI.loadObj(null, modelUrl + "center.obj", fRepaint);
-    this.cornerObj = J3DI.loadObj(null, modelUrl + "corner.obj", fRepaint);
+    this.centerObj = J3DI.loadObj(null, modelUrl + "#center", fRepaint);
+    this.cornerObj = J3DI.loadObj(null, modelUrl + "#corner", fRepaint);
 
     // stickers
     this.stickerObjs = new Array(this.stickerCount);
     for (let i = 0; i < this.stickerObjs.length; i++) {
       this.stickerObjs[i] = new J3DI.J3DIObj();
     }
-    this.corner_rObj = J3DI.loadObj(null, modelUrl + "corner_r.obj", function () {
+    this.corner_rObj = J3DI.loadObj(null, modelUrl + "#corner_r", function () {
       self.initAbstractPocketCubeCube3D_corner_r();
       self.repaint();
     });
-    this.corner_uObj = J3DI.loadObj(null, modelUrl + "corner_u.obj", function () {
+    this.corner_uObj = J3DI.loadObj(null, modelUrl + "#corner_u", function () {
       self.initAbstractPocketCubeCube3D_corner_u();
       self.repaint();
     });
-    this.corner_fObj = J3DI.loadObj(null, modelUrl + "corner_f.obj", function () {
+    this.corner_fObj = J3DI.loadObj(null, modelUrl + "#corner_f", function () {
       self.initAbstractPocketCubeCube3D_corner_f();
       self.repaint();
     });
+    */
   }
 
   validateAttributes() {
@@ -172,6 +194,24 @@ class AbstractPocketCubeCube3D extends Cube3D.Cube3D {
         this.stickerObjs[i].hasTexture = this.attributes.stickersImageURL != null;
       }
     }
+  }
+
+  onObjLoaded(obj) {
+    this.centerObj = obj.clone();
+    this.centerObj.selectedObject = "center";
+
+    this.cornerObj = obj.clone();
+    this.cornerObj.selectedObject = "corner";
+
+    this.corner_fObj = obj.clone();
+    this.corner_fObj.selectedObject = "corner_f";
+    this.initAbstractPocketCubeCube3D_corner_f();
+    this.corner_rObj = obj.clone();
+    this.corner_rObj.selectedObject = "corner_r";
+    this.initAbstractPocketCubeCube3D_corner_r();
+    this.corner_uObj = obj.clone();
+    this.corner_uObj.selectedObject = "corner_u";
+    this.initAbstractPocketCubeCube3D_corner_u();
   }
 
   initAbstractPocketCubeCube3D_corner_r() {
@@ -231,6 +271,7 @@ class AbstractPocketCubeCube3D extends Cube3D.Cube3D {
 
     this.initAbstractPocketCubeCube3D_textureScales();
   }
+
   initAbstractPocketCubeCube3D_textureScales() {
     let attr = this.attributes;
 
@@ -598,64 +639,61 @@ AbstractPocketCubeCube3D.prototype.stickerOffsets = Cube3D.computeStickerOffsets
  * Creates the 3D geometry of a "Pocket Cube".
  */
 class PocketCubeCube3D extends AbstractPocketCubeCube3D {
-  constructor(loadGeometry) {
-  super(2.0);
+  constructor(partSize) {
+    super(partSize);
   }
   loadGeometry() {
-  super.loadGeometry();
-  this.isDrawTwoPass=false;
+    super.loadGeometry();
+    this.isDrawTwoPass=false;
   }
 
   getModelUrl() {
-  return this.baseUrl+'/'+this.relativeUrl;
+    return this.baseUrl+'/'+this.relativeUrl;
   }
-
 
   createAttributes() {
-  let a=new CubeAttributes.CubeAttributes(this.partCount, 6*4, [4,4,4,4,4,4]);
-  let partsPhong=[0.5,0.6,0.4,16.0];//shiny plastic [ambient, diffuse, specular, shininess]
-  for (let i=0;i<this.partCount;i++) {
-    a.partsFillColor[i]=[24,24,24,255];
-    a.partsPhong[i]=partsPhong;
-  }
-  a.partsFillColor[this.centerOffset]=[240,240,240,255];
-
-  let faceColors=[//Right, Up, Front, Left, Down, Back
-    [255, 210, 0,255], // Yellow
-    [0, 51, 115,255], // Blue
-    [140, 0, 15,255], // Red
-    [248, 248, 248,255], // White
-    [0, 115, 47,255], // Green
-    [255, 70, 0,255], // Orange
-  ];
-
-  let stickersPhong=[0.8,0.2,0.1,8.0];//shiny paper [ambient, diffuse, specular, shininess]
-
-  let layerCount = this.cube.getLayerCount();
-  let stickersPerFace = layerCount*layerCount;
-  for (let i=0;i<6;i++) {
-    for (let j=0;j<stickersPerFace;j++) {
-    a.stickersFillColor[i*stickersPerFace+j]=faceColors[i];
-    a.stickersPhong[i*stickersPerFace+j]=stickersPhong;
+    let a=new CubeAttributes.CubeAttributes(this.partCount, 6*4, [4,4,4,4,4,4]);
+    let partsPhong=[0.5,0.6,0.4,16.0];//shiny plastic [ambient, diffuse, specular, shininess]
+    for (let i=0;i<this.partCount;i++) {
+      a.partsFillColor[i]=[24,24,24,255];
+      a.partsPhong[i]=partsPhong;
     }
-  }
+    a.partsFillColor[this.centerOffset]=[240,240,240,255];
 
-   return a;
+    let faceColors=[//Right, Up, Front, Left, Down, Back
+      [255, 210, 0,255], // Yellow
+      [0, 51, 115,255], // Blue
+      [140, 0, 15,255], // Red
+      [248, 248, 248,255], // White
+      [0, 115, 47,255], // Green
+      [255, 70, 0,255], // Orange
+    ];
+
+    let stickersPhong=[0.8,0.2,0.1,8.0];//shiny paper [ambient, diffuse, specular, shininess]
+
+    let layerCount = this.cube.getLayerCount();
+    let stickersPerFace = layerCount*layerCount;
+    for (let i=0;i<6;i++) {
+      for (let j=0;j<stickersPerFace;j++) {
+      a.stickersFillColor[i*stickersPerFace+j]=faceColors[i];
+      a.stickersPhong[i*stickersPerFace+j]=stickersPhong;
+      }
+    }
+
+    return a;
   }
 }
 
 
 function createCube3D(levelOfDetail) {
-  const c = new PocketCubeCube3D();
-  c.baseUrl = 'lib/';
+  let partSize;
+  let relativeUrl;
   switch (levelOfDetail) {
-  case 1: c.relativeUrl = 'models/pocketcube-1/'; break; // low-res model that should not be taken apart
-  case 2: c.relativeUrl = 'models/pocketcube-4/'; break; // med-res model that should not be taken apart
-  case 3: c.relativeUrl = 'models/pocketcube-4/'; break; // high-res model that should not be taken apart
-  case 4: c.relativeUrl = 'models/pocketcube-4/'; break; // low-res model that can be taken apart
-  case 5: c.relativeUrl = 'models/pocketcube-4/'; break; // med-res model that can be taken apart
-  default: c.relativeUrl = 'models/pocketcube-4/'; break; // high-res model that can be taken apart
+  default: partSize=18;relativeUrl = 'models/pocketcube-1.obj'; break;
   }
+  const c = new PocketCubeCube3D(partSize);
+  c.baseUrl = 'lib/';
+  c.relativeUrl = relativeUrl;
   return c;
 }
 

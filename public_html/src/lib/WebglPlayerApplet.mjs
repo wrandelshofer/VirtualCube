@@ -298,7 +298,12 @@ class WebglPlayerApplet extends AbstractPlayerApplet.AbstractPlayerApplet {
     }
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, obj.indexBuffer);
-    gl.drawElements(gl.TRIANGLES, obj.numIndices, gl.UNSIGNED_SHORT, 0);
+    if (obj.objects.has(obj.selectedObject)) {
+      let fromCount = obj.objects.get(obj.selectedObject);
+      gl.drawElements(gl.TRIANGLES, fromCount[1], gl.UNSIGNED_SHORT, fromCount[0]*2);
+    } else {
+      gl.drawElements(gl.TRIANGLES, obj.numIndices, gl.UNSIGNED_SHORT, 0);
+    }
 
     this.checkGLError('drawObject.drawElements vshader=' + prg.vshaderId + " fshader=" + prg.fshaderId);
   }

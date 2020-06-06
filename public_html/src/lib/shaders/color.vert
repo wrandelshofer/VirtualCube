@@ -3,7 +3,7 @@
  * Copyright (c) 2014 Werner Randelshofer, Switzerland.
  * You may only use this software in accordance with the license terms.
  */
- 
+
 // WebGL Vertex Shader
 
 // Model information
@@ -18,7 +18,7 @@ attribute vec4 vColor;       // vertex color
 // Fragment information
 // ------------------
 varying vec4 fColor;         // fragment color
-		
+
 void main() {
  fColor=vColor/255.0;
  gl_Position = mvpMatrix * vPos;

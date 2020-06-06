@@ -31,15 +31,7 @@ class AbstractRubiksCubeCube3D extends Cube3D.Cube3D {
   super();
 
   this.partSize = partSize;
-  if (partSize > 2) {
-    // The internal coordinates are given in millimeters
-    // We must scale them down here so that the entire
-    // scene fits into a cube of size 1.
-    this.cubeSize = partSize * 0.3;
-    this.matrix.scale(0.1);
-  } else {
-    this.cubeSize = partSize * 3;
-  }
+  this.cubeSize = partSize * 3;
 
   this.cornerCount = 8;
   this.edgeCount = 12;
@@ -945,12 +937,12 @@ function createCube3D(levelOfDetail) {
   let relativeUrl;
   switch (levelOfDetail) {
   case 4:
-  case 1: relativeUrl = 'models/rubikscube-4/'; break; // low-res model that should not be taken apart
-  case 2: relativeUrl = 'models/rubikscube-4/'; break; // med-res model that should not be taken apart
-  case 3: relativeUrl = 'models/rubikscube-4/'; break; // high-res model that should not be taken apart
-  case 4: relativeUrl = 'models/rubikscube-4/'; break; // low-res model that can be taken apart
-  case 5: relativeUrl = 'models/rubikscube-5/'; break; // med-res model that can be taken apart
-  default: relativeUrl = 'models/rubikscube-6/'; break; // high-res model that can be taken apart
+  case 1: relativeUrl = 'models/genericcube-1/'; break; // low-res model that should not be taken apart
+  case 2: relativeUrl = 'models/genericcube-1/'; break; // med-res model that should not be taken apart
+  case 3: relativeUrl = 'models/genericcube-1/'; break; // high-res model that should not be taken apart
+  case 4: relativeUrl = 'models/genericcube-1/'; break; // low-res model that can be taken apart
+  case 5: relativeUrl = 'models/genericcube-1/'; break; // med-res model that can be taken apart
+  default: relativeUrl = 'models/genericcube-1/'; break; // high-res model that can be taken apart
   }
   const c = new RubiksCubeCube3D(partSize);
   c.baseUrl = 'lib/';

@@ -11,14 +11,14 @@
     <h1>Test of the <code>partlist</code>  parameter</h1>
     <article>
     <section class="test">
-      <div class="virtualcube small" 
+      <div class="virtualcube small"
            ></div>
       <p>Default value.</p>
     </section>
     </article>
     <article>
     <section class="test">
-      <div class="virtualcube small" 
+      <div class="virtualcube small"
            partlist="urf,dfr,ubr,drb,ulb,dbl,ufl,dlf, ur,rf,dr,bu,rb,bd,ul,lb,dl,fu,lf,fd, r,u,f,l,d,b, center"
            ></div>
       <p><code>partlist="urf,dfr,ubr,drb,ulb,dbl,ufl,dlf, ur,rf,dr,bu,rb,bd,ul,lb,dl,fu,lf,fd, r,u,f,l,d,b, center"</code> (default)</p>
@@ -26,12 +26,12 @@
     </article>
     <article>
     <section class="test">
-      <div class="virtualcube small" 
+      <div class="virtualcube small"
            kind="RubiksCube"
            rendercontext="webgl"
-           partlist="l,r,u,d,b,center"
+           partlist="r,fl,ubl,center"
            ></div>
-      <p><code>rendercontext="webgl" partlist="l,r,u,f,d,b,center"</code></p>
+      <p><code>rendercontext="webgl" partlist="r,rl,ubl,center"</code></p>
     </section>
     </article>
     <article>
@@ -46,17 +46,7 @@
     </article>
     <article>
     <section class="test">
-      <div class="virtualcube small" 
-           kind="RubiksCube"
-           rendercontext="webgl"
-           partlist="l,r,u,f,d,b,df,db,dl,dr,drb,drf,dlb,dlf,center"
-           ></div>
-      <p><code>partlist="l,r,u,f,d,b,df,db,dl,dr,drb,drf,dlb,dlf,center"</code></p>
-    </section>
-    </article>
-    <article>
-    <section class="test">
-      <div class="virtualcube small" 
+      <div class="virtualcube"
            partlist="dfr,dlf,drb,center"
            kind="PocketCube"
            ></div>
@@ -71,6 +61,27 @@
              rendercontext="2d"
         ></div>
         <p><code>kind="PocketCube" rendercontext="2d" partlist="dfr,dlf,drb,center"</code></p>
+      </section>
+    </article>
+    <article>
+      <section class="test">
+        <div class="virtualcube"
+             kind="RevengeCube"
+             rendercontext="webgl"
+             partlist="bul r1 lf1 center"
+        ></div>
+        <p><code>partlist="bul r1 lf1 center"</code></p>
+      </section>
+    </article>
+    <article>
+      <section class="test">
+        <div class="virtualcube"
+             kind="RevengeCube"
+             partlist="bul r1 lf1 center"
+             rendercontext="2d"
+             levelofdetail="4"
+        ></div>
+        <p><code>partlist="bul r1 lf1 center" rendercontext="2d"</code></p>
       </section>
     </article>
   </body>

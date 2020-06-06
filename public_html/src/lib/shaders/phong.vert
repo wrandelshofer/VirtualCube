@@ -3,7 +3,7 @@
  * Copyright (c) 2014 Werner Randelshofer, Switzerland.
  * You may only use this software in accordance with the license terms.
  */
- 
+
 // WebGL Vertex Shader
 #ifdef GL_ES
     precision mediump float;
@@ -32,7 +32,7 @@ attribute vec4 vColor;       // vertex color
 varying vec4 fPos;           // fragment position in view coordinates
 varying vec4 fColor;         // fragment color
 varying vec4 fNormal;        // fragment normal in view coordinates
-		
+
 void main() {
  fPos = mvMatrix * vPos;
  fNormal = mvNormalMatrix * vec4(vNormal, 1);
