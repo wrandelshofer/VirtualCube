@@ -212,7 +212,7 @@
             td.append(document.createTextNode(expectedValue));
           } else {
             td.classList.add("differentValues");
-            td.append(document.createTextNode("Expected <"+expectedValue+"> but found <"+actualValue+">."));
+            td.append(document.createTextNode("Given <"+expectedValue+"> but computed <"+actualValue+">."));
           }
           tr.append(td);
         }

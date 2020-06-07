@@ -689,7 +689,7 @@ function createCube3D(levelOfDetail) {
   let partSize;
   let relativeUrl;
   switch (levelOfDetail) {
-  default: partSize=18;relativeUrl = 'models/pocketcube-1.obj'; break;
+  default: partSize=20;relativeUrl = 'models/pocketcube-1.obj'; break;
   }
   const c = new PocketCubeCube3D(partSize);
   c.baseUrl = 'lib/';

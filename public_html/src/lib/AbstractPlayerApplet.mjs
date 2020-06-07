@@ -334,7 +334,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
     this.currentAngle = 0;
     this.xRot = attr.xRot;
     this.yRot = attr.yRot;
-    this.camPos = new J3DIMath.J3DIVector3(0, 0, -this.cubeSize * 3.5);
+    this.camPos = new J3DIMath.J3DIVector3(0, 0, -this.cubeSize * 3.25);
     this.lookAtPos = new J3DIMath.J3DIVector3(0, 0, 0);
     this.up = new J3DIMath.J3DIVector3(0, 1, 0);
     this.lightPos = new J3DIMath.J3DIVector3(4,this.cubeSize* -4, this.cubeSize*8);
@@ -1476,7 +1476,7 @@ class Cube3DHandler extends AbstractCanvas.AbstractHandler {
           //   x(t0+h) := x(t0) + h * x'(t0)
           //       := x(t0) + h * v(t0);
           //   v(t0+h) := v(t0) + h * v'(t0)
-          //       := v(t0) + h * (F(t0)-dampings*v(t0))/m
+          //       := v(t0) + h * (F(t0)-damping*v(t0))/m
           if (Math.abs(v.norm()) < 0.1) {
             self.canvas.smoothRotationFunction = null;
           } else {
