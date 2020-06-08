@@ -86,10 +86,6 @@ import Cube6Cube3D from "./Cube6Cube3D.mjs";
 import Cube7Cube3D from "./Cube7Cube3D.mjs";
 
 // import cached .obj files for 3d models
-import PreloadRubiksCubeS4 from "./PreloadRubiksCubeS4.mjs";
-import PreloadPocketCubeS4 from "./PreloadPocketCubeS4.mjs";
-
-
 import AbstractCanvas from "./AbstractCanvas.mjs";
 import ScriptAST from "./ScriptAST.mjs";
 

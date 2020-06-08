@@ -148,8 +148,11 @@ class AbstractPocketCubeCube3D extends Cube3D.Cube3D {
     let modelUrl = this.getModelUrl();
 
     // create the parts
-    this.centerObj = new J3DI.J3DIObj();
     this.cornerObj = new J3DI.J3DIObj();
+    this.corner_rObj = new J3DI.J3DIObj();
+    this.corner_uObj = new J3DI.J3DIObj();
+    this.corner_fObj = new J3DI.J3DIObj();
+    this.centerObj = new J3DI.J3DIObj();
     this.stickerObjs = new Array(this.stickerCount);
     for (let i = 0; i < this.stickerObjs.length; i++) {
       this.stickerObjs[i] = new J3DI.J3DIObj();
@@ -160,30 +163,6 @@ class AbstractPocketCubeCube3D extends Cube3D.Cube3D {
       self.onObjLoaded(obj);
       self.repaint();
     });
-
-  /*
-    // parts
-    this.centerObj = J3DI.loadObj(null, modelUrl + "#center", fRepaint);
-    this.cornerObj = J3DI.loadObj(null, modelUrl + "#corner", fRepaint);
-
-    // stickers
-    this.stickerObjs = new Array(this.stickerCount);
-    for (let i = 0; i < this.stickerObjs.length; i++) {
-      this.stickerObjs[i] = new J3DI.J3DIObj();
-    }
-    this.corner_rObj = J3DI.loadObj(null, modelUrl + "#corner_r", function () {
-      self.initAbstractPocketCubeCube3D_corner_r();
-      self.repaint();
-    });
-    this.corner_uObj = J3DI.loadObj(null, modelUrl + "#corner_u", function () {
-      self.initAbstractPocketCubeCube3D_corner_u();
-      self.repaint();
-    });
-    this.corner_fObj = J3DI.loadObj(null, modelUrl + "#corner_f", function () {
-      self.initAbstractPocketCubeCube3D_corner_f();
-      self.repaint();
-    });
-    */
   }
 
   validateAttributes() {
@@ -197,21 +176,20 @@ class AbstractPocketCubeCube3D extends Cube3D.Cube3D {
   }
 
   onObjLoaded(obj) {
-    this.centerObj = obj.clone();
-    this.centerObj.selectedObject = "center";
-
-    this.cornerObj = obj.clone();
+    this.cornerObj.setTo(obj);
     this.cornerObj.selectedObject = "corner";
-
-    this.corner_fObj = obj.clone();
-    this.corner_fObj.selectedObject = "corner_f";
-    this.initAbstractPocketCubeCube3D_corner_f();
-    this.corner_rObj = obj.clone();
+    this.corner_rObj.setTo(obj);
     this.corner_rObj.selectedObject = "corner_r";
     this.initAbstractPocketCubeCube3D_corner_r();
-    this.corner_uObj = obj.clone();
+    this.corner_uObj.setTo(obj);
     this.corner_uObj.selectedObject = "corner_u";
     this.initAbstractPocketCubeCube3D_corner_u();
+    this.corner_fObj.setTo(obj);
+    this.corner_fObj.selectedObject = "corner_f";
+    this.initAbstractPocketCubeCube3D_corner_f();
+
+    this.centerObj.setTo(obj);
+    this.centerObj.selectedObject = "center";
   }
 
   initAbstractPocketCubeCube3D_corner_r() {
@@ -689,6 +667,7 @@ function createCube3D(levelOfDetail) {
   let partSize;
   let relativeUrl;
   switch (levelOfDetail) {
+  case 0: partSize=20;relativeUrl = 'models/pocketcube-0.obj'; break;
   default: partSize=20;relativeUrl = 'models/pocketcube-1.obj'; break;
   }
   const c = new PocketCubeCube3D(partSize);

@@ -199,5 +199,3 @@ gl_Position = mvpMatrix * vPos;
 // MODULE API
 // ------------------
 export default {};
-
-

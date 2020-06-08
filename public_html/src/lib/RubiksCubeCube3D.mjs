@@ -87,27 +87,6 @@ class AbstractRubiksCubeCube3D extends Cube3D.Cube3D {
     this.identityStickerLocations[i] = new J3DIMath.J3DIMatrix4();
   }
 
-  /* Corners
-   *       +---+---+---+
-   *      ulb|4.0|   |2.0|ubr
-   *       +---+   +---+
-   *       |   1   |
-   *       +---+   +---+
-   *      ufl|6.0|   |0.0|urf
-   * +---+---+---+---+---+---+---+---+---+---+---+---+
-   * |4.1|   |6.2|6.1|   |0.2|0.1|   |2.2|2.1|   |4.2|
-   * +---+   +---+---+   +---+---+   +---+---+   +---+
-   * |   3   |   2   |   0   |   5   |
-   * +---+   +---+---+   +---+---+   +---+---+   +---+
-   * |5.2|   |7.1|7.2|   |1.1|1.2|   |3.1|3.2|   |5.1|
-   * +---+---+---+---+---+---+---+---+---+---+---+---+
-   *      dlf|7.0|   |1.0|dfr
-   *       +---+   +---+
-   *       |   4   |
-   *       +---+   +---+
-   *      dbl|5.0|   |3.0|drb
-   *       +---+---+---+
-   */
   let o = this.cornerOffset;
   let ps = this.partSize;
 
@@ -137,33 +116,7 @@ class AbstractRubiksCubeCube3D extends Cube3D.Cube3D {
   // 7:dlf
   this.identityPartLocations[o + 7].rotateZ(180);
 
-  if (partSize > 2) {
-    for (let i = 0; i < this.cornerCount; i++) {
-       this.identityPartLocations[o + i].translate(ps*1.0,ps*1.0,-ps*1.0);
-    }
-  }
   //
-  /* Edges
-   *       +---+---+---+
-   *       |   |3.1|   |
-   *       +--- --- ---+
-   *       |6.0| u |0.0|
-   *       +--- --- ---+
-   *       |   |9.1|   |
-   * +---+---+---+---+---+---+---+---+---+---+---+---+
-   * |   |6.1|   |   |9.0|   |   |0.1|   |   |3.0|   |
-   * +--- --- ---+--- --- ---+--- --- ---+--- --- ---+
-   * |7.0| l 10.0|10.1 f |1.1|1.0| r |4.0|4.1| b |7.1|
-   * +--- --- ---+--- --- ---+--- --- ---+--- --- ---+
-   * |   |8.1|   |   |11.0   |   |2.1|   |   |5.0|   |
-   * +---+---+---+---+---+---+---+---+---+---+---+---+
-   *       |   |11.1   |
-   *       +--- --- ---+
-   *       |8.0| d |2.0|
-   *       +--- --- ---+
-   *       |   |5.1|   |
-   *       +---+---+---+
-   */
   o = this.edgeOffset;
 
   // Move all edge parts to up right (ur)
@@ -204,32 +157,6 @@ class AbstractRubiksCubeCube3D extends Cube3D.Cube3D {
   this.identityPartLocations[o + 11].rotateZ(-90);
   this.identityPartLocations[o + 11].rotateX(-90);
 
-  if (partSize > 2) {
-    for (let i = 0; i < this.edgeCount; i++) {
-       this.identityPartLocations[o + i].translate(ps*1.0,ps*1.0,0);
-    }
-  }
-  /* Sides
-   *       +------------+
-   *       |   .1   |
-   *       |  ---   |
-   *       | .0| 1 |.2  |
-   *       |  ---   |
-   *       |   .3   |
-   * +-----------+------------+-----------+-----------+
-   * |   .0  |   .2   |   .3  |  .1   |
-   * |  ---  |  ---   |  ---  |  ---  |
-   * | .3| 3 |.1 | .1| 2 |.3  | .2| 0 |.0 | .0| 5 |.2 |
-   * |  ---  |  ---   |  ---  |  ---  |
-   * |   .2  |  .0    |   .1  |   .3  |
-   * +-----------+------------+-----------+-----------+
-   *       |   .0   |
-   *       |  ---   |
-   *       | .3| 4 |.1  |
-   *       |  ---   |
-   *       |   .2   |
-   *       +------------+
-   */
   o = this.sideOffset;
 
   // Move all side parts to right (= position of side[0]
@@ -253,12 +180,6 @@ class AbstractRubiksCubeCube3D extends Cube3D.Cube3D {
   // b
   this.identityPartLocations[o + 5].rotate(90, 0, -1, 0);
   this.identityPartLocations[o + 5].rotate(180, 1, 0, 0);
-
-  if (partSize > 2) {
-    for (let i = 0; i < this.sideCount; i++) {
-       this.identityPartLocations[o + i].translate(ps*1.0,0,0);
-    }
-  }
   }
 
   loadGeometry() {
@@ -269,47 +190,62 @@ class AbstractRubiksCubeCube3D extends Cube3D.Cube3D {
       self.repaint();
     };
 
-    let baseUrl = this.getModelUrl();
+    let modelUrl = this.getModelUrl();
 
-    {
-      // parts
-      this.centerObj = J3DI.loadObj(null, baseUrl + "center.obj", fRepaint);
-      this.cornerObj = J3DI.loadObj(null, baseUrl + "corner.obj", fRepaint);
-      this.edgeObj = J3DI.loadObj(null, baseUrl + "edge.obj", fRepaint);
-      this.sideObj = J3DI.loadObj(null, baseUrl + "side.obj", fRepaint);
-
-      // stickers
-      this.stickerObjs = new Array(this.stickerCount);
-      for (let i = 0; i < this.stickerObjs.length; i++) {
-        this.stickerObjs[i] = new J3DI.J3DIObj();
-      }
-      this.corner_rObj = J3DI.loadObj(null, baseUrl + "corner_r.obj", function () {
-        self.initAbstractRubiksCubeCube3D_corner_r();
-        self.repaint();
-      });
-      this.corner_uObj = J3DI.loadObj(null, baseUrl + "corner_u.obj", function () {
-        self.initAbstractRubiksCubeCube3D_corner_u();
-        self.repaint();
-      });
-      this.corner_fObj = J3DI.loadObj(null, baseUrl + "corner_f.obj", function () {
-        self.initAbstractRubiksCubeCube3D_corner_f();
-        self.repaint();
-      });
-      this.edge_rObj = J3DI.loadObj(null, baseUrl + "edge_r.obj", function () {
-        self.initAbstractRubiksCubeCube3D_edge_r();
-        self.repaint();
-      });
-      this.edge_uObj = J3DI.loadObj(null, baseUrl + "edge_u.obj", function () {
-        self.initAbstractRubiksCubeCube3D_edge_u();
-        self.repaint();
-      });
-      this.side_rObj = J3DI.loadObj(null, baseUrl + "side_r.obj", function () {
-        self.initAbstractRubiksCubeCube3D_side_r();
-        self.repaint();
-      });
+    // create the parts
+    this.cornerObj = new J3DI.J3DIObj();
+    this.corner_rObj = new J3DI.J3DIObj();
+    this.corner_uObj = new J3DI.J3DIObj();
+    this.corner_fObj = new J3DI.J3DIObj();
+    this.edgeObj = new J3DI.J3DIObj();
+    this.edge_rObj = new J3DI.J3DIObj();
+    this.edge_uObj = new J3DI.J3DIObj();
+    this.sideObj = new J3DI.J3DIObj();
+    this.side_rObj = new J3DI.J3DIObj();
+    this.centerObj = new J3DI.J3DIObj();
+    this.stickerObjs = new Array(this.stickerCount);
+    for (let i = 0; i < this.stickerObjs.length; i++) {
+      this.stickerObjs[i] = new J3DI.J3DIObj();
     }
 
+    // load the 3d model
+    J3DI.loadObj(null, modelUrl, function(obj) {
+      self.onObjLoaded(obj);
+      self.repaint();
+    });
   }
+
+  onObjLoaded(obj) {
+    this.cornerObj.setTo(obj);
+    this.cornerObj.selectedObject = "corner";
+    this.corner_rObj.setTo(obj);
+    this.corner_rObj.selectedObject = "corner_r";
+    this.initAbstractRubiksCubeCube3D_corner_r();
+    this.corner_uObj.setTo(obj);
+    this.corner_uObj.selectedObject = "corner_u";
+    this.initAbstractRubiksCubeCube3D_corner_u();
+    this.corner_fObj.setTo(obj);
+    this.corner_fObj.selectedObject = "corner_f";
+    this.initAbstractRubiksCubeCube3D_corner_f();
+    this.edgeObj.setTo(obj);
+    this.edgeObj.selectedObject = "edge";
+    this.edge_rObj.setTo(obj);
+    this.edge_rObj.selectedObject = "edge_r";
+    this.initAbstractRubiksCubeCube3D_edge_r();
+    this.edge_uObj.setTo(obj);
+    this.edge_uObj.selectedObject = "edge_u";
+    this.initAbstractRubiksCubeCube3D_edge_u();
+
+    this.sideObj.setTo(obj);
+    this.sideObj.selectedObject = "side";
+    this.side_rObj.setTo(obj);
+    this.side_rObj.selectedObject = "side_r";
+    this.initAbstractRubiksCubeCube3D_side_r();
+
+    this.centerObj.setTo(obj);
+    this.centerObj.selectedObject = "center";
+  }
+
   doValidateAttributes() {
     let a = this.attributes;
     for (let i = 0; i < this.stickerObjs.length; i++) {
@@ -933,16 +869,13 @@ class RubiksCubeCube3D extends AbstractRubiksCubeCube3D {
 
 // ------------------
 function createCube3D(levelOfDetail) {
-  let partSize=18;
+  let partSize;
   let relativeUrl;
   switch (levelOfDetail) {
-  case 4:
-  case 1: relativeUrl = 'models/genericcube-1/'; break; // low-res model that should not be taken apart
-  case 2: relativeUrl = 'models/genericcube-1/'; break; // med-res model that should not be taken apart
-  case 3: relativeUrl = 'models/genericcube-1/'; break; // high-res model that should not be taken apart
-  case 4: relativeUrl = 'models/genericcube-1/'; break; // low-res model that can be taken apart
-  case 5: relativeUrl = 'models/genericcube-1/'; break; // med-res model that can be taken apart
-  default: relativeUrl = 'models/genericcube-1/'; break; // high-res model that can be taken apart
+  case 0: partSize=18; relativeUrl = 'models/rubikscube-0.obj'; break;
+  case 1: partSize=18; relativeUrl = 'models/rubikscube-1.obj'; break;
+  case 2: partSize=18; relativeUrl = 'models/rubikscube-2.obj'; break;
+  default: partSize=18; relativeUrl = 'models/rubikscube-3.obj'; break;
   }
   const c = new RubiksCubeCube3D(partSize);
   c.baseUrl = 'lib/';

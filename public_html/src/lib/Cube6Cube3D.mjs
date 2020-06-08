@@ -515,55 +515,71 @@ class AbstractCube6Cube3D extends Cube3D.Cube3D {
     }
   }
 
+
   loadGeometry() {
-      // ----------------------------
-      // Load geometry
-      let self = this;
-      let fRepaint = function () {
-          self.repaint();
-      };
+    // ----------------------------
+    // Load geometry
+    let self = this;
+    let fRepaint = function () {
+      self.repaint();
+    };
 
-      let baseUrl = this.getModelUrl();
+    let modelUrl = this.getModelUrl();
 
-      {
-          // parts
-          this.centerObj = J3DI.loadObj(null, baseUrl + "center.obj", fRepaint);
-          this.cornerObj = J3DI.loadObj(null, baseUrl + "corner.obj", fRepaint);
-          this.edgeObj = J3DI.loadObj(null, baseUrl + "edge.obj", fRepaint);
-          this.sideObj = J3DI.loadObj(null, baseUrl + "side.obj", fRepaint);
+    // create the parts
+    this.cornerObj = new J3DI.J3DIObj();
+    this.corner_rObj = new J3DI.J3DIObj();
+    this.corner_uObj = new J3DI.J3DIObj();
+    this.corner_fObj = new J3DI.J3DIObj();
+    this.edgeObj = new J3DI.J3DIObj();
+    this.edge_rObj = new J3DI.J3DIObj();
+    this.edge_uObj = new J3DI.J3DIObj();
+    this.sideObj = new J3DI.J3DIObj();
+    this.side_rObj = new J3DI.J3DIObj();
+    this.centerObj = new J3DI.J3DIObj();
+    this.stickerObjs = new Array(this.stickerCount);
+    for (let i = 0; i < this.stickerObjs.length; i++) {
+      this.stickerObjs[i] = new J3DI.J3DIObj();
+    }
 
-          // stickers
-          this.stickerObjs = new Array(this.stickerCount);
-          for (let i = 0; i < this.stickerObjs.length; i++) {
-              this.stickerObjs[i] = new J3DI.J3DIObj();
-          }
-          this.corner_rObj = J3DI.loadObj(null, baseUrl + "corner_r.obj", function () {
-              self.initAbstractCube6Cube3D_corner_r();
-              self.repaint();
-          });
-          this.corner_uObj = J3DI.loadObj(null, baseUrl + "corner_u.obj", function () {
-              self.initAbstractCube6Cube3D_corner_u();
-              self.repaint();
-          });
-          this.corner_fObj = J3DI.loadObj(null, baseUrl + "corner_f.obj", function () {
-              self.initAbstractCube6Cube3D_corner_f();
-              self.repaint();
-          });
-          this.edge_rObj = J3DI.loadObj(null, baseUrl + "edge_r.obj", function () {
-              self.initAbstractCube6Cube3D_edge_r();
-              self.repaint();
-          });
-          this.edge_uObj = J3DI.loadObj(null, baseUrl + "edge_u.obj", function () {
-              self.initAbstractCube6Cube3D_edge_u();
-              self.repaint();
-          });
-          this.side_rObj = J3DI.loadObj(null, baseUrl + "side_r.obj", function () {
-              self.initAbstractCube6Cube3D_side_r();
-              self.repaint();
-          });
-      }
-
+    // load the 3d model
+    J3DI.loadObj(null, modelUrl, function(obj) {
+      self.onObjLoaded(obj);
+      self.repaint();
+    });
   }
+
+  onObjLoaded(obj) {
+    this.cornerObj.setTo(obj);
+    this.cornerObj.selectedObject = "corner0";
+    this.corner_rObj.setTo(obj);
+    this.corner_rObj.selectedObject = "corner0_r";
+    this.initAbstractCube6Cube3D_corner_r();
+    this.corner_uObj.setTo(obj);
+    this.corner_uObj.selectedObject = "corner0_u";
+    this.initAbstractCube6Cube3D_corner_u();
+    this.corner_fObj.setTo(obj);
+    this.corner_fObj.selectedObject = "corner0_f";
+    this.initAbstractCube6Cube3D_corner_f();
+    this.edgeObj.setTo(obj);
+    this.edgeObj.selectedObject = "edge0";
+    this.edge_rObj.setTo(obj);
+    this.edge_rObj.selectedObject = "edge0_r";
+    this.initAbstractCube6Cube3D_edge_r();
+    this.edge_uObj.setTo(obj);
+    this.edge_uObj.selectedObject = "edge0_u";
+    this.initAbstractCube6Cube3D_edge_u();
+
+    this.sideObj.setTo(obj);
+    this.sideObj.selectedObject = "side0";
+    this.side_rObj.setTo(obj);
+    this.side_rObj.selectedObject = "side0_r";
+    this.initAbstractCube6Cube3D_side_r();
+
+    this.centerObj.setTo(obj);
+    this.centerObj.selectedObject = "center";
+  }
+
   doValidateAttributes() {
       let a = this.attributes;
       for (let i = 0; i < this.stickerObjs.length; i++) {
@@ -1165,7 +1181,67 @@ class Cube6Cube3D extends AbstractCube6Cube3D {
     super(11);
   }
   loadGeometry() {
-    super.loadGeometry();
+    // ----------------------------
+    // Load geometry
+    let self = this;
+    let fRepaint = function () {
+      self.repaint();
+    };
+
+    let modelUrl = this.getModelUrl();
+
+    // create the parts
+    this.cornerObj = new J3DI.J3DIObj();
+    this.corner_rObj = new J3DI.J3DIObj();
+    this.corner_uObj = new J3DI.J3DIObj();
+    this.corner_fObj = new J3DI.J3DIObj();
+    this.edgeObj = new J3DI.J3DIObj();
+    this.edge_rObj = new J3DI.J3DIObj();
+    this.edge_uObj = new J3DI.J3DIObj();
+    this.sideObj = new J3DI.J3DIObj();
+    this.side_rObj = new J3DI.J3DIObj();
+    this.centerObj = new J3DI.J3DIObj();
+    this.stickerObjs = new Array(this.stickerCount);
+    for (let i = 0; i < this.stickerObjs.length; i++) {
+      this.stickerObjs[i] = new J3DI.J3DIObj();
+    }
+
+    // load the 3d model
+    J3DI.loadObj(null, modelUrl, function(obj) {
+      self.onObjLoaded(obj);
+      self.repaint();
+    });
+  }
+
+  onObjLoaded(obj) {
+    this.cornerObj.setTo(obj);
+    this.cornerObj.selectedObject = "corner0";
+    this.corner_rObj.setTo(obj);
+    this.corner_rObj.selectedObject = "corner0_r";
+    this.initAbstractCube6Cube3D_corner_r();
+    this.corner_uObj.setTo(obj);
+    this.corner_uObj.selectedObject = "corner0_u";
+    this.initAbstractCube6Cube3D_corner_u();
+    this.corner_fObj.setTo(obj);
+    this.corner_fObj.selectedObject = "corner0_f";
+    this.initAbstractCube6Cube3D_corner_f();
+    this.edgeObj.setTo(obj);
+    this.edgeObj.selectedObject = "edge0";
+    this.edge_rObj.setTo(obj);
+    this.edge_rObj.selectedObject = "edge0_r";
+    this.initAbstractCube6Cube3D_edge_r();
+    this.edge_uObj.setTo(obj);
+    this.edge_uObj.selectedObject = "edge0_u";
+    this.initAbstractCube6Cube3D_edge_u();
+
+    this.sideObj.setTo(obj);
+    this.sideObj.selectedObject = "side0";
+    this.side_rObj.setTo(obj);
+    this.side_rObj.selectedObject = "side0_r";
+    this.initAbstractCube6Cube3D_side_r();
+
+    this.centerObj.setTo(obj);
+    this.centerObj.selectedObject = "center";
   }
 
   getModelUrl() {
@@ -1208,16 +1284,17 @@ class Cube6Cube3D extends AbstractCube6Cube3D {
 
 // ------------------
 function createCube3D(levelOfDetail) {
-  const c = new Cube6Cube3D(18);
-  c.baseUrl = 'lib/';
+  let partSize;
+  let relativeUrl;
   switch (levelOfDetail) {
-    case 1: c.relativeUrl = 'models/genericcube-1/'; break; // low-res model that should not be taken apart
-    case 2: c.relativeUrl = 'models/genericcube-1/'; break; // med-res model that should not be taken apart
-    case 3: c.relativeUrl = 'models/genericcube-1/'; break; // high-res model that should not be taken apart
-    case 4: c.relativeUrl = 'models/genericcube-1/'; break; // low-res model that can be taken apart
-    case 5: c.relativeUrl = 'models/genericcube-1/'; break; // med-res model that can be taken apart
-    default: c.relativeUrl = 'models/genericcube-1/'; break; // high-res model that can be taken apart
+  case 0: partSize=10; relativeUrl = 'models/cube6-0.obj'; break;
+  case 1: partSize=10; relativeUrl = 'models/cube6-0.obj'; break;
+  case 2: partSize=10; relativeUrl = 'models/cube6-0.obj'; break;
+  default: partSize=10; relativeUrl = 'models/cube6-0.obj'; break;
   }
+  const c = new Cube6Cube3D(partSize);
+  c.baseUrl = 'lib/';
+  c.relativeUrl = relativeUrl;
   return c;
 }
 // ------------------

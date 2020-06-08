@@ -301,7 +301,7 @@ class WebglPlayerApplet extends AbstractPlayerApplet.AbstractPlayerApplet {
     if (obj.objects.has(obj.selectedObject)) {
       let fromCount = obj.objects.get(obj.selectedObject);
       gl.drawElements(gl.TRIANGLES, fromCount[1], gl.UNSIGNED_SHORT, fromCount[0]*2);
-    } else {
+    } else if (obj.selectedObject == null) {
       gl.drawElements(gl.TRIANGLES, obj.numIndices, gl.UNSIGNED_SHORT, 0);
     }
 

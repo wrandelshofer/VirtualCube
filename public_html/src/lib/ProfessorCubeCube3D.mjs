@@ -87,27 +87,6 @@ class AbstractProfessorCubeCube3D extends Cube3D.Cube3D {
     }
     this.partSize = (partSize === undefined) ? 2.0 : partSize;
 
-    /* Corners
-     *       +---+---+---+
-     *      ulb|4.0|   |2.0|ubr
-     *       +---+   +---+
-     *       |   1   |
-     *       +---+   +---+
-     *      ufl|6.0|   |0.0|urf
-     * +---+---+---+---+---+---+---+---+---+---+---+---+
-     * |4.1|   |6.2|6.1|   |0.2|0.1|   |2.2|2.1|   |4.2|
-     * +---+   +---+---+   +---+---+   +---+---+   +---+
-     * |   3   |   2   |   0   |   5   |
-     * +---+   +---+---+   +---+---+   +---+---+   +---+
-     * |5.2|   |7.1|7.2|   |1.1|1.2|   |3.1|3.2|   |5.1|
-     * +---+---+---+---+---+---+---+---+---+---+---+---+
-     *      dlf|7.0|   |1.0|dfr
-     *       +---+   +---+
-     *       |   4   |
-     *       +---+   +---+
-     *      dbl|5.0|   |3.0|drb
-     *       +---+---+---+
-     */
     let cornerOffset = this.cornerOffset;
     let ps = this.partSize;
 
@@ -266,40 +245,6 @@ class AbstractProfessorCubeCube3D extends Cube3D.Cube3D {
     this.identityStickerLocations[24].rotate(-90, 0, 0, 1);
     this.identityStickerLocations[24].rotate(-90, 1, 0, 0);
     //
-    /* Edges
-  /* Edges
-  *             +---+---+---+---+---+
-  *             |   |15 |3.1| 27|   |
-  *             +---+---+---+---+---+
-  *             |18 |       |12 |
-  *             +---+       +---+
-  *             |6.0|   u   |0.0|
-  *             +---+       +---+
-  *             |30 |       |24 |
-  *             +---+---+---+---+---+
-  *             |   |21 |9.1|33 |   |
-  *   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-  *   |   |18 |6.1|30 |   |   |21 |9.0|33 |   |   |24 |0.1|12 |   |   |27 |3.0|15 |   |
-  *   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-  *   |31 |       |34 |34 |       |25 |25 |       |28 |28 |       |31 |
-  *   +---+       +---+---+       +---+---+       +---+---+       +---+
-  *   |7.0|  l    10.0|10.1   f   |1.1|1.0|   r   |4.0|4.1|   b   |7.1|
-  *   +---+       +---+---+       +---+---+       +---+---+       +---+
-  *   |19 |       |22 |22 |       |13 |13 |       |16 |16 |       |19 |
-  *   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-  *   |   |20 |8.1|32 |   |   |23 11.0|35 |   |   |26 |2.1|14 |   |   |29 |5.0| 17|   |
-  *   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-  *             |   |23 11.1|35 |   |
-  *             +---+---+---+---+---+
-  *             |32 |       |26 |
-  *             +---+       +---+
-  *             |8.0|   d   |2.0|
-  *             +---+       +---+
-  *             |20 |       |14 |
-  *             +---+---+---+---+---+
-  *             |   |17 |5.1|29 |   |
-  *             +---+---+---+---+---+
-  */
     let edgeOffset = this.edgeOffset;
 
     // Move all edge parts to up right (ur)
@@ -454,27 +399,7 @@ class AbstractProfessorCubeCube3D extends Cube3D.Cube3D {
     this.identityStickerLocations[37].translate(ps * 0, ps * -3, 0);
     this.identityStickerLocations[37].rotate(90, 0, 0, 1); // @19
     this.identityStickerLocations[37].rotate(-90, 1, 0, 0); // @23
-    /* Sides
-     *       +------------+
-     *       |   .1   |
-     *       |  ---   |
-     *       | .0| 1 |.2  |
-     *       |  ---   |
-     *       |   .3   |
-     * +-----------+------------+-----------+-----------+
-     * |   .0  |   .2   |   .3  |  .1   |
-     * |  ---  |  ---   |  ---  |  ---  |
-     * | .3| 3 |.1 | .1| 2 |.3  | .2| 0 |.0 | .0| 5 |.2 |
-     * |  ---  |  ---   |  ---  |  ---  |
-     * |   .2  |  .0    |   .1  |   .3  |
-     * +-----------+------------+-----------+-----------+
-     *       |   .0   |
-     *       |  ---   |
-     *       | .3| 4 |.1  |
-     *       |  ---   |
-     *       |   .2   |
-     *       +------------+
-     */
+
     let sideOffset = this.sideOffset;
 
     // Move all side parts to right (= position of side[0]
@@ -541,47 +466,62 @@ class AbstractProfessorCubeCube3D extends Cube3D.Cube3D {
       self.repaint();
     };
 
-    let baseUrl = this.getModelUrl();
+    let modelUrl = this.getModelUrl();
 
-    {
-      // parts
-      this.centerObj = J3DI.loadObj(null, baseUrl + "center.obj", fRepaint);
-      this.cornerObj = J3DI.loadObj(null, baseUrl + "corner.obj", fRepaint);
-      this.edgeObj = J3DI.loadObj(null, baseUrl + "edge.obj", fRepaint);
-      this.sideObj = J3DI.loadObj(null, baseUrl + "side.obj", fRepaint);
-
-      // stickers
-      this.stickerObjs = new Array(this.stickerCount);
-      for (let i = 0; i < this.stickerObjs.length; i++) {
-        this.stickerObjs[i] = new J3DI.J3DIObj();
-      }
-      this.corner_rObj = J3DI.loadObj(null, baseUrl + "corner_r.obj", function () {
-        self.initAbstractProfessorCubeCube3D_corner_r();
-        self.repaint();
-      });
-      this.corner_uObj = J3DI.loadObj(null, baseUrl + "corner_u.obj", function () {
-        self.initAbstractProfessorCubeCube3D_corner_u();
-        self.repaint();
-      });
-      this.corner_fObj = J3DI.loadObj(null, baseUrl + "corner_f.obj", function () {
-        self.initAbstractProfessorCubeCube3D_corner_f();
-        self.repaint();
-      });
-      this.edge_rObj = J3DI.loadObj(null, baseUrl + "edge_r.obj", function () {
-        self.initAbstractProfessorCubeCube3D_edge_r();
-        self.repaint();
-      });
-      this.edge_uObj = J3DI.loadObj(null, baseUrl + "edge_u.obj", function () {
-        self.initAbstractProfessorCubeCube3D_edge_u();
-        self.repaint();
-      });
-      this.side_rObj = J3DI.loadObj(null, baseUrl + "side_r.obj", function () {
-        self.initAbstractProfessorCubeCube3D_side_r();
-        self.repaint();
-      });
+    // create the parts
+    this.cornerObj = new J3DI.J3DIObj();
+    this.corner_rObj = new J3DI.J3DIObj();
+    this.corner_uObj = new J3DI.J3DIObj();
+    this.corner_fObj = new J3DI.J3DIObj();
+    this.edgeObj = new J3DI.J3DIObj();
+    this.edge_rObj = new J3DI.J3DIObj();
+    this.edge_uObj = new J3DI.J3DIObj();
+    this.sideObj = new J3DI.J3DIObj();
+    this.side_rObj = new J3DI.J3DIObj();
+    this.centerObj = new J3DI.J3DIObj();
+    this.stickerObjs = new Array(this.stickerCount);
+    for (let i = 0; i < this.stickerObjs.length; i++) {
+      this.stickerObjs[i] = new J3DI.J3DIObj();
     }
 
+    // load the 3d model
+    J3DI.loadObj(null, modelUrl, function(obj) {
+      self.onObjLoaded(obj);
+      self.repaint();
+    });
   }
+
+  onObjLoaded(obj) {
+    this.cornerObj.setTo(obj);
+    this.cornerObj.selectedObject = "corner0";
+    this.corner_rObj.setTo(obj);
+    this.corner_rObj.selectedObject = "corner0_r";
+    this.initAbstractProfessorCubeCube3D_corner_r();
+    this.corner_uObj.setTo(obj);
+    this.corner_uObj.selectedObject = "corner0_u";
+    this.initAbstractProfessorCubeCube3D_corner_u();
+    this.corner_fObj.setTo(obj);
+    this.corner_fObj.selectedObject = "corner0_f";
+    this.initAbstractProfessorCubeCube3D_corner_f();
+    this.edgeObj.setTo(obj);
+    this.edgeObj.selectedObject = "edge0";
+    this.edge_rObj.setTo(obj);
+    this.edge_rObj.selectedObject = "edge0_r";
+    this.initAbstractProfessorCubeCube3D_edge_r();
+    this.edge_uObj.setTo(obj);
+    this.edge_uObj.selectedObject = "edge0_u";
+    this.initAbstractProfessorCubeCube3D_edge_u();
+
+    this.sideObj.setTo(obj);
+    this.sideObj.selectedObject = "side0";
+    this.side_rObj.setTo(obj);
+    this.side_rObj.selectedObject = "side0_r";
+    this.initAbstractProfessorCubeCube3D_side_r();
+
+    this.centerObj.setTo(obj);
+    this.centerObj.selectedObject = "center";
+  }
+
   doValidateAttributes() {
     let a = this.attributes;
     for (let i = 0; i < this.stickerObjs.length; i++) {
@@ -1227,16 +1167,17 @@ class ProfessorCubeCube3D extends AbstractProfessorCubeCube3D {
 
 // ------------------
 function createCube3D(levelOfDetail) {
-  const c = new ProfessorCubeCube3D(18);
-  c.baseUrl = 'lib/';
+  let partSize;
+  let relativeUrl;
   switch (levelOfDetail) {
-  case 1: c.relativeUrl = 'models/genericcube-1/'; break; // low-res model that should not be taken apart
-  case 2: c.relativeUrl = 'models/genericcube-1/'; break; // med-res model that should not be taken apart
-  case 3: c.relativeUrl = 'models/genericcube-1/'; break; // high-res model that should not be taken apart
-  case 4: c.relativeUrl = 'models/genericcube-1/'; break; // low-res model that can be taken apart
-  case 5: c.relativeUrl = 'models/genericcube-1/'; break; // med-res model that can be taken apart
-  default: c.relativeUrl = 'models/genericcube-1/'; break; // high-res model that can be taken apart
+  case 0: partSize=10; relativeUrl = 'models/professorcube-0.obj'; break;
+  case 1: partSize=10; relativeUrl = 'models/professorcube-0.obj'; break;
+  case 2: partSize=10; relativeUrl = 'models/professorcube-0.obj'; break;
+  default: partSize=10; relativeUrl = 'models/professorcube-0.obj'; break;
   }
+  const c = new ProfessorCubeCube3D(partSize);
+  c.baseUrl = 'lib/';
+  c.relativeUrl = relativeUrl;
   return c;
 }
 // ------------------

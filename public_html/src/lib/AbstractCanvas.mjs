@@ -442,7 +442,7 @@ class Face {
    *             \+-----+/
    */
   draw(g) {
-    if (false&&this.txImage != null) {
+    if (this.txImage != null) {
       this.drawTexturedFaceTriangulated(g);
     } else {
       this.drawColoredFace(g);
