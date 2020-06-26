@@ -30,38 +30,73 @@ form {
     background: lightgray;
 }
 
-/* Responsive layout */
-/* Create four equal columns that floats next to each other */
+/* Responsive layout for wide screens: 4 columns, small mouse friendly buttons. */
 body.responsive article {
   padding: 0.5vw;
   float: left;
-  width: 23%;
+  width: 22vw;
 }
 body.responsive .virtualcube .cube-canvas {
   width: 22vw;
   height: 22vw;
 }
+body.responsive .virtualcube button {
+    height: 24px;
+    width: 24px;
+    margin: 0px 4px;
+}
 
-/* On screens that are 992px wide or less, go from four columns to two columns */
-@media screen and (max-width: 800px) {
+/* Responsive layout for medium wide screens: 2 columns, small mouse friendly buttons */
+@media only screen and (max-width: 640px) {
     body.responsive article {
-      width: 48%;
-    }
-    body.responsive .virtualcube .cube-canvas {
       width: 44vw;
-      height: 44vw;
-    }
-}
-/* On screens that are 420px wide or less, make the columns stack on top of each other instead of next to each other */
-@media screen and (max-width: 420px) {
-    body.responsive article {
-      width: 98%;
+      float: left;
     }
     body.responsive .virtualcube .cube-canvas {
-      width: 88vw;
-      height: 88vw;
+      width: 42vw;
+      height: 42vw;
+    }
+    body.responsive .virtualcube button {
+        height: 24vw;
+        width: 24vw;
+        margin: 8vw;
     }
 }
+
+
+/* Responsive layout for small screens: 1 column, large touch friendly buttons. */
+@media only screen and (max-width: 420px) {
+  body.responsive article {
+    width: 98vw;
+  }
+  body.responsive .virtualcube .cube-canvas {
+    width: 94vw;
+    height: 94vw;
+  }
+  body.responsive .virtualcube button {
+      height: 14vmin;
+      width: 14vmin;
+      margin: 2vmin;
+  }
+}
+
+/* iPhone 7 portrait mode */
+@media only screen and (min-width: 768px) and (max-width: 1024px)
+       and (orientation:portrait) {
+  body.responsive article {
+    width: 98vw;
+  }
+  body.responsive .virtualcube .cube-canvas {
+    width: 94vw;
+    height: 94vw;
+  }
+  body.responsive .virtualcube button {
+      height: 12vmin;
+      width: 12vmin;
+      margin: 3vmin;
+  }
+}
+
 
 /* system tests */
 section.unittest {

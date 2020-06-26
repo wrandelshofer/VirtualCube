@@ -32,29 +32,33 @@
     display: inline-flex;
 }
 .virtualcube toolbar button {
-    height: 24px;
-    width: 24px;
     border: none;
     background: none;
     cursor: pointer;
-    mask-size: cover;
     opacity: 56%;
     background-size: cover;
+
+    /* Use large buttons on devices without mouse pointer. */
+    height: 48px;
+    width: 48px;
+    margin: 8px;
 }
 
-/* Use small margin on devices with mouse pointer. */
-@media (pointer: fine) {
+/* Use small buttons on devices with mouse pointer. */
+@media only screen and (pointer: fine) {
     .virtualcube toolbar button {
+        height: 24px;
+        width: 24px;
         margin: 0px 2px;
     }
 }
-
-/* Use large margin on devices without mouse pointer. */
-@media not (pointer: fine) {
-    .virtualcube toolbar button {
-        margin: 8px;
-    }
+@media only screen and (pointer: coarse) {
 }
+    .virtualcube toolbar button {
+        height: 48px;
+        width: 48px;
+        margin: 0px 2px;
+    }
 
 .virtualcube toolbar button:disabled {
     opacity: 24%;

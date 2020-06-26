@@ -875,7 +875,8 @@ function createCube3D(levelOfDetail) {
   case 0: partSize=18; relativeUrl = 'models/rubikscube-0.obj'; break;
   case 1: partSize=18; relativeUrl = 'models/rubikscube-1.obj'; break;
   case 2: partSize=18; relativeUrl = 'models/rubikscube-2.obj'; break;
-  default: partSize=18; relativeUrl = 'models/rubikscube-3.obj'; break;
+  case 3: partSize=18; relativeUrl = 'models/rubikscube-3.obj'; break;
+  default: partSize=18; relativeUrl = 'models/rubikscube-2.obj'; break;
   }
   const c = new RubiksCubeCube3D(partSize);
   c.baseUrl = 'lib/';
