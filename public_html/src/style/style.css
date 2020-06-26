@@ -16,7 +16,7 @@
       <div class="scramble-button">Scramble</div>
    </div>
  </div>
- 
+
 */
 
 /* general layout */
@@ -40,7 +40,6 @@ body.responsive article {
 body.responsive .virtualcube .cube-canvas {
   width: 22vw;
   height: 22vw;
-  border:1px solid #ccc;
 }
 
 /* On screens that are 992px wide or less, go from four columns to two columns */
@@ -68,10 +67,10 @@ body.responsive .virtualcube .cube-canvas {
 section.unittest {
     margin-bottom: 1em;
 }
-section.unittest.fail .actual { 
+section.unittest.fail .actual {
     background: lightcoral;
 }
-section.unittest.pass .actual { 
+section.unittest.pass .actual {
     background: lightgreen;
 }
 p.input, p.expected, p.actual {

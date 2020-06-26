@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .virtualcube * {
+            margin: 0px;
+            padding: 0px;
+        }
+        .virtualcube .cube-canvas {
+            display: flex;
+        }
+        .virtualcube toolbar {
+            border: 1px solid rgba(0,0,0,50%);
+            margin-top: -1px;
+            display: inline-flex;
+        }
+        .virtualcube toolbar button {
+            height: 24px;
+            width: 24px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            mask-size: cover;
+            opacity: 56%;
+            background-size: cover;
+        }
+
+        /* Use small margin on devices with mouse pointer. */
+        @media (pointer: fine) {
+            .virtualcube toolbar button {
+                margin: 2px;
+            }
+        }
+
+        /* Use large margin on devices without mouse pointer. */
+        @media not (pointer: fine) {
+            .virtualcube toolbar button {
+                margin: 8px;
+            }
+        }
+
+        .virtualcube toolbar button:disabled {
+            opacity: 24%;
+        }
+        .virtualcube toolbar button:active {
+            opacity: 86%;
+        }
+        .virtualcube toolbar button span {
+            display: none;
+        }
+        .virtualcube .play-button {
+          /*background-image: url("../icon/ic_play_arrow_24px.svg");*/
+          background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path d='M8 5v14l11-7z'/></svg>");
+        }
+        .virtualcube .reset-button {
+          /*background-image: url("../icon/ic_skip_previous_24px.svg");*/
+          background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path d='M6 6h2v12H6zm3.5 6l8.5 6V6z'/></svg>");
+        }
+        .virtualcube .step-forward-button {
+          /*background-image: url("../icon/vc_step_forward_24px.svg");*/
+          background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path d='M10 18l8.5-6L10 6v12z M6 6v12h2V6h-2z'/></svg>");
+        }
+        .virtualcube .step-backward-button {
+          /*background-image: url("../icon/vc_step_backward_24px.svg");*/
+          background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path d='M5 12 l8.5 6v-12z M16 6h2v12h-2z'/></svg>");
+        }
+        .virtualcube .undo-button {
+          /*background-image: url("../icon/ic_undo_24px.svg");*/
+          background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path d='M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z'/></svg>");
+        }
+        .virtualcube .redo-button {
+          /*background-image: url("../icon/ic_redo_24px.svg");*/
+          background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path d='M18.4 10.6C16.55 8.99 14.15 8 11.5 8c-4.65 0-8.58 3.03-9.96 7.22L3.9 16c1.05-3.19 4.05-5.5 7.6-5.5 1.95 0 3.73.72 5.12 1.88L13 16h9V7l-3.6 3.6z'/></svg>");
+        }
+        .virtualcube .scramble-button {
+          /*background-image: url("../icon/vc_scramble_24px.svg");*/
+          background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path d='m11,4 0,6.267949104309082 -5.428203105926514,-3.133974552154541 -1,1.7320504188537598 5.428203105926514,3.133975028991699 0,0 -5.428203105926514,3.133975028991699 1,1.732050895690918 5.428203105926514,-3.133975028991699 0,0 0,6.267949104309082 2,0 0,-6.267949104309082 5.428203582763672,3.133975028991699 1,-1.732050895690918 -5.428203582763672,-3.133975028991699 5.428203582763672,-3.133975028991699 -1,-1.7320504188537598 -5.428203582763672,3.133974552154541 0,-6.267949104309082 z'/></svg>");
+        }
+    </icon>
+</head>
+<body>
+<p>This is a test page for trying out icon designs for the toolbar.</p>
+<div class="virtualcube">
+    <canvas class="cube-canvas" width="220" height="220"></canvas>
+    <toolbar>
+        <button class="reset-button" title="Reset"><span>Reset</span></button>
+        <button class="play-button" title="Undo"><span>Undo</span></button>
+        <button class="step-backward-button" title="Previous"><span>Previous</span></button>
+        <button class="step-forward-button" title="Next"><span>Next</span></button>
+        <button class="undo-button" title="Undo"><span>Undo</span></button>
+        <button class="redo-button" title="Redo"><span>Redo</span></button>
+        <button class="scramble-button" title="Scramble"><span>Scramble</span></button>
+    </toolbar>
+</div>
+</body>
+</html>

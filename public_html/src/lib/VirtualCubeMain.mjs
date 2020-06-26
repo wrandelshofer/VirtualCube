@@ -79,8 +79,7 @@ function appendButton(parent, text, styleClass, onclick) {
 }
 
 function appendToolbar(parent, id, parameters) {
-  let toolbarElem = document.createElement("div");
-  toolbarElem.setAttribute("class", "button-toolbar");
+  let toolbarElem = document.createElement("toolbar");
   parent.append(toolbarElem);
   let buttonElem, spanElem;
 
@@ -103,12 +102,17 @@ function appendToolbar(parent, id, parameters) {
  * If a <div>-Element is specified, then the following child elements
  * are added to it:
  *
- * <canvas class="cube-canvas"/>
- * <div class="button-toolbar">
- *  <div class="reset-button" />
- *  <div class="undo-button" />
- *  <div class="redo-button" />
- *  <div class="scramble-button" />
+ * <div class="virtualcube">
+ * <canvas class="cube-canvas" width="220" height="220"></canvas>
+ * <toolbar>
+ *   <button class="reset-button"><span>Reset</span></button>
+ *   <button class="play-button"><span>Undo</span></button>
+ *   <button class="step-backward-button"><span>Previous</span></button>
+ *   <button class="step-forward-button"><span>Next</span></button>
+ *   <button class="undo-button"><span>Undo</span></button>
+ *   <button class="redo-button"><span>Redo</span></button>
+ *   <button class="scramble-button"><span>Scramble</span></button>
+ * </toolbar>
  * </div>
  *
  * @param parameters applet parameters (key,names)

@@ -378,7 +378,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
     flip.multiply(this.cameraMatrix);
     this.cameraMatrix.load(flip);
     this.perspectiveMatrix.makeIdentity();
-    this.perspectiveMatrix.perspective(30, this.width / this.height, 1, 12);
+    this.perspectiveMatrix.perspective(31, this.width / this.height, 1, 12);
     this.perspectiveMatrix.multiply(this.cameraMatrix);
     if (this.width < this.height) {
       let factor = this.width / this.height;
