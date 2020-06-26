@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Drawing height="24" id="drawing1" width="24" xmlns="http://jhotdraw.org/samples/grapher">
+  <Layer id="layer1">
+    <CombinedPath cag-operation="add" fill="#000000" id="combinedpath1" stroke="none">
+      <Rectangle bounds="11 4 2 16" fill="black" id="rectangle1" rotate="-60" stroke="none"/>
+      <Rectangle bounds="11 4 2 16" fill="black" id="rectangle2" stroke="none"/>
+      <Rectangle bounds="11 4 2 16" fill="black" id="rectangle3" rotate="60" stroke="none"/>
+    </CombinedPath>
+  </Layer>
+</Drawing>
