@@ -19,53 +19,15 @@
 
 */
 
-/* general layout */
-body {
-    word-break: break-word;
-}
-body>* {
-    padding: 0 0.5vw;
-}
-form {
-    background: lightgray;
-}
 
-/* Responsive layout for wide screens: 4 columns, small mouse friendly buttons. */
-body.responsive article {
-  padding: 0.5vw;
-  float: left;
-  width: 22vw;
-}
-body.responsive .virtualcube .cube-canvas {
-  width: 22vw;
-  height: 22vw;
-}
-body.responsive .virtualcube button {
-    height: 24px;
-    width: 24px;
-    margin: 0px 4px;
-}
-
-/* Responsive layout for medium wide screens: 2 columns, small mouse friendly buttons */
-@media only screen and (max-width: 640px) {
-    body.responsive article {
-      width: 44vw;
-      float: left;
-    }
-    body.responsive .virtualcube .cube-canvas {
-      width: 42vw;
-      height: 42vw;
-    }
-    body.responsive .virtualcube button {
-        height: 24vw;
-        width: 24vw;
-        margin: 8vw;
-    }
-}
-
-
-/* Responsive layout for small screens: 1 column, large touch friendly buttons. */
-@media only screen and (max-width: 420px) {
+/* --- Responsive layout XXS --- */
+  body {
+      word-break: break-word;
+  }
+  form {
+      background: lightgray;
+  }
+  /* 1 column */
   body.responsive article {
     width: 98vw;
   }
@@ -73,55 +35,79 @@ body.responsive .virtualcube button {
     width: 94vw;
     height: 94vw;
   }
-  body.responsive .virtualcube button {
-      height: 14vmin;
-      width: 14vmin;
-      margin: 2vmin;
+  /* system tests */
+  section.unittest {
+      margin-bottom: 1em;
   }
+  section.unittest.fail .actual {
+      background: lightcoral;
+  }
+  section.unittest.pass .actual {
+      background: lightgreen;
+  }
+  p.input, p.expected, p.actual {
+      margin: 0;
+  }
+
+  .differentValues {
+      background: orange;
+  }
+
+  p.input:before {
+      content: "input: ";
+  }
+  p.expected:before {
+      content: "expected: ";
+  }
+  p.actual:before {
+      content: "actual: ";
+  }
+
+/* --- Responsive layout XS --- */
+@media only screen and (min-width: 480px) and (pointer: fine) {
 }
 
-/* iPhone 7 portrait mode */
-@media only screen and (min-width: 768px) and (max-width: 1024px)
-       and (orientation:portrait) {
+/* --- Responsive layout S --- */
+@media only screen and (min-width: 544px) and (pointer: fine) {
+  /* 2 columns */
   body.responsive article {
-    width: 98vw;
+    width: 44vw;
+    float: left;
   }
   body.responsive .virtualcube .cube-canvas {
-    width: 94vw;
-    height: 94vw;
-  }
-  body.responsive .virtualcube button {
-      height: 12vmin;
-      width: 12vmin;
-      margin: 3vmin;
+    width: 42vw;
+    height: 42vw;
   }
 }
 
-
-/* system tests */
-section.unittest {
-    margin-bottom: 1em;
-}
-section.unittest.fail .actual {
-    background: lightcoral;
-}
-section.unittest.pass .actual {
-    background: lightgreen;
-}
-p.input, p.expected, p.actual {
-    margin: 0;
+/* --- Responsive layout M --- */
+@media only screen and (min-width: 768px) and (pointer: fine) {
 }
 
-.differentValues {
-    background: orange;
+/* --- Responsive layout L --- */
+@media only screen and (min-width: 992px) and (pointer: fine) {
+
 }
 
-p.input:before {
-    content: "input: ";
+/* --- Responsive layout XL --- */
+@media only screen and (min-width: 1200px) {
+  /* 4 columns */
+  body.responsive article {
+    padding: 0.5vw;
+    float: left;
+    width: 22vw;
+  }
+  body.responsive .virtualcube .cube-canvas {
+    width: 22vw;
+    height: 22vw;
+  }
 }
-p.expected:before {
-    content: "expected: ";
+
+/* --- Responsive layout XXL --- */
+@media only screen and (min-width: 1500px) {
 }
-p.actual:before {
-    content: "actual: ";
+
+/* --- Responsive layout XXXL --- */
+@media only screen and (min-width: 1600px) {
 }
+
