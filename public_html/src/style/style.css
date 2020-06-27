@@ -63,6 +63,12 @@
       content: "actual: ";
   }
 
+  body.responsive .virtualcube toolbar button {
+      height: 10vmin;
+      width: 10vmin;
+      margin: 0vmin 2vmin;
+   }
+
 /* --- Responsive layout XS --- */
 @media only screen and (min-width: 480px) and (pointer: fine) {
 }
@@ -101,6 +107,13 @@
     width: 22vw;
     height: 22vw;
   }
+
+  /* large buttons */
+  body.responsive .virtualcube toolbar button {
+      height: 48px;
+      width: 48px;
+      margin: 0px 8px;
+  }
 }
 
 /* --- Responsive layout XXL --- */
@@ -111,3 +124,12 @@
 @media only screen and (min-width: 1600px) {
 }
 
+/* --- Responsive layout mouse --- */
+@media only screen and (pointer: fine) {
+  /* small buttons */
+  body.responsive .virtualcube toolbar button {
+    height: 24px;
+    width: 24px;
+    margin: 0px 2px;
+  }
+}
