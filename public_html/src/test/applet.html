@@ -77,6 +77,37 @@
     </article>
     <article>
       <section class="test">
+        <applet
+                code     = "RevengePlayerFlat.class"
+                codebase = "lib"
+                archive  = "RevengePlayerFlat.jar"
+                width    = "170"
+                height   = "170"
+        >
+          <param name="faces"        value="5,3,0,4,2,1">
+          <param name="script"       value="R2 U F2 U2 R2 U R2">
+          <param name="displayLines" value="0">
+
+          <!-- BEGIN Parameters for Sun Java Plugin -->
+          <param name="codebase_lookup" value="false">
+          <param name="classloader_cache" value="false">
+          <param name="java_arguments" value="-Djnlp.packEnabled=true"/>
+          <param name="image" value="Splash.gif"/>
+          <param name="boxborder" value="false"/>
+          <param name="centerimage" value="true"/>
+          <!-- END Parameters for Sun Java Plugin -->
+          <!-- BEGIN Parameters for Applet security -->
+          <param name="permissions" value="sandbox"/>
+          <!-- END Parameters for Applet security -->
+
+          <a href="http://java.sun.com/getjava/" target="_blank">Java Plug-in not installed!</a>
+          <p><strong>Install the <a href="http://java.sun.com/getjava/" target="_blank">Java Plug-in</a> to see the cube pattern!</strong><br/><br/></p>
+        </applet>
+        <p>RevengePlayerFlat with <code>script</code> attribute</p>
+      </section>
+    </article>
+    <article>
+      <section class="test">
         <applet archive="lib/VirtualRubiksCube.jar" code="VirtualRubiksCube.class" codebase=".." width="170" height="170" mayscript>
           <param name="locale" value="en"/>
           <param name="colorTable" value="0xa57cda,0xf7f7f7,0xb90a0f">

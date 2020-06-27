@@ -158,6 +158,7 @@ function attachVirtualCube(parameters, element) {
          case "RubikPlayerFlat":
          case "PocketPlayer":
          case "PocketPlayerFlat":
+         case "RevengePlayerFlat":
          case "VirtualRubiksCube":
           htmlCollection.push(elem);
           break;
@@ -257,6 +258,10 @@ function attachVirtualCube(parameters, element) {
         case "PocketPlayer":
         case "PocketPlayerFlat":
           kind = "PocketCube";
+          break;
+        case "RevengePlayer":
+        case "RevengePlayerFlat":
+          kind = "RevengeCube";
           break;
         case "RubiksPlayer":
         case "RubiksPlayerFlat":
