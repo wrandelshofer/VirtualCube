@@ -47,9 +47,15 @@
 .virtualcube toolbar button:disabled {
     opacity: 24%;
 }
+
 .virtualcube toolbar button:active {
-    opacity: 86%;
+    opacity: 100%;
 }
+
+.virtualcube toolbar button:hover {
+     opacity: 90%;
+}
+
 .virtualcube toolbar button span {
     display: none;
 }
