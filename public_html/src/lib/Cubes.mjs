@@ -840,4 +840,3 @@ export default {
   getOrder : getOrder,
   getVisibleOrder: getVisibleOrder
 };
-

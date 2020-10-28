@@ -6,7 +6,10 @@
 // require.js
 // --------------
 import Node3D from './Node3D.mjs';
+import Cube from './Cube.mjs';
+import J3DI from './J3DI.mjs';
 import J3DIMath from './J3DIMath.mjs';
+import CubeAttributes from './CubeAttributes.mjs';
 import SplineInterpolator from './SplineInterpolator.mjs';
 
 /** Change event. */
@@ -23,7 +26,7 @@ class ChangeEvent {
  *
  */
 class Cube3D extends Node3D.Node3D {
-  constructor() {
+  constructor(layerCount, partSize) {
     super();
     // subclasses must build the following model hierarchy
     // for use when the cube is assembled:
@@ -58,18 +61,24 @@ class Cube3D extends Node3D.Node3D {
     //              the mesh, so that the sticker is
     //              moved to position 0 and orientation 0.
 
-    this.cube = null;
-    this.cubeSize = 5; // cube size in centimeters
-    this.cornerCount = 0;
-    this.edgeCount = 0;
-    this.sideCount = 0;
+    this.layerCount = layerCount;
+    this.cube = Cube.createCube(layerCount);
 
-    this.centerCount = 0;
-    this.partCount = 0;
+    this.partSize = partSize;
+    this.cubeSize = partSize * layerCount;  // cube size in centimeters
+
+    this.cornerCount = 8;
+    this.edgeCount = 12 * (layerCount - 2);
+    this.sideCount = 6 * (layerCount - 2)*(layerCount - 2);
+    this.centerCount = 1;
+    this.partCount = layerCount * layerCount * layerCount
+        - (layerCount - 2) * (layerCount - 2) * (layerCount - 2)
+        + 1;
     this.cornerOffset = 0;
-    this.edgeOffset = 0;
-    this.sideOffset = 0;
-    this.centerOffset = 0;
+    this.edgeOffset = this.cornerOffset + this.cornerCount;
+    this.sideOffset = this.edgeOffset + this.edgeCount;
+    this.centerOffset = this.sideOffset + this.sideCount;
+
     this.repainter = null;
     this.isTwisting = false;
     this.repaintFunction = null;
@@ -93,13 +102,58 @@ class Cube3D extends Node3D.Node3D {
     this.isCubeValid = false;
     this.updateTwistRotation = new J3DIMath.J3DIMatrix4();
     this.updateTwistOrientation = new J3DIMath.J3DIMatrix4();
-    this.partSize = 3;
 
     this.developedStickerTranslations = [];
     this.developedStickers = [];
     this.identityDevelopedMatrix = [];
 
     this.currentStickerTransforms = [];
+    this.textureScaleFactor=512/Math.floor(512/(3*layerCount));
+
+    this.attributes = this.createAttributes();
+    this.stickerCount = this.attributes.getStickerCount();
+    this.cube.addCubeListener(this);
+    this.createSceneNodes();
+  }
+
+  createSceneNodes() {
+    this.partToStickerMap = new Array(this.partCount);
+    for (let i = 0; i < this.partCount; i++) {
+      this.parts[i] = new Node3D.Node3D();
+      this.partOrientations[i] = new Node3D.Node3D();
+      this.partExplosions[i] = new Node3D.Node3D();
+      this.partLocations[i] = new Node3D.Node3D();
+
+      this.partOrientations[i].add(this.parts[i]);
+      this.partExplosions[i].add(this.partOrientations[i]);
+      this.partLocations[i].add(this.partExplosions[i]);
+      this.add(this.partLocations[i]);
+
+      this.identityPartLocations[i] = new J3DIMath.J3DIMatrix4();
+      this.partToStickerMap[i] = new Array(3);
+    }
+
+    for (let i = 0; i < this.stickerCount; i++) {
+      this.partToStickerMap[this.stickerToPartMap[i]][this.stickerToFaceMap[i]] = i;
+
+      this.stickers[i] = new Node3D.Node3D();
+      this.stickerOrientations[i] = new Node3D.Node3D();
+      this.stickerExplosions[i] = new Node3D.Node3D();
+      this.stickerLocations[i] = new Node3D.Node3D();
+      this.stickerTranslations[i] = new Node3D.Node3D();
+
+      this.stickerOrientations[i].add(this.stickers[i]);
+      this.stickerExplosions[i].add(this.stickerOrientations[i]);
+      this.stickerLocations[i].add(this.stickerExplosions[i]);
+      this.stickerTranslations[i].add(this.stickerLocations[i]);
+      this.add(this.stickerTranslations[i]);
+
+      this.developedStickers[i] = new Node3D.Node3D();
+
+      this.currentStickerTransforms[i] = new Node3D.Node3D();
+      this.add(this.currentStickerTransforms[i]);
+      this.identityStickerLocations[i] = new J3DIMath.J3DIMatrix4();
+    }
   }
 
   cubeChanged(evt) {
@@ -248,8 +302,14 @@ class Cube3D extends Node3D.Node3D {
       this.doValidateAttributes();
     }
   }
-  doValidateAttributes() {
-    // subclasses can override this methods
+   doValidateAttributes() {
+      let a = this.attributes;
+      for (let i = 0; i < this.stickerObjs.length; i++) {
+          this.stickerObjs[i].hasTexture = a.stickersImageURL != null;
+      }
+      for (let i = 0; i < a.getPartCount(); i++) {
+          this.parts[i].visible = a.isPartVisible(i);
+      }
   }
   doValidateDevelopAttributes() {
     if (this.attributes.developmentFactor == this.cachedDevelopmentFactor) {
@@ -369,7 +429,7 @@ class Cube3D extends Node3D.Node3D {
    *  ...}
    *
    * @return point Intersection point: 3D vector.
-   * @return uv  Intersecton UV coordinates: 2D vector on the intersection plane.
+   * @return uv  Intersection UV coordinates: 2D vector on the intersection plane.
    * @return t   The distance that the ray traveled to the intersection point.
    * @return axis  The twist axis.
    * @return layerMask The twist layer mask.
@@ -482,6 +542,410 @@ class Cube3D extends Node3D.Node3D {
     }
     this.fireStateChanged();
   }
+
+  createAttributes() {
+    let layerCount = this.cube.getLayerCount();
+    let stickersPerFace = layerCount*layerCount;
+    let a = new CubeAttributes.CubeAttributes(
+        this.partCount,
+        6 * stickersPerFace,
+        [stickersPerFace, stickersPerFace, stickersPerFace, stickersPerFace, stickersPerFace, stickersPerFace]
+        );
+    let partsPhong = [0.5, 0.6, 0.4, 16.0];//shiny plastic [ambient, diffuse, specular, shininess]
+    for (let i = 0; i < this.partCount; i++) {
+      a.partsFillColor[i] = [24, 24, 24, 255];
+      a.partsPhong[i] = partsPhong;
+    }
+    a.partsFillColor[this.centerOffset] = [240, 240, 240, 255];
+
+    let faceColors = [//Right, Up, Front, Left, Down, Back
+      [255, 210, 0, 255], // Yellow
+      [0, 51, 115, 255], // Blue
+      [140, 0, 15, 255], // Red
+      [248, 248, 248, 255], // White
+      [0, 115, 47, 255], // Green
+      [255, 70, 0, 255], // Orange
+    ];
+
+    let stickersPhong = [0.8, 0.2, 0.1, 8.0];//shiny paper [ambient, diffuse, specular, shininess]
+
+    let faceOffset=0;
+    for (let i=0;i<6;i++) {
+    for (let j=0;j<a.getStickerCount(i);j++) {
+      a.stickersFillColor[faceOffset+j]=faceColors[i];
+      a.stickersPhong[faceOffset+j]=stickersPhong;
+    }
+    faceOffset+=a.getStickerCount(i)
+    }
+
+    return a;
+  }
+  makeClonesWithRotatedTextures(obj) {
+      let s0 = obj;
+      let s90 = new J3DI.J3DIObj();
+      s90.setTo(s0);
+      s90.rotateTexture(90);
+      let s180 = new J3DI.J3DIObj();
+      s180.setTo(s0);
+      s180.rotateTexture(180);
+      let s270 = new J3DI.J3DIObj();
+      s270.setTo(s0);
+      s270.rotateTexture(270);
+
+      return [s0,s90,s180,s270];
+  }
+
+  initCornerR() {
+    let s0,s90,s180,s270;
+    [s0,s90,s180,s270] = this.makeClonesWithRotatedTextures(this.corner_rObj);
+    let stickerMap = this.partToStickerMap;
+
+    let o=this.cornerOffset;
+    this.stickerObjs[ stickerMap[o+0][1] ] = s0.clone();
+    this.stickerObjs[ stickerMap[o+1][1] ] = s180.clone();
+    this.stickerObjs[ stickerMap[o+2][1] ] = s0.clone();
+    this.stickerObjs[ stickerMap[o+3][1] ] = s180.clone();
+    this.stickerObjs[ stickerMap[o+4][1] ] = s0.clone();
+    this.stickerObjs[ stickerMap[o+5][1] ] = s180.clone();
+    this.stickerObjs[ stickerMap[o+6][1] ] = s0.clone();
+    this.stickerObjs[ stickerMap[o+7][1] ] = s180.clone();
+  }
+  initCornerF() {
+    let s0,s90,s180,s270;
+    [s0,s90,s180,s270] = this.makeClonesWithRotatedTextures(this.corner_fObj);
+    let stickerMap = this.partToStickerMap;
+
+    let o=this.cornerOffset;
+    this.stickerObjs[ stickerMap[o+0][2] ] = s0.clone();
+    this.stickerObjs[ stickerMap[o+1][2] ] = s180.clone();
+    this.stickerObjs[ stickerMap[o+2][2] ] = s0.clone();
+    this.stickerObjs[ stickerMap[o+3][2] ] = s180.clone();
+    this.stickerObjs[ stickerMap[o+4][2] ] = s0.clone();
+    this.stickerObjs[ stickerMap[o+5][2] ] = s180.clone();
+    this.stickerObjs[ stickerMap[o+6][2] ] = s0.clone();
+    this.stickerObjs[ stickerMap[o+7][2] ] = s180.clone();
+  }
+
+  initCornerU() {
+    let s0,s90,s180,s270;
+    [s0,s90,s180,s270] = this.makeClonesWithRotatedTextures(this.corner_uObj);
+    let stickerMap = this.partToStickerMap;
+
+    let o = this.cornerOffset;
+    this.stickerObjs[ stickerMap[o+0][0] ] = s0.clone();
+    this.stickerObjs[ stickerMap[o+1][0] ] = s90.clone();
+    this.stickerObjs[ stickerMap[o+2][0] ] = s90.clone();
+    this.stickerObjs[ stickerMap[o+3][0] ] = s0.clone();
+    this.stickerObjs[ stickerMap[o+4][0] ] = s180.clone();
+    this.stickerObjs[ stickerMap[o+5][0] ] = s270.clone();
+    this.stickerObjs[ stickerMap[o+6][0] ] = s270.clone();
+    this.stickerObjs[ stickerMap[o+7][0] ] = s180.clone();
+  }
+  initEdgeU() {
+    let s0,s90,s180,s270;
+    [s0,s90,s180,s270] = this.makeClonesWithRotatedTextures(this.edge_uObj);
+    let stickerMap = this.partToStickerMap;
+
+    if (this.layerCount & 1 == 1) {
+        let o=this.edgeOffset;
+        this.stickerObjs[ stickerMap[o+0][0] ] = s0.clone();
+        this.stickerObjs[ stickerMap[o+1][0] ] = s180.clone();
+        this.stickerObjs[ stickerMap[o+2][0] ] = s0.clone();
+        this.stickerObjs[ stickerMap[o+3][0] ] = s90.clone();
+        this.stickerObjs[ stickerMap[o+4][0] ] = s0.clone();
+        this.stickerObjs[ stickerMap[o+5][0] ] = s270.clone();
+        this.stickerObjs[ stickerMap[o+6][0] ] = s180.clone();
+        this.stickerObjs[ stickerMap[o+7][0] ] = s180.clone();
+        this.stickerObjs[ stickerMap[o+8][0] ] = s180.clone();
+        this.stickerObjs[ stickerMap[o+9][0] ] = s90.clone();
+        this.stickerObjs[ stickerMap[o+10][0] ] = s0.clone();
+        this.stickerObjs[ stickerMap[o+11][0] ] = s270.clone();
+    }
+    if (this.layerCount > 3) {
+        let o;
+        if (this.layerCount & 1 == 1) {
+            [s0,s90,s180,s270] = this.makeClonesWithRotatedTextures(this.edge12_uObj);
+            o=this.edgeOffset+12;
+        } else {
+            o=this.edgeOffset;
+        }
+        this.stickerObjs[ stickerMap[o+0][1] ] = s90.clone();
+        this.stickerObjs[ stickerMap[o+1][1] ] = s0.clone();
+        this.stickerObjs[ stickerMap[o+2][0] ] = s0.clone();
+        this.stickerObjs[ stickerMap[o+3][0] ] = s90.clone();
+        this.stickerObjs[ stickerMap[o+4][0] ] = s0.clone();
+        this.stickerObjs[ stickerMap[o+5][1] ] = s270.clone();
+        this.stickerObjs[ stickerMap[o+6][0] ] = s180.clone();
+        this.stickerObjs[ stickerMap[o+7][1] ] = s0.clone();
+        this.stickerObjs[ stickerMap[o+8][1] ] = s270.clone();
+        this.stickerObjs[ stickerMap[o+9][1] ] = s270.clone();
+        this.stickerObjs[ stickerMap[o+10][0] ] = s0.clone();
+        this.stickerObjs[ stickerMap[o+11][0] ] = s270.clone();
+        this.stickerObjs[ stickerMap[o+12][0] ] = s0.clone();
+        this.stickerObjs[ stickerMap[o+13][0] ] = s180.clone();
+        this.stickerObjs[ stickerMap[o+14][1] ] = s270.clone();
+        this.stickerObjs[ stickerMap[o+15][1] ] = s90.clone();
+        this.stickerObjs[ stickerMap[o+16][1] ] = s180.clone();
+        this.stickerObjs[ stickerMap[o+17][0] ] = s270.clone();
+        this.stickerObjs[ stickerMap[o+18][1] ] = s90.clone();
+        this.stickerObjs[ stickerMap[o+19][0] ] = s180.clone();
+        this.stickerObjs[ stickerMap[o+20][0] ] = s180.clone();
+        this.stickerObjs[ stickerMap[o+21][0] ] = s90.clone();
+        this.stickerObjs[ stickerMap[o+22][1] ] = s180.clone();
+        this.stickerObjs[ stickerMap[o+23][1] ] = s90.clone();    }
+  }
+  initEdgeR() {
+    let stickerMap = this.partToStickerMap;
+    let s0,s90,s180,s270;
+    [s0,s90,s180,s270] = this.makeClonesWithRotatedTextures(this.edge_rObj);
+
+    if (this.layerCount & 1 == 1) {
+        let o=this.edgeOffset;
+        this.stickerObjs[ stickerMap[o+0][1] ] = s0.clone();
+        this.stickerObjs[ stickerMap[o+1][1] ] = s270.clone();
+        this.stickerObjs[ stickerMap[o+2][1] ] = s180.clone();
+        this.stickerObjs[ stickerMap[o+3][1] ] = s0.clone();
+        this.stickerObjs[ stickerMap[o+4][1] ] = s90.clone();
+        this.stickerObjs[ stickerMap[o+5][1] ] = s180.clone();
+        this.stickerObjs[ stickerMap[o+6][1] ] = s0.clone();
+        this.stickerObjs[ stickerMap[o+7][1] ] = s270.clone();
+        this.stickerObjs[ stickerMap[o+8][1] ] = s180.clone();
+        this.stickerObjs[ stickerMap[o+9][1] ] = s180.clone();
+        this.stickerObjs[ stickerMap[o+10][1] ] = s90.clone();
+        this.stickerObjs[ stickerMap[o+11][1] ] = s0.clone();
+    }
+    if (this.layerCount > 3) {
+        let o;
+        if (this.layerCount & 1 == 1) {
+            [s0,s90,s180,s270] = this.makeClonesWithRotatedTextures(this.edge12_fObj);
+            o = this.edgeOffset + 12;
+        } else {
+            o=this.edgeOffset;
+        }
+        this.stickerObjs[ stickerMap[o+0][0] ] = s270.clone();
+        this.stickerObjs[ stickerMap[o+1][0] ] = s90.clone();
+        this.stickerObjs[ stickerMap[o+2][1] ] = s180.clone();
+        this.stickerObjs[ stickerMap[o+3][1] ] = s0.clone();
+        this.stickerObjs[ stickerMap[o+4][1] ] = s90.clone();
+        this.stickerObjs[ stickerMap[o+5][0] ] = s180.clone();
+        this.stickerObjs[ stickerMap[o+6][1] ] = s0.clone();
+        this.stickerObjs[ stickerMap[o+7][0] ] = s90.clone();
+        this.stickerObjs[ stickerMap[o+8][0] ] = s90.clone();
+        this.stickerObjs[ stickerMap[o+9][0] ] = s0.clone();
+        this.stickerObjs[ stickerMap[o+10][1] ] = s90.clone();
+        this.stickerObjs[ stickerMap[o+11][1] ] = s0.clone();
+
+        this.stickerObjs[ stickerMap[o+12][1] ] = s0.clone();
+        this.stickerObjs[ stickerMap[o+13][1] ] = s270.clone();
+        this.stickerObjs[ stickerMap[o+14][0] ] = s270.clone();
+        this.stickerObjs[ stickerMap[o+15][0] ] = s0.clone();
+        this.stickerObjs[ stickerMap[o+16][0] ] = s270.clone();
+        this.stickerObjs[ stickerMap[o+17][1] ] = s180.clone();
+        this.stickerObjs[ stickerMap[o+18][0] ] = s90.clone();
+        this.stickerObjs[ stickerMap[o+19][1] ] = s270.clone();
+        this.stickerObjs[ stickerMap[o+20][1] ] = s180.clone();
+        this.stickerObjs[ stickerMap[o+21][1] ] = s180.clone();
+        this.stickerObjs[ stickerMap[o+22][0] ] = s270.clone();
+        this.stickerObjs[ stickerMap[o+23][0] ] = s180.clone();
+    }
+  }
+  initSideR() {
+    let stickerMap = this.partToStickerMap;
+
+    let s0,s90,s180,s270;
+    [s0,s90,s180,s270] = this.makeClonesWithRotatedTextures(this.side_rObj);
+
+    if (this.layerCount & 1 == 1) {
+        let o=this.sideOffset;
+        this.stickerObjs[ stickerMap[o+0][0]] = s0.clone();//r
+        this.stickerObjs[stickerMap[o+1][0]] = s180.clone();//u
+        this.stickerObjs[stickerMap[o+2][0]] = s270.clone();//f
+        this.stickerObjs[stickerMap[o+3][0]] = s90.clone();//l
+        this.stickerObjs[stickerMap[o+4][0]] = s90.clone();//d
+        this.stickerObjs[stickerMap[o+5][0]] = s180.clone();//b
+    }
+    if (this.layerCount == 4) {
+        let o=this.sideOffset;
+        this.stickerObjs[ stickerMap[o+0][0] ] = s180.clone();//r
+        this.stickerObjs[ stickerMap[o+1][0] ] = s0.clone();//u
+        this.stickerObjs[ stickerMap[o+2][0] ] = s90.clone();//f
+        this.stickerObjs[ stickerMap[o+3][0] ] = s270.clone();//l
+        this.stickerObjs[ stickerMap[o+4][0] ] = s270.clone();//d
+        this.stickerObjs[ stickerMap[o+5][0] ] = s0.clone();//b
+    
+        this.stickerObjs[ stickerMap[o+6][0] ] = s90.clone();//r
+        this.stickerObjs[ stickerMap[o+7][0] ] = s270.clone();//u
+        this.stickerObjs[ stickerMap[o+8][0] ] = s0.clone();//f
+        this.stickerObjs[ stickerMap[o+9][0] ] = s180.clone();//l
+        this.stickerObjs[ stickerMap[o+10][0] ] = s180.clone();//d
+        this.stickerObjs[ stickerMap[o+11][0] ] = s270.clone();//b
+    
+        this.stickerObjs[ stickerMap[o+12][0] ] = s0.clone();//r
+        this.stickerObjs[ stickerMap[o+13][0] ] = s180.clone();//u
+        this.stickerObjs[ stickerMap[o+14][0] ] = s270.clone();//f
+        this.stickerObjs[ stickerMap[o+15][0] ] = s90.clone();//l
+        this.stickerObjs[ stickerMap[o+16][0] ] = s90.clone();//d
+        this.stickerObjs[ stickerMap[o+17][0] ] = s180.clone();//b
+    
+        this.stickerObjs[ stickerMap[o+18][0] ] = s270.clone();//r
+        this.stickerObjs[ stickerMap[o+19][0] ] = s90.clone();//u
+        this.stickerObjs[ stickerMap[o+20][0] ] = s180.clone();//f
+        this.stickerObjs[ stickerMap[o+21][0] ] = s0.clone();//l
+        this.stickerObjs[ stickerMap[o+22][0] ] = s0.clone();//d
+        this.stickerObjs[ stickerMap[o+23][0] ] = s90.clone();//b
+    }
+    if (this.layerCount == 5) {
+        for (let i=1;i<9;i++) {
+            let o=this.sideOffset+i*6;
+            [s0,s90,s180,s270] = this.makeClonesWithRotatedTextures(
+                i&1==1?this.side1_rObj:this.side2_rObj
+                );
+            this.stickerObjs[ stickerMap[o+0][0]] = s0.clone();//r
+            this.stickerObjs[stickerMap[o+1][0]] = s180.clone();//u
+            this.stickerObjs[stickerMap[o+2][0]] = s270.clone();//f
+            this.stickerObjs[stickerMap[o+3][0]] = s90.clone();//l
+            this.stickerObjs[stickerMap[o+4][0]] = s90.clone();//d
+            this.stickerObjs[stickerMap[o+5][0]] = s180.clone();//b
+        }
+    }
+  }
+  initTextureScaleFactor(fraction) {
+    let attr = this.attributes;
+
+    for (let i = 0; i < this.stickerObjs.length; i++) {
+      if (!this.stickerObjs[i].loaded)
+        continue;
+
+      if (this.stickerObjs[i].isTextureScaled)
+        continue;
+      if (i * 2 + 1 < this.stickerOffsets.length) {
+        this.stickerObjs[i].textureOffsetX = this.stickerOffsets[i * 2];
+        this.stickerObjs[i].textureOffsetY = this.stickerOffsets[i * 2 + 1];
+      }
+      this.stickerObjs[i].textureScale = fraction;
+      this.stickerObjs[i].isTextureScaled = true;
+    }
+
+    this.isAttributesValid = false;
+  }
+
+
+  loadGeometry() {
+    // ----------------------------
+    // Load geometry
+    let self = this;
+    let fRepaint = function () {
+      self.repaint();
+    };
+
+    let modelUrl = this.getModelUrl();
+
+    // create the parts
+    this.cornerObjs = new Array(this.cornerCount);
+    for (let i=0;i<this.cornerCount;i++){
+        this.cornerObjs[i]=new J3DI.J3DIObj();
+    }
+    this.edgeObjs = new Array(this.edgeCount);
+    this.edge_rObjs = new Array(this.edgeCount);
+    this.edge_uObjs = new Array(this.edgeCount);
+    for (let i=0;i<this.edgeCount;i++){
+        this.edgeObjs[i]=new J3DI.J3DIObj();
+    }
+    this.sideObjs = new Array(this.sideCount);
+    for (let i=0;i<this.sideCount;i++){
+        this.sideObjs[i]=new J3DI.J3DIObj();
+    }
+    this.corner_rObj = new J3DI.J3DIObj();
+    this.corner_uObj = new J3DI.J3DIObj();
+    this.corner_fObj = new J3DI.J3DIObj();
+    this.edge_rObj = new J3DI.J3DIObj();
+    this.edge_uObj = new J3DI.J3DIObj();
+    this.edge12_uObj = new J3DI.J3DIObj();
+    this.edge12_fObj = new J3DI.J3DIObj();
+    this.side_rObj = new J3DI.J3DIObj();
+    this.side1_rObj = new J3DI.J3DIObj();
+    this.side2_rObj = new J3DI.J3DIObj();
+    this.centerObj = new J3DI.J3DIObj();
+    this.stickerObjs = new Array(this.attributes.getStickerCount());
+    for (let i = 0; i < this.stickerObjs.length; i++) {
+      this.stickerObjs[i] = new J3DI.J3DIObj();
+    }
+
+    // load the 3d model
+    J3DI.loadObj(null, modelUrl, function(obj) {
+      self.onObjLoaded(obj);
+      self.repaint();
+    });
+  }
+
+  onObjLoaded(obj) {
+    for (let i=0;i<this.cornerCount;i++){
+        this.cornerObjs[i].setTo(obj);
+        this.cornerObjs[i].selectedObject = "corner";
+    }
+    for (let i = 0; i < this.edgeCount;i++){
+        this.edgeObjs[i].setTo(obj);
+        if (this.layerCount == 5) {
+            this.edgeObjs[i].selectedObject = (i<12) ? "edge" : "edge12";
+        } else {
+            this.edgeObjs[i].selectedObject = "edge";
+        }
+    }
+    for (let i = 0; i < this.sideCount; i++){
+        this.sideObjs[i].setTo(obj);
+        if (this.layerCount == 5) {
+            switch (Math.floor(i / 6)) {
+            case 0:
+                this.sideObjs[i].selectedObject = "side";
+                break;
+            case 1:
+            case 3:
+            case 5:
+            case 7:
+                this.sideObjs[i].selectedObject = "side1";
+                break;
+            case 2:
+            case 4:
+            case 6:
+            case 8:
+                this.sideObjs[i].selectedObject = "side2";
+                break;
+            }
+        } else {
+            this.sideObjs[i].selectedObject = "side";
+        }
+    }
+    this.corner_rObj.setTo(obj);
+    this.corner_rObj.selectedObject = "corner_r";
+    this.corner_uObj.setTo(obj);
+    this.corner_uObj.selectedObject = "corner_u";
+    this.corner_fObj.setTo(obj);
+    this.corner_fObj.selectedObject = "corner_f";
+    this.edge_rObj.setTo(obj);
+    this.edge_rObj.selectedObject = "edge_r";
+    this.edge_uObj.setTo(obj);
+    this.edge_uObj.selectedObject = "edge_u";
+    this.edge12_uObj.setTo(obj);
+    this.edge12_uObj.selectedObject = "edge12_u";
+    this.edge12_fObj.setTo(obj);
+    this.edge12_fObj.selectedObject = "edge12_f";
+    this.side_rObj.setTo(obj);
+    this.side_rObj.selectedObject = "side_r";
+    this.side1_rObj.setTo(obj);
+    this.side1_rObj.selectedObject = "side1_r";
+    this.side2_rObj.setTo(obj);
+    this.side2_rObj.selectedObject = "side2_r";
+    this.centerObj.setTo(obj);
+    this.centerObj.selectedObject = "center";
+
+    this.initCornerR();
+    this.initCornerU();
+    this.initCornerF();
+    this.initEdgeR();
+    this.initEdgeU();
+    this.initSideR();
+    this.initTextureScaleFactor(this.textureScaleFactor);
+  }
 }
 
 /**
@@ -489,19 +953,19 @@ class Cube3D extends Node3D.Node3D {
  * a texture map which is structured as follows:
  * <pre>
  *   0 1 2 3 4 5 6 7 8
- *    +-----+
- * 0    |   |
- * 1    |  U  |
- * 2    |   |
+ *        +-----+
+ * 0      |     |
+ * 1      |  U  |
+ * 2      |     |
  *  +-----+-----+-----+
- * 3|   |   |   |
+ * 3|     |     |     |
  * 4|  L  |  F  |  R  |
- * 5|   |   |   |
+ * 5|     |     |     |
  *  +-----+-----+-----+
- * 6    |   |   |
- * 7    |  D  |  B  |
- * 8    |   |   |
- *    +-----+-----+
+ * 6      |     |     |
+ * 7      |  D  |  B  |
+ * 8      |     |     |
+ *        +-----+-----+
  * </pre>
  * For a 3x3 cube this function yields the following output:
  * stickerOffsets = [
@@ -536,10 +1000,10 @@ let computeStickerOffsets = function(layerCount) {
   let i=0;
   for (let face=0;face<6;face++) {
   let [offx,offy] = faceOffsets[face];
-  for (let y=0;y<layerCount;y++) {
-    for (let x=0;x<layerCount;x++) {
-    a[i++] = offx*layerCount+x;
-    a[i++] = offy*layerCount+y;
+  for (let y = 0; y < layerCount; y++) {
+    for (let x = 0; x < layerCount; x++) {
+      a[i++] = offx * layerCount + x;
+      a[i++] = offy * layerCount + y;
     }
   }
   }

@@ -28,18 +28,16 @@ let module = {
  */
 class AbstractRevengeCubeCube3D extends Cube3D.Cube3D {
   constructor(partSize) {
-    super();
+    super(4);
 
     this.partSize = partSize;
     this.cubeSize = partSize * 4;
 
     this.cube = Cube.createCube(4);
-    this.cube.addCubeListener(this);
-
     let layerCount= this.cube.getLayerCount();
     this.cornerCount = 8;
-    this.edgeCount = 12*Math.max(0,layerCount - 2);
-    this.sideCount = 6*Math.max(0,layerCount - 2)*Math.max(0,layerCount - 2);
+    this.edgeCount = 12 * Math.max(0,layerCount - 2);
+    this.sideCount = 6 * Math.max(0,layerCount - 2) * Math.max(0,layerCount - 2);
     this.centerCount = 1;
     this.partCount = this.cornerCount + this.edgeCount + this.sideCount + this.centerCount;
     this.cornerOffset = 0;
@@ -47,6 +45,7 @@ class AbstractRevengeCubeCube3D extends Cube3D.Cube3D {
     this.sideOffset = this.edgeOffset + this.edgeCount;
     this.centerOffset = this.sideOffset + this.sideCount;
 
+    this.cube.addCubeListener(this);
     this.attributes = this.createAttributes();
 
     this.partToStickerMap = new Array(this.partCount);
@@ -199,9 +198,8 @@ class AbstractRevengeCubeCube3D extends Cube3D.Cube3D {
       }
     }
 
+    // Rotate all side parts into place
     o = this.sideOffset;
-
-    // Move all side parts to right (= position of side[0]
     for (let i=0;i<this.sideCount;i++) {
       switch (i%6) {
       case 0:
@@ -251,279 +249,6 @@ class AbstractRevengeCubeCube3D extends Cube3D.Cube3D {
     }
   }
 
-  loadGeometry() {
-      // ----------------------------
-      // Load geometry
-      let self = this;
-      let fRepaint = function () {
-          self.repaint();
-      };
-
-    let modelUrl = this.getModelUrl();
-
-    // create the parts
-    this.cornerObj = new J3DI.J3DIObj();
-    this.corner_rObj = new J3DI.J3DIObj();
-    this.corner_uObj = new J3DI.J3DIObj();
-    this.corner_fObj = new J3DI.J3DIObj();
-    this.edgeObj = new J3DI.J3DIObj();
-    this.edge_rObj = new J3DI.J3DIObj();
-    this.edge_uObj = new J3DI.J3DIObj();
-    this.sideObj = new J3DI.J3DIObj();
-    this.side_rObj = new J3DI.J3DIObj();
-    this.centerObj = new J3DI.J3DIObj();
-    this.stickerObjs = new Array(this.stickerCount);
-    for (let i = 0; i < this.stickerObjs.length; i++) {
-      this.stickerObjs[i] = new J3DI.J3DIObj();
-    }
-
-    // load the 3d model
-    J3DI.loadObj(null, modelUrl, function(obj) {
-      self.onObjLoaded(obj);
-      self.repaint();
-    });
-  }
-
-  onObjLoaded(obj) {
-    this.cornerObj.setTo(obj);
-    this.cornerObj.selectedObject = "corner";
-    this.corner_rObj.setTo(obj);
-    this.corner_rObj.selectedObject = "corner_r";
-    this.initAbstractRevengeCubeCube3D_corner_r();
-    this.corner_uObj.setTo(obj);
-    this.corner_uObj.selectedObject = "corner_u";
-    this.initAbstractRevengeCubeCube3D_corner_u();
-    this.corner_fObj.setTo(obj);
-    this.corner_fObj.selectedObject = "corner_f";
-    this.initAbstractRevengeCubeCube3D_corner_f();
-    this.edgeObj.setTo(obj);
-    this.edgeObj.selectedObject = "edge";
-    this.edge_rObj.setTo(obj);
-    this.edge_rObj.selectedObject = "edge_r";
-    this.initAbstractRevengeCubeCube3D_edge_r();
-    this.edge_uObj.setTo(obj);
-    this.edge_uObj.selectedObject = "edge_u";
-    this.initAbstractRevengeCubeCube3D_edge_u();
-
-    this.sideObj.setTo(obj);
-    this.sideObj.selectedObject = "side";
-    this.side_rObj.setTo(obj);
-    this.side_rObj.selectedObject = "side_r";
-    this.initAbstractRevengeCubeCube3D_side_r();
-
-    this.centerObj.setTo(obj);
-    this.centerObj.selectedObject = "center";
-  }
-
-  doValidateAttributes() {
-      let a = this.attributes;
-      for (let i = 0; i < this.stickerObjs.length; i++) {
-          this.stickerObjs[i].hasTexture = a.stickersImageURL != null;
-      }
-      for (let i = 0; i < a.getPartCount(); i++) {
-          this.parts[i].visible = a.isPartVisible(i);
-      }
-  }
-
-  initAbstractRevengeCubeCube3D_corner_r() {
-      let s0 = this.corner_rObj;
-      let s180 = new J3DI.J3DIObj();
-      s180.setTo(s0);
-      s180.rotateTexture(180);
-
-      let o=this.cornerOffset;
-      this.stickerObjs[ this.partToStickerMap[o+0][1] ] = s0.clone();
-      this.stickerObjs[ this.partToStickerMap[o+1][1] ] = s180.clone();
-      this.stickerObjs[ this.partToStickerMap[o+2][1] ] = s0.clone();
-      this.stickerObjs[ this.partToStickerMap[o+3][1] ] = s180.clone();
-      this.stickerObjs[ this.partToStickerMap[o+4][1] ] = s0.clone();
-      this.stickerObjs[ this.partToStickerMap[o+5][1] ] = s180.clone();
-      this.stickerObjs[ this.partToStickerMap[o+6][1] ] = s0.clone();
-      this.stickerObjs[ this.partToStickerMap[o+7][1] ] = s180.clone();
-
-      this.initAbstractRevengeCubeCube3D_textureScales();
-  }
-  initAbstractRevengeCubeCube3D_corner_f() {
-      let s0 = this.corner_fObj;
-      let s180 = new J3DI.J3DIObj();
-      s180.setTo(s0);
-      s180.rotateTexture(180);
-
-      let o=this.cornerOffset;
-      this.stickerObjs[ this.partToStickerMap[o+0][2] ] = s0.clone();
-      this.stickerObjs[ this.partToStickerMap[o+1][2] ] = s180.clone();
-      this.stickerObjs[ this.partToStickerMap[o+2][2] ] = s0.clone();
-      this.stickerObjs[ this.partToStickerMap[o+3][2] ] = s180.clone();
-      this.stickerObjs[ this.partToStickerMap[o+4][2] ] = s0.clone();
-      this.stickerObjs[ this.partToStickerMap[o+5][2] ] = s180.clone();
-      this.stickerObjs[ this.partToStickerMap[o+6][2] ] = s0.clone();
-      this.stickerObjs[ this.partToStickerMap[o+7][2] ] = s180.clone();
-
-      this.initAbstractRevengeCubeCube3D_textureScales();
-  }
-  initAbstractRevengeCubeCube3D_corner_u() {
-      let s0 = this.corner_uObj;
-      let s90 = new J3DI.J3DIObj();
-      s90.setTo(s0);
-      s90.rotateTexture(90);
-      let s180 = new J3DI.J3DIObj();
-      s180.setTo(s0);
-      s180.rotateTexture(180);
-      let s270 = new J3DI.J3DIObj();
-      s270.setTo(s0);
-      s270.rotateTexture(270);
-
-      let o=this.cornerOffset;
-      this.stickerObjs[ this.partToStickerMap[o+0][0] ] = s0.clone();
-      this.stickerObjs[ this.partToStickerMap[o+1][0] ] = s90.clone();
-      this.stickerObjs[ this.partToStickerMap[o+2][0] ] = s90.clone();
-      this.stickerObjs[ this.partToStickerMap[o+3][0] ] = s0.clone();
-      this.stickerObjs[ this.partToStickerMap[o+4][0] ] = s180.clone();
-      this.stickerObjs[ this.partToStickerMap[o+5][0] ] = s270.clone();
-      this.stickerObjs[ this.partToStickerMap[o+6][0] ] = s270.clone();
-      this.stickerObjs[ this.partToStickerMap[o+7][0] ] = s180.clone();
-
-      this.initAbstractRevengeCubeCube3D_textureScales();
-  }
-  initAbstractRevengeCubeCube3D_edge_u() {
-    let s0 = this.edge_uObj;
-    let s90 = new J3DI.J3DIObj();
-    s90.setTo(s0);
-    s90.rotateTexture(90);
-    let s180 = new J3DI.J3DIObj();
-    s180.setTo(s0);
-    s180.rotateTexture(180);
-    let s270 = new J3DI.J3DIObj();
-    s270.setTo(s0);
-    s270.rotateTexture(270);
-
-    let o=this.edgeOffset;
-    this.stickerObjs[ this.partToStickerMap[o+0][1] ] = s90.clone();
-    this.stickerObjs[ this.partToStickerMap[o+12][0] ] = s0.clone();
-    this.stickerObjs[ this.partToStickerMap[o+1][1] ] = s0.clone();
-    this.stickerObjs[ this.partToStickerMap[o+13][0] ] = s180.clone();
-    this.stickerObjs[ this.partToStickerMap[o+2][0] ] = s0.clone();
-    this.stickerObjs[ this.partToStickerMap[o+14][1] ] = s270.clone();
-    this.stickerObjs[ this.partToStickerMap[o+3][0] ] = s90.clone();
-    this.stickerObjs[ this.partToStickerMap[o+15][1] ] = s90.clone();
-    this.stickerObjs[ this.partToStickerMap[o+4][0] ] = s0.clone();
-    this.stickerObjs[ this.partToStickerMap[o+16][1] ] = s180.clone();
-    this.stickerObjs[ this.partToStickerMap[o+5][1] ] = s270.clone();
-    this.stickerObjs[ this.partToStickerMap[o+17][0] ] = s270.clone();
-    this.stickerObjs[ this.partToStickerMap[o+6][0] ] = s180.clone();
-    this.stickerObjs[ this.partToStickerMap[o+18][1] ] = s90.clone();
-    this.stickerObjs[ this.partToStickerMap[o+7][1] ] = s0.clone();
-    this.stickerObjs[ this.partToStickerMap[o+19][0] ] = s180.clone();
-    this.stickerObjs[ this.partToStickerMap[o+8][1] ] = s270.clone();
-    this.stickerObjs[ this.partToStickerMap[o+20][0] ] = s180.clone();
-    this.stickerObjs[ this.partToStickerMap[o+9][1] ] = s270.clone();
-    this.stickerObjs[ this.partToStickerMap[o+21][0] ] = s90.clone();
-    this.stickerObjs[ this.partToStickerMap[o+10][0] ] = s0.clone();
-    this.stickerObjs[ this.partToStickerMap[o+22][1] ] = s180.clone();
-    this.stickerObjs[ this.partToStickerMap[o+11][0] ] = s270.clone();
-    this.stickerObjs[ this.partToStickerMap[o+23][1] ] = s90.clone();
-    this.initAbstractRevengeCubeCube3D_textureScales();
-  }
-  initAbstractRevengeCubeCube3D_edge_r() {
-    let s0 = this.edge_rObj;
-    let s90 = new J3DI.J3DIObj();
-    s90.setTo(s0);
-    s90.rotateTexture(90);
-    let s180 = new J3DI.J3DIObj();
-    s180.setTo(s0);
-    s180.rotateTexture(180);
-    let s270 = new J3DI.J3DIObj();
-    s270.setTo(s0);
-    s270.rotateTexture(270);
-
-    let o=this.edgeOffset;
-    this.stickerObjs[ this.partToStickerMap[o+0][0] ] = s270.clone();
-    this.stickerObjs[ this.partToStickerMap[o+12][1] ] = s0.clone();
-    this.stickerObjs[ this.partToStickerMap[o+1][0] ] = s90.clone();
-    this.stickerObjs[ this.partToStickerMap[o+13][1] ] = s270.clone();
-    this.stickerObjs[ this.partToStickerMap[o+2][1] ] = s180.clone();
-    this.stickerObjs[ this.partToStickerMap[o+14][0] ] = s270.clone();
-    this.stickerObjs[ this.partToStickerMap[o+3][1] ] = s0.clone();
-    this.stickerObjs[ this.partToStickerMap[o+15][0] ] = s0.clone();
-    this.stickerObjs[ this.partToStickerMap[o+4][1] ] = s90.clone();
-    this.stickerObjs[ this.partToStickerMap[o+16][0] ] = s270.clone();
-    this.stickerObjs[ this.partToStickerMap[o+5][0] ] = s180.clone();
-    this.stickerObjs[ this.partToStickerMap[o+17][1] ] = s180.clone();
-    this.stickerObjs[ this.partToStickerMap[o+6][1] ] = s0.clone();
-    this.stickerObjs[ this.partToStickerMap[o+18][0] ] = s90.clone();
-    this.stickerObjs[ this.partToStickerMap[o+7][0] ] = s90.clone();
-    this.stickerObjs[ this.partToStickerMap[o+19][1] ] = s270.clone();
-    this.stickerObjs[ this.partToStickerMap[o+8][0] ] = s90.clone();
-    this.stickerObjs[ this.partToStickerMap[o+20][1] ] = s180.clone();
-    this.stickerObjs[ this.partToStickerMap[o+9][0] ] = s0.clone();
-    this.stickerObjs[ this.partToStickerMap[o+21][1] ] = s180.clone();
-    this.stickerObjs[ this.partToStickerMap[o+10][1] ] = s90.clone();
-    this.stickerObjs[ this.partToStickerMap[o+22][0] ] = s270.clone();
-    this.stickerObjs[ this.partToStickerMap[o+11][1] ] = s0.clone();
-    this.stickerObjs[ this.partToStickerMap[o+23][0] ] = s180.clone();
-
-    this.initAbstractRevengeCubeCube3D_textureScales();
-  }
-  initAbstractRevengeCubeCube3D_side_r() {
-    let s0 = this.side_rObj;
-    let s90 = s0.clone();
-    s90.rotateTexture(90);
-    let s180 = s0.clone();
-    s180.rotateTexture(180);
-    let s270 = s0.clone();
-    s270.rotateTexture(270);
-
-    let o=this.sideOffset;
-    this.stickerObjs[ this.partToStickerMap[o+0][0] ] = s180.clone();//r
-    this.stickerObjs[ this.partToStickerMap[o+1][0] ] = s0.clone();//u
-    this.stickerObjs[ this.partToStickerMap[o+2][0] ] = s90.clone();//f
-    this.stickerObjs[ this.partToStickerMap[o+3][0] ] = s270.clone();//l
-    this.stickerObjs[ this.partToStickerMap[o+4][0] ] = s270.clone();//d
-    this.stickerObjs[ this.partToStickerMap[o+5][0] ] = s0.clone();//b
-
-    this.stickerObjs[ this.partToStickerMap[o+6][0] ] = s90.clone();//r
-    this.stickerObjs[ this.partToStickerMap[o+7][0] ] = s270.clone();//u
-    this.stickerObjs[ this.partToStickerMap[o+8][0] ] = s0.clone();//f
-    this.stickerObjs[ this.partToStickerMap[o+9][0] ] = s180.clone();//l
-    this.stickerObjs[ this.partToStickerMap[o+10][0] ] = s180.clone();//d
-    this.stickerObjs[ this.partToStickerMap[o+11][0] ] = s270.clone();//b
-
-    this.stickerObjs[ this.partToStickerMap[o+12][0] ] = s0.clone();//r
-    this.stickerObjs[ this.partToStickerMap[o+13][0] ] = s180.clone();//u
-    this.stickerObjs[ this.partToStickerMap[o+14][0] ] = s270.clone();//f
-    this.stickerObjs[ this.partToStickerMap[o+15][0] ] = s90.clone();//l
-    this.stickerObjs[ this.partToStickerMap[o+16][0] ] = s90.clone();//d
-    this.stickerObjs[ this.partToStickerMap[o+17][0] ] = s180.clone();//b
-
-    this.stickerObjs[ this.partToStickerMap[o+18][0] ] = s270.clone();//r
-    this.stickerObjs[ this.partToStickerMap[o+19][0] ] = s90.clone();//u
-    this.stickerObjs[ this.partToStickerMap[o+20][0] ] = s180.clone();//f
-    this.stickerObjs[ this.partToStickerMap[o+21][0] ] = s0.clone();//l
-    this.stickerObjs[ this.partToStickerMap[o+22][0] ] = s0.clone();//d
-    this.stickerObjs[ this.partToStickerMap[o+23][0] ] = s90.clone();//b
-
-   this.initAbstractRevengeCubeCube3D_textureScales();
-  }
-  initAbstractRevengeCubeCube3D_textureScales() {
-    let attr = this.attributes;
-
-    for (let i = 0; i < this.stickerObjs.length; i++) {
-        if (!this.stickerObjs[i].loaded)
-            continue;
-
-        if (this.stickerObjs[i].isTextureScaled)
-            continue;
-        if (i * 2 + 1 < this.stickerOffsets.length) {
-            this.stickerObjs[i].textureOffsetX = this.stickerOffsets[i * 2];
-            this.stickerObjs[i].textureOffsetY = this.stickerOffsets[i * 2 + 1];
-        }
-        this.stickerObjs[i].textureScale = 42 / 512;
-        this.stickerObjs[i].isTextureScaled = true;
-    }
-
-    this.isAttributesValid = false;
-  }
-
   getPartIndexForStickerIndex(stickerIndex) {
       return this.stickerToPartMap[stickerIndex];
   }
@@ -533,37 +258,6 @@ class AbstractRevengeCubeCube3D extends Cube3D.Cube3D {
   }
   getStickerIndexForPartIndex(partIndex, orientation) {
       return this.partToStickerMap[partIndex][orientation];
-  }
-  /** Default cube attributes. */
-  createAttributes() {
-    let a = new CubeAttributes.CubeAttributes(this.partCount, 6 * 16, [16, 16, 16, 16, 16, 16]);
-    let partsPhong = [0.5, 0.6, 0.4, 16.0];//shiny plastic [ambient, diffuse, specular, shininess]
-    for (let i = 0; i < this.partCount; i++) {
-        a.partsFillColor[i] = [40, 40, 40, 255];
-        a.partsPhong[i] = partsPhong;
-    }
-    a.partsFillColor[this.centerOffset] = [240, 240, 240, 255];
-
-    let faceColors = [
-        [255, 210, 0, 255], // right: yellow
-        [0, 51, 115, 255], // up   : blue
-        [140, 0, 15, 255], // front: red
-        [248, 248, 248, 255], // left : white
-        [0, 115, 47, 255], // down : green
-        [255, 70, 0, 255] // back : orange
-    ];
-
-    let stickersPhong = [0.8, 0.2, 0.1, 8.0];//shiny paper [ambient, diffuse, specular, shininess]
-
-    let layerCount = this.cube.getLayerCount();
-    let stickersPerFace = layerCount*layerCount;
-    for (let i = 0; i < 6; i++) {
-        for (let j = 0; j < stickersPerFace; j++) {
-            a.stickersFillColor[i * stickersPerFace + j] = faceColors[i];
-            a.stickersPhong[i * stickersPerFace+ j] = stickersPhong;
-        }
-    }
-    return a;
   }
 }
 
@@ -705,7 +399,7 @@ AbstractRevengeCubeCube3D.prototype.boxSwipeToLayerMap = [
  * 0        |       |
  * 1        |   U   |
  * 2        |       |
- * 4        |       |
+ * 3        |       |
  *  +-------+-------+-------+
  * 4|       |       |       |
  * 5|   L   |   F   |   R   |
@@ -736,39 +430,7 @@ class RevengeCubeCube3D extends AbstractRevengeCubeCube3D {
   getModelUrl() {
       return this.baseUrl + '/' + this.relativeUrl;
   }
-  createAttributes() {
-    let layerCount = this.cube.getLayerCount();
-    let stickersPerFace = layerCount*layerCount;
-      let a = new CubeAttributes.CubeAttributes(this.partCount, 6 * stickersPerFace, [stickersPerFace, stickersPerFace, stickersPerFace, stickersPerFace, stickersPerFace, stickersPerFace]);
-      let partsPhong = [0.5, 0.6, 0.4, 16.0];//shiny plastic [ambient, diffuse, specular, shininess]
-      for (let i = 0; i < this.partCount; i++) {
-          a.partsFillColor[i] = [24, 24, 24, 255];
-          a.partsPhong[i] = partsPhong;
-      }
-      a.partsFillColor[this.centerOffset] = [240, 240, 240, 255];
 
-      let faceColors = [//Right, Up, Front, Left, Down, Back
-          [255, 210, 0, 255], // Yellow
-          [0, 51, 115, 255], // Blue
-          [140, 0, 15, 255], // Red
-          [248, 248, 248, 255], // White
-          [0, 115, 47, 255], // Green
-          [255, 70, 0, 255], // Orange
-      ];
-
-      let stickersPhong = [0.8, 0.2, 0.1, 8.0];//shiny paper [ambient, diffuse, specular, shininess]
-
-  let faceOffset=0;
-  for (let i=0;i<6;i++) {
-    for (let j=0;j<a.getStickerCount(i);j++) {
-      a.stickersFillColor[faceOffset+j]=faceColors[i];
-      a.stickersPhong[faceOffset+j]=stickersPhong;
-    }
-    faceOffset+=a.getStickerCount(i)
-  }
-
-  return a;
-  }
 }
 
 // ------------------

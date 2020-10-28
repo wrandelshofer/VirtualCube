@@ -23,6 +23,7 @@ class CubeAttributes {
     this.stickersVisible = new Array(stickerCount);//boolean
     this.stickersFillColor = new Array(stickerCount);//[r,g,b,a]
     this.stickersPhong = new Array(stickerCount);//[ambient, diffuse, specular, shininess]
+    this.stickerCount = stickerCount;
     this.stickerCounts = stickerCounts;//integer array for each face
     this.partExplosion = new Array(partCount);//float
     this.stickerExplosion = new Array(stickerCount);//float
@@ -67,14 +68,18 @@ class CubeAttributes {
     return this.faceCount;
   }
   getStickerOffset(face) {
-  return this.stickerOffsets[face];
+    return this.stickerOffsets[face];
   }
   getStickerCount(face) {
-  return this.stickerCounts[face];
+    if (face == null) {
+        return this.stickerCount;
+    }
+    return this.stickerCounts[face];
   }
   getPartCount() {
-  return this.partsVisible.length;
+    return this.partsVisible.length;
   }
+
   setExplosionFactor(newValue) {
     this.explosionFactor=newValue;
   }

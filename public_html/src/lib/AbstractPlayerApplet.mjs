@@ -456,7 +456,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
       mvMatrix.makeIdentity();
       cube3d.parts[cube3d.sideOffset + i].transform(mvMatrix);
       let cparts = attr.partsFillColor[cube3d.sideOffset + i];
-      this.drawObject(cube3d.sideObj, mvMatrix, cparts, attr.partsPhong[this.cube3d.sideOffset + i]);
+      this.drawObject(cube3d.sideObjs[i], mvMatrix, cparts, attr.partsPhong[this.cube3d.sideOffset + i]);
       let si = cube3d.getStickerIndexForPartIndex(cube3d.sideOffset + i, 0);
       this.drawObject(cube3d.stickerObjs[si], mvMatrix,
         attr.stickersFillColor[si],
@@ -469,7 +469,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
       mvMatrix.makeIdentity();
       this.cube3d.parts[cube3d.edgeOffset + i].transform(mvMatrix);
       let cparts = attr.partsFillColor[cube3d.edgeOffset + i];
-      this.drawObject(cube3d.edgeObj, mvMatrix, cparts, attr.partsPhong[this.cube3d.edgeOffset + i]);
+      this.drawObject(cube3d.edgeObjs[i], mvMatrix, cparts, attr.partsPhong[this.cube3d.edgeOffset + i]);
       let si = cube3d.getStickerIndexForPartIndex(cube3d.edgeOffset + i, 0);
       this.drawObject(cube3d.stickerObjs[si], mvMatrix,
         attr.stickersFillColor[si],
@@ -486,7 +486,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
       mvMatrix.makeIdentity();
       this.cube3d.parts[cube3d.cornerOffset + i].transform(mvMatrix);
       let cparts = attr.partsFillColor[cube3d.cornerOffset + i];
-      this.drawObject(cube3d.cornerObj, mvMatrix, cparts, attr.partsPhong[this.cube3d.cornerOffset + i], this.forceColorUpdate);
+      this.drawObject(cube3d.cornerObjs[i], mvMatrix, cparts, attr.partsPhong[this.cube3d.cornerOffset + i], this.forceColorUpdate);
       let si = cube3d.getStickerIndexForPartIndex(cube3d.cornerOffset + i, 1);
       this.drawObject(cube3d.stickerObjs[si], mvMatrix, attr.stickersFillColor[si], attr.stickersPhong[si], this.forceColorUpdate);
       si = cube3d.getStickerIndexForPartIndex(cube3d.cornerOffset + i, 0);
@@ -526,19 +526,19 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
       for (let i = 0; i < cube3d.sideCount; i++) {
         mvMatrix.makeIdentity();
         cube3d.parts[cube3d.sideOffset + i].transform(mvMatrix);
-        this.drawObject(cube3d.sideObj, mvMatrix, cparts, attr.partsPhong[cube3d.sideOffset + i]);
+        this.drawObject(cube3d.sideObjs[i], mvMatrix, cparts, attr.partsPhong[cube3d.sideOffset + i]);
       }
       // draw edge parts
       for (let i = 0; i < cube3d.edgeCount; i++) {
         mvMatrix.makeIdentity();
         this.cube3d.parts[cube3d.edgeOffset + i].transform(mvMatrix);
-        this.drawObject(cube3d.edgeObj, mvMatrix, cparts, attr.partsPhong[this.cube3d.edgeOffset + i]);
+        this.drawObject(cube3d.edgeObjs[i], mvMatrix, cparts, attr.partsPhong[this.cube3d.edgeOffset + i]);
       }
       // draw corner parts
       for (let i = 0; i < cube3d.cornerCount; i++) {
         mvMatrix.makeIdentity();
         this.cube3d.parts[cube3d.cornerOffset + i].transform(mvMatrix);
-        this.drawObject(cube3d.cornerObj, mvMatrix, cparts, attr.partsPhong[this.cube3d.cornerOffset + i], this.forceColorUpdate);
+        this.drawObject(cube3d.cornerObjs[i], mvMatrix, cparts, attr.partsPhong[this.cube3d.cornerOffset + i], this.forceColorUpdate);
       }
       this.flushCanvas();
     }

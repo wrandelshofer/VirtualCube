@@ -206,7 +206,7 @@ class AbstractCanvas {
     let mv = this.mvVertexArray;
     mv.load(obj.vertexArray);
     mv.multVecMatrix(this.mvMatrix);
-    if (obj.polyIndexArray !== undefined) {
+    if (obj.polyIndexArray != null) {
       for (let j of obj.polyObjects.keys()) {
         if (obj.selectedObject != null && obj.selectedObject!=j) {
           continue; // only render selected object
@@ -223,7 +223,7 @@ class AbstractCanvas {
           if (z > 0) {
             let light = Math.max(0, mv.normal(i1, i2, i3).dot(this.lightNormal));
             let t = this.deferredFaces[this.deferredFaceCount++];
-            if (t === undefined) {
+            if (t == null) {
               t = new Face();
               this.deferredFaces.push(t);
             }
@@ -234,7 +234,7 @@ class AbstractCanvas {
           }
         }
       }
-    } else if (obj.objects !== undefined) {
+    } else if (obj.objects != null) {
       for (let j of obj.objects.keys()) {
         if (obj.selectedObject != null && obj.selectedObject!=j) {
           continue; // only render selected object
@@ -251,7 +251,7 @@ class AbstractCanvas {
             //let light = Math.max(0,mv.normal(i1,i2,i3).dot(this.lightNormal));
             //g.fillStyle='rgb('+color[0]*light+','+color[1]*light+','+color[2]*light+')';
             let t = this.deferredFaces[this.deferredFaceCount++];
-            if (t === undefined) {
+            if (t == null) {
               t = new Face();
               this.deferredFaces.push(t);
             }

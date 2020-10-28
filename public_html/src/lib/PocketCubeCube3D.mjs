@@ -17,62 +17,10 @@ import Node3D from './Node3D.mjs';
  */
 class AbstractPocketCubeCube3D extends Cube3D.Cube3D {
   constructor(partSize) {
-    super();
+    super(2, partSize);
 
-    this.partSize = partSize;
-    this.cubeSize = partSize * 2;
-    this.cornerCount = 8;
-    this.edgeCount = 0;
-    this.sideCount = 0;
-    this.centerCount = 1;
-    this.partCount = this.cornerCount + this.edgeCount + this.sideCount + this.centerCount;
-    this.cornerOffset = 0;
-    this.edgeOffset = 8;
-    this.sideOffset = 8;
-    this.centerOffset = 8;
-    this.stickerCount = 4 * 6;
 
-    this.cube = Cube.createCube(2);
-    this.cube.addCubeListener(this);
-    this.attributes = this.createAttributes();
 
-    this.partToStickerMap = new Array(this.partCount);
-    for (let i = 0; i < this.partCount; i++) {
-      this.parts[i] = new Node3D.Node3D();
-      this.partOrientations[i] = new Node3D.Node3D();
-      this.partExplosions[i] = new Node3D.Node3D();
-      this.partLocations[i] = new Node3D.Node3D();
-
-      this.partOrientations[i].add(this.parts[i]);
-      this.partExplosions[i].add(this.partOrientations[i]);
-      this.partLocations[i].add(this.partExplosions[i]);
-      this.add(this.partLocations[i]);
-
-      this.identityPartLocations[i] = new J3DIMath.J3DIMatrix4();
-      this.partToStickerMap[i] = new Array(3);
-    }
-
-    for (let i = 0; i < this.stickerCount; i++) {
-      this.partToStickerMap[this.stickerToPartMap[i]][this.stickerToFaceMap[i]] = i;
-
-      this.stickers[i] = new Node3D.Node3D();
-      this.stickerOrientations[i] = new Node3D.Node3D();
-      this.stickerExplosions[i] = new Node3D.Node3D();
-      this.stickerLocations[i] = new Node3D.Node3D();
-      this.stickerTranslations[i] = new Node3D.Node3D();
-
-      this.stickerOrientations[i].add(this.stickers[i]);
-      this.stickerExplosions[i].add(this.stickerOrientations[i]);
-      this.stickerLocations[i].add(this.stickerExplosions[i]);
-      this.stickerTranslations[i].add(this.stickerLocations[i]);
-      this.add(this.stickerTranslations[i]);
-
-      this.developedStickers[i] = new Node3D.Node3D();
-
-      this.currentStickerTransforms[i] = new Node3D.Node3D();
-      this.add(this.currentStickerTransforms[i]);
-      this.identityStickerLocations[i] = new J3DIMath.J3DIMatrix4();
-    }
 
     /*
      * Corners
@@ -137,192 +85,30 @@ class AbstractPocketCubeCube3D extends Cube3D.Cube3D {
     }
   }
 
-  loadGeometry() {
-    // ----------------------------
-    // Load geometry
-    let self = this;
-    let fRepaint = function () {
-      self.repaint();
-    };
-
-    let modelUrl = this.getModelUrl();
-
-    // create the parts
-    this.cornerObj = new J3DI.J3DIObj();
-    this.corner_rObj = new J3DI.J3DIObj();
-    this.corner_uObj = new J3DI.J3DIObj();
-    this.corner_fObj = new J3DI.J3DIObj();
-    this.centerObj = new J3DI.J3DIObj();
-    this.stickerObjs = new Array(this.stickerCount);
-    for (let i = 0; i < this.stickerObjs.length; i++) {
-      this.stickerObjs[i] = new J3DI.J3DIObj();
-    }
-
-    // load the 3d model
-    J3DI.loadObj(null, modelUrl, function(obj) {
-      self.onObjLoaded(obj);
-      self.repaint();
-    });
-  }
-
-  validateAttributes() {
-    if (!this.isAttributesValid) {
-      this.isAttributesValid = true;
-
-      for (let i = 0; i < this.stickerObjs.length; i++) {
-        this.stickerObjs[i].hasTexture = this.attributes.stickersImageURL != null;
-      }
-    }
-  }
-
-  onObjLoaded(obj) {
-    this.cornerObj.setTo(obj);
-    this.cornerObj.selectedObject = "corner";
-    this.corner_rObj.setTo(obj);
-    this.corner_rObj.selectedObject = "corner_r";
-    this.initAbstractPocketCubeCube3D_corner_r();
-    this.corner_uObj.setTo(obj);
-    this.corner_uObj.selectedObject = "corner_u";
-    this.initAbstractPocketCubeCube3D_corner_u();
-    this.corner_fObj.setTo(obj);
-    this.corner_fObj.selectedObject = "corner_f";
-    this.initAbstractPocketCubeCube3D_corner_f();
-
-    this.centerObj.setTo(obj);
-    this.centerObj.selectedObject = "center";
-  }
-
   initAbstractPocketCubeCube3D_corner_r() {
-    let s = this.corner_rObj;
-    let s180 = new J3DI.J3DIObj();
-    s180.setTo(s);
-    s180.rotateTexture(180);
-
-    this.stickerObjs[ this.partToStickerMap[0][1] ] = s.clone();
-    this.stickerObjs[ this.partToStickerMap[1][1] ] = s180.clone();
-    this.stickerObjs[ this.partToStickerMap[2][1] ] = s.clone();
-    this.stickerObjs[ this.partToStickerMap[3][1] ] = s180.clone();
-    this.stickerObjs[ this.partToStickerMap[4][1] ] = s.clone();
-    this.stickerObjs[ this.partToStickerMap[5][1] ] = s180.clone();
-    this.stickerObjs[ this.partToStickerMap[6][1] ] = s.clone();
-    this.stickerObjs[ this.partToStickerMap[7][1] ] = s180.clone();
-
+    this.initCornerR();
     this.initAbstractPocketCubeCube3D_textureScales();
   }
   initAbstractPocketCubeCube3D_corner_f() {
-    let s = this.corner_fObj;
-    let s180 = new J3DI.J3DIObj();
-    s180.setTo(s);
-    s180.rotateTexture(180);
-
-    this.stickerObjs[ this.partToStickerMap[0][2] ] = s.clone();
-    this.stickerObjs[ this.partToStickerMap[1][2] ] = s180.clone();
-    this.stickerObjs[ this.partToStickerMap[2][2] ] = s.clone();
-    this.stickerObjs[ this.partToStickerMap[3][2] ] = s180.clone();
-    this.stickerObjs[ this.partToStickerMap[4][2] ] = s.clone();
-    this.stickerObjs[ this.partToStickerMap[5][2] ] = s180.clone();
-    this.stickerObjs[ this.partToStickerMap[6][2] ] = s.clone();
-    this.stickerObjs[ this.partToStickerMap[7][2] ] = s180.clone();
-
+    this.initCornerF();
     this.initAbstractPocketCubeCube3D_textureScales();
   }
   initAbstractPocketCubeCube3D_corner_u() {
-    let s = this.corner_uObj;
-    let s90 = new J3DI.J3DIObj();
-    s90.setTo(s);
-    s90.rotateTexture(90);
-    let s180 = new J3DI.J3DIObj();
-    s180.setTo(s);
-    s180.rotateTexture(180);
-    let s270 = new J3DI.J3DIObj();
-    s270.setTo(s);
-    s270.rotateTexture(270);
-
-    this.stickerObjs[ this.partToStickerMap[0][0] ] = s.clone();
-    this.stickerObjs[ this.partToStickerMap[1][0] ] = s90.clone();
-    this.stickerObjs[ this.partToStickerMap[2][0] ] = s90.clone();
-    this.stickerObjs[ this.partToStickerMap[3][0] ] = s.clone();
-    this.stickerObjs[ this.partToStickerMap[4][0] ] = s180.clone();
-    this.stickerObjs[ this.partToStickerMap[5][0] ] = s270.clone();
-    this.stickerObjs[ this.partToStickerMap[6][0] ] = s270.clone();
-    this.stickerObjs[ this.partToStickerMap[7][0] ] = s180.clone();
-
+    this.initCornerU();
     this.initAbstractPocketCubeCube3D_textureScales();
   }
 
   initAbstractPocketCubeCube3D_textureScales() {
-    let attr = this.attributes;
-
-    for (let i = 0; i < this.stickerObjs.length; i++) {
-      if (!this.stickerObjs[i].loaded)
-        continue;
-
-      if (this.stickerObjs[i].isTextureScaled)
-        continue;
-      if (i * 2 + 1 < this.stickerOffsets.length) {
-        this.stickerObjs[i].textureOffsetX = this.stickerOffsets[i * 2];
-        this.stickerObjs[i].textureOffsetY = this.stickerOffsets[i * 2 + 1];
-      }
-      this.stickerObjs[i].textureScale = 84 / 512;
-      this.stickerObjs[i].isTextureScaled = true;
-    }
-
-    this.isAttributesValid = false;
+    this.initTextureScaleFactor(84/512);
   }
+
   getPartIndexForStickerIndex(stickerIndex) {
     return stickerToPartMap[stickerIndex];
   }
   getStickerIndexForPartIndex(partIndex, orientationIndex) {
     return this.partToStickerMap[partIndex][orientationIndex];
   }
-  /** Default cube attributes. */
-  createAttributes() {
-    let a = new CubeAttributes.CubeAttributes(this.partCount, 6 * 4, [4, 4, 4, 4, 4, 4]);
-    let partsPhong = [0.5, 0.6, 0.4, 16.0];//shiny plastic [ambient, diffuse, specular, shininess]
-    for (let i = 0; i < this.partCount; i++) {
-      a.partsFillColor[i] = [40, 40, 40, 255];
-      a.partsPhong[i] = partsPhong;
-    }
-    a.partsFillColor[this.centerOffset] = [240, 240, 240, 255];
-
-    let faceColors = [
-      [255, 210, 0, 255], // right: yellow
-      [0, 51, 115, 255], // up   : blue
-      [140, 0, 15, 255], // front: red
-      [248, 248, 248, 255], // left : white
-      [0, 115, 47, 255], // down : green
-      [255, 70, 0, 255] // back : orange
-    ];
-
-    let stickersPhong = [0.8, 0.2, 0.1, 8.0];//shiny paper [ambient, diffuse, specular, shininess]
-
-    for (let i = 0; i < 6; i++) {
-      for (let j = 0; j < 4; j++) {
-        a.stickersFillColor[i * 4 + j] = faceColors[i];
-        a.stickersPhong[i * 4 + j] = stickersPhong;
-      }
-    }
-
-    return a;
-  }
-
-  updateExplosionFactor(factor) {
-    if (factor == null) {
-      factor = this.attributes.explosionFactor;
-    }
-    let explosionShift = this.partSize * 1.5;
-    let baseShift = explosionShift * factor;
-    let shift = 0;
-    let a = this.attributes;
-    for (let i = 0; i < this.cornerCount; i++) {
-      let index = this.cornerOffset + i;
-      shift = baseShift + a.partExplosion[index];
-      this.partExplosions[index].matrix.makeIdentity();
-      this.partExplosions[index].matrix.translate(shift, shift, -shift);//ruf
-    }
-    this.fireStateChanged();
-  }
-
+/*
   validateTwist(partIndices, locations, orientations, length, axis, angle, alpha) {
     let rotation = this.updateTwistRotation;
     rotation.makeIdentity();
@@ -415,10 +201,10 @@ class AbstractPocketCubeCube3D extends Cube3D.Cube3D {
     this.repainter.repaint(f);
   }
 
-  /* Immediately completes the current twisting animation. */
+  /* Immediately completes the current twisting animation. * /
    finishTwisting() {
      this.isTwisting=null;
-   }
+   }*/
 
 }
 
@@ -627,38 +413,6 @@ class PocketCubeCube3D extends AbstractPocketCubeCube3D {
 
   getModelUrl() {
     return this.baseUrl+'/'+this.relativeUrl;
-  }
-
-  createAttributes() {
-    let a=new CubeAttributes.CubeAttributes(this.partCount, 6*4, [4,4,4,4,4,4]);
-    let partsPhong=[0.5,0.6,0.4,16.0];//shiny plastic [ambient, diffuse, specular, shininess]
-    for (let i=0;i<this.partCount;i++) {
-      a.partsFillColor[i]=[24,24,24,255];
-      a.partsPhong[i]=partsPhong;
-    }
-    a.partsFillColor[this.centerOffset]=[240,240,240,255];
-
-    let faceColors=[//Right, Up, Front, Left, Down, Back
-      [255, 210, 0,255], // Yellow
-      [0, 51, 115,255], // Blue
-      [140, 0, 15,255], // Red
-      [248, 248, 248,255], // White
-      [0, 115, 47,255], // Green
-      [255, 70, 0,255], // Orange
-    ];
-
-    let stickersPhong=[0.8,0.2,0.1,8.0];//shiny paper [ambient, diffuse, specular, shininess]
-
-    let layerCount = this.cube.getLayerCount();
-    let stickersPerFace = layerCount*layerCount;
-    for (let i=0;i<6;i++) {
-      for (let j=0;j<stickersPerFace;j++) {
-      a.stickersFillColor[i*stickersPerFace+j]=faceColors[i];
-      a.stickersPhong[i*stickersPerFace+j]=stickersPhong;
-      }
-    }
-
-    return a;
   }
 }
 
