@@ -1,0 +1,72 @@
+@charset "UTF-8";
+/*
+ * @(#)style.css
+ * Copyright (c) 2020 Werner Randelshofer, Switzerland. MIT License.
+ */
+
+@include virtualcube/style/virtualcube.css
+
+/* --- Responsive layout XS --- */
+@media only screen and (min-width: 480px) and (pointer: fine) {
+}
+
+/* --- Responsive layout S --- */
+@media only screen and (min-width: 544px) and (pointer: fine) {
+  /* 2 columns */
+  body.responsive article {
+    width: 44vw;
+    float: left;
+  }
+  body.responsive .virtualcube .cube-canvas {
+    width: 42vw;
+    height: 42vw;
+  }
+}
+
+/* --- Responsive layout M --- */
+@media only screen and (min-width: 768px) and (pointer: fine) {
+}
+
+/* --- Responsive layout L --- */
+@media only screen and (min-width: 992px) and (pointer: fine) {
+
+}
+
+/* --- Responsive layout XL --- */
+@media only screen and (min-width: 1200px) {
+  /* 4 columns */
+  body.responsive article {
+    padding: 0.5vw;
+    float: left;
+    width: 22vw;
+  }
+  body.responsive .virtualcube .cube-canvas {
+    width: 22vw;
+    height: 22vw;
+  }
+
+  /* large buttons */
+  body.responsive .virtualcube toolbar button {
+      height: 48px;
+      width: 48px;
+      margin: 0px 8px;
+  }
+}
+
+/* --- Responsive layout XXL --- */
+@media only screen and (min-width: 1500px) {
+}
+
+/* --- Responsive layout XXXL --- */
+@media only screen and (min-width: 1600px) {
+}
+
+/* --- Responsive layout mouse --- */
+@media only screen and (pointer: fine) {
+  /* small buttons */
+  body.responsive .virtualcube toolbar button {
+    height: 24px;
+    width: 24px;
+    margin: 0px 2px;
+  }
+}

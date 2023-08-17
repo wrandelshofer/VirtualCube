@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>colortable</title>
+    <script type="module" src="../virtualcube/lib/virtualcube.mjs"></script>
+    <link href="../virtualcube/style/virtualcube.css" rel="stylesheet" type="text/css"/>
+    <link href="../style.css" rel="stylesheet" type="text/css"/>
+  </head>
+  <body class="responsive">
+    <h1>Test of the deprecated <code>colortable</code>  parameter</h1>
+    <p>The <code>colorlist</code> parameter should be used instead, because <code>colortable</code> was not consistently implemented in all Java Applets.</p>
+    <article>
+    <section class="test">
+      <div class="virtualcube small" 
+           ></div>
+      <p>Default value.</p>
+    </section>
+    </article>
+    <article>
+    <section class="test">
+      <div class="virtualcube small"
+           colortable="0xf8f8f8,0xc080808,0xf8f8f8,0xf8f8f8,0x080808,0x080808"
+           ></div>
+      <p><code>colorTable="0xf8f8f8,0xc080808,0xf8f8f8,0xf8f8f8,0x080808,0x080808"</code></p>
+    </section>
+    </article>
+  </body>
+</html>

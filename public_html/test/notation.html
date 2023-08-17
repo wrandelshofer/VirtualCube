@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>notation</title>
+    <script type="module" src="../virtualcube/lib/virtualcube.mjs"></script>
+    <link href="../style.css" rel="stylesheet" type="text/css">
+    <link href="../virtualcube/style/virtualcube.css" rel="stylesheet" type="text/css">
+</head>
+  <body class="responsive">
+    <h1>Test of the <code>notation</code> parameter</h1>
+    <article>
+      <section class="test">
+        <div class="virtualcube small"
+             ></div>
+        <p>(default)</p>
+      </section>
+    </article>
+    <article>
+      <section class="test">
+        <div class="virtualcube small"
+             initscript="CF2"
+             ></div>
+        <p><code>initscript="CF2"</code> (default notation)</p>
+      </section>
+    </article>
+    <article>
+      <section class="test">
+        <div class="virtualcube small"
+             resourceFile="../lib/notations.xml"
+             notation="WCA 3x3"
+             initscript="z2"
+             ></div>
+        <p><code>resourceFile="../lib/notations.xml" notation="WCA 3x3" initscript="z2"</code></p>
+      </section>
+    </article>
+  </body>
+</html>

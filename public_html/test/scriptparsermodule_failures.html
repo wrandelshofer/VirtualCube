@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>ScriptParser module: parse() function</title>
+    <link href="../style.css" rel="stylesheet" type="text/css">
+    <link href="../virtualcube/style/virtualcube.css" rel="stylesheet" type="text/css">
+<script type="module">
+      import ScriptParser from '../lib/ScriptParser.mjs';
+      import ScriptNotation from '../lib/ScriptNotation.mjs';
+
+
+      function performTests() {
+      let tests = document.getElementsByClassName("unittest");
+      let inputs = document.getElementsByClassName("input");
+      let expecteds = document.getElementsByClassName("expected");
+      let actuals = document.getElementsByClassName("actual");
+
+      let notation = new ScriptNotation.DefaultNotation();
+      let parser = new ScriptParser.ScriptParser(notation);
+
+      for (let i = 0; i < tests.length; i++) {
+        let input = inputs[i].innerText;
+        let expected = expecteds[i].innerText;
+
+        try {
+          let ast = parser.parse(input);
+          actuals[i].innerText = "should have thrown an exception";
+          tests[i].classList.add("fail");
+        } catch (err) {
+          let actual=err.message;
+          actuals[i].innerText = actual;
+          tests[i].classList.add(actual == expected ? "pass" : "fail");
+        }
+      }
+    }
+    
+    performTests();
+     
+    </script>
+  </head>
+  <body class="responsive">
+    <h1>Tests for the <code>ScriptParser.parse()</code> methods in the <code>ScriptParser</code> module.</h1>
+
+  <article>
+    <section class="unittest">
+      <p class="input">B R (X3U MR- MU- · MR ML · MD ML- U-) R- B-</p>
+      <p class="expected">Permutation: PermutationItem expected. Found "X".</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+  </body>
+</html>

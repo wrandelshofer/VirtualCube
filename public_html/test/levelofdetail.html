@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>levelofdetail</title>
+    <script type="module" src="../virtualcube/lib/virtualcube.mjs"></script>
+    <link href="../style.css" rel="stylesheet" type="text/css">
+    <link href="../virtualcube/style/virtualcube.css" rel="stylesheet" type="text/css">
+</head>
+  <body class="responsive">
+    <h1>Test of the <code>levelofdetail</code>  parameter</h1>
+    <article>
+    <section class="test">
+      <div class="virtualcube small"
+           ></div>
+      <p>Default value.</p>
+    </section>
+    </article>
+    <article>
+    <section class="test">
+      <div class="virtualcube small"
+           levelofdetail="1"
+           ></div>
+      <p><code>levelofdetail="4"</code> (default)</p>
+    </section>
+    </article>
+    <article>
+      <section class="test">
+        <div class="virtualcube"
+             levelofdetail="0"
+             ></div>
+        <p><code>levelofdetail="0"</code></p>
+      </section>
+    </article>
+    <article>
+      <section class="test">
+        <div class="virtualcube"
+             levelofdetail="1"
+             ></div>
+        <p><code>levelofdetail="1"</code></p>
+      </section>
+    </article>
+    <article>
+      <section class="test">
+        <div class="virtualcube"
+             levelofdetail="2"
+             ></div>
+        <p><code>levelofdetail="2"</code></p>
+      </section>
+    </article>
+    <article>
+      <section class="test">
+        <div class="virtualcube"
+             levelofdetail="4"
+             ></div>
+        <p><code>levelofdetail="3"</code></p>
+      </section>
+    </article>
+    <article>
+      <section class="test">
+        <div class="virtualcube"
+             kind="revengecube"
+             levelofdetail="1"
+        ></div>
+        <p><code>kind="revengecube" levelofdetail="1"</code></p>
+      </section>
+    </article>
+    <article>
+      <section class="test">
+        <div class="virtualcube"
+             kind="revengecube"
+             levelofdetail="4"
+        ></div>
+        <p><code>kind="revengecube" levelofdetail="4"</code></p>
+      </section>
+    </article>
+  </body>
+</html>

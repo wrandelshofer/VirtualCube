@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>ScriptParser module: parse() function</title>
+    <link href="../style.css" rel="stylesheet" type="text/css">
+    <link href="../virtualcube/style/virtualcube.css" rel="stylesheet" type="text/css">
+<script type="module">
+      import ScriptParser from '../lib/ScriptParser.mjs';
+      import ScriptNotation from '../lib/ScriptNotation.mjs';
+
+      function appendAst (buf, ast) {
+        if (ast.getNodeName() == "permutationitem") {
+          buf.push(ast.getLocation());
+          buf.push(":");
+          buf.push(ast.getOrientation());
+          return;
+        }
+        buf.push(ast.getStartPosition());
+        buf.push("..");
+        buf.push(ast.getEndPosition());
+        buf.push(" ");
+        buf.push(ast.getNodeName());
+        buf.push("{");
+        switch (ast.getNodeName()) {
+          case "move":
+            buf.push(" ");
+            buf.push(ast.getAxis());
+            buf.push(":");
+            buf.push(ast.getLayerMask());
+            buf.push(":");
+            buf.push(ast.getAngle());
+            break;
+          case "repetition":
+            buf.push(" ");
+            buf.push(ast.getRepeatCount());
+            buf.push(",");
+            break;
+         case "permutation":
+            buf.push(" ");
+            switch (ast.getType()) {
+              case 1:
+                buf.push("Side");
+                break;
+              case 2:
+                buf.push("Edge");
+                break;
+              case 3:
+                buf.push("Corner");
+                break;
+              default:
+                buf.push(ast.getType());
+                break;
+            }
+            buf.push(" sign:");
+            buf.push(ast.getSign());
+            break;
+        }
+        for (let child of ast.getChildren()) {
+          buf.push(" ");
+          appendAst(buf, child);
+        }
+        buf.push(" }");
+//        buf.push(ast.toString());
+      };
+
+      function performTests() {
+      let tests = document.getElementsByClassName("unittest");
+      let inputs = document.getElementsByClassName("input");
+      let expecteds = document.getElementsByClassName("expected");
+      let actuals = document.getElementsByClassName("actual");
+
+
+      for (let i = 0; i < tests.length; i++) {
+        let input = inputs[i].innerText;
+        let [layerCount,script] = input.split(':');
+        let expected = expecteds[i].innerText;
+
+        try {
+          let notation = new ScriptNotation.DefaultNotation(layerCount);
+          let parser = new ScriptParser.ScriptParser(notation);
+          let ast = parser.parse(script);
+          let buf = new Array();
+          appendAst(buf, ast);
+          let actual = buf.join("");
+          actuals[i].innerText = actual;
+          tests[i].classList.add(actual == expected ? "pass" : "fail");
+        } catch (err) {
+          actuals[i].innerText = err;
+          tests[i].classList.add("fail");
+        }
+      }
+    }
+    
+    performTests();
+     
+    </script>
+  </head>
+  <body class="responsive">
+    <h1>Tests for the <code>ScriptParser.parse()</code> methods in the <code>ScriptParser</code> module.</h1>
+
+    <article>
+      <section class="unittest">
+        <p class="input">4:U2 WR MD2 WR- U- WR MD2 WR- U-</p>
+        <p class="expected">0..30 sequence{ 0..2 move{ 1:8:2 } 3..5 move{ 0:6:1 } 6..9 move{ 1:2:-2 } 10..13 inversion{ 10..12 move{ 0:6:1 } } 14..16 inversion{ 14..15 move{ 1:8:1 } } 17..19 move{ 0:6:1 } 20..23 move{ 1:2:-2 } 24..27 inversion{ 24..26 move{ 0:6:1 } } 28..30 inversion{ 28..29 move{ 1:8:1 } } }</p>
+        <p class="actual"></p>
+      </section>
+    </article>
+
+    <article>
+      <section class="unittest">
+        <p class="input">4:MB</p>
+        <p class="expected">0..2 sequence{ 0..2 move{ 2:2:-1 } }</p>
+        <p class="actual"></p>
+      </section>
+    </article>
+
+    <article>
+      <section class="unittest">
+        <p class="input">4:(MB2 MR2)2 U- (MB2 MR2)2 U</p>
+        <p class="expected">0..26 sequence{ 0..10 repetition{ 2, 0..9 grouping{ 1..4 move{ 2:2:-2 } 5..8 move{ 0:4:2 } } } 11..13 inversion{ 11..12 move{ 1:8:1 } } 14..24 repetition{ 2, 14..23 grouping{ 15..18 move{ 2:2:-2 } 19..22 move{ 0:4:2 } } } 25..26 move{ 1:8:1 } }</p>
+        <p class="actual"></p>
+      </section>
+    </article>
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:</p>
+      <p class="expected">0..0 sequence{ }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+    <article>
+    <section class="unittest">
+      <p class="input">3: </p>
+      <p class="expected">0..0 sequence{ }</p>
+      <p class="actual"></p>
+    </section>
+    </article>
+
+    <article>
+    <section class="unittest">
+      <p class="input">3: &nbsp;</p>
+      <p class="expected">0..0 sequence{ }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:.</p>
+      <p class="expected">0..1 sequence{ 0..1 nop{ } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:R</p>
+      <p class="expected">0..1 sequence{ 0..1 move{ 0:4:1 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:U</p>
+      <p class="expected">0..1 sequence{ 0..1 move{ 1:4:1 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:F</p>
+      <p class="expected">0..1 sequence{ 0..1 move{ 2:4:1 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:L</p>
+      <p class="expected">0..1 sequence{ 0..1 move{ 0:1:-1 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:D</p>
+      <p class="expected">0..1 sequence{ 0..1 move{ 1:1:-1 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:B</p>
+      <p class="expected">0..1 sequence{ 0..1 move{ 2:1:-1 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:R'</p>
+      <p class="expected">0..2 sequence{ 0..2 inversion{ 0..1 move{ 0:4:1 } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:U'</p>
+      <p class="expected">0..2 sequence{ 0..2 inversion{ 0..1 move{ 1:4:1 } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:F'</p>
+      <p class="expected">0..2 sequence{ 0..2 inversion{ 0..1 move{ 2:4:1 } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:L'</p>
+      <p class="expected">0..2 sequence{ 0..2 inversion{ 0..1 move{ 0:1:-1 } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:D'</p>
+      <p class="expected">0..2 sequence{ 0..2 inversion{ 0..1 move{ 1:1:-1 } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:B'</p>
+      <p class="expected">0..2 sequence{ 0..2 inversion{ 0..1 move{ 2:1:-1 } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:R2</p>
+      <p class="expected">0..2 sequence{ 0..2 move{ 0:4:2 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:U2</p>
+      <p class="expected">0..2 sequence{ 0..2 move{ 1:4:2 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:F2</p>
+      <p class="expected">0..2 sequence{ 0..2 move{ 2:4:2 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:L2</p>
+      <p class="expected">0..2 sequence{ 0..2 move{ 0:1:-2 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:D2</p>
+      <p class="expected">0..2 sequence{ 0..2 move{ 1:1:-2 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:B2</p>
+      <p class="expected">0..2 sequence{ 0..2 move{ 2:1:-2 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:MR</p>
+      <p class="expected">0..2 sequence{ 0..2 move{ 0:2:1 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:MU</p>
+      <p class="expected">0..2 sequence{ 0..2 move{ 1:2:1 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:MF</p>
+      <p class="expected">0..2 sequence{ 0..2 move{ 2:2:1 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:ML</p>
+      <p class="expected">0..2 sequence{ 0..2 move{ 0:2:-1 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:MD</p>
+      <p class="expected">0..2 sequence{ 0..2 move{ 1:2:-1 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:MB</p>
+      <p class="expected">0..2 sequence{ 0..2 move{ 2:2:-1 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:MR'</p>
+      <p class="expected">0..3 sequence{ 0..3 inversion{ 0..2 move{ 0:2:1 } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:MU'</p>
+      <p class="expected">0..3 sequence{ 0..3 inversion{ 0..2 move{ 1:2:1 } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:MF'</p>
+      <p class="expected">0..3 sequence{ 0..3 inversion{ 0..2 move{ 2:2:1 } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:ML'</p>
+      <p class="expected">0..3 sequence{ 0..3 inversion{ 0..2 move{ 0:2:-1 } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:MD'</p>
+      <p class="expected">0..3 sequence{ 0..3 inversion{ 0..2 move{ 1:2:-1 } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:MB'</p>
+      <p class="expected">0..3 sequence{ 0..3 inversion{ 0..2 move{ 2:2:-1 } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:MR2</p>
+      <p class="expected">0..3 sequence{ 0..3 move{ 0:2:2 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:MU2</p>
+      <p class="expected">0..3 sequence{ 0..3 move{ 1:2:2 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:MF2</p>
+      <p class="expected">0..3 sequence{ 0..3 move{ 2:2:2 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:ML2</p>
+      <p class="expected">0..3 sequence{ 0..3 move{ 0:2:-2 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:MD2</p>
+      <p class="expected">0..3 sequence{ 0..3 move{ 1:2:-2 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:MB2</p>
+      <p class="expected">0..3 sequence{ 0..3 move{ 2:2:-2 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:TR</p>
+      <p class="expected">0..2 sequence{ 0..2 move{ 0:6:1 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:TU</p>
+      <p class="expected">0..2 sequence{ 0..2 move{ 1:6:1 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:TF</p>
+      <p class="expected">0..2 sequence{ 0..2 move{ 2:6:1 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:TL</p>
+      <p class="expected">0..2 sequence{ 0..2 move{ 0:3:-1 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:TD</p>
+      <p class="expected">0..2 sequence{ 0..2 move{ 1:3:-1 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:TB</p>
+      <p class="expected">0..2 sequence{ 0..2 move{ 2:3:-1 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:TR'</p>
+      <p class="expected">0..3 sequence{ 0..3 inversion{ 0..2 move{ 0:6:1 } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:TU'</p>
+      <p class="expected">0..3 sequence{ 0..3 inversion{ 0..2 move{ 1:6:1 } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:TF'</p>
+      <p class="expected">0..3 sequence{ 0..3 inversion{ 0..2 move{ 2:6:1 } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:TL'</p>
+      <p class="expected">0..3 sequence{ 0..3 inversion{ 0..2 move{ 0:3:-1 } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:TD'</p>
+      <p class="expected">0..3 sequence{ 0..3 inversion{ 0..2 move{ 1:3:-1 } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:TB'</p>
+      <p class="expected">0..3 sequence{ 0..3 inversion{ 0..2 move{ 2:3:-1 } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:TR2</p>
+      <p class="expected">0..3 sequence{ 0..3 move{ 0:6:2 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:TU2</p>
+      <p class="expected">0..3 sequence{ 0..3 move{ 1:6:2 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:TF2</p>
+      <p class="expected">0..3 sequence{ 0..3 move{ 2:6:2 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:TL2</p>
+      <p class="expected">0..3 sequence{ 0..3 move{ 0:3:-2 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:TD2</p>
+      <p class="expected">0..3 sequence{ 0..3 move{ 1:3:-2 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:TB2</p>
+      <p class="expected">0..3 sequence{ 0..3 move{ 2:3:-2 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:CR</p>
+      <p class="expected">0..2 sequence{ 0..2 move{ 0:7:1 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:CU</p>
+      <p class="expected">0..2 sequence{ 0..2 move{ 1:7:1 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:CF</p>
+      <p class="expected">0..2 sequence{ 0..2 move{ 2:7:1 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:CL</p>
+      <p class="expected">0..2 sequence{ 0..2 move{ 0:7:-1 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:CD</p>
+      <p class="expected">0..2 sequence{ 0..2 move{ 1:7:-1 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:CB</p>
+      <p class="expected">0..2 sequence{ 0..2 move{ 2:7:-1 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:CR'</p>
+      <p class="expected">0..3 sequence{ 0..3 inversion{ 0..2 move{ 0:7:1 } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:CU'</p>
+      <p class="expected">0..3 sequence{ 0..3 inversion{ 0..2 move{ 1:7:1 } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:CF'</p>
+      <p class="expected">0..3 sequence{ 0..3 inversion{ 0..2 move{ 2:7:1 } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:CL'</p>
+      <p class="expected">0..3 sequence{ 0..3 inversion{ 0..2 move{ 0:7:-1 } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:CD'</p>
+      <p class="expected">0..3 sequence{ 0..3 inversion{ 0..2 move{ 1:7:-1 } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:CB'</p>
+      <p class="expected">0..3 sequence{ 0..3 inversion{ 0..2 move{ 2:7:-1 } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:CR2</p>
+      <p class="expected">0..3 sequence{ 0..3 move{ 0:7:2 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:CU2</p>
+      <p class="expected">0..3 sequence{ 0..3 move{ 1:7:2 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:CF2</p>
+      <p class="expected">0..3 sequence{ 0..3 move{ 2:7:2 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:CL2</p>
+      <p class="expected">0..3 sequence{ 0..3 move{ 0:7:-2 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:CD2</p>
+      <p class="expected">0..3 sequence{ 0..3 move{ 1:7:-2 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:CB2</p>
+      <p class="expected">0..3 sequence{ 0..3 move{ 2:7:-2 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:SR</p>
+      <p class="expected">0..2 sequence{ 0..2 move{ 0:5:1 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:SU</p>
+      <p class="expected">0..2 sequence{ 0..2 move{ 1:5:1 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:SF</p>
+      <p class="expected">0..2 sequence{ 0..2 move{ 2:5:1 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:SL</p>
+      <p class="expected">0..2 sequence{ 0..2 move{ 0:5:-1 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:SD</p>
+      <p class="expected">0..2 sequence{ 0..2 move{ 1:5:-1 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:SB</p>
+      <p class="expected">0..2 sequence{ 0..2 move{ 2:5:-1 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:SR'</p>
+      <p class="expected">0..3 sequence{ 0..3 inversion{ 0..2 move{ 0:5:1 } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:SU'</p>
+      <p class="expected">0..3 sequence{ 0..3 inversion{ 0..2 move{ 1:5:1 } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:SF'</p>
+      <p class="expected">0..3 sequence{ 0..3 inversion{ 0..2 move{ 2:5:1 } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:SL'</p>
+      <p class="expected">0..3 sequence{ 0..3 inversion{ 0..2 move{ 0:5:-1 } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:SD'</p>
+      <p class="expected">0..3 sequence{ 0..3 inversion{ 0..2 move{ 1:5:-1 } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:SB'</p>
+      <p class="expected">0..3 sequence{ 0..3 inversion{ 0..2 move{ 2:5:-1 } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:SR2</p>
+      <p class="expected">0..3 sequence{ 0..3 move{ 0:5:2 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:SU2</p>
+      <p class="expected">0..3 sequence{ 0..3 move{ 1:5:2 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:SF2</p>
+      <p class="expected">0..3 sequence{ 0..3 move{ 2:5:2 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:SL2</p>
+      <p class="expected">0..3 sequence{ 0..3 move{ 0:5:-2 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:SD2</p>
+      <p class="expected">0..3 sequence{ 0..3 move{ 1:5:-2 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:SB2</p>
+      <p class="expected">0..3 sequence{ 0..3 move{ 2:5:-2 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:R U F</p>
+      <p class="expected">0..5 sequence{ 0..1 move{ 0:4:1 } 2..3 move{ 1:4:1 } 4..5 move{ 2:4:1 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:(R U F)</p>
+      <p class="expected">0..7 sequence{ 0..7 grouping{ 1..2 move{ 0:4:1 } 3..4 move{ 1:4:1 } 5..6 move{ 2:4:1 } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:(R U F)'</p>
+      <p class="expected">0..8 sequence{ 0..8 inversion{ 0..7 grouping{ 1..2 move{ 0:4:1 } 3..4 move{ 1:4:1 } 5..6 move{ 2:4:1 } } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:(R)2</p>
+      <p class="expected">0..4 sequence{ 0..4 repetition{ 2, 0..3 grouping{ 1..2 move{ 0:4:1 } } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:R3</p>
+      <p class="expected">0..2 sequence{ 0..2 repetition{ 3, 0..1 move{ 0:4:1 } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:(R U F)3</p>
+      <p class="expected">0..8 sequence{ 0..8 repetition{ 3, 0..7 grouping{ 1..2 move{ 0:4:1 } 3..4 move{ 1:4:1 } 5..6 move{ 2:4:1 } } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:(R U F)'3</p>
+      <p class="expected">0..9 sequence{ 0..9 repetition{ 3, 0..8 inversion{ 0..7 grouping{ 1..2 move{ 0:4:1 } 3..4 move{ 1:4:1 } 5..6 move{ 2:4:1 } } } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:(R U F)3'</p>
+      <p class="expected">0..9 sequence{ 0..9 inversion{ 0..8 repetition{ 3, 0..7 grouping{ 1..2 move{ 0:4:1 } 3..4 move{ 1:4:1 } 5..6 move{ 2:4:1 } } } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:(R U F)3''</p>
+      <p class="expected">0..10 sequence{ 0..10 inversion{ 0..9 inversion{ 0..8 repetition{ 3, 0..7 grouping{ 1..2 move{ 0:4:1 } 3..4 move{ 1:4:1 } 5..6 move{ 2:4:1 } } } } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:(R U F)3'4</p>
+      <p class="expected">0..10 sequence{ 0..10 repetition{ 4, 0..9 inversion{ 0..8 repetition{ 3, 0..7 grouping{ 1..2 move{ 0:4:1 } 3..4 move{ 1:4:1 } 5..6 move{ 2:4:1 } } } } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:(R)'</p>
+      <p class="expected">0..4 sequence{ 0..4 inversion{ 0..3 grouping{ 1..2 move{ 0:4:1 } } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:(R F)'</p>
+      <p class="expected">0..6 sequence{ 0..6 inversion{ 0..5 grouping{ 1..2 move{ 0:4:1 } 3..4 move{ 2:4:1 } } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:(R- U F)- (R' U F)'</p>
+      <p class="expected">0..19 sequence{ 0..9 inversion{ 0..8 grouping{ 1..3 inversion{ 1..2 move{ 0:4:1 } } 4..5 move{ 1:4:1 } 6..7 move{ 2:4:1 } } } 10..19 inversion{ 10..18 grouping{ 11..13 inversion{ 11..12 move{ 0:4:1 } } 14..15 move{ 1:4:1 } 16..17 move{ 2:4:1 } } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:&lt;CU&gt;R</p>
+      <p class="expected">0..5 sequence{ 0..5 conjugation{ 1..3 sequence{ 1..3 move{ 1:7:1 } } 4..5 move{ 0:4:1 } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:&lt;CU CF&gt;(R)</p>
+      <p class="expected">0..10 sequence{ 0..10 conjugation{ 1..6 sequence{ 1..3 move{ 1:7:1 } 4..6 move{ 2:7:1 } } 7..10 grouping{ 8..9 move{ 0:4:1 } } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:&lt;CU CF&gt;'(R)</p>
+      <p class="expected">0..11 sequence{ 0..11 rotation{ 1..6 sequence{ 1..3 move{ 1:7:1 } 4..6 move{ 2:7:1 } } 8..11 grouping{ 9..10 move{ 0:4:1 } } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:&lt;CU CF&gt;(R B)</p>
+      <p class="expected">0..12 sequence{ 0..12 conjugation{ 1..6 sequence{ 1..3 move{ 1:7:1 } 4..6 move{ 2:7:1 } } 7..12 grouping{ 8..9 move{ 0:4:1 } 10..11 move{ 2:1:-1 } } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:&lt;R&gt;U</p>
+      <p class="expected">0..4 sequence{ 0..4 conjugation{ 1..2 sequence{ 1..2 move{ 0:4:1 } } 3..4 move{ 1:4:1 } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:[CU,R]</p>
+      <p class="expected">0..6 sequence{ 0..6 commutation{ 1..3 sequence{ 1..3 move{ 1:7:1 } } 4..5 sequence{ 4..5 move{ 0:4:1 } } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:[CU CF,R]</p>
+      <p class="expected">0..9 sequence{ 0..9 commutation{ 1..6 sequence{ 1..3 move{ 1:7:1 } 4..6 move{ 2:7:1 } } 7..8 sequence{ 7..8 move{ 0:4:1 } } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:[CU CF,R B]</p>
+      <p class="expected">0..11 sequence{ 0..11 commutation{ 1..6 sequence{ 1..3 move{ 1:7:1 } 4..6 move{ 2:7:1 } } 7..10 sequence{ 7..8 move{ 0:4:1 } 9..10 move{ 2:1:-1 } } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:[R,U]</p>
+      <p class="expected">0..5 sequence{ 0..5 commutation{ 1..2 sequence{ 1..2 move{ 0:4:1 } } 3..4 sequence{ 3..4 move{ 1:4:1 } } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:R U R'</p>
+      <p class="expected">0..6 sequence{ 0..1 move{ 0:4:1 } 2..3 move{ 1:4:1 } 4..6 inversion{ 4..5 move{ 0:4:1 } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:R U /* a comment */ R' U'</p>
+      <p class="expected">0..25 sequence{ 0..1 move{ 0:4:1 } 2..3 move{ 1:4:1 } 20..22 inversion{ 20..21 move{ 0:4:1 } } 23..25 inversion{ 23..24 move{ 1:4:1 } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:R*</p>
+      <p class="expected">0..2 sequence{ 0..2 reflection{ 0..1 move{ 0:4:1 } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:(R' U F)*</p>
+      <p class="expected">0..9 sequence{ 0..9 reflection{ 0..8 grouping{ 1..3 inversion{ 1..2 move{ 0:4:1 } } 4..5 move{ 1:4:1 } 6..7 move{ 2:4:1 } } } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+
+  <article>
+    <section class="unittest">
+      <p class="input">3:R . U · F</p>
+      <p class="expected">0..9 sequence{ 0..1 move{ 0:4:1 } 2..3 nop{ } 4..5 move{ 1:4:1 } 6..7 nop{ } 8..9 move{ 2:4:1 } }</p>
+      <p class="actual"></p>
+    </section>
+  </article>
+
+    <article>
+      <section class="unittest">
+        <p class="input">3:(+urf,bru,drb,frd) (+ur,br,dr,fr) (+r) (r,b) (++u,d) (++f,+l)</p>
+        <p class="expected">0..61 sequence{ 0..18 permutation{ Corner sign:2 0:0 2:2 3:0 1:2 } 19..33 permutation{ Edge sign:1 0:0 4:1 2:0 1:1 } 34..38 permutation{ Side sign:3 0:0 } 39..44 permutation{ Side sign:0 0:0 5:0 } 45..52 permutation{ Side sign:2 1:0 4:0 } 53..61 permutation{ Side sign:2 2:0 3:3 } }</p>
+        <p class="actual"></p>
+      </section>
+    </article>
+  </body>
+</html>

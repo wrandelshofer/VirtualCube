@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>applet</title>
+    <script type="module" src="../virtualcube/lib/virtualcube.mjs"></script>
+    <link href="../style.css" rel="stylesheet" type="text/css">
+    <link href="../virtualcube/style/virtualcube.css" rel="stylesheet" type="text/css">
+</head>
+  <body class="responsive">
+    <h1>Test of the <code>applet</code> tag</h1>
+    <article>
+      <section class="test">
+          <applet code="RubikPlayerFlat" archive="RubikPlayerFlat.jar" codebase="../lib" width="170" height="170">
+            <p>Please install the Java plugin.</p>
+          </applet>
+        <p>RubikPlayerFlat default value.</p>
+      </section>
+    </article>
+    <article>
+      <section class="test">
+        <applet code="RubikPlayerFlat" archive="RubikPlayerFlat.jar" codebase="../lib" width="170" height="170">
+          <param name="colorList" value="w=#ffffff,y=#fff100,g=#008b0d,b=#00468b,r=#a90034,o=#fc7216,p=#a57cda,lg=#606060,dg=#404040">
+          <param name="stickersRightList" value="dg,dg,dg,g,g,g,g,g,g">
+          <param name="stickersUpList" value="dg,dg,dg,dg,y,dg,dg,dg,dg">
+          <param name="stickersFrontList" value="dg,dg,dg,r,r,r,r,r,r">
+          <param name="stickersLeftList" value="dg,dg,dg,b,b,b,b,b,b">
+          <param name="stickersDownList" value="w,w,w,w,w,w,w,w,w">
+          <param name="stickersBackList" value="dg,dg,dg,o,o,o,o,o,o">
+        </applet>
+        <p>RubikPlayerFlat with <code>colorlist</code> and <code>stickerslist</code> parameters</p>
+      </section>
+    </article>
+    <article>
+      <section class="test">
+        <applet code="RubikPlayerFlat" archive="RubikPlayerFlat.jar" codebase="../lib" width="170" height="170">
+          <param name="resourceFile" value="../lib/notations.xml">
+          <param name="cube" value="Rubik's Cube F2L">
+          <param name="notation" value="WCA 3x3">
+          <param name="scriptType" value="solver">
+          <param name="script" value="R U R' Dw2 L U2 L' Dw L' U' L [u']">
+        </applet>
+        <p>RubikPlayerFlat with <code>resourceFile</code>, <code>cube</code>, <code>notation</code>, <code>script</code>
+          and <code>scriptType</code> parameters</p>
+      </section>
+    </article>
+    <article>
+      <section class="test">
+        <applet
+                code     = "PocketPlayerFlat.class"
+                codebase = "lib"
+                archive  = "PocketPlayerFlat.jar"
+                width    = "170"
+                height   = "170"
+        >
+          <param name="faces"        value="5,3,0,4,2,1">
+          <param name="script"       value="R2 U F2 U2 R2 U R2">
+          <param name="displayLines" value="0">
+
+          <!-- BEGIN Parameters for Sun Java Plugin -->
+          <param name="codebase_lookup" value="false">
+          <param name="classloader_cache" value="false">
+          <param name="java_arguments" value="-Djnlp.packEnabled=true"/>
+          <param name="image" value="Splash.gif"/>
+          <param name="boxborder" value="false"/>
+          <param name="centerimage" value="true"/>
+          <!-- END Parameters for Sun Java Plugin -->
+          <!-- BEGIN Parameters for Applet security -->
+          <param name="permissions" value="sandbox"/>
+          <!-- END Parameters for Applet security -->
+
+          <a href="http://java.sun.com/getjava/" target="_blank">Java Plug-in not installed!</a>
+          <p><strong>Install the <a href="http://java.sun.com/getjava/" target="_blank">Java Plug-in</a> to see the cube pattern!</strong><br/><br/></p>
+        </applet>
+        <p>PocketPlayerFlat with <code>script</code> attribute</p>
+      </section>
+    </article>
+    <article>
+      <section class="test">
+        <applet
+                code     = "RevengePlayerFlat.class"
+                codebase = "lib"
+                archive  = "RevengePlayerFlat.jar"
+                width    = "170"
+                height   = "170"
+        >
+          <param name="faces"        value="5,3,0,4,2,1">
+          <param name="script"       value="R2 U F2 U2 R2 U R2">
+          <param name="displayLines" value="0">
+
+          <!-- BEGIN Parameters for Sun Java Plugin -->
+          <param name="codebase_lookup" value="false">
+          <param name="classloader_cache" value="false">
+          <param name="java_arguments" value="-Djnlp.packEnabled=true"/>
+          <param name="image" value="Splash.gif"/>
+          <param name="boxborder" value="false"/>
+          <param name="centerimage" value="true"/>
+          <!-- END Parameters for Sun Java Plugin -->
+          <!-- BEGIN Parameters for Applet security -->
+          <param name="permissions" value="sandbox"/>
+          <!-- END Parameters for Applet security -->
+
+          <a href="http://java.sun.com/getjava/" target="_blank">Java Plug-in not installed!</a>
+          <p><strong>Install the <a href="http://java.sun.com/getjava/" target="_blank">Java Plug-in</a> to see the cube pattern!</strong><br/><br/></p>
+        </applet>
+        <p>RevengePlayerFlat with <code>script</code> attribute</p>
+      </section>
+    </article>
+    <article>
+      <section class="test">
+        <applet archive="lib/VirtualRubiksCube.jar" code="VirtualRubiksCube.class" codebase=".." width="170" height="170" mayscript>
+          <param name="locale" value="en"/>
+          <param name="colorTable" value="0xa57cda,0xf7f7f7,0xb90a0f">
+          <param name="faces" value="1,2,0,2,0,1">
+          <!-- <param name="stickersImage" value="images/DeLuxeCube_512.gif"> -->
+
+          <!-- BEGIN Parameters for Sun Java Plugin -->
+          <param name="codebase_lookup" value="false"/>
+          <param name="classloader_cache" value="false"/>
+          <param name="java_arguments" value="-Djnlp.packEnabled=true"/>
+          <param name="image" value="Splash.gif"/>
+          <param name="boxborder" value="false"/>
+          <param name="centerimage" value="true"/>
+          <!-- END Parameters for Sun Java Plugin -->
+
+        </applet>
+        <p>VirtualRubiksCube with <code>colorTable<code> and <code>faces</code> attributes</p>
+      </section>
+    </article>
+  </body>
+</html>

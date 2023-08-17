@@ -22,7 +22,7 @@
         <property name="version" value="${git.revision}"/>
     
         <property name="dist" value="dist"/>
-        <property name="lib" value="${src}/lib"/>
+        <property name="lib" value="public_html/virtualcube/lib"/>
         <property name="dist.bundle" value="${dist}/${name}"/>
         <property name="distname" value="virtualcubejs"/>
     </target>

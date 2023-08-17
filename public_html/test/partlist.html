@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>partlist</title>
+    <script type="module" src="../virtualcube/lib/virtualcube.mjs"></script>
+    <link href="../style.css" rel="stylesheet" type="text/css">
+    <link href="../virtualcube/style/virtualcube.css" rel="stylesheet" type="text/css">
+</head>
+  <body class="responsive">
+    <h1>Test of the <code>partlist</code>  parameter</h1>
+    <article>
+    <section class="test">
+      <div class="virtualcube small"
+           ></div>
+      <p>Default value.</p>
+    </section>
+    </article>
+    <article>
+    <section class="test">
+      <div class="virtualcube small"
+           partlist="urf,dfr,ubr,drb,ulb,dbl,ufl,dlf, ur,rf,dr,bu,rb,bd,ul,lb,dl,fu,lf,fd, r,u,f,l,d,b, center"
+           ></div>
+      <p><code>partlist="urf,dfr,ubr,drb,ulb,dbl,ufl,dlf, ur,rf,dr,bu,rb,bd,ul,lb,dl,fu,lf,fd, r,u,f,l,d,b, center"</code> (default)</p>
+    </section>
+    </article>
+    <article>
+    <section class="test">
+      <div class="virtualcube small"
+           kind="RubiksCube"
+           rendercontext="webgl"
+           partlist="r,fl,ubl,center"
+           ></div>
+      <p><code>rendercontext="webgl" partlist="r,rl,ubl,center"</code></p>
+    </section>
+    </article>
+    <article>
+      <section class="test">
+        <div class="virtualcube small"
+             kind="RubiksCube"
+             rendercontext="2d"
+             partlist="l,r,u,d,b,center"
+        ></div>
+        <p><code>rendercontext="2d" partlist="l,r,u,f,d,b,center"</code></p>
+      </section>
+    </article>
+    <article>
+    <section class="test">
+      <div class="virtualcube"
+           partlist="dfr,dlf,drb,center"
+           kind="PocketCube"
+           ></div>
+      <p><code>kind="PocketCube" partlist="dfr,dlf,drb,center"</code></p>
+    </section>
+    </article>
+    <article>
+      <section class="test">
+        <div class="virtualcube small"
+             partlist="dfr,dlf,drb,center"
+             kind="PocketCube"
+             rendercontext="2d"
+        ></div>
+        <p><code>kind="PocketCube" rendercontext="2d" partlist="dfr,dlf,drb,center"</code></p>
+      </section>
+    </article>
+    <article>
+      <section class="test">
+        <div class="virtualcube"
+             kind="RevengeCube"
+             rendercontext="webgl"
+             partlist="bul r1 lf1 center"
+        ></div>
+        <p><code>partlist="bul r1 lf1 center"</code></p>
+      </section>
+    </article>
+    <article>
+      <section class="test">
+        <div class="virtualcube"
+             kind="RevengeCube"
+             partlist="bul r1 lf1 center"
+             rendercontext="2d"
+             levelofdetail="4"
+        ></div>
+        <p><code>partlist="bul r1 lf1 center" rendercontext="2d"</code></p>
+      </section>
+    </article>
+  </body>
+</html>
