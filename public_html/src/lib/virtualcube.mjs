@@ -82,10 +82,10 @@ import Cube from "./Cube.mjs";
 import SplineInterpolator from "./SplineInterpolator.mjs";
 
 // import 3d models of the cubes
-import PocketCubeCube3D from "./PocketCubeCube3D.mjs";
-import RubiksCubeCube3D from "./RubiksCubeCube3D.mjs";
-import RevengeCubeCube3D from "./RevengeCubeCube3D.mjs";
-import ProfessorCubeCube3D from "./ProfessorCubeCube3D.mjs";
+import Cube2Cube3D from "./Cube2Cube3D.mjs";
+import Cube3Cube3D from "./Cube3Cube3D.mjs";
+import Cube4Cube3D from "./Cube4Cube3D.mjs";
+import Cube5Cube3D from "./Cube5Cube3D.mjs";
 import Cube6Cube3D from "./Cube6Cube3D.mjs";
 import Cube7Cube3D from "./Cube7Cube3D.mjs";
 

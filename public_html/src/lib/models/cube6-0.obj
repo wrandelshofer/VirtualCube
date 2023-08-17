@@ -17,7 +17,7 @@ vt 0.88967162370682 0.90063446760178 0
 vt 0.88967162370682 0.09936559200287 0
 # 4 texture coordinates
 
-o corner0_f
+o cornerF0
 usemtl default
 f 2/4/1 4/3/1 3/2/1 1/1/1
 
@@ -32,7 +32,7 @@ vn 1 0 0
 
 # 0 texture coordinate
 
-o corner0_r
+o cornerR0
 usemtl default
 f 6/4/2 8/3/2 7/2/2 5/1/2
 
@@ -51,7 +51,7 @@ vt 1 1 0
 vt 1 0 0
 # 4 texture coordinates
 
-o corner0_u
+o cornerU0
 usemtl default
 f 10/8/3 11/7/3 12/6/3 9/5/3
 
@@ -516,7 +516,7 @@ f 121/11/97 129/10/98 128/3/105
 
 # 0 texture coordinate
 
-o edge24_r
+o edgeR24
 usemtl default
 f 116/4/2 124/3/2 123/2/2 115/1/2
 
@@ -526,7 +526,7 @@ f 116/4/2 124/3/2 123/2/2 115/1/2
 
 # 0 texture coordinate
 
-o edge24_u
+o edgeU24
 usemtl default
 f 130/8/3 131/7/3 132/6/3 129/5/3
 
@@ -540,7 +540,7 @@ v 33 32.25 -10.25
 
 # 0 texture coordinate
 
-o edge0_r
+o edgeR0
 usemtl default
 f 134/4/2 136/3/2 135/2/2 133/1/2
 
@@ -554,7 +554,7 @@ v 22.75 33 -10.25
 
 # 0 texture coordinate
 
-o edge0_u
+o edgeU0
 usemtl default
 f 138/8/3 139/7/3 140/6/3 137/5/3
 

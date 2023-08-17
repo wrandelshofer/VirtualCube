@@ -108,7 +108,7 @@ class Cube3D extends Node3D.Node3D {
     this.identityDevelopedMatrix = [];
 
     this.currentStickerTransforms = [];
-    this.textureScaleFactor=512/Math.floor(512/(3*layerCount));
+    this.textureScaleFactor=Math.floor(512/(3*layerCount))/512;
 
     this.attributes = this.createAttributes();
     this.stickerCount = this.attributes.getStickerCount();
@@ -243,7 +243,9 @@ class Cube3D extends Node3D.Node3D {
       } else if (partIndices[i] < this.sideOffset) { //=> part is an edge
         if (orientations[i] == 1) {
           // Base location of an edge part is ur. (= edge part 0)
-          if (this.edgeCount==12) {
+          if (this.layerCount == 3
+          || this.layerCount == 5 && partIndices[i] - this.edgeOffset < 12
+          ) {
             orientationMatrix.rotateZ(90);
             orientationMatrix.rotateX(180);
           }
@@ -251,7 +253,9 @@ class Cube3D extends Node3D.Node3D {
       } else if (partIndices[i] < this.centerOffset) {//=> part is a side
         if (orientations[i] > 0) {
           // Base location of a side part is r. (= side part 0)
-          if (this.sideCount==6) {
+          if (this.layerCount==3
+          || this.layerCount == 5 && partIndices[i] - this.sideOffset < 6
+          ) {
             orientationMatrix.rotate(90 * orientations[i], -1, 0, 0);
           }
         }
@@ -390,7 +394,7 @@ class Cube3D extends Node3D.Node3D {
    *  angle:int, ...}
    *
    * @return point Intersection point: 3D vector.
-   * @return uv  Intersecton UV coordinates: 2D vector on the intersection plane.
+   * @return uv  Intersection UV coordinates: 2D vector on the intersection plane.
    * @return t   The distance that the ray traveled to the intersection point.
    * @return axis  The twist axis.
    * @return layerMask The twist layer mask.
@@ -597,7 +601,7 @@ class Cube3D extends Node3D.Node3D {
 
   initCornerR() {
     let s0,s90,s180,s270;
-    [s0,s90,s180,s270] = this.makeClonesWithRotatedTextures(this.corner_rObj);
+    [s0,s90,s180,s270] = this.makeClonesWithRotatedTextures(this.cornerR0Obj);
     let stickerMap = this.partToStickerMap;
 
     let o=this.cornerOffset;
@@ -612,7 +616,7 @@ class Cube3D extends Node3D.Node3D {
   }
   initCornerF() {
     let s0,s90,s180,s270;
-    [s0,s90,s180,s270] = this.makeClonesWithRotatedTextures(this.corner_fObj);
+    [s0,s90,s180,s270] = this.makeClonesWithRotatedTextures(this.cornerF0Obj);
     let stickerMap = this.partToStickerMap;
 
     let o=this.cornerOffset;
@@ -628,7 +632,7 @@ class Cube3D extends Node3D.Node3D {
 
   initCornerU() {
     let s0,s90,s180,s270;
-    [s0,s90,s180,s270] = this.makeClonesWithRotatedTextures(this.corner_uObj);
+    [s0,s90,s180,s270] = this.makeClonesWithRotatedTextures(this.cornerU0Obj);
     let stickerMap = this.partToStickerMap;
 
     let o = this.cornerOffset;
@@ -641,9 +645,10 @@ class Cube3D extends Node3D.Node3D {
     this.stickerObjs[ stickerMap[o+6][0] ] = s270.clone();
     this.stickerObjs[ stickerMap[o+7][0] ] = s180.clone();
   }
-  initEdgeU() {
+  
+  initMiddleEdgeU() {
     let s0,s90,s180,s270;
-    [s0,s90,s180,s270] = this.makeClonesWithRotatedTextures(this.edge_uObj);
+    [s0,s90,s180,s270] = this.makeClonesWithRotatedTextures(this.edgeU0Obj);
     let stickerMap = this.partToStickerMap;
 
     if (this.layerCount & 1 == 1) {
@@ -661,99 +666,103 @@ class Cube3D extends Node3D.Node3D {
         this.stickerObjs[ stickerMap[o+10][0] ] = s0.clone();
         this.stickerObjs[ stickerMap[o+11][0] ] = s270.clone();
     }
-    if (this.layerCount > 3) {
-        let o;
-        if (this.layerCount & 1 == 1) {
-            [s0,s90,s180,s270] = this.makeClonesWithRotatedTextures(this.edge12_uObj);
-            o=this.edgeOffset+12;
-        } else {
-            o=this.edgeOffset;
-        }
-        this.stickerObjs[ stickerMap[o+0][1] ] = s90.clone();
-        this.stickerObjs[ stickerMap[o+1][1] ] = s0.clone();
-        this.stickerObjs[ stickerMap[o+2][0] ] = s0.clone();
-        this.stickerObjs[ stickerMap[o+3][0] ] = s90.clone();
-        this.stickerObjs[ stickerMap[o+4][0] ] = s0.clone();
-        this.stickerObjs[ stickerMap[o+5][1] ] = s270.clone();
-        this.stickerObjs[ stickerMap[o+6][0] ] = s180.clone();
-        this.stickerObjs[ stickerMap[o+7][1] ] = s0.clone();
-        this.stickerObjs[ stickerMap[o+8][1] ] = s270.clone();
-        this.stickerObjs[ stickerMap[o+9][1] ] = s270.clone();
-        this.stickerObjs[ stickerMap[o+10][0] ] = s0.clone();
-        this.stickerObjs[ stickerMap[o+11][0] ] = s270.clone();
-        this.stickerObjs[ stickerMap[o+12][0] ] = s0.clone();
-        this.stickerObjs[ stickerMap[o+13][0] ] = s180.clone();
-        this.stickerObjs[ stickerMap[o+14][1] ] = s270.clone();
-        this.stickerObjs[ stickerMap[o+15][1] ] = s90.clone();
-        this.stickerObjs[ stickerMap[o+16][1] ] = s180.clone();
-        this.stickerObjs[ stickerMap[o+17][0] ] = s270.clone();
-        this.stickerObjs[ stickerMap[o+18][1] ] = s90.clone();
-        this.stickerObjs[ stickerMap[o+19][0] ] = s180.clone();
-        this.stickerObjs[ stickerMap[o+20][0] ] = s180.clone();
-        this.stickerObjs[ stickerMap[o+21][0] ] = s90.clone();
-        this.stickerObjs[ stickerMap[o+22][1] ] = s180.clone();
-        this.stickerObjs[ stickerMap[o+23][1] ] = s90.clone();    }
   }
-  initEdgeR() {
+  
+  initSliceEdgeU(edgeUObject, edgeOffset) {
+    let s0,s90,s180,s270;
+    [s0,s90,s180,s270] = this.makeClonesWithRotatedTextures(edgeUObject);
+    let stickerMap = this.partToStickerMap;
+    let o=edgeOffset;
+    this.stickerObjs[ stickerMap[o+0][1] ] = s90.clone();
+    this.stickerObjs[ stickerMap[o+1][1] ] = s0.clone();
+    this.stickerObjs[ stickerMap[o+2][0] ] = s0.clone();
+    this.stickerObjs[ stickerMap[o+3][0] ] = s90.clone();
+    this.stickerObjs[ stickerMap[o+4][0] ] = s0.clone();
+    this.stickerObjs[ stickerMap[o+5][1] ] = s270.clone();
+    this.stickerObjs[ stickerMap[o+6][0] ] = s180.clone();
+    this.stickerObjs[ stickerMap[o+7][1] ] = s0.clone();
+    this.stickerObjs[ stickerMap[o+8][1] ] = s270.clone();
+    this.stickerObjs[ stickerMap[o+9][1] ] = s270.clone();
+    this.stickerObjs[ stickerMap[o+10][0] ] = s0.clone();
+    this.stickerObjs[ stickerMap[o+11][0] ] = s270.clone();
+    this.stickerObjs[ stickerMap[o+12][0] ] = s0.clone();
+    this.stickerObjs[ stickerMap[o+13][0] ] = s180.clone();
+    this.stickerObjs[ stickerMap[o+14][1] ] = s270.clone();
+    this.stickerObjs[ stickerMap[o+15][1] ] = s90.clone();
+    this.stickerObjs[ stickerMap[o+16][1] ] = s180.clone();
+    this.stickerObjs[ stickerMap[o+17][0] ] = s270.clone();
+    this.stickerObjs[ stickerMap[o+18][1] ] = s90.clone();
+    this.stickerObjs[ stickerMap[o+19][0] ] = s180.clone();
+    this.stickerObjs[ stickerMap[o+20][0] ] = s180.clone();
+    this.stickerObjs[ stickerMap[o+21][0] ] = s90.clone();
+    this.stickerObjs[ stickerMap[o+22][1] ] = s180.clone();
+    this.stickerObjs[ stickerMap[o+23][1] ] = s90.clone(); 
+  }
+  
+  initEdgeU() {
+    //subclass responsibility
+  }
+  
+  initMiddleEdgeR() {
     let stickerMap = this.partToStickerMap;
     let s0,s90,s180,s270;
-    [s0,s90,s180,s270] = this.makeClonesWithRotatedTextures(this.edge_rObj);
+    [s0,s90,s180,s270] = this.makeClonesWithRotatedTextures(this.edgeR0Obj);
 
-    if (this.layerCount & 1 == 1) {
-        let o=this.edgeOffset;
-        this.stickerObjs[ stickerMap[o+0][1] ] = s0.clone();
-        this.stickerObjs[ stickerMap[o+1][1] ] = s270.clone();
-        this.stickerObjs[ stickerMap[o+2][1] ] = s180.clone();
-        this.stickerObjs[ stickerMap[o+3][1] ] = s0.clone();
-        this.stickerObjs[ stickerMap[o+4][1] ] = s90.clone();
-        this.stickerObjs[ stickerMap[o+5][1] ] = s180.clone();
-        this.stickerObjs[ stickerMap[o+6][1] ] = s0.clone();
-        this.stickerObjs[ stickerMap[o+7][1] ] = s270.clone();
-        this.stickerObjs[ stickerMap[o+8][1] ] = s180.clone();
-        this.stickerObjs[ stickerMap[o+9][1] ] = s180.clone();
-        this.stickerObjs[ stickerMap[o+10][1] ] = s90.clone();
-        this.stickerObjs[ stickerMap[o+11][1] ] = s0.clone();
-    }
-    if (this.layerCount > 3) {
-        let o;
-        if (this.layerCount & 1 == 1) {
-            [s0,s90,s180,s270] = this.makeClonesWithRotatedTextures(this.edge12_fObj);
-            o = this.edgeOffset + 12;
-        } else {
-            o=this.edgeOffset;
-        }
-        this.stickerObjs[ stickerMap[o+0][0] ] = s270.clone();
-        this.stickerObjs[ stickerMap[o+1][0] ] = s90.clone();
-        this.stickerObjs[ stickerMap[o+2][1] ] = s180.clone();
-        this.stickerObjs[ stickerMap[o+3][1] ] = s0.clone();
-        this.stickerObjs[ stickerMap[o+4][1] ] = s90.clone();
-        this.stickerObjs[ stickerMap[o+5][0] ] = s180.clone();
-        this.stickerObjs[ stickerMap[o+6][1] ] = s0.clone();
-        this.stickerObjs[ stickerMap[o+7][0] ] = s90.clone();
-        this.stickerObjs[ stickerMap[o+8][0] ] = s90.clone();
-        this.stickerObjs[ stickerMap[o+9][0] ] = s0.clone();
-        this.stickerObjs[ stickerMap[o+10][1] ] = s90.clone();
-        this.stickerObjs[ stickerMap[o+11][1] ] = s0.clone();
+    let o=this.edgeOffset;
+    this.stickerObjs[ stickerMap[o+0][1] ] = s0.clone();
+    this.stickerObjs[ stickerMap[o+1][1] ] = s270.clone();
+    this.stickerObjs[ stickerMap[o+2][1] ] = s180.clone();
+    this.stickerObjs[ stickerMap[o+3][1] ] = s0.clone();
+    this.stickerObjs[ stickerMap[o+4][1] ] = s90.clone();
+    this.stickerObjs[ stickerMap[o+5][1] ] = s180.clone();
+    this.stickerObjs[ stickerMap[o+6][1] ] = s0.clone();
+    this.stickerObjs[ stickerMap[o+7][1] ] = s270.clone();
+    this.stickerObjs[ stickerMap[o+8][1] ] = s180.clone();
+    this.stickerObjs[ stickerMap[o+9][1] ] = s180.clone();
+    this.stickerObjs[ stickerMap[o+10][1] ] = s90.clone();
+    this.stickerObjs[ stickerMap[o+11][1] ] = s0.clone();
+  }
+  initSliceEdgeR(edgeRObject, edgeOffset) {
+    let stickerMap = this.partToStickerMap;
+    let s0,s90,s180,s270;
+    [s0,s90,s180,s270] = this.makeClonesWithRotatedTextures(edgeRObject);
+    let o=edgeOffset;
+    
+    this.stickerObjs[ stickerMap[o+0][0] ] = s270.clone();
+    this.stickerObjs[ stickerMap[o+1][0] ] = s90.clone();
+    this.stickerObjs[ stickerMap[o+2][1] ] = s180.clone();
+    this.stickerObjs[ stickerMap[o+3][1] ] = s0.clone();
+    this.stickerObjs[ stickerMap[o+4][1] ] = s90.clone();
+    this.stickerObjs[ stickerMap[o+5][0] ] = s180.clone();
+    this.stickerObjs[ stickerMap[o+6][1] ] = s0.clone();
+    this.stickerObjs[ stickerMap[o+7][0] ] = s90.clone();
+    this.stickerObjs[ stickerMap[o+8][0] ] = s90.clone();
+    this.stickerObjs[ stickerMap[o+9][0] ] = s0.clone();
+    this.stickerObjs[ stickerMap[o+10][1] ] = s90.clone();
+    this.stickerObjs[ stickerMap[o+11][1] ] = s0.clone();
 
-        this.stickerObjs[ stickerMap[o+12][1] ] = s0.clone();
-        this.stickerObjs[ stickerMap[o+13][1] ] = s270.clone();
-        this.stickerObjs[ stickerMap[o+14][0] ] = s270.clone();
-        this.stickerObjs[ stickerMap[o+15][0] ] = s0.clone();
-        this.stickerObjs[ stickerMap[o+16][0] ] = s270.clone();
-        this.stickerObjs[ stickerMap[o+17][1] ] = s180.clone();
-        this.stickerObjs[ stickerMap[o+18][0] ] = s90.clone();
-        this.stickerObjs[ stickerMap[o+19][1] ] = s270.clone();
-        this.stickerObjs[ stickerMap[o+20][1] ] = s180.clone();
-        this.stickerObjs[ stickerMap[o+21][1] ] = s180.clone();
-        this.stickerObjs[ stickerMap[o+22][0] ] = s270.clone();
-        this.stickerObjs[ stickerMap[o+23][0] ] = s180.clone();
-    }
+    this.stickerObjs[ stickerMap[o+12][1] ] = s0.clone();
+    this.stickerObjs[ stickerMap[o+13][1] ] = s270.clone();
+    this.stickerObjs[ stickerMap[o+14][0] ] = s270.clone();
+    this.stickerObjs[ stickerMap[o+15][0] ] = s0.clone();
+    this.stickerObjs[ stickerMap[o+16][0] ] = s270.clone();
+    this.stickerObjs[ stickerMap[o+17][1] ] = s180.clone();
+    this.stickerObjs[ stickerMap[o+18][0] ] = s90.clone();
+    this.stickerObjs[ stickerMap[o+19][1] ] = s270.clone();
+    this.stickerObjs[ stickerMap[o+20][1] ] = s180.clone();
+    this.stickerObjs[ stickerMap[o+21][1] ] = s180.clone();
+    this.stickerObjs[ stickerMap[o+22][0] ] = s270.clone();
+    this.stickerObjs[ stickerMap[o+23][0] ] = s180.clone();  
+  }
+
+  initEdgeR() {
+    //subclass responsibility
   }
   initSideR() {
     let stickerMap = this.partToStickerMap;
 
     let s0,s90,s180,s270;
-    [s0,s90,s180,s270] = this.makeClonesWithRotatedTextures(this.side_rObj);
+    [s0,s90,s180,s270] = this.makeClonesWithRotatedTextures(this.sideR0Obj);
 
     if (this.layerCount & 1 == 1) {
         let o=this.sideOffset;
@@ -798,7 +807,7 @@ class Cube3D extends Node3D.Node3D {
         for (let i=1;i<9;i++) {
             let o=this.sideOffset+i*6;
             [s0,s90,s180,s270] = this.makeClonesWithRotatedTextures(
-                i&1==1?this.side1_rObj:this.side2_rObj
+                i&1==1?this.sideR1Obj:this.sideR2Obj
                 );
             this.stickerObjs[ stickerMap[o+0][0]] = s0.clone();//r
             this.stickerObjs[stickerMap[o+1][0]] = s180.clone();//u
@@ -855,16 +864,18 @@ class Cube3D extends Node3D.Node3D {
     for (let i=0;i<this.sideCount;i++){
         this.sideObjs[i]=new J3DI.J3DIObj();
     }
-    this.corner_rObj = new J3DI.J3DIObj();
-    this.corner_uObj = new J3DI.J3DIObj();
-    this.corner_fObj = new J3DI.J3DIObj();
-    this.edge_rObj = new J3DI.J3DIObj();
-    this.edge_uObj = new J3DI.J3DIObj();
-    this.edge12_uObj = new J3DI.J3DIObj();
-    this.edge12_fObj = new J3DI.J3DIObj();
-    this.side_rObj = new J3DI.J3DIObj();
-    this.side1_rObj = new J3DI.J3DIObj();
-    this.side2_rObj = new J3DI.J3DIObj();
+    this.cornerR0Obj = new J3DI.J3DIObj();
+    this.cornerU0Obj = new J3DI.J3DIObj();
+    this.cornerF0Obj = new J3DI.J3DIObj();
+    this.edgeR0Obj = new J3DI.J3DIObj();
+    this.edgeU0Obj = new J3DI.J3DIObj();
+    this.edgeR12Obj = new J3DI.J3DIObj();
+    this.edgeU12Obj = new J3DI.J3DIObj();
+    this.edgeR24Obj = new J3DI.J3DIObj();
+    this.edgeU24Obj = new J3DI.J3DIObj();
+    this.sideR0Obj = new J3DI.J3DIObj();
+    this.sideR1Obj = new J3DI.J3DIObj();
+    this.sideR2Obj = new J3DI.J3DIObj();
     this.centerObj = new J3DI.J3DIObj();
     this.stickerObjs = new Array(this.attributes.getStickerCount());
     for (let i = 0; i < this.stickerObjs.length; i++) {
@@ -881,14 +892,16 @@ class Cube3D extends Node3D.Node3D {
   onObjLoaded(obj) {
     for (let i=0;i<this.cornerCount;i++){
         this.cornerObjs[i].setTo(obj);
-        this.cornerObjs[i].selectedObject = "corner";
+        this.cornerObjs[i].selectedObject = "corner0";
     }
     for (let i = 0; i < this.edgeCount;i++){
         this.edgeObjs[i].setTo(obj);
         if (this.layerCount == 5) {
-            this.edgeObjs[i].selectedObject = (i<12) ? "edge" : "edge12";
+            this.edgeObjs[i].selectedObject = (i<12) ? "edge0" : "edge12";
+        } else if (this.layerCount == 6) {
+            this.edgeObjs[i].selectedObject = (i<24) ? "edge0" : "edge24";
         } else {
-            this.edgeObjs[i].selectedObject = "edge";
+            this.edgeObjs[i].selectedObject = "edge0";
         }
     }
     for (let i = 0; i < this.sideCount; i++){
@@ -912,29 +925,37 @@ class Cube3D extends Node3D.Node3D {
                 break;
             }
         } else {
-            this.sideObjs[i].selectedObject = "side";
+            this.sideObjs[i].selectedObject = "side0";
         }
     }
-    this.corner_rObj.setTo(obj);
-    this.corner_rObj.selectedObject = "corner_r";
-    this.corner_uObj.setTo(obj);
-    this.corner_uObj.selectedObject = "corner_u";
-    this.corner_fObj.setTo(obj);
-    this.corner_fObj.selectedObject = "corner_f";
-    this.edge_rObj.setTo(obj);
-    this.edge_rObj.selectedObject = "edge_r";
-    this.edge_uObj.setTo(obj);
-    this.edge_uObj.selectedObject = "edge_u";
-    this.edge12_uObj.setTo(obj);
-    this.edge12_uObj.selectedObject = "edge12_u";
-    this.edge12_fObj.setTo(obj);
-    this.edge12_fObj.selectedObject = "edge12_f";
-    this.side_rObj.setTo(obj);
-    this.side_rObj.selectedObject = "side_r";
-    this.side1_rObj.setTo(obj);
-    this.side1_rObj.selectedObject = "side1_r";
-    this.side2_rObj.setTo(obj);
-    this.side2_rObj.selectedObject = "side2_r";
+    this.cornerR0Obj.setTo(obj);
+    this.cornerR0Obj.selectedObject = "cornerR0";
+    this.cornerU0Obj.setTo(obj);
+    this.cornerU0Obj.selectedObject = "cornerU0";
+    this.cornerF0Obj.setTo(obj);
+    this.cornerF0Obj.selectedObject = "cornerF0";
+
+    this.edgeR0Obj.setTo(obj);
+    this.edgeR0Obj.selectedObject = "edgeR0";
+    this.edgeU0Obj.setTo(obj);
+    this.edgeU0Obj.selectedObject = "edgeU0";
+
+    this.edgeR12Obj.setTo(obj);
+    this.edgeR12Obj.selectedObject = "edgeR12";
+    this.edgeU12Obj.setTo(obj);
+    this.edgeU12Obj.selectedObject = "edgeU12";
+
+    this.edgeR24Obj.setTo(obj);
+    this.edgeR24Obj.selectedObject = "edgeR24";
+    this.edgeU24Obj.setTo(obj);
+    this.edgeU24Obj.selectedObject = "edgeU24";
+
+    this.sideR0Obj.setTo(obj);
+    this.sideR0Obj.selectedObject = "sideR0";
+    this.sideR1Obj.setTo(obj);
+    this.sideR1Obj.selectedObject = "sideR1";
+    this.sideR2Obj.setTo(obj);
+    this.sideR2Obj.selectedObject = "sideR2";
     this.centerObj.setTo(obj);
     this.centerObj.selectedObject = "center";
 

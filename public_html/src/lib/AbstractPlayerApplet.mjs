@@ -15,10 +15,10 @@ import ScriptNotation from './ScriptNotation.mjs';
 import ScriptAST from './ScriptAST.mjs';
 import ScriptParser from './ScriptParser.mjs';
 import Tokenizer from './Tokenizer.mjs';
-import RubiksCubeCube3D from './RubiksCubeCube3D.mjs';
-import PocketCubeCube3D from './PocketCubeCube3D.mjs';
-import RevengeCubeCube3D from './RevengeCubeCube3D.mjs';
-import ProfessorCubeCube3D from './ProfessorCubeCube3D.mjs';
+import Cube3Cube3D from './Cube3Cube3D.mjs';
+import Cube2Cube3D from './Cube2Cube3D.mjs';
+import Cube4Cube3D from './Cube4Cube3D.mjs';
+import Cube5Cube3D from './Cube5Cube3D.mjs';
 import Cube6Cube3D from './Cube6Cube3D.mjs';
 import Cube7Cube3D from './Cube7Cube3D.mjs';
 
@@ -265,16 +265,16 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
     let c3d = null;
     switch (cname.toLowerCase()) {
       case "rubikscube" :
-        c3d = RubiksCubeCube3D.createCube3D(levelOfDetail);
+        c3d = Cube3Cube3D.createCube3D(levelOfDetail);
         break;
       case "pocketcube" :
-        c3d = PocketCubeCube3D.createCube3D(levelOfDetail);
+        c3d = Cube2Cube3D.createCube3D(levelOfDetail);
         break;
       case "revengecube" :
-        c3d = RevengeCubeCube3D.createCube3D(levelOfDetail);
+        c3d = Cube4Cube3D.createCube3D(levelOfDetail);
         break;
       case "professorcube" :
-        c3d = ProfessorCubeCube3D.createCube3D(levelOfDetail);
+        c3d = Cube5Cube3D.createCube3D(levelOfDetail);
         break;
       case "cube6" :
         c3d = Cube6Cube3D.createCube3D(levelOfDetail);
@@ -285,9 +285,9 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
       default :
         logger.error('illegal cube attribute :' + cname);
         if (this.useFullModel) {
-          c3d = RubiksCubeCube3D.createCube3D(levelOfDetail);
+          c3d = Cube3Cube3D.createCube3D(levelOfDetail);
         } else {
-          c3d = RubiksCubeCube3D.createCube3D(levelOfDetail);
+          c3d = Cube3Cube3D.createCube3D(levelOfDetail);
         }
     }
     if (c3d != null) {

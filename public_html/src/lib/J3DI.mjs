@@ -84,35 +84,30 @@ let requestAnimFrame = (function () {
   return function (/* function FrameRequestCallback */ callback, /* DOMElement Element */ element) {
     window.setTimeout(callback, 1000 / 60);
   };
-  /*
-   return window.requestAnimationFrame ||
-   window.webkitRequestAnimationFrame ||
-   window.mozRequestAnimationFrame ||
-   window.oRequestAnimationFrame ||
-   window.msRequestAnimationFrame ||
-   function(/* function FrameRequestCallback * / callback, /* DOMElement Element * / element) {
-   window.setTimeout(callback, 1000/60);
-   };*/
 })();
 
 class J3DIObj {
   constructor() {
-    this.loaded = false;
     this.gl = null;
-    this.url = null;
-    this.normalArray = null;
-    this.textureArray = null;
-    this.vertexArray = null;
-    this.numIndices = null;
-    this.indexArray = null;
     this.groups = null;
-    this.normalBuffer = null;
-    this.textureBuffer = null;
-    this.vertexBuffer = null;
+    this.indexArray = null;
     this.indexBuffer = null;
+    this.loaded = false;
+    this.numIndices = null;
+    this.normalArray = null;
+    this.normalBuffer = null;
+    this.objects = null;
+    this.polyIndexArray = null;
+    this.polyObjects = null;
+    this.selectedObject = null;
+    this.textureArray = null;
+    this.textureBuffer = null;
     this.textureOffsetX = 0;
     this.textureOffsetY = 0;
     this.textureScale = 1;
+    this.url = null;
+    this.vertexArray = null;
+    this.vertexBuffer = null;
     this.visible = true;
   }
 
@@ -120,17 +115,27 @@ class J3DIObj {
    * Returns this.
    */
   setTo(that) {
-    this.url = that.url;
-    this.loaded = that.loaded;
-    this.normalArray = that.normalArray;
-    this.textureArray = that.textureArray;
-    this.vertexArray = that.vertexArray;
-    this.numIndices = that.numIndices;
+    this.gl = that.gl;
+    this.groups = that.groups;
     this.indexArray = that.indexArray;
-    this.polyIndexArray = that.polyIndexArray;
+    this.indexBuffer = that.indexBuffer;
+    this.loaded = that.loaded;
+    this.numIndices = that.numIndices;
+    this.normalArray = that.normalArray;
+    this.normalBuffer = that.normalBuffer;
     this.objects = that.objects;
+    this.polyIndexArray = that.polyIndexArray;
     this.polyObjects = that.polyObjects;
     this.selectedObject = that.selectedObject;
+    this.textureArray = that.textureArray;
+    this.textureBuffer = that.textureBuffer;
+    this.textureOffsetX = that.textureOffsetX;
+    this.textureOffsetY = that.textureOffsetY;
+    this.textureScale = that.textureScale;
+    this.url = that.url;
+    this.vertexArray = that.vertexArray;
+    this.vertexBuffer = that.vertexBuffer;
+    this.visible = that.visible;
   }
   clone() {
     let that = new J3DIObj();

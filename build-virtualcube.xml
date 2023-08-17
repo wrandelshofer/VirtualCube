@@ -37,124 +37,6 @@
         <property name="@{name}" value="@{from}"/>
       </sequential>
     </macrodef>
-    <macrodef name="generatepreloader2x2">
-      <attribute name="file"/>
-      <attribute name="model"/>
-      <sequential>
-        <local name="corner.url"/>
-        <local name="corner_r.url"/>
-        <local name="corner_u.url"/>
-        <local name="corner_f.url"/>
-        <local name="center.url"/>
-        <local name="corner.obj"/>
-        <local name="corner_r.obj"/>
-        <local name="corner_u.obj"/>
-        <local name="corner_f.obj"/>
-        <local name="center.obj"/>
-        <local name="file.text"/>
-        <local name="file.replaced"/>
-        <property name="corner.url" value="@{model}/corner.obj"/>
-        <property name="corner_r.url" value="@{model}/corner_r.obj"/>
-        <property name="corner_u.url" value="@{model}/corner_u.obj"/>
-        <property name="corner_f.url" value="@{model}/corner_f.obj"/>
-        <property name="center.url" value="@{model}/center.obj"/>
-        <replace file="${build.generate}/${corner.url}" token="${line.separator}" value="\n"/>
-        <replace file="${build.generate}/${corner_r.url}" token="${line.separator}" value="\n"/>
-        <replace file="${build.generate}/${corner_u.url}" token="${line.separator}" value="\n"/>
-        <replace file="${build.generate}/${corner_f.url}" token="${line.separator}" value="\n"/>
-        <replace file="${build.generate}/${center.url}" token="${line.separator}" value="\n"/>
-        <loadfile property="corner.obj" encoding="UTF-8" srcFile="${build.generate}/${corner.url}"/>
-        <loadfile property="corner_r.obj" encoding="UTF-8" srcFile="${build.generate}/${corner_r.url}"/>
-        <loadfile property="corner_u.obj" encoding="UTF-8" srcFile="${build.generate}/${corner_u.url}"/>
-        <loadfile property="corner_f.obj" encoding="UTF-8" srcFile="${build.generate}/${corner_f.url}"/>
-        <loadfile property="center.obj" encoding="UTF-8" srcFile="${build.generate}/${center.url}"/>
-        <loadfile property="file.text" encoding="UTF-8" srcFile="${build.generate}/@{file}"/>
-        <propertyeval name="file.replaced" from="${file.text}"/>
-        <echo file="${build.generate}/@{file}" message="${file.replaced}"/>
-      </sequential>
-    </macrodef>
-    <macrodef name="generatepreloader3x3">
-      <attribute name="file"/>
-      <attribute name="model"/>
-      <sequential>
-        <local name="corner.url"/>
-        <local name="corner_r.url"/>
-        <local name="corner_u.url"/>
-        <local name="corner_f.url"/>
-        <local name="edge.url"/>
-        <local name="edge_r.url"/>
-        <local name="edge_u.url"/>
-        <local name="side.url"/>
-        <local name="side_r.url"/>
-        <local name="center.url"/>
-        <local name="corner.obj"/>
-        <local name="corner_r.obj"/>
-        <local name="corner_u.obj"/>
-        <local name="corner_f.obj"/>
-        <local name="edge.obj"/>
-        <local name="edge_r.obj"/>
-        <local name="edge_u.obj"/>
-        <local name="side.obj"/>
-        <local name="side_r.obj"/>
-        <local name="center.obj"/>
-        <local name="file.text"/>
-        <local name="file.replaced"/>
-        <property name="corner.url" value="@{model}/corner.obj"/>
-        <property name="corner_r.url" value="@{model}/corner_r.obj"/>
-        <property name="corner_u.url" value="@{model}/corner_u.obj"/>
-        <property name="corner_f.url" value="@{model}/corner_f.obj"/>
-        <property name="edge.url" value="@{model}/edge.obj"/>
-        <property name="edge_r.url" value="@{model}/edge_r.obj"/>
-        <property name="edge_u.url" value="@{model}/edge_u.obj"/>
-        <property name="side.url" value="@{model}/side.obj"/>
-        <property name="side_r.url" value="@{model}/side_r.obj"/>
-        <property name="center.url" value="@{model}/center.obj"/>
-        <replace file="${build.generate}/${corner.url}" token="${line.separator}" value="\n"/>
-        <replace file="${build.generate}/${corner_r.url}" token="${line.separator}" value="\n"/>
-        <replace file="${build.generate}/${corner_u.url}" token="${line.separator}" value="\n"/>
-        <replace file="${build.generate}/${corner_f.url}" token="${line.separator}" value="\n"/>
-        <replace file="${build.generate}/${edge.url}" token="${line.separator}" value="\n"/>
-        <replace file="${build.generate}/${edge_r.url}" token="${line.separator}" value="\n"/>
-        <replace file="${build.generate}/${edge_u.url}" token="${line.separator}" value="\n"/>
-        <replace file="${build.generate}/${side.url}" token="${line.separator}" value="\n"/>
-        <replace file="${build.generate}/${side_r.url}" token="${line.separator}" value="\n"/>
-        <replace file="${build.generate}/${center.url}" token="${line.separator}" value="\n"/>
-        <loadfile property="corner.obj" encoding="UTF-8" srcFile="${build.generate}/${corner.url}"/>
-        <loadfile property="corner_r.obj" encoding="UTF-8" srcFile="${build.generate}/${corner_r.url}"/>
-        <loadfile property="corner_u.obj" encoding="UTF-8" srcFile="${build.generate}/${corner_u.url}"/>
-        <loadfile property="corner_f.obj" encoding="UTF-8" srcFile="${build.generate}/${corner_f.url}"/>
-        <loadfile property="edge.obj" encoding="UTF-8" srcFile="${build.generate}/${edge.url}"/>
-        <loadfile property="edge_r.obj" encoding="UTF-8" srcFile="${build.generate}/${edge_r.url}"/>
-        <loadfile property="edge_u.obj" encoding="UTF-8" srcFile="${build.generate}/${edge_u.url}"/>
-        <loadfile property="side.obj" encoding="UTF-8" srcFile="${build.generate}/${side.url}"/>
-        <loadfile property="side_r.obj" encoding="UTF-8" srcFile="${build.generate}/${side_r.url}"/>
-        <loadfile property="center.obj" encoding="UTF-8" srcFile="${build.generate}/${center.url}"/>
-        <loadfile property="file.text" encoding="UTF-8" srcFile="${build.generate}/@{file}"/>
-        <propertyeval name="file.replaced" from="${file.text}"/>
-        <echo file="${build.generate}/@{file}" message="${file.replaced}"/>
-      </sequential>
-    </macrodef>
-    <macrodef name="generatepreloaderShaders">
-      <attribute name="file"/>
-      <attribute name="shaders"/>
-      <sequential>
-        <property name="texture.frag.url" value="@{shaders}/texture.frag"/>
-        <property name="phong.frag.url" value="@{shaders}/phong.frag"/>
-        <property name="texture.vert.url" value="@{shaders}/texture.vert"/>
-        <property name="phong.vert.url" value="@{shaders}/phong.vert"/>
-        <replace file="${build.generate}/${texture.frag.url}" token="${line.separator}" value="\n"/>
-        <replace file="${build.generate}/${phong.frag.url}" token="${line.separator}" value="\n"/>
-        <replace file="${build.generate}/${texture.vert.url}" token="${line.separator}" value="\n"/>
-        <replace file="${build.generate}/${phong.vert.url}" token="${line.separator}" value="\n"/>
-        <loadfile property="texture.frag.obj" encoding="UTF-8" srcFile="${build.generate}/${texture.frag.url}"/>
-        <loadfile property="phong.frag.obj" encoding="UTF-8" srcFile="${build.generate}/${phong.frag.url}"/>
-        <loadfile property="texture.vert.obj" encoding="UTF-8" srcFile="${build.generate}/${texture.vert.url}"/>
-        <loadfile property="phong.vert.obj" encoding="UTF-8" srcFile="${build.generate}/${phong.vert.url}"/>
-        <loadfile property="file.text" encoding="UTF-8" srcFile="${build.generate}/@{file}"/>
-        <propertyeval name="file.replaced" from="${file.text}"/>
-        <echo file="${build.generate}/@{file}" message="${file.replaced}"/>
-      </sequential>
-    </macrodef>
 
     <target name="build.generate" depends="init,clean">
       <!-- Incorporates models and shaders into PreloadXxxx.js scripts.
@@ -164,45 +46,28 @@
         <copy todir="${build.generate}">
             <fileset dir="${src}">
                 <exclude name="**/_notes/**"/>
-                <exclude name="lib/buildconfig*"/>
-                <exclude name="lib/TwoDSolverCanvas.js"/>
-                <exclude name="lib/SolverCanvas.js"/>
-                <exclude name="lib/WebglSolverCanvas.js"/>
-                <exclude name="lib/cubesolver.js"/>
                 <exclude name="**/.*"/>
             </fileset>
         </copy>
         <mkdir dir="${build.generate}/lib"/>
-        <copy todir="${build.generate}/lib">
-            <fileset dir="${lib}">
-                <include name="almond.js*"/>
-            </fileset>
-        </copy>
-        <generatepreloader2x2 file="lib/PreloadPocketCubeS1.js" model="lib/models/pocketcubes1"/>
-        <generatepreloader2x2 file="lib/PreloadPocketCubeS4.js" model="lib/models/pocketcubes4"/>
-        <generatepreloader3x3 file="lib/PreloadRubiksCubeS1.js" model="lib/models/rubikscubes1"/>
-        <generatepreloader3x3 file="lib/PreloadRubiksCubeS4.js" model="lib/models/rubikscubes4"/>
-        <generatepreloaderShaders file="lib/PreloadWebglShaders.js" shaders="lib/shaders"/>
-        <delete dir="${build.generate}/lib/models"/>
         <delete dir="${build.generate}/lib/shaders"/>
     </target>
     <target name="build.stripcomments" depends="init,build.generate">
       <!-- strip slash/star comment if the comment starts at the beginning of a line.
-      * Can not strip comments larger than 4000 characters due to limited stack size in Java.
-      * Will horribly fail with multiline strings!
+      * Can not strip comments larger than 3400 characters due to limited stack size in Java.
+      * Specify the following argument to ANT to increase the stack size:  -J-Xss8m
       -->
       <replaceregexp 
-               match="^\s*/\*(?:.|[\r\n]){0,2000}?\*/\n?"
+               match="^\s*/\*(?:.|[\r\n]){0,16000}?\*/\n?"
                replace=""
                flags="gm"
                encoding="UTF-8"
       >
             <fileset dir="${build.generate}/lib">
-                <include name="*.js"/>
+                <include name="*.mjs"/>
             </fileset>
       </replaceregexp>
       <!-- strip slash/slash comment if the comment starts at the beginning of a line 
-      * Will horribly fail with multiline strings!
       -->
       <replaceregexp 
                match="^\s*//.*$|//[^'&quot;\n]*$"
@@ -211,11 +76,10 @@
                encoding="UTF-8"
       >
             <fileset dir="${build.generate}/lib">
-                <include name="*.js"/>
+                <include name="*.mjs"/>
             </fileset>
       </replaceregexp>
       <!-- strip empty lines 
-      * Will horribly fail with multiline strings!
       -->
       <replaceregexp 
                match="^\s*\n"
@@ -224,7 +88,7 @@
                encoding="UTF-8"
       >
             <fileset dir="${build.generate}/lib">
-                <include name="*.js"/>
+                <include name="*.mjs"/>
             </fileset>
       </replaceregexp>
     </target>

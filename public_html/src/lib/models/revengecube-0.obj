@@ -80,7 +80,7 @@ vt 0.9 0.9 0.1
 vt 0.9 0.1 0.1
 # 4 texture coordinates
 
-o side_r
+o sideR0
 usemtl default
 f 14/7/22 16/6/22 15/5/22 13/4/22
 
@@ -94,7 +94,7 @@ v 20 19.5 0.5
 
 # 0 texture coordinate
 
-o edge_r
+o edgeR0
 usemtl default
 f 18/7/22 20/6/22 19/5/22 17/4/22
 
@@ -109,7 +109,7 @@ vn 0 0 1
 
 # 0 texture coordinate
 
-o corner_f
+o cornerF0
 usemtl default
 f 22/7/23 24/6/23 23/5/23 21/4/23
 
@@ -126,7 +126,7 @@ vt 0.1 0.1 0.1
 vt 0.9 0.1 0.1
 # 2 texture coordinates
 
-o edge_u
+o edgeU0
 usemtl default
 f 26/9/24 27/2/24 28/1/24 25/8/24
 
@@ -140,7 +140,7 @@ v 10.5 20 10.5
 
 # 0 texture coordinate
 
-o corner_u
+o cornerU0
 usemtl default
 f 30/9/24 31/2/24 32/1/24 29/8/24
 
@@ -154,7 +154,7 @@ v 20 19.5 10.5
 
 # 0 texture coordinate
 
-o corner_r
+o cornerR0
 usemtl default
 f 34/7/22 36/6/22 35/5/22 33/4/22
 
@@ -217,7 +217,7 @@ vt 0.9 0.9 0.1
 vt 0.9 0.9 0.1
 # 6 texture coordinates
 
-o side
+o side0
 usemtl default
 f 38/10/28 42/7/27 41/4/26 37/8/25
 f 42/7/23 48/6/23 47/5/23 41/4/23
@@ -287,7 +287,7 @@ vn -0.73883432149887 0.47651037573814 0.47650992870331
 
 # 0 texture coordinate
 
-o edge
+o edge0
 usemtl default
 f 54/10/55 58/7/54 57/4/53 53/8/52
 f 58/7/23 64/6/23 63/5/23 57/4/23
@@ -352,7 +352,7 @@ vn -0.73883414268494 -0.47651028633118 0.47651028633118
 
 # 0 texture coordinate
 
-o corner
+o corner0
 usemtl default
 f 70/10/79 22/7/78 21/4/77 69/8/76
 f 23/14/82 29/15/81 76/6/80

@@ -1,4 +1,4 @@
-/* @(#)PocketCubeCube3D.mjs
+/* @(#)Cube2Cube3D.mjs
  * Copyright (c) 2018 Werner Randelshofer, Switzerland. MIT License.
  */
 
@@ -13,14 +13,11 @@ import Node3D from './Node3D.mjs';
 
 /** Constructor
  * Creates the 3D geometry of a Rubik's Cube.
- *  Subclasses must call initAbstractPocketCubeCube3D().
+ *  Subclasses must call initAbstractCube2Cube3D().
  */
-class AbstractPocketCubeCube3D extends Cube3D.Cube3D {
+class AbstractCube2Cube3D extends Cube3D.Cube3D {
   constructor(partSize) {
     super(2, partSize);
-
-
-
 
     /*
      * Corners
@@ -85,20 +82,20 @@ class AbstractPocketCubeCube3D extends Cube3D.Cube3D {
     }
   }
 
-  initAbstractPocketCubeCube3D_corner_r() {
+  initAbstractCube2Cube3D_corner_r() {
     this.initCornerR();
-    this.initAbstractPocketCubeCube3D_textureScales();
+    this.initAbstractCube2Cube3D_textureScales();
   }
-  initAbstractPocketCubeCube3D_corner_f() {
+  initAbstractCube2Cube3D_corner_f() {
     this.initCornerF();
-    this.initAbstractPocketCubeCube3D_textureScales();
+    this.initAbstractCube2Cube3D_textureScales();
   }
-  initAbstractPocketCubeCube3D_corner_u() {
+  initAbstractCube2Cube3D_corner_u() {
     this.initCornerU();
-    this.initAbstractPocketCubeCube3D_textureScales();
+    this.initAbstractCube2Cube3D_textureScales();
   }
 
-  initAbstractPocketCubeCube3D_textureScales() {
+  initAbstractCube2Cube3D_textureScales() {
     this.initTextureScaleFactor(84/512);
   }
 
@@ -108,104 +105,12 @@ class AbstractPocketCubeCube3D extends Cube3D.Cube3D {
   getStickerIndexForPartIndex(partIndex, orientationIndex) {
     return this.partToStickerMap[partIndex][orientationIndex];
   }
-/*
-  validateTwist(partIndices, locations, orientations, length, axis, angle, alpha) {
-    let rotation = this.updateTwistRotation;
-    rotation.makeIdentity();
-    let rad = (90 * angle * (1 - alpha));
-    switch (axis) {
-      case 0:
-        rotation.rotate(rad, -1, 0, 0);
-        break;
-      case 1:
-        rotation.rotate(rad, 0, -1, 0);
-        break;
-      case 2:
-        rotation.rotate(rad, 0, 0, 1);
-        break;
-    }
 
-    let orientationMatrix = this.updateTwistOrientation;
-    for (let i = 0; i < length; i++) {
-      orientationMatrix.makeIdentity();
-      if (partIndices[i] < this.edgeOffset) { //=> part is a corner
-        // Base location of a corner part is urf. (= corner part 0)
-        switch (orientations[i]) {
-          case 0:
-            break;
-          case 1:
-            orientationMatrix.rotate(90, 0, 0, 1);
-            orientationMatrix.rotate(90, -1, 0, 0);
-            break;
-          case 2:
-            orientationMatrix.rotate(90, 0, 0, -1);
-            orientationMatrix.rotate(90, 0, 1, 0);
-            break;
-        }
-      }
-      this.partOrientations[partIndices[i]].matrix.load(orientationMatrix);
-      let transform = this.partLocations[partIndices[i]].matrix;
-      transform.load(rotation);
-      transform.multiply(this.identityPartLocations[locations[i]]);
-    }
+  initEdgeR() {
   }
 
-  cubeTwisted(evt) {
-    if (this.repainter == null) {
-      this.updateCube();
-      return;
-    }
-
-    let layerMask = evt.layerMask;
-    let axis = evt.axis;
-    let angle = evt.angle;
-    let model = this.cube;
-
-    let partIndices = new Array(this.partCount);
-    let locations = new Array(this.partCount);
-    let orientations = new Array(this.partCount);
-    let count = 0;
-
-    let affectedParts = evt.getAffectedLocations();
-    count = affectedParts.length;
-    locations = affectedParts.slice(0, count);
-    for (let i = 0; i < count; i++) {
-      partIndices[i] = model.getPartAt(locations[i]);
-      orientations[i] = model.getPartOrientation(partIndices[i]);
-    }
-
-    let finalCount = count;
-    let self = this;
-    let interpolator = new SplineInterpolator.SplineInterpolator(0, 0, 1, 1);
-    let start = new Date().getTime();
-    let duration = this.attributes.getTwistDuration() * Math.abs(angle);
-    let token=new Object();
-    this.isTwisting = token;
-    let f = function () {
-      if (!self.isTwisting===token) {
-        // Twisting was aborted. Complete this twisting animation.
-        self.validateTwist(partIndices, locations, orientations, finalCount, axis, angle, 1.0);
-        return;
-      }
-      let now = new Date().getTime();
-      let elapsed = now - start;
-      let value = elapsed / duration;
-      if (value < 1) {
-        self.validateTwist(partIndices, locations, orientations, finalCount, axis, angle, interpolator.getFraction(value));
-        self.repainter.repaint(f);
-      } else {
-        self.validateTwist(partIndices, locations, orientations, finalCount, axis, angle, 1.0);
-        self.isTwisting = null;
-      }
-    };
-    this.repainter.repaint(f);
+  initEdgeU() {
   }
-
-  /* Immediately completes the current twisting animation. * /
-   finishTwisting() {
-     this.isTwisting=null;
-   }*/
-
 }
 
 
@@ -263,7 +168,7 @@ class AbstractPocketCubeCube3D extends Cube3D.Cube3D {
  *     +---+---+
  * </pre>
  */
-AbstractPocketCubeCube3D.prototype.stickerToPartMap = [
+AbstractCube2Cube3D.prototype.stickerToPartMap = [
   0, 2, 1, 3, // right
   4, 2, 6, 0, // up
   6, 0, 7, 1, // front
@@ -277,7 +182,7 @@ AbstractPocketCubeCube3D.prototype.stickerToPartMap = [
  * the part.
  * This map is filled in by the init method!!
  */
-AbstractPocketCubeCube3D.prototype.partToStickerMap = null;
+AbstractCube2Cube3D.prototype.partToStickerMap = null;
 
 /**
  * Gets the face of the part which holds the indicated sticker.
@@ -314,7 +219,7 @@ AbstractPocketCubeCube3D.prototype.partToStickerMap = null;
  *     +---+---+
  * </pre>
  */
-AbstractPocketCubeCube3D.prototype.stickerToFaceMap = [
+AbstractCube2Cube3D.prototype.stickerToFaceMap = [
   1, 2, 2, 1, // right
   0, 0, 0, 0, // up
   1, 2, 2, 1, // front
@@ -323,7 +228,7 @@ AbstractPocketCubeCube3D.prototype.stickerToFaceMap = [
   1, 2, 2, 1 // back
 ];
 
-AbstractPocketCubeCube3D.prototype.boxClickToLocationMap = [
+AbstractCube2Cube3D.prototype.boxClickToLocationMap = [
   [[7, 6], [5, 4]], // left
   [[7, 5], [1, 3]], // down
   [[7, 6], [1, 0]], // front
@@ -332,7 +237,7 @@ AbstractPocketCubeCube3D.prototype.boxClickToLocationMap = [
   [[5, 4], [3, 2]], // back
 ];
 
-AbstractPocketCubeCube3D.prototype.boxClickToAxisMap = [
+AbstractCube2Cube3D.prototype.boxClickToAxisMap = [
   [[0, 0], [0, 0]], // left
   [[1, 1], [1, 1]], // down
   [[2, 2], [2, 2]], // front
@@ -340,7 +245,7 @@ AbstractPocketCubeCube3D.prototype.boxClickToAxisMap = [
   [[1, 1], [1, 1]], // up
   [[2, 2], [2, 2]], // back
 ];
-AbstractPocketCubeCube3D.prototype.boxClickToAngleMap = [
+AbstractCube2Cube3D.prototype.boxClickToAngleMap = [
   [[-1, -1], [-1, -1]],
   [[-1, -1], [-1, -1]],
   [[1, 1], [1, 1]],
@@ -348,7 +253,7 @@ AbstractPocketCubeCube3D.prototype.boxClickToAngleMap = [
   [[1, 1], [1, 1]],
   [[-1, -1], [-1, -1]],
 ];
-AbstractPocketCubeCube3D.prototype.boxClickToLayerMap = [
+AbstractCube2Cube3D.prototype.boxClickToLayerMap = [
   [[1, 1], [1, 1]],
   [[1, 1], [1, 1]],
   [[2, 2], [2, 2]],
@@ -356,7 +261,7 @@ AbstractPocketCubeCube3D.prototype.boxClickToLayerMap = [
   [[2, 2], [2, 2]],
   [[1, 1], [1, 1]],
 ];
-AbstractPocketCubeCube3D.prototype.boxSwipeToAxisMap = [
+AbstractCube2Cube3D.prototype.boxSwipeToAxisMap = [
   [1, 2, 1, 2], // left
   [2, 0, 2, 0], // down
   [1, 0, 1, 0], // front
@@ -364,7 +269,7 @@ AbstractPocketCubeCube3D.prototype.boxSwipeToAxisMap = [
   [2, 0, 2, 0], // up
   [1, 0, 1, 0], // back
 ];
-AbstractPocketCubeCube3D.prototype.boxSwipeToAngleMap = [
+AbstractCube2Cube3D.prototype.boxSwipeToAngleMap = [
   [-1, -1, 1, 1], // left
   [1, 1, -1, -1], // down
   [1, -1, -1, 1], // front
@@ -372,7 +277,7 @@ AbstractPocketCubeCube3D.prototype.boxSwipeToAngleMap = [
   [-1, -1, 1, 1], // up
   [-1, 1, 1, -1], // back
 ];
-AbstractPocketCubeCube3D.prototype.boxSwipeToLayerMap = [
+AbstractCube2Cube3D.prototype.boxSwipeToLayerMap = [
   [[[1, 2, 1, 2], [2, 2, 2, 2]], [[1, 1, 1, 1], [2, 1, 2, 1]]], // left
   [[[2, 1, 2, 1], [1, 1, 1, 1]], [[2, 2, 2, 2], [1, 2, 1, 2]]], // down
   [[[1, 1, 1, 1], [2, 1, 2, 1]], [[1, 2, 1, 2], [2, 2, 2, 2]]], // front
@@ -397,12 +302,12 @@ AbstractPocketCubeCube3D.prototype.boxSwipeToLayerMap = [
  *    +---+---+
  * </pre>
  */
-AbstractPocketCubeCube3D.prototype.stickerOffsets = Cube3D.computeStickerOffsets(2);
+AbstractCube2Cube3D.prototype.stickerOffsets = Cube3D.computeStickerOffsets(2);
 
 /** Constructor
  * Creates the 3D geometry of a "Pocket Cube".
  */
-class PocketCubeCube3D extends AbstractPocketCubeCube3D {
+class Cube2Cube3D extends AbstractCube2Cube3D {
   constructor(partSize) {
     super(partSize);
   }
@@ -424,7 +329,7 @@ function createCube3D(levelOfDetail) {
   case 0: partSize=20;relativeUrl = 'models/pocketcube-0.obj'; break;
   default: partSize=20;relativeUrl = 'models/pocketcube-1.obj'; break;
   }
-  const c = new PocketCubeCube3D(partSize);
+  const c = new Cube2Cube3D(partSize);
   c.baseUrl = 'lib/';
   c.relativeUrl = relativeUrl;
   return c;
@@ -434,6 +339,6 @@ function createCube3D(levelOfDetail) {
 // MODULE API
 // ------------------
 export default {
-  AbstractPocketCubeCube3D: AbstractPocketCubeCube3D,
+  AbstractCube2Cube3D: AbstractCube2Cube3D,
   createCube3D : createCube3D,
 };

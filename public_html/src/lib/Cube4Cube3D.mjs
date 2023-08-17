@@ -1,4 +1,4 @@
-/* @(#)RevengeCubeCube3D.mjs
+/* @(#)Cube4Cube3D.mjs
  * Copyright (c) 2018 Werner Randelshofer, Switzerland. MIT License.
  */
 
@@ -24,9 +24,9 @@ let module = {
 
 /** Constructor
  * Creates the 3D geometry of a Rubik's Cube.
- *  Subclasses must call initAbstractRevengeCubeCube3D().
+ *  Subclasses must call initAbstractCube4Cube3D().
  */
-class AbstractRevengeCubeCube3D extends Cube3D.Cube3D {
+class AbstractCube4Cube3D extends Cube3D.Cube3D {
   constructor(partSize) {
     super(4);
 
@@ -259,6 +259,14 @@ class AbstractRevengeCubeCube3D extends Cube3D.Cube3D {
   getStickerIndexForPartIndex(partIndex, orientation) {
       return this.partToStickerMap[partIndex][orientation];
   }
+
+  initEdgeR() {
+    this.initSliceEdgeR(this.edgeR0Obj, this.edgeOffset)
+  }
+
+  initEdgeU() {
+    this.initSliceEdgeU(this.edgeU0Obj, this.edgeOffset)
+  }
 }
 
 /**
@@ -293,7 +301,7 @@ class AbstractRevengeCubeCube3D extends Cube3D.Cube3D {
  *                 +---+---+---+---+
  * </pre>
  */
-AbstractRevengeCubeCube3D.prototype.stickerToPartMap = [
+AbstractCube4Cube3D.prototype.stickerToPartMap = [
   0, 20, 8, 2,/**/ 21, 44, 50, 24,/**/ 9, 38, 32, 12,/**/ 1, 22, 10, 3, // right
   4, 11, 23, 2,/**/ 14, 33, 39, 8,/**/ 26, 51, 45, 20,/**/ 6, 17, 29, 0, // up
   6, 17, 29, 0,/**/ 30, 40, 46, 21,/**/ 18, 34, 52, 9,/**/ 7, 19, 31, 1, // front
@@ -307,13 +315,13 @@ AbstractRevengeCubeCube3D.prototype.stickerToPartMap = [
  * the part.
  * This map is filled in by the init method!!
  */
-AbstractRevengeCubeCube3D.prototype.partToStickerMap = null;
+AbstractCube4Cube3D.prototype.partToStickerMap = null;
 
 /**
  * Gets the face of the part which holds the indicated sticker.
  * The sticker index is interpreted according to this scheme:
  */
-AbstractRevengeCubeCube3D.prototype.stickerToFaceMap = [
+AbstractCube4Cube3D.prototype.stickerToFaceMap = [
   1, 1, 1, 2,/**/  0, 0, 0, 0,/**/  0, 0, 0, 0,/**/  2, 1, 1, 1, // right
   0, 1, 1, 0,/**/  0, 0, 0, 0,/**/  0, 0, 0, 0,/**/  0, 1, 1, 0, // up
   1, 0, 0, 2,/**/  1, 0, 0, 1,/**/  1, 0, 0, 1,/**/  2, 0, 0, 1, // front
@@ -322,7 +330,7 @@ AbstractRevengeCubeCube3D.prototype.stickerToFaceMap = [
   1, 0, 0, 2,/**/  1, 0, 0, 1,/**/  1, 0, 0, 1,/**/  2, 0, 0, 1, // back
 ];
 
-AbstractRevengeCubeCube3D.prototype.boxClickToLocationMap = [
+AbstractCube4Cube3D.prototype.boxClickToLocationMap = [
   [[7, 10+8, 22+8, 6], [20+8,  9+32,  3+32, 18+8], [ 8+8, 15+32, 21+32,  6+8], [5,  7+8, 19+8, 4]], // left →↑
   [[7, 20+8,  8+8, 5], [11+8, 22+32, 16+32,  5+8], [23+8,  4+32, 10+32, 17+8], [1, 14+8,  2+8, 3]], // down
   [[7, 10+8, 22+8, 6], [11+8,  2+32,  8+32,  9+8], [23+8, 20+32, 14+32, 21+8], [1,  1+8, 13+8, 0]], // front ←
@@ -330,7 +338,7 @@ AbstractRevengeCubeCube3D.prototype.boxClickToLocationMap = [
   [[6,  18+8, 6+8, 4], [ 9+8, 19+32,  1+32,  3+8], [21+8, 13+32,  7+32, 15+8], [0, 12+8,  0+8, 2]], // up
   [[5,  7+8, 19+8, 4], [ 5+8, 17+32, 11+32,  3+8], [17+8, 23+32,  5+32, 15+8], [3,  4+8, 16+8, 2]], // back
 ];
-AbstractRevengeCubeCube3D.prototype.boxClickToAxisMap = [
+AbstractCube4Cube3D.prototype.boxClickToAxisMap = [
   [[0, 1, 1, 0], [2, 0, 0, 2],[2, 0, 0, 2], [0, 1, 1, 0]], // left
   [[1, 2, 2, 1], [0, 1, 1, 0],[0, 1, 1, 0], [1, 2, 2, 1]], // down
   [[2, 1, 1, 2], [0, 2, 2, 0],[0, 2, 2, 0], [2, 1, 1, 2]], // front
@@ -338,7 +346,7 @@ AbstractRevengeCubeCube3D.prototype.boxClickToAxisMap = [
   [[1, 2, 2, 1], [0, 1, 1, 0],[0, 1, 1, 0], [1, 2, 2, 1]], // up
   [[2, 1, 1, 2], [0, 2, 2, 0],[0, 2, 2, 0], [2, 1, 1, 2]], // back
 ];
-AbstractRevengeCubeCube3D.prototype.boxClickToAngleMap = [
+AbstractCube4Cube3D.prototype.boxClickToAngleMap = [
   [[-1,-1,-1,-1], [-1,-1,-1, 1], [-1,-1,-1, 1], [-1, 1, 1,-1]],// left
   [[-1, 1, 1,-1], [ 1,-1,-1,-1], [ 1,-1,-1,-1], [-1,-1,-1,-1]],// down
   [[ 1, 1, 1, 1], [-1, 1, 1, 1], [-1, 1, 1, 1], [ 1,-1,-1, 1]],// front
@@ -346,7 +354,7 @@ AbstractRevengeCubeCube3D.prototype.boxClickToAngleMap = [
   [[ 1,-1,-1, 1], [-1, 1, 1, 1], [-1, 1, 1, 1], [ 1, 1, 1, 1]],// up
   [[-1,-1,-1,-1], [ 1,-1,-1,-1], [ 1,-1,-1,-1], [-1, 1, 1,-1]],// back
 ];
-AbstractRevengeCubeCube3D.prototype.boxClickToLayerMap = [
+AbstractCube4Cube3D.prototype.boxClickToLayerMap = [
   [[1, 2, 4, 1], [4, 1, 1, 4], [2, 1, 1, 2], [1, 2, 4, 1]],// left
   [[1, 4, 2, 1], [2, 1, 1, 2], [4, 1, 1, 4], [1, 4, 2, 1]],// down
   [[8, 2, 4, 8], [2, 8, 8, 2], [4, 8, 8, 4], [8, 2, 4, 8]],// front
@@ -354,7 +362,7 @@ AbstractRevengeCubeCube3D.prototype.boxClickToLayerMap = [
   [[8, 4, 2, 8], [2, 8, 8, 2], [4, 8, 8, 4], [8, 4, 2, 8]],// up
   [[1, 2, 4, 1], [2, 1, 1, 2], [4, 1, 1, 4], [1, 2, 4, 1]],// back
 ];
-AbstractRevengeCubeCube3D.prototype.boxSwipeToAxisMap = [
+AbstractCube4Cube3D.prototype.boxSwipeToAxisMap = [
   [1, 2, 1, 2], // left
   [2, 0, 2, 0], // down
   [1, 0, 1, 0], // front
@@ -362,7 +370,7 @@ AbstractRevengeCubeCube3D.prototype.boxSwipeToAxisMap = [
   [2, 0, 2, 0], // up
   [1, 0, 1, 0], // back
 ];
-AbstractRevengeCubeCube3D.prototype.boxSwipeToAngleMap = [
+AbstractCube4Cube3D.prototype.boxSwipeToAngleMap = [
   [-1, -1, 1, 1], // left
   [1, 1, -1, -1], // down
   [1, -1, -1, 1], // front
@@ -370,7 +378,7 @@ AbstractRevengeCubeCube3D.prototype.boxSwipeToAngleMap = [
   [-1, -1, 1, 1], // up
   [-1, 1, 1, -1], // back
 ];
-AbstractRevengeCubeCube3D.prototype.boxSwipeToLayerMap = [
+AbstractCube4Cube3D.prototype.boxSwipeToLayerMap = [
   [[[1, 4, 1, 4], [2, 4, 2, 4], [4, 4, 4, 4]],
    [[1, 2, 1, 2], [2, 2, 2, 2], [4, 2, 4, 2]],
    [[1, 1, 1, 1], [2, 1, 2, 1], [4, 1, 4, 1]]], // left
@@ -413,9 +421,9 @@ AbstractRevengeCubeCube3D.prototype.boxSwipeToLayerMap = [
  *          +-------+-------+
  * </pre>
  */
-AbstractRevengeCubeCube3D.prototype.stickerOffsets = Cube3D.computeStickerOffsets(4);
+AbstractCube4Cube3D.prototype.stickerOffsets = Cube3D.computeStickerOffsets(4);
 // ------------------
-class RevengeCubeCube3D extends AbstractRevengeCubeCube3D {
+class Cube4Cube3D extends AbstractCube4Cube3D {
   /** Constructor
    * Creates the 3D geometry of a "Rubik's Cube".
    * You must call loadGeometry() after constructing a new instance.
@@ -443,7 +451,7 @@ function createCube3D(levelOfDetail) {
   case 2: partSize=10; relativeUrl = 'models/revengecube-2.obj'; break;
   default: partSize=10; relativeUrl = 'models/revengecube-1.obj'; break;
   }
-  const c = new RevengeCubeCube3D(partSize);
+  const c = new Cube4Cube3D(partSize);
   c.baseUrl = 'lib/';
   c.relativeUrl = relativeUrl;
   return c;
@@ -452,6 +460,6 @@ function createCube3D(levelOfDetail) {
 // MODULE API
 // ------------------
 export default {
-  AbstractRevengeCubeCube3D: AbstractRevengeCubeCube3D,
+  AbstractCube4Cube3D: AbstractCube4Cube3D,
   createCube3D: createCube3D,
 };

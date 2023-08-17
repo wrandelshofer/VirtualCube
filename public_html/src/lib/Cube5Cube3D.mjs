@@ -1,4 +1,4 @@
-/* @(#)ProfessorCubeCube3D.mjs
+/* @(#)Cube5Cube3D.mjs
  * Copyright (c) 2018 Werner Randelshofer, Switzerland. MIT License.
  */
 
@@ -24,9 +24,9 @@ let module = {
 
 /** Constructor
  * Creates the 3D geometry of a Rubik's Cube.
- *  Subclasses must call initAbstractProfessorCubeCube3D().
+ *  Subclasses must call initAbstractCube5Cube3D().
  */
-class AbstractProfessorCubeCube3D extends Cube3D.Cube3D {
+class AbstractCube5Cube3D extends Cube3D.Cube3D {
   constructor(partSize) {
     super(5,partSize);
 
@@ -210,6 +210,16 @@ class AbstractProfessorCubeCube3D extends Cube3D.Cube3D {
   getStickerIndexForPartIndex(partIndex, orientation) {
     return this.partToStickerMap[partIndex][orientation];
   }
+
+  initEdgeR() {
+    this.initMiddleEdgeR();
+    this.initSliceEdgeR(this.edgeR12Obj, this.edgeOffset+12)
+  }
+
+  initEdgeU() {
+    this.initMiddleEdgeU();
+    this.initSliceEdgeU(this.edgeU12Obj, this.edgeOffset+12)
+  }
 }
 
 /**
@@ -252,7 +262,7 @@ class AbstractProfessorCubeCube3D extends Cube3D.Cube3D {
  *                     +---+---+---+---+---+
  * </pre>
  */
-AbstractProfessorCubeCube3D.prototype.stickerToPartMap = [
+AbstractCube5Cube3D.prototype.stickerToPartMap = [
     0, 32, 8, 20, 2,/**/ 33, 62, 92, 68, 36,/**/ 9, 86, 44, 74, 12,/**/ 21, 56, 80, 50, 24,/**/ 1, 34, 10, 22, 3, // right
     4, 23, 11, 35, 2,/**/ 26, 51, 81, 57, 20,/**/ 14, 75, 45, 87, 8,/**/ 38, 69, 93, 63, 32,/**/ 6, 29, 17, 41, 0, // up
     6, 29, 17, 41, 0,/**/ 42, 58, 88, 64, 33,/**/ 18, 82, 46, 94, 9,/**/ 30, 52, 76, 70, 21,/**/ 7, 31, 19, 43, 1, // front
@@ -261,15 +271,14 @@ AbstractProfessorCubeCube3D.prototype.stickerToPartMap = [
     2, 35, 11, 23, 4,/**/ 36, 55, 85, 61, 39,/**/ 12, 79, 49, 91, 15,/**/ 24, 73, 97, 67, 27,/**/ 3, 37, 13, 25, 5, // back
 ];
 
-
 /** Maps parts to stickers. This is a two dimensional array. The first
  * dimension is the part index, the second dimension the orientation of
  * the part.
  * This map is filled in by the init method!!
  */
-AbstractProfessorCubeCube3D.prototype.partToStickerMap = null;
+AbstractCube5Cube3D.prototype.partToStickerMap = null;
 
-AbstractProfessorCubeCube3D.prototype.stickerToFaceMap = [
+AbstractCube5Cube3D.prototype.stickerToFaceMap = [
     1, 1, 1, 1, 2,/**/ 0, 0, 0, 0, 0,/**/ 0, 0, 0, 0, 0,/**/ 0, 0, 0, 0, 0,/**/ 2, 1, 1, 1, 1, // right
     0, 1, 1, 1, 0,/**/ 0, 0, 0, 0, 0,/**/ 0, 0, 0, 0, 0,/**/ 0, 0, 0, 0, 0,/**/ 0, 1, 1, 1, 0, // up
     1, 0, 0, 0, 2,/**/ 1, 0, 0, 0, 1,/**/ 1, 0, 0, 0, 1,/**/ 1, 0, 0, 0, 1,/**/ 2, 0, 0, 0, 1, // front
@@ -278,7 +287,7 @@ AbstractProfessorCubeCube3D.prototype.stickerToFaceMap = [
     1, 0, 0, 0, 2,/**/ 1, 0, 0, 0, 1,/**/ 1, 0, 0, 0, 1,/**/ 1, 0, 0, 0, 1,/**/ 2, 0, 0, 0, 1, // back
 ];
 
-AbstractProfessorCubeCube3D.prototype.boxClickToLocationMap = [
+AbstractCube5Cube3D.prototype.boxClickToLocationMap = [
 // XXX FANTOMAS
   [[7, 10+8, 22+8, 6], [20+8,  9+44,  3+44, 18+8], [ 8+8, 15+44, 21+44,  6+8], [5,  7+8, 19+8, 4]], // left →↑
   [[7, 20+8,  8+8, 5], [11+8, 22+44, 16+44,  5+8], [23+8,  4+44, 10+44, 17+8], [1, 14+8,  2+8, 3]], // down
@@ -287,7 +296,7 @@ AbstractProfessorCubeCube3D.prototype.boxClickToLocationMap = [
   [[6,  18+8, 6+8, 4], [ 9+8, 19+44,  1+44,  3+8], [21+8, 13+44,  7+44, 15+8], [0, 12+8,  0+8, 2]], // up
   [[5,  7+8, 19+8, 4], [ 5+8, 17+44, 11+44,  3+8], [17+8, 23+44,  5+44, 15+8], [3,  4+8, 16+8, 2]], // back
 ];
-AbstractProfessorCubeCube3D.prototype.boxClickToAxisMap = [
+AbstractCube5Cube3D.prototype.boxClickToAxisMap = [
   [[0, 1, 1, 1, 0], [2, 0, 0, 0, 2],[2, 0, 0, 0, 2], [2, 0, 0, 0, 2], [0, 1, 1, 1, 0]], // left
   [[1, 2, 2, 2, 1], [0, 1, 1, 1, 0],[0, 1, 1, 1, 0], [0, 1, 1, 1, 0], [1, 2, 2, 2, 1]], // down
   [[2, 1, 1, 1, 2], [0, 2, 2, 2, 0],[0, 2, 2, 2, 0], [0, 2, 2, 2, 0], [2, 1, 1, 1, 2]], // front
@@ -295,7 +304,7 @@ AbstractProfessorCubeCube3D.prototype.boxClickToAxisMap = [
   [[1, 2, 2, 2, 1], [0, 1, 1, 1, 0],[0, 1, 1, 1, 0], [0, 1, 1, 1, 0], [1, 2, 2, 2, 1]], // up
   [[2, 1, 1, 1, 2], [0, 2, 2, 2, 0],[0, 2, 2, 2, 0], [0, 2, 2, 2, 0], [2, 1, 1, 1, 2]], // back
 ];
-AbstractProfessorCubeCube3D.prototype.boxClickToAngleMap = [
+AbstractCube5Cube3D.prototype.boxClickToAngleMap = [
   [[-1,-1,-1,-1,-1], [-1,-1,-1,-1, 1], [-1,-1,-1,-1, 1], [-1,-1,-1,-1, 1], [-1, 1, 1, 1,-1]],// left
   [[-1, 1, 1, 1,-1], [ 1,-1,-1,-1,-1], [ 1,-1,-1,-1,-1], [ 1,-1,-1,-1,-1], [-1,-1,-1,-1,-1]],// down
   [[ 1, 1, 1, 1, 1], [-1, 1, 1, 1, 1], [-1, 1, 1, 1, 1], [-1, 1, 1, 1, 1], [ 1,-1,-1,-1, 1]],// front
@@ -303,7 +312,7 @@ AbstractProfessorCubeCube3D.prototype.boxClickToAngleMap = [
   [[ 1,-1,-1,-1, 1], [-1, 1, 1, 1, 1], [-1, 1, 1, 1, 1], [-1, 1, 1, 1, 1], [ 1, 1, 1, 1, 1]],// up
   [[-1,-1,-1,-1,-1], [ 1,-1,-1,-1,-1], [ 1,-1,-1,-1,-1], [ 1,-1,-1,-1,-1], [-1, 1, 1, 1,-1]],// back
 ];
-AbstractProfessorCubeCube3D.prototype.boxClickToLayerMap = [
+AbstractCube5Cube3D.prototype.boxClickToLayerMap = [
   [[1, 2, 4, 8, 1], [8, 1, 1, 1, 8], [4, 1, 1, 1, 4], [2, 1, 1, 1, 2], [1, 2, 4, 8, 1]],// left
   [[1, 8, 4, 2, 1], [2, 1, 1, 1, 2], [4, 1, 1, 1, 4], [8, 1, 1, 1, 8], [1, 8, 4, 2, 1]],// down
   [[16, 2, 4, 8, 16], [2, 16, 16, 16, 2], [4, 16, 16, 16, 4], [8, 16, 16, 16, 8], [16, 2, 4, 8, 16]],// front
@@ -311,7 +320,7 @@ AbstractProfessorCubeCube3D.prototype.boxClickToLayerMap = [
   [[16, 8, 4, 2, 16], [2, 16, 16, 16, 2], [4, 16, 16, 16, 4], [8, 16, 16, 16, 8], [16, 8, 4, 2, 16]],// up
   [[1, 2, 4, 8, 1], [2, 1, 1, 1, 2], [4, 1, 1, 1, 4], [8, 1, 1, 1, 8], [1, 2, 4, 8, 1]],// back
 ];
-AbstractProfessorCubeCube3D.prototype.boxSwipeToAxisMap = [
+AbstractCube5Cube3D.prototype.boxSwipeToAxisMap = [
   [1, 2, 1, 2], // left
   [2, 0, 2, 0], // down
   [1, 0, 1, 0], // front
@@ -319,7 +328,7 @@ AbstractProfessorCubeCube3D.prototype.boxSwipeToAxisMap = [
   [2, 0, 2, 0], // up
   [1, 0, 1, 0], // back
 ];
-AbstractProfessorCubeCube3D.prototype.boxSwipeToAngleMap = [
+AbstractCube5Cube3D.prototype.boxSwipeToAngleMap = [
   [-1, -1, 1, 1], // left
   [1, 1, -1, -1], // down
   [1, -1, -1, 1], // front
@@ -327,7 +336,7 @@ AbstractProfessorCubeCube3D.prototype.boxSwipeToAngleMap = [
   [-1, -1, 1, 1], // up
   [-1, 1, 1, -1], // back
 ];
-AbstractProfessorCubeCube3D.prototype.boxSwipeToLayerMap = [
+AbstractCube5Cube3D.prototype.boxSwipeToLayerMap = [
   [[[1, 4, 1, 4], [2, 4, 2, 4], [4, 4, 4, 4]],
    [[1, 2, 1, 2], [2, 2, 2, 2], [4, 2, 4, 2]],
    [[1, 1, 1, 1], [2, 1, 2, 1], [4, 1, 4, 1]]], // left
@@ -373,18 +382,15 @@ AbstractProfessorCubeCube3D.prototype.boxSwipeToLayerMap = [
  *             +---------+---------+
  * </pre>
  */
-AbstractProfessorCubeCube3D.prototype.stickerOffsets = Cube3D.computeStickerOffsets(5);
+AbstractCube5Cube3D.prototype.stickerOffsets = Cube3D.computeStickerOffsets(5);
 // ------------------
-class ProfessorCubeCube3D extends AbstractProfessorCubeCube3D {
+class Cube5Cube3D extends AbstractCube5Cube3D {
   /** Constructor
-   * Creates the 3D geometry of a "Rubik's Cube".
+   * Creates the 3D geometry of a "Professor Cube".
    * You must call loadGeometry() after constructing a new instance.
    */
   constructor() {
     super(13);
-  }
-  loadGeometry() {
-    super.loadGeometry();
   }
 
   getModelUrl() {
@@ -403,7 +409,7 @@ function createCube3D(levelOfDetail) {
   default: partSize=10; relativeUrl = 'models/professorcube-0.obj'; break;
   }
 
-  const c = new ProfessorCubeCube3D(partSize);
+  const c = new Cube5Cube3D(partSize);
   c.baseUrl = 'lib/';
   c.relativeUrl = relativeUrl;
   return c;
@@ -412,7 +418,7 @@ function createCube3D(levelOfDetail) {
 // MODULE API
 // ------------------
 export default {
-  AbstractProfessorCubeCube3D: AbstractProfessorCubeCube3D,
+  AbstractCube5Cube3D: AbstractCube5Cube3D,
   createCube3D: createCube3D,
 };
 

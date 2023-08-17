@@ -1614,7 +1614,7 @@ function arraysEquals(a, b) {
  *         +---+---+
  * </pre>
  */
-class PocketCube extends Cube {
+class Cube2 extends Cube {
   /** Creates a new instance. */
   constructor() {
     super(2);
@@ -1682,7 +1682,7 @@ class PocketCube extends Cube {
   }
 
   clone() {
-    let that = new PocketCube();
+    let that = new Cube2();
     that.setTo(this);
     return that;
   }
@@ -1709,7 +1709,7 @@ class PocketCube extends Cube {
   /**
    * Maps the name of a part to its part index.
    */
-  PocketCube.prototype.NAME_PART_MAP = partMap;
+  Cube2.prototype.NAME_PART_MAP = partMap;
 }
 
 /**
@@ -1797,7 +1797,7 @@ class PocketCube extends Cube {
  *             +------------+
  * </pre>
  */
-class RubiksCube extends Cube {
+class Cube3 extends Cube {
   /** Creates a new instance. */
   constructor() {
     super(3);
@@ -1913,7 +1913,7 @@ class RubiksCube extends Cube {
   }
 
   clone() {
-    let that = new RubiksCube();
+    let that = new Cube3();
     that.setTo(this);
     return that;
   }
@@ -1954,7 +1954,7 @@ class RubiksCube extends Cube {
   /**
    * Maps the name of a part to its part index.
    */
-  RubiksCube.prototype.NAME_PART_MAP = partMap;
+  Cube3.prototype.NAME_PART_MAP = partMap;
 }
 
 //Cube4
@@ -1997,7 +1997,8 @@ class RubiksCube extends Cube {
  *                 +---+---+---+---+
  * </pre>
  * <p>
- * <b>Edge parts</b>
+ */
+/* <b>Edge parts</b>
  * <p>
  * The following diagram shows the initial orientations and locations of
  * the edge parts. The first 12 edges are located near the origins of the
@@ -2031,7 +2032,8 @@ class RubiksCube extends Cube {
  *                   +---+---+---+---+
  * </pre>
  * <p>
- * <b>Side parts</b>
+ */
+/* <b>Side parts</b>
  * <p>
  * The following diagram shows the initial orientation and location of
  * the face parts:
@@ -2066,7 +2068,7 @@ class RubiksCube extends Cube {
  * For more information about the location and orientation of the parts see
  * {@link Cube}.
  */
-class RevengeCube extends Cube {
+class Cube4 extends Cube {
   constructor() {
     super(4);
     this.reset();
@@ -2208,7 +2210,7 @@ class RevengeCube extends Cube {
     this.fourCycle(this.sideLoc, 18, 10, 15, 1, this.sideOrient, 2, 1, 2, 3, 4);
   }
   clone() {
-      let that = new RevengeCube();
+      let that = new Cube4();
       that.setTo(this);
       return that;
   }
@@ -2249,7 +2251,7 @@ class RevengeCube extends Cube {
   /**
    * Maps the name of a part to its part index.
    */
-  RevengeCube.prototype.NAME_PART_MAP = partMap;
+  Cube4.prototype.NAME_PART_MAP = partMap;
 }
 
 //Cube5
@@ -2298,7 +2300,8 @@ class RevengeCube extends Cube {
   *                     +---+---+---+---+---+
   * </pre>
   * <p>
-  * <b>Edge parts</b>
+  */
+ /* <b>Edge parts</b>
   * <p>
   * The following diagram shows the initial orientations and locations of
   * the edge parts. The first 12 edges are located at the center of the x-, y-,
@@ -2341,7 +2344,8 @@ class RevengeCube extends Cube {
   *
   * </pre>
   * <p>
-  * <b>Side parts</b>
+  */
+ /* <b>Side parts</b>
   * <p>
   * The following diagram shows the initial orientation and location of
   * the side parts:
@@ -2379,7 +2383,7 @@ class RevengeCube extends Cube {
   *                     +---+---+---+---+---+
   * </pre>
   */
-class ProfessorCube extends Cube {
+class Cube5 extends Cube {
   constructor() {
       super(5);
       this.reset();
@@ -2584,7 +2588,7 @@ class ProfessorCube extends Cube {
     this.fourCycle(this.sideLoc, 24, 16, 21, 7, this.sideOrient, 2, 1, 2, 3, 4);
   }
   clone() {
-      let that = new ProfessorCube();
+      let that = new Cube5();
       that.setTo(this);
       return that;
   }
@@ -2641,7 +2645,8 @@ class ProfessorCube extends Cube {
  *                         |5.0|               |3.0|
  *                         +---+---+---+---+---+---+
  * </pre>
- * <p>
+ */
+/* <p>
  * <b>Edge parts</b>
  * <p>
  * The following diagram shows the initial orientations and locations of
@@ -2691,7 +2696,8 @@ class ProfessorCube extends Cube {
  *                                    X--&gt;
  * </pre>
  * <p>
- * <b>Side parts</b>
+ */
+/* <b>Side parts</b>
  * <p>
  * The following diagram shows the initial orientation and location of
  * the side parts:
@@ -3485,10 +3491,10 @@ class Cube7 extends Cube {
 
 function createCube(layerCount) {
   switch (layerCount) {
-  case 2: return new PocketCube();
-  case 3: return new RubiksCube();
-  case 4: return new RevengeCube();
-  case 5: return new ProfessorCube();
+  case 2: return new Cube2();
+  case 3: return new Cube3();
+  case 4: return new Cube4();
+  case 5: return new Cube5();
   case 6: return new Cube6();
   case 7: return new Cube7();
   default: throw "Cannot create a cube with "+layerCount+" layers.";
