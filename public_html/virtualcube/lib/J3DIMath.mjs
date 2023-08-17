@@ -172,29 +172,12 @@ function formatNumber(number, digits)
 
 
  */
-
-let J3DIHasCSSMatrix = false;
-let J3DIHasCSSMatrixCopy = false;
-
-if ("WebKitCSSMatrix" in window && ("media" in window && window.media.matchMedium("(-webkit-transform-3d)")) ||
-  ("styleMedia" in window && window.styleMedia.matchMedium("(-webkit-transform-3d)"))) {
-  J3DIHasCSSMatrix = true;
-  if ("copy" in WebKitCSSMatrix.prototype)
-    J3DIHasCSSMatrixCopy = true;
-}
-
-// console.log("J3DIHasCSSMatrix="+J3DIHasCSSMatrix);
-// console.log("J3DIHasCSSMatrixCopy="+J3DIHasCSSMatrixCopy);
-
 //
 // J3DIMatrix4
 //
 class J3DIMatrix4 {
   constructor(m) {
-    if (J3DIHasCSSMatrix)
-      this.$matrix = new WebKitCSSMatrix;
-    else
-      this.$matrix = new Object;
+    this.$matrix = new Object;
 
     if (typeof m == 'object') {
       if ("length" in m && m.length >= 16) {
@@ -283,11 +266,6 @@ class J3DIMatrix4 {
       + "]";
   }
   getAsFloat32Array() {
-    if (J3DIHasCSSMatrixCopy) {
-      let array = new Float32Array(16);
-      this.$matrix.copy(array);
-      return array;
-    }
     return new Float32Array(this.getAsArray());
   }
 
@@ -297,28 +275,24 @@ class J3DIMatrix4 {
       J3DIMatrix4.setUniformArray = new Array(16);
     }
 
-    if (J3DIHasCSSMatrixCopy)
-      this.$matrix.copy(J3DIMatrix4.setUniformWebGLArray);
-    else {
-      J3DIMatrix4.setUniformArray[0] = this.$matrix.m11;
-      J3DIMatrix4.setUniformArray[1] = this.$matrix.m12;
-      J3DIMatrix4.setUniformArray[2] = this.$matrix.m13;
-      J3DIMatrix4.setUniformArray[3] = this.$matrix.m14;
-      J3DIMatrix4.setUniformArray[4] = this.$matrix.m21;
-      J3DIMatrix4.setUniformArray[5] = this.$matrix.m22;
-      J3DIMatrix4.setUniformArray[6] = this.$matrix.m23;
-      J3DIMatrix4.setUniformArray[7] = this.$matrix.m24;
-      J3DIMatrix4.setUniformArray[8] = this.$matrix.m31;
-      J3DIMatrix4.setUniformArray[9] = this.$matrix.m32;
-      J3DIMatrix4.setUniformArray[10] = this.$matrix.m33;
-      J3DIMatrix4.setUniformArray[11] = this.$matrix.m34;
-      J3DIMatrix4.setUniformArray[12] = this.$matrix.m41;
-      J3DIMatrix4.setUniformArray[13] = this.$matrix.m42;
-      J3DIMatrix4.setUniformArray[14] = this.$matrix.m43;
-      J3DIMatrix4.setUniformArray[15] = this.$matrix.m44;
+    J3DIMatrix4.setUniformArray[0] = this.$matrix.m11;
+    J3DIMatrix4.setUniformArray[1] = this.$matrix.m12;
+    J3DIMatrix4.setUniformArray[2] = this.$matrix.m13;
+    J3DIMatrix4.setUniformArray[3] = this.$matrix.m14;
+    J3DIMatrix4.setUniformArray[4] = this.$matrix.m21;
+    J3DIMatrix4.setUniformArray[5] = this.$matrix.m22;
+    J3DIMatrix4.setUniformArray[6] = this.$matrix.m23;
+    J3DIMatrix4.setUniformArray[7] = this.$matrix.m24;
+    J3DIMatrix4.setUniformArray[8] = this.$matrix.m31;
+    J3DIMatrix4.setUniformArray[9] = this.$matrix.m32;
+    J3DIMatrix4.setUniformArray[10] = this.$matrix.m33;
+    J3DIMatrix4.setUniformArray[11] = this.$matrix.m34;
+    J3DIMatrix4.setUniformArray[12] = this.$matrix.m41;
+    J3DIMatrix4.setUniformArray[13] = this.$matrix.m42;
+    J3DIMatrix4.setUniformArray[14] = this.$matrix.m43;
+    J3DIMatrix4.setUniformArray[15] = this.$matrix.m44;
 
-      J3DIMatrix4.setUniformWebGLArray.set(J3DIMatrix4.setUniformArray);
-    }
+    J3DIMatrix4.setUniformWebGLArray.set(J3DIMatrix4.setUniformArray);
 
     ctx.uniformMatrix4fv(loc, transpose, J3DIMatrix4.setUniformWebGLArray);
   }
@@ -372,11 +346,6 @@ class J3DIMatrix4 {
     return this;
   }
   invert() {
-    if (J3DIHasCSSMatrix) {
-      this.$matrix = this.$matrix.inverse();
-      return;
-    }
-
     // Calculate the 4x4 determinant
     // If the determinant is zero,
     // then the inverse matrix is not unique.
@@ -424,11 +393,6 @@ class J3DIMatrix4 {
         z = 0;
     }
 
-    if (J3DIHasCSSMatrix) {
-      this.$matrix = this.$matrix.translate(x, y, z);
-      return;
-    }
-
     let matrix = new J3DIMatrix4();
     matrix.$matrix.m41 = x;
     matrix.$matrix.m42 = y;
@@ -455,11 +419,6 @@ class J3DIMatrix4 {
           z = 1;
       } else if (y == undefined)
         y = x;
-    }
-
-    if (J3DIHasCSSMatrix) {
-      this.$matrix = this.$matrix.scale(x, y, z);
-      return this;
     }
 
     let matrix = new J3DIMatrix4();
@@ -498,11 +457,6 @@ class J3DIMatrix4 {
         this.rotate(y, 0, 0, 1); // about Z axis
         return;
       }
-    }
-
-    if (J3DIHasCSSMatrix) {
-      this.$matrix = this.$matrix.rotateAxisAngle(x, y, z, angle);
-      return this;
     }
 
     // angles are in degrees. Switch to radians
@@ -593,11 +547,6 @@ class J3DIMatrix4 {
   multiply(mat) {
     if (typeof mat == 'object' && "$matrix" in mat) {
 
-      if (J3DIHasCSSMatrix) {
-        this.$matrix = this.$matrix.multiply(mat.$matrix);
-        return this;
-      }
-
       let a = mat.$matrix;
       let b = this.$matrix;
 
@@ -683,11 +632,6 @@ class J3DIMatrix4 {
 
   premultiply(mat) {
     if (typeof mat == 'object' && "$matrix" in mat) {
-
-      if (J3DIHasCSSMatrix) {
-        this.$matrix = mat.$matrix.multiply(this.$matrix);
-        return this;
-      }
 
       let b = mat.$matrix;
       let a = this.$matrix;
