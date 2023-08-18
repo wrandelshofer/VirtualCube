@@ -215,6 +215,24 @@ class InversionNode extends Node {
     yield* super.resolvedIterable(!inverse);
   }
 
+  * resolvedIterable(inverse = false) {
+    if (this.children.length == 1 && (this.children[0] instanceof MoveNode)) {
+      let node = this.children[0];
+      if (inverse) {
+         node = new MoveNode(node.layerCount, node.axis, node.layerMask, node.angle);
+      } else {
+         node = new MoveNode(node.layerCount, node.axis, node.layerMask, -node.angle);
+      }
+      node.startPosition = this.startPosition;
+      node.endPosition = this.endPosition;
+      yield node;
+    } else {
+      for (let i in this.children) {
+        yield * this.children[i].resolvedIterable(inverse);
+      }
+    }
+  }
+
   getSymbol() {
     return Symbol.INVERSION;
   }

@@ -36,16 +36,18 @@
 
   <div class="virtualcube" cube="..." stickersimage="...">
     <canvas class="cube-canvas"></canvas>
-    <toolbar>
-      <button class="reset-button"><span>Reset</span></button>
-      <button class="play-button"><span>Undo</span></button>
-      <button class="step-backward-button"><span>Previous</span></button>
-      <button class="step-forward-button"><span>Next</span></button>
-      <button class="undo-button"><span>Undo</span></button>
-      <button class="redo-button"><span>Redo</span></button>
-      <button class="scramble-button"><span>Scramble</span></button>
-    </toolbar>
-    <div class="script">...<span class="currentMove">...</span> <span class="nextMove">...</span>...</div>
+    <div class="controls">
+      <div class="toolbar">
+        <button class="reset-button"><span>Reset</span></button>
+        <button class="play-button"><span>Undo</span></button>
+        <button class="step-backward-button"><span>Previous</span></button>
+        <button class="step-forward-button"><span>Next</span></button>
+        <button class="undo-button"><span>Undo</span></button>
+        <button class="redo-button"><span>Redo</span></button>
+        <button class="scramble-button"><span>Scramble</span></button>
+      </div>
+      <div class="script">...<span class="currentMove">...</span> <span class="nextMove">...</span>...</div>
+    </div>
   </div>
 
   If the applet fails to run, it leaves the div elements untouched.

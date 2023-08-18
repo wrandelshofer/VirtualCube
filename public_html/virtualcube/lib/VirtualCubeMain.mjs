@@ -79,7 +79,8 @@ function appendButton(parent, text, styleClass, onclick) {
 }
 
 function appendToolbar(parent, id, parameters) {
-  let toolbarElem = document.createElement("toolbar");
+  let toolbarElem = document.createElement("div");
+  toolbarElem.setAttribute("class", "toolbar");
   parent.append(toolbarElem);
 
   if (parameters.script == null) {
@@ -96,7 +97,7 @@ function appendToolbar(parent, id, parameters) {
 }
 
 function appendScriptDiv(parent, id, parameters) {
-  if (parameters.script != null) {
+  if (parameters.script != null && parameters.script.length > 0) {
      let scriptDivElem = document.createElement("div");
      parent.append(scriptDivElem);
      scriptDivElem.setAttribute("class", "script");
@@ -114,16 +115,18 @@ function appendScriptDiv(parent, id, parameters) {
  *
  * <div class="virtualcube">
  * <canvas class="cube-canvas" width="220" height="220"></canvas>
- * <toolbar>
- *   <button class="reset-button"><span>Reset</span></button>
- *   <button class="play-button"><span>Undo</span></button>
- *   <button class="step-backward-button"><span>Previous</span></button>
- *   <button class="step-forward-button"><span>Next</span></button>
- *   <button class="undo-button"><span>Undo</span></button>
- *   <button class="redo-button"><span>Redo</span></button>
- *   <button class="scramble-button"><span>Scramble</span></button>
- * </toolbar>
- * <div class="script">...<span class="currentMove">...</span> <span class="nextMove">...</span>...</div>
+ * <div class="controls">
+ *   <div class="toolbar">
+ *     <button class="reset-button"><span>Reset</span></button>
+ *     <button class="play-button"><span>Undo</span></button>
+ *     <button class="step-backward-button"><span>Previous</span></button>
+ *     <button class="step-forward-button"><span>Next</span></button>
+ *     <button class="undo-button"><span>Undo</span></button>
+ *     <button class="redo-button"><span>Redo</span></button>
+ *     <button class="scramble-button"><span>Scramble</span></button>
+ *   </div>
+ *   <div class="script">...<span class="currentMove">...</span> <span class="nextMove">...</span>...</div>
+ * </div>
  * </div>
  *
  * @param parameters applet parameters (key,names)
@@ -225,8 +228,11 @@ function attachVirtualCube(parameters, element) {
       }
 
       element.append(canvasElem);
-      appendToolbar(divElem, id, parameters);
-      parameters["scriptDiv"]= appendScriptDiv(divElem, id, parameters);
+      let controlsElem = document.createElement("div");
+      controlsElem.setAttribute("class", "controls");
+      element.append(controlsElem);
+      appendToolbar(controlsElem, id, parameters);
+      parameters["scriptDiv"]= appendScriptDiv(controlsElem, id, parameters);
 
     } else if (element.tagName == "APPLET") {
       // => A <applet> element was provided, remove element, then insert a div element with
@@ -284,7 +290,10 @@ function attachVirtualCube(parameters, element) {
       canvasElem.setAttribute("kind",kind);
       parameters["kind"] = kind;
 
-      appendToolbar(divElem, id, parameters);
+      let controlsElem = document.createElement("div");
+      controlsElem.setAttribute("class", "controls");
+      element.append(controlsElem);
+      appendToolbar(controlsElem, id, parameters);
       parameters["scriptField"]=appendScriptField(divElem, id, parameters);
 
       // replace the applet with our div element
