@@ -26,6 +26,7 @@
  * of this software, even if advised of the possibility of such damage.
  *
  * Enhancements:
+ * 2.1   2023-08-18 Werner Randelshofer. Remove WebKitCssMatrix as it is no longer supported by the Safari browser.
  * 2.0   2018-12-25 Werner Randelshofer. Integrates now with EcmaScript module system.
  * 1.2   2014-02-02 Werner Randelshofer. Integrates now with Require.js. Adds intersection tests.
  * 1.1   2012-06-17 Werner Randelshofer. Adds world function.

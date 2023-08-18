@@ -123,6 +123,7 @@ function appendScriptDiv(parent, id, parameters) {
  *   <button class="redo-button"><span>Redo</span></button>
  *   <button class="scramble-button"><span>Scramble</span></button>
  * </toolbar>
+ * <div class="script">...<span class="currentMove">...</span> <span class="nextMove">...</span>...</div>
  * </div>
  *
  * @param parameters applet parameters (key,names)
