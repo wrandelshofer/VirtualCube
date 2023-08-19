@@ -1401,7 +1401,7 @@ class Cube3DHandler extends AbstractCanvas.AbstractHandler {
     this.mousePrevX = event.clientX;
     this.mousePrevY = event.clientY;
     this.mousePrevTimeStamp = event.timeStamp;
-    this.isMouseDrag = true;
+    this.isMouseDrag = event.button == 0;
     let isect = this.canvas.mouseIntersectionTest(event);
     this.mouseDownIsect = isect;
     this.isCubeSwipe = isect != null;
