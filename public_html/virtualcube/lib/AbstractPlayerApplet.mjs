@@ -613,7 +613,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
       // remove repainter needed for animation
       self.cube3d.repainter = null;
       // Reset cube
-      self.resetPlayback(true);
+      self.resetPlayback(self.isSolver());
 
       // reinstall repainter needed for animation
       self.cube3d.repainter = this;
