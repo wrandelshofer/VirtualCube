@@ -295,8 +295,7 @@ function attachVirtualCube(parameters, element) {
       }
       canvasElem.setAttribute("kind",kind);
       parameters["kind"] = kind;
-
-      appendControls(element,id,parameters);
+      appendControls(divElem,id,parameters);
 
       // replace the applet with our div element
       element.parentNode.replaceChild(divElem, appletElem);
