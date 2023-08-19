@@ -78,6 +78,14 @@ function appendButton(parent, text, styleClass, onclick) {
   parent.append(buttonElem);
 }
 
+function appendControls(parent, id, parameters) {
+  let controlsElem = document.createElement("div");
+  controlsElem.setAttribute("class", "controls");
+  parent.append(controlsElem);
+  appendToolbar(controlsElem, id, parameters);
+  appendScriptElement(controlsElem, id, parameters);
+}
+
 function appendToolbar(parent, id, parameters) {
   let toolbarElem = document.createElement("div");
   toolbarElem.setAttribute("class", "toolbar");
@@ -96,13 +104,16 @@ function appendToolbar(parent, id, parameters) {
   }
 }
 
-function appendScriptDiv(parent, id, parameters) {
-  if (parameters.script != null && parameters.script.length > 0) {
-     let scriptDivElem = document.createElement("div");
-     parent.append(scriptDivElem);
-     scriptDivElem.setAttribute("class", "script");
-     scriptDivElem.append(document.createTextNode(parameters.script));
-     return scriptDivElem;
+function appendScriptElement(parent, id, parameters) {
+  if (parameters["script"] != null
+     && parameters["script"].length > 0
+     && parameters["showscript"]!="false") {
+    let scriptElement = document.createElement("div");
+    parent.append(scriptElement);
+    scriptElement.setAttribute("class", "script");
+    scriptElement.append(document.createTextNode(parameters.script));
+    parameters["scriptelement"]=scriptElement;
+    return scriptElement;
   }
   return null;
 }
@@ -228,12 +239,7 @@ function attachVirtualCube(parameters, element) {
       }
 
       element.append(canvasElem);
-      let controlsElem = document.createElement("div");
-      controlsElem.setAttribute("class", "controls");
-      element.append(controlsElem);
-      appendToolbar(controlsElem, id, parameters);
-      parameters["scriptDiv"]= appendScriptDiv(controlsElem, id, parameters);
-
+      appendControls(element,id,parameters);
     } else if (element.tagName == "APPLET") {
       // => A <applet> element was provided, remove element, then insert a div element with
       //   a canvas child and buttons
@@ -290,11 +296,7 @@ function attachVirtualCube(parameters, element) {
       canvasElem.setAttribute("kind",kind);
       parameters["kind"] = kind;
 
-      let controlsElem = document.createElement("div");
-      controlsElem.setAttribute("class", "controls");
-      element.append(controlsElem);
-      appendToolbar(controlsElem, id, parameters);
-      parameters["scriptField"]=appendScriptField(divElem, id, parameters);
+      appendControls(element,id,parameters);
 
       // replace the applet with our div element
       element.parentNode.replaceChild(divElem, appletElem);

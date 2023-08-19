@@ -248,7 +248,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
 
     this.script = null; // This is the root node of the parsed script AST
     this.scriptString = null; // This is the script string used for display
-    this.scriptDiv = null;// This is a DIV element that displays the scriptString
+    this.scriptElement = null;// This is a DIV element that displays the scriptString
     this.scriptSequence = [];
     this.playIndex = 0;
     this.playToken = null;
@@ -584,16 +584,6 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
       this.flushCanvas();
       this.forceColorUpdate = false;
     }
-    /*
-     //gl.flush();
-     this.forceColorUpdate=false;
-     // The steps above only collect triangles
-     // we sort them by depth, and draw them
-     let tri = this.deferredFaces.splice(0,this.deferredFaceCount);
-     tri.sort(function(a,b){return b.depth - a.depth});
-     for (let i=0;i<tri.length;i++) {
-     tri[i].draw(g);
-     }*/
   }
 
   /**
@@ -624,35 +614,6 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
       self.cube3d.repainter = null;
       // Reset cube
       self.resetPlayback(true);
-      /*
-      self.cube.reset();
-      if (self.initScript != null) {
-        self.initScript.applyTo(self.cube);
-      }
-      self.clearUndoRedo();
-      if (self.script != null) {
-        if (self.isSolver()) {
-          self.script.applyTo(self.cube, true);
-          self.setPlayIndex( (0 <= self.scriptProgress
-                  && self.scriptProgress <= self.scriptSequence.length)
-                 ? self.scriptProgress : 0);
-        } else {
-          if (initialReset) {
-            self.setPlayIndex( (0 <= self.scriptProgress
-                      && self.scriptProgress <= self.scriptSequence.length)
-                     ? self.scriptProgress : self.scriptSequence.length);
-          } else {
-            self.setPlayIndex( (0 <= self.scriptProgress
-                      && self.scriptProgress <= self.scriptSequence.length)
-                      ? self.scriptProgress : 0);
-          }
-        }
-        for (let i=0; i < self.playIndex; i++) {
-          self.scriptSequence[i].applyTo(self.cube);
-        }
-      } else {
-        self.setPlayIndex(0);
-      }*/
 
       // reinstall repainter needed for animation
       self.cube3d.repainter = this;
@@ -752,10 +713,10 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
    * Shows the script and highlights the current move or the playback index.
    */
   updateScriptDiv() {
-     if(this.scriptDiv==null) {
+     if(this.scriptElement==null) {
         return;
      }
-     let elem = this.scriptDiv;
+     let elem = this.scriptElement;
      while (elem.firstChild) {
         elem.removeChild(elem.lastChild);
      }
@@ -1280,7 +1241,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
     let a = cube3d.attributes;
     let p = this.parameters;
 
-    this.scriptDiv = p.scriptDiv;
+    this.scriptElement = p["scriptelement"];
 
     let notation = p.scriptNotationObject != null
       ? p.scriptNotationObject
