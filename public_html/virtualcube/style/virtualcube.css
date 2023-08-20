@@ -83,11 +83,10 @@
 }
 .virtualcube .script .currentMove {
     color: rgba(0,0,0,86%);
-    font-weight: bold;
     text-decoration: underline;
 }
 .virtualcube .script .nextMove {
-    font-weight: bold;
+    text-decoration: underline;
 }
 
 .virtualcube .play-button {
