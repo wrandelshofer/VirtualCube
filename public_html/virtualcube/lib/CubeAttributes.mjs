@@ -1,5 +1,5 @@
 /* @(#)CubeAttributes.mjs
- * Copyright (c) 2018 Werner Randelshofer, Switzerland. MIT License.
+ * Copyright (c) 2023 Werner Randelshofer, Switzerland. MIT License.
  */
 
   let module = {

@@ -1,5 +1,5 @@
 /* @(#)VirtualCubeMain.mjs
- * Copyright (c) 2018 Werner Randelshofer, Switzerland. MIT License.
+ * Copyright (c) 2023 Werner Randelshofer, Switzerland. MIT License.
  */
 
 /** Integrates a virtual cube into a HTML page.

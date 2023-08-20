@@ -1,5 +1,5 @@
 /* @(#)ScriptAST.mjs  0.1  2011-08-12
- * Copyright (c) 2011 Werner Randelshofer, Switzerland. MIT License.
+ * Copyright (c) 2023 Werner Randelshofer, Switzerland. MIT License.
  */
 
 // --------------

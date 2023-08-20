@@ -1,6 +1,6 @@
 /*
  * @(#)phong.vert
- * Copyright (c) 2014 Werner Randelshofer, Switzerland.
+ * Copyright (c) 2023 Werner Randelshofer, Switzerland.
  * You may only use this software in accordance with the license terms.
  */
 

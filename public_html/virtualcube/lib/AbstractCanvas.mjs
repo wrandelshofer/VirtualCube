@@ -1,5 +1,5 @@
 /* @(#)AbstractCanvas.mjs
- * Copyright (c) 2018 Werner Randelshofer, Switzerland. MIT License.
+ * Copyright (c) 2023 Werner Randelshofer, Switzerland. MIT License.
  */
 
 /** Base class for Cube3DCanvas and AbstractCanvas.

@@ -1,5 +1,5 @@
 /* @(#)PreloadWebglShaders.mjs  1.0  2014-01-17
- * Copyright (c) 2014 Werner Randelshofer, Switzerland. MIT License.
+ * Copyright (c) 2023 Werner Randelshofer, Switzerland. MIT License.
  */
 
 /** Preloads the shaders used by WebglPlayerApplet.
@@ -11,7 +11,7 @@ J3DI.setFileData("/shaders/texture.frag",
 `
 /*
 * @(#)texture.frag
-* Copyright (c) 2014 Werner Randelshofer, Switzerland.
+* Copyright (c) 2023 Werner Randelshofer, Switzerland.
 * You may only use this software in accordance with the license terms.
 */
 
@@ -60,7 +60,7 @@ J3DI.setFileData("/shaders/texture.vert",
 `
 /*
 * @(#)texture.vert
-* Copyright (c) 2014 Werner Randelshofer, Switzerland.
+* Copyright (c) 2023 Werner Randelshofer, Switzerland.
 * You may only use this software in accordance with the license terms.
 */
 
@@ -109,7 +109,7 @@ J3DI.setFileData("/shaders/phong.frag",
 `
 /*
 * @(#)phong.frag
-* Copyright (c) 2014 Werner Randelshofer, Switzerland.
+* Copyright (c) 2023 Werner Randelshofer, Switzerland.
 * You may only use this software in accordance with the license terms.
 */
 
@@ -153,7 +153,7 @@ J3DI.setFileData("/shaders/phong.vert",
 `
 /*
  * @(#)phong.vert
- * Copyright (c) 2014 Werner Randelshofer, Switzerland.
+ * Copyright (c) 2023 Werner Randelshofer, Switzerland.
  * You may only use this software in accordance with the license terms.
  */
 

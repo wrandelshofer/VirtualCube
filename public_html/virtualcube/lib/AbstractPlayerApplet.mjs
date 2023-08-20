@@ -1,5 +1,5 @@
 /* @(#)AbstractPlayerApplet.mjs
- * Copyright (c) 2018 Werner Randelshofer, Switzerland. MIT License.
+ * Copyright (c) 2023 Werner Randelshofer, Switzerland. MIT License.
  */
 
 /** Base class for objects which can render a Cube3D into an HTML 5 canvas
