@@ -56,16 +56,20 @@
     background-size: cover;
     border-radius: 4px;
     margin: 4px;
+    padding: 0px;
 }
 
 .virtualcube .toolbar button:disabled {
     opacity: 24%;
+    padding: 0px;
 }
 .virtualcube .toolbar button:active {
     opacity: 86%;
+    padding: 0px;
 }
 .virtualcube .toolbar button span {
     display: none;
+    padding: 0px;
 }
 .virtualcube .toolbar button:hover {
     background-color: rgba(0,0,0,20%);
