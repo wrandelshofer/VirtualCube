@@ -613,7 +613,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
       // remove repainter needed for animation
       self.cube3d.repainter = null;
       // Reset cube
-      self.resetPlayback(self.isSolver());
+      self.resetPlayback(initialReset?self.isSolver():true);
 
       // reinstall repainter needed for animation
       self.cube3d.repainter = this;
@@ -754,22 +754,24 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
    * @param {type} forward if true resets to start of sequence,
    * if false resets to end of sequence
    */
-  resetPlayback(forward) {
+  resetPlayback(forward=false) {
        this.cube3d.setRepainter(null);
        this.cube.reset();
        if (this.initScript != null) {
          this.initScript.applyTo(this.cube);
        }
-       if (forward) {
-         if (this.isSolver()) {
-          this.script.applyTo(this.cube, true);
-         }
-         this.setPlayIndex(0);
-       } else {
-         if (!this.isSolver()) {
-          this.script.applyTo(this.cube, false);
-         }
-         this.setPlayIndex(this.scriptSequence.length);
+       if (this.script != null) {
+           if (forward) {
+             if (this.isSolver()) {
+              this.script.applyTo(this.cube, true);
+             }
+             this.setPlayIndex(0);
+           } else {
+             if (!this.isSolver()) {
+              this.script.applyTo(this.cube, false);
+             }
+             this.setPlayIndex(this.scriptSequence.length);
+           }
        }
        this.cube3d.setRepainter(this);
        this.repaint();
@@ -1378,6 +1380,14 @@ class Cube3DHandler extends AbstractCanvas.AbstractHandler {
       event.clientX = event.touches[0].clientX;
       event.clientY = event.touches[0].clientY;
       this.onMouseDown(event);
+
+      this.mouseDownX = this.mousePrevX = event.touches[0].clientX;
+      this.mouseDownY = this.mousePrevY = event.touches[0].clientY;
+      this.mousePrevTimeStamp = event.timeStamp;
+      this.isMouseDrag = true;
+      let isect = this.canvas.mouseIntersectionTest(event);
+      this.mouseDownIsect = isect;
+      this.isCubeSwipe = isect != null;
     } else {
       this.isMouseDrag = false;
     }
@@ -1396,10 +1406,8 @@ class Cube3DHandler extends AbstractCanvas.AbstractHandler {
    * Mouse handler for the canvas object.
    */
   onMouseDown(event) {
-    this.mouseDownX = event.clientX;
-    this.mouseDownY = event.clientY;
-    this.mousePrevX = event.clientX;
-    this.mousePrevY = event.clientY;
+    this.mouseDownX = this.mousePrevX = event.clientX;
+    this.mouseDownY = this.mousePrevY = event.clientY;
     this.mousePrevTimeStamp = event.timeStamp;
     this.isMouseDrag = event.button == 0;
     let isect = this.canvas.mouseIntersectionTest(event);
