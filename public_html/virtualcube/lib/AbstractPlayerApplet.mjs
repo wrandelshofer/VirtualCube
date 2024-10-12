@@ -595,7 +595,7 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
     return this.parameters.scripttype == "solver";
   }
 
-  reset(initialReset=false) {
+  reset(initialReset=false, resetCube=true) {
     this.currentAngle = 0;
     this.xRot = this.cube3d.attributes.xRot;
     this.yRot = this.cube3d.attributes.yRot;
@@ -612,8 +612,9 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
       }
       // remove repainter needed for animation
       self.cube3d.repainter = null;
-      // Reset cube
-      self.resetPlayback(initialReset?self.isSolver():true);
+      if (resetCube) {
+        self.resetPlayback(initialReset?self.isSolver():true);
+      }
 
       // reinstall repainter needed for animation
       self.cube3d.repainter = this;
@@ -623,6 +624,11 @@ class AbstractPlayerApplet extends AbstractCanvas.AbstractCanvas {
     this.repaint(f);
     return;
   }
+
+  resetCubeOrientation() {
+    this.reset(false,false);
+  }
+
   /**
    * Pushes a move for undoing.
    * @param move twistNode.
@@ -1370,6 +1376,17 @@ class Cube3DHandler extends AbstractCanvas.AbstractHandler {
     this.mousePrevTimestamp = undefined;
   }
 
+  /** Returns true if x,y is outside the safe space around the cube */
+  isOutsideSafeSpace(x,y) {
+    let radius = Math.min(this.canvas.width, this.canvas.height) * 0.5;
+    let cx = this.canvas.width * 0.5;
+    let cy = this.canvas.height * 0.5;
+    let dx = x - cx;
+    let dy = y - cy;
+    let distanceSquared = dx*dx + dy*dy;
+    return distanceSquared > radius*radius;
+  }
+
   /**
    * Touch handler for the canvas object.
    * Forwards everything to the mouse handler.
@@ -1388,6 +1405,7 @@ class Cube3DHandler extends AbstractCanvas.AbstractHandler {
       let isect = this.canvas.mouseIntersectionTest(event);
       this.mouseDownIsect = isect;
       this.isCubeSwipe = isect != null;
+      this.isCubeRotation = this.isOutsideSafeSpace(this.mouseDownX,this.mouseDownY);
     } else {
       this.isMouseDrag = false;
     }
@@ -1413,7 +1431,10 @@ class Cube3DHandler extends AbstractCanvas.AbstractHandler {
     let isect = this.canvas.mouseIntersectionTest(event);
     this.mouseDownIsect = isect;
     this.isCubeSwipe = isect != null;
+    this.isCubeRotation = this.isOutsideSafeSpace(this.mouseDownX,this.mouseDownY);
   }
+
+
   onMouseMove(event) {
     if (this.isMouseDrag) {
       let x = event.clientX;
@@ -1457,7 +1478,7 @@ class Cube3DHandler extends AbstractCanvas.AbstractHandler {
             this.isMouseDrag = false;
           }
         }
-      } else {
+      } else if (this.isCubeRotation) {
         let rm = new J3DIMath.J3DIMatrix4();
         rm.rotate(dy, 0, 1, 0);
         rm.rotate(dx, 1, 0, 0);

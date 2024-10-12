@@ -58,19 +58,20 @@ function instantiateVirtualCube(canvasElem, parameters) {
   canvasElem.setScript = (script) => vr.setScript(script);
   canvasElem.getScript = () => vr.getScript();
   canvasElem.resetCube = () => vr.reset();
+  canvasElem.resetCubeOrientation = () => vr.resetCubeOrientation();
   canvasElem.play    = () => vr.play();
   canvasElem.getEndPosition    = () => vr.getEndPosition();
   canvasElem.getCurrentPosition    = () => vr.getCurrentPosition();
   canvasElem.setCurrentPosition    = (newValue) => vr.setCurrentPosition(newValue);
 }
 
-function appendButton(parent, text, styleClass, onclick) {
+function appendButton(parent, text, styleClass, onClick) {
   let buttonElem, spanElem;
 
   buttonElem = document.createElement("button");
   buttonElem.setAttribute("type", "button");
   buttonElem.setAttribute("class", styleClass);
-  buttonElem.setAttribute("onclick", onclick);
+  buttonElem.setAttribute("onclick", onClick);
   buttonElem.setAttribute("title", text);
   spanElem = document.createElement("span");
   spanElem.append(document.createTextNode(text));
@@ -93,7 +94,7 @@ function appendToolbar(parent, id, parameters) {
 
   if (parameters.script == null) {
     appendButton(toolbarElem, "Scramble", "scramble-button", "document.getElementById('" + id + "').virtualcube.scramble();");
-    appendButton(toolbarElem, "Reset", "reset-button", "document.getElementById('" + id + "').virtualcube.reset();");
+    appendButton(toolbarElem, "Reset", "reset-button", "{ var vcube=document.getElementById('" + id + "').virtualcube; if (event.altKey||event.ctrlKey) {vcube.resetCubeOrientation();}else{vcube.reset()}}");
     appendButton(toolbarElem, "Undo", "undo-button", "document.getElementById('" + id + "').virtualcube.undo();");
     appendButton(toolbarElem, "Redo", "redo-button", "document.getElementById('" + id + "').virtualcube.redo();");
   } else {
@@ -367,6 +368,9 @@ class VirtualCube {
   }
   reset() {
     this.canvas3d.reset();
+  }
+  resetCubeOrientation() {
+    this.canvas3d.resetCubeOrientation();
   }
   scramble(scrambleCount, animate) {
     this.canvas3d.scramble(scrambleCount, animate);
