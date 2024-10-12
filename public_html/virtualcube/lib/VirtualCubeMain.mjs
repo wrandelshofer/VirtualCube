@@ -65,13 +65,14 @@ function instantiateVirtualCube(canvasElem, parameters) {
   canvasElem.setCurrentPosition    = (newValue) => vr.setCurrentPosition(newValue);
 }
 
-function appendButton(parent, text, styleClass, onClick) {
+function appendButton(parent, text, styleClass, onClick, onDblClick) {
   let buttonElem, spanElem;
 
   buttonElem = document.createElement("button");
   buttonElem.setAttribute("type", "button");
   buttonElem.setAttribute("class", styleClass);
   buttonElem.setAttribute("onclick", onClick);
+  buttonElem.setAttribute("ondblclick", onDblClick);
   buttonElem.setAttribute("title", text);
   spanElem = document.createElement("span");
   spanElem.append(document.createTextNode(text));
@@ -94,7 +95,7 @@ function appendToolbar(parent, id, parameters) {
 
   if (parameters.script == null) {
     appendButton(toolbarElem, "Scramble", "scramble-button", "document.getElementById('" + id + "').virtualcube.scramble();");
-    appendButton(toolbarElem, "Reset", "reset-button", "{ var vcube=document.getElementById('" + id + "').virtualcube; if (event.altKey||event.ctrlKey) {vcube.resetCubeOrientation();}else{vcube.reset()}}");
+    appendButton(toolbarElem, "Reset", "reset-button", "document.getElementById('" + id + "').virtualcube.resetCubeOrientation();","document.getElementById('" + id + "').virtualcube.reset();");
     appendButton(toolbarElem, "Undo", "undo-button", "document.getElementById('" + id + "').virtualcube.undo();");
     appendButton(toolbarElem, "Redo", "redo-button", "document.getElementById('" + id + "').virtualcube.redo();");
   } else {
