@@ -19,6 +19,8 @@ class AbstractCube2Cube3D extends Cube3D.Cube3D {
   constructor(partSize) {
     super(2, partSize);
 
+    this.textureScaleFactor=84/512;
+
     /*
      * Corners
      *       +---+---+---+
@@ -80,6 +82,8 @@ class AbstractCube2Cube3D extends Cube3D.Cube3D {
     for (let i = 0; i < this.partCount; i++) {
       this.partLocations[i].matrix.load(this.identityPartLocations[i]);
     }
+
+
   }
 
   initAbstractCube2Cube3D_corner_r() {
@@ -95,9 +99,6 @@ class AbstractCube2Cube3D extends Cube3D.Cube3D {
     this.initAbstractCube2Cube3D_textureScales();
   }
 
-  initAbstractCube2Cube3D_textureScales() {
-    this.initTextureScaleFactor(84/512);
-  }
 
   getPartIndexForStickerIndex(stickerIndex) {
     return stickerToPartMap[stickerIndex];
