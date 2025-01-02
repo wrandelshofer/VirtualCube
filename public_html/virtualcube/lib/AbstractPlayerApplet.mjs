@@ -1376,8 +1376,12 @@ class Cube3DHandler extends AbstractCanvas.AbstractHandler {
     this.mousePrevTimestamp = undefined;
   }
 
-  /** Returns true if x,y is outside the safe space around the cube */
-  isOutsideSafeSpace(x,y) {
+  /** Returns true if eventX,eventY is outside the safe space around the cube */
+  isOutsideSafeSpace(eventX,eventY) {
+    let rect = this.canvas.canvas.getBoundingClientRect();
+    let x = eventX - rect.x;
+    let y = eventY - rect.y;
+
     let radius = Math.min(this.canvas.width, this.canvas.height) * 0.5;
     let cx = this.canvas.width * 0.5;
     let cy = this.canvas.height * 0.5;
@@ -1389,14 +1393,12 @@ class Cube3DHandler extends AbstractCanvas.AbstractHandler {
 
   /**
    * Touch handler for the canvas object.
-   * Forwards everything to the mouse handler.
    */
   onTouchStart(event) {
     if (event.touches.length == 1) {
       event.preventDefault();
       event.clientX = event.touches[0].clientX;
       event.clientY = event.touches[0].clientY;
-      this.onMouseDown(event);
 
       this.mouseDownX = this.mousePrevX = event.touches[0].clientX;
       this.mouseDownY = this.mousePrevY = event.touches[0].clientY;
@@ -1431,7 +1433,7 @@ class Cube3DHandler extends AbstractCanvas.AbstractHandler {
     let isect = this.canvas.mouseIntersectionTest(event);
     this.mouseDownIsect = isect;
     this.isCubeSwipe = isect != null;
-    this.isCubeRotation = this.isOutsideSafeSpace(this.mouseDownX,this.mouseDownY);
+    this.isCubeRotation = isect == null;
   }
 
 
