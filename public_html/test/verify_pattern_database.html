@@ -6,11 +6,12 @@
     <link href="../style.css" rel="stylesheet" type="text/css">
     <link href="../virtualcube/style/virtualcube.css" rel="stylesheet" type="text/css">
     <script type="module">
-      import ScriptParser   from '../lib/ScriptParser.mjs';
-      import ScriptNotation from '../lib/ScriptNotation.mjs';
-      import MoveMetrics    from '../lib/MoveMetrics.mjs';
-      import Cube           from '../lib/Cube.mjs';
-      import Cubes          from '../lib/Cubes.mjs';
+      import ScriptParser   from '../virtualcube/lib/ScriptParser.mjs';
+      import ScriptNotation from '../virtualcube/lib/ScriptNotation.mjs';
+      import MoveMetrics    from '../virtualcube/lib/MoveMetrics.mjs';
+      import Cube           from '../virtualcube/lib/Cube.mjs';
+      import Cubes          from '../virtualcube/lib/Cubes.mjs';
+      import {diffChars}           from './lib/jsdiff/index.js';
 
       /**
        * Verifies if the JavaScript functions compute the same
@@ -211,8 +212,35 @@
           if (expectedValue == actualValue) {
             td.append(document.createTextNode(expectedValue));
           } else {
-            td.classList.add("differentValues");
-            td.append(document.createTextNode("Given <"+expectedValue+"> but computed <"+actualValue+">."));
+            td.classList.add("differentValuesLine");
+            td.append(document.createTextNode("Given <"));
+            let span=document.createElement("span");
+            span.classList.add("differentValuesSpan");
+            span.append(document.createTextNode(expectedValue));
+            td.append(span);
+            td.append(document.createTextNode("> but computed <"));
+            span=document.createElement("span");
+            span.classList.add("differentValuesSpan");
+            span.append(document.createTextNode(actualValue));
+            td.append(span);
+            td.append(document.createTextNode(">."));
+
+            let para=document.createElement("p");
+            para.append(document.createTextNode("Diff: "));
+            let diff = diffChars(expectedValue,actualValue);
+            let fragment = document.createDocumentFragment();
+            diff.forEach((part) => {
+              // green for additions, red for deletions
+              // grey for common parts
+              const color = part.added ? 'green' :
+              part.removed ? 'red' : 'grey';
+              span = document.createElement('span');
+              span.style.color = color;
+              span.appendChild(document.createTextNode(part.value));
+              fragment.appendChild(span);
+            });
+            para.append(fragment);
+            td.append(para);
           }
           tr.append(td);
         }
@@ -301,7 +329,7 @@ id number name_de script ltm_or_btm ftm qtm order permutation
       </textarea>
       </p>
       <p>
-        <input id="filterRowsWithDifferences" type="checkbox" name="filterRowsWithDifferences">Only shows rows that have differences<br>
+        <input id="filterRowsWithDifferences" type="checkbox" checked="true" name="filterRowsWithDifferences">Only shows rows that have differences<br>
         <input id="ignoreEmptyInputValues" type="checkbox" name="ignoreEmptyInputValues">Ignore empty input values<br>
         <p>
         <p>

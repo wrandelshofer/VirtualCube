@@ -1461,7 +1461,7 @@ class Cube3DHandler extends AbstractCanvas.AbstractHandler {
             let axis = cube3d.boxSwipeToAxisMap[face][swipeDirection];
             let layerMask = cube3d.boxSwipeToLayerMap[face][u][v][swipeDirection];
             let angle = cube3d.boxSwipeToAngleMap[face][swipeDirection];
-            //this.log('virtualrubik face,u,v,s:'+face+' '+u+' '+v+' '+swipeDirection);
+            console.log('virtualrubik face,u,v,s => layerMask:'+face+' '+u+' '+v+' '+swipeDirection+"=>"+layerMask);
             //this.log('virtualrubik ax,l,an   :'+axis+' '+layerMask+' '+angle);
             if (event.shiftKey || event.metaKey) {
               angle = 2 * angle;

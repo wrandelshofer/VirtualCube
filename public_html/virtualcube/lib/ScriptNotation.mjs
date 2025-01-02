@@ -115,6 +115,18 @@ class Symbol {
   }
 }
 
+/* Utility functions */
+function IntegerReverse(i) {
+  i = (i & 0x55555555) << 1 | (i >>> 1) & 0x55555555;
+  i = (i & 0x33333333) << 2 | (i >>> 2) & 0x33333333;
+  i = (i & 0x0f0f0f0f) << 4 | (i >>> 4) & 0x0f0f0f0f;
+
+  return (i << 24)            |
+         ((i & 0xff00) << 8)  |
+         ((i >>> 8) & 0xff00) |
+         (i >>> 24);
+}
+
 /** Defines a terminal symbol. */
 class TerminalSymbol extends Symbol {
   /**
@@ -172,7 +184,7 @@ class CompositeSymbol extends Symbol {
 Symbol.NOP = new TerminalSymbol("NOP");
 Symbol.MOVE = new TerminalSymbol("move", "twist");
 
-// Note: THe ordering of the permutation face symbols is significant in ScriptASt.mjs PermutationNode.
+// Note: The ordering of the permutation face symbols is significant in ScriptASt.mjs PermutationNode.
 Symbol.FACE_R = new TerminalSymbol("permR");
 Symbol.FACE_U = new TerminalSymbol("permU");
 Symbol.FACE_F = new TerminalSymbol("permF");
@@ -296,36 +308,6 @@ Symbol.SEQUENCE = new CompositeSymbol("sequence", [
   Symbol.STATEMENT,
   Symbol.COMMENT
 ]);
-
-Symbol.isBegin = new function (s) {
-  switch (s) {
-    case Symbol.CONJUGATION_BEGIN:
-    case Symbol.COMMUTATION_BEGIN:
-    case Symbol.ROTATION_BEGIN:
-    case Symbol.PERMUTATION_BEGIN:
-    case Symbol.INVERSION_BEGIN:
-    case Symbol.REFLECTION_BEGIN:
-    case Symbol.GROUPING_BEGIN:
-    case Symbol.MULTILINE_COMMENT_BEGIN:
-    case Symbol.SINGLELINE_COMMENT_BEGIN:
-      return true;
-    default:
-      return false;
-  }
-};
-Symbol.isOperator = new function (s) {
-  switch (s) {
-    case Symbol.CONJUGATION_OPERATOR:
-    case Symbol.COMMUTATION_OPERATOR:
-    case Symbol.ROTATION_OPERATOR:
-    case Symbol.INVERSION_OPERATOR:
-    case Symbol.REFLECTION_OPERATOR:
-    case Symbol.REPETITION_OPERATOR:
-      return true;
-    default:
-      return false;
-  }
-};
 
 Symbol.isDelimiter = function (s) {
   switch (s) {
@@ -653,9 +635,8 @@ class DefaultNotation extends Notation {
         let innerMiddle = (layerCount % 2 == 0)
             ? ((1 << (layer + 1)) - 1) << (midLayer - Math.floor((layer + 1) / 2) - (layer + 1) % 2)
             : ((1 << (layer + 1)) - 1) << (midLayer - Math.floor((layer + 1) / 2));
-        let outerMiddle = (layerCount % 2 == 0)
-            ? innerMiddle<<1
-            : innerMiddle;
+        let outerMiddle = IntegerReverse(innerMiddle) >>> (32 - layerCount);
+
         if (innerMiddle == all) {
           continue;
         }
@@ -704,10 +685,10 @@ class DefaultNotation extends Notation {
       }
 
       // Verge twists (tier twists without face)
-      for (let layer = 1; layer < layerCount; layer++) {
-        let innerTier = inner ^ ((1 << (layer + 1)) - 1);
-        let outerTier = outer ^ (all ^ ((1 << (layerCount - layer - 1)) - 1));
-        if (layer == 2) {
+      for (let layer = 1; layer < layerCount - 1; layer++) {
+        let innerTier = ((1 << (layer + 1)) - 1) << 1;
+        let outerTier = IntegerReverse(innerTier) >>> (32 - layerCount);
+        if (layer == 1) {
           this.addMoves(layerCount, outerTier, innerTier, angle, "V", suffix);
         }
         this.addMoves(layerCount, outerTier, innerTier, angle, "V" + (layer + 1), suffix);

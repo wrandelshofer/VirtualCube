@@ -70,3 +70,13 @@
     margin: 0px 2px;
   }
 }
+
+/* --- Style class for marking lines that contain differences -- */
+.differentValuesLine {
+    background-color: #ebf0fc;
+}
+
+/* --- Style class for marking spans that contain differences -- */
+.differentValuesSpan {
+    background-color: #cdd9f7;
+}

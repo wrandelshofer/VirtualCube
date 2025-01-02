@@ -513,7 +513,7 @@ function toSidePermutationString(cube, syntax,
  * of the permutation of the supplied cube.
  * <p>
  * The order says how many times the permutation
- * has to be applied to the cube to get the
+ * has to be applied to the cube to get back to the
  * initial state.
  *
  * @param cube A cube
@@ -565,7 +565,6 @@ function getOrder(cube) {
 
       prevOrient = (prevOrient + cornerOrient[i]) % 3;
       if (prevOrient != 0) {
-        //order = scm(order, 3);
         length *= 3;
       }
       order = scm(order, length);
@@ -573,7 +572,7 @@ function getOrder(cube) {
   }
 
   // determine cycle lengths of the current edge permutation
-  // and compute smallest common multiple
+  // and compute the smallest common multiple
   visitedLocs = new Array(edgeLoc.length);
   for (i = 0, n = edgeLoc.length; i < n; i++) {
     if (!visitedLocs[i]) {
