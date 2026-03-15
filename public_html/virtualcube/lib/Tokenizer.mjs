@@ -17,30 +17,30 @@
   let TT_SKIP = -13;
 
 /**
-  * A node of keyword tree.
+  * A node of Keyword tree.
   *
   * Example tree structure, for the keywords "ab", and "abcd".
   *
-  * ''.KeywordNode{keyword=null}
-  * ''.'a'.KeywordNode{keyword=null}
-  * ''.'a'.'b'.KeywordNode{keyword=n"ab"}
-  * ''.'a'.'b'.'c'.KeywordNode{keyword=null}
-  * ''.'a'.'b'.'c'.'d'.KeywordNode{keyword="abcd"}
+  * ''.KeywordNode{startSeq=null}
+  * ''.'a'.KeywordNode{startSeq=null}
+  * ''.'a'.'b'.KeywordNode{startSeq=n"ab"}
+  * ''.'a'.'b'.'c'.KeywordNode{startSeq=null}
+  * ''.'a'.'b'.'c'.'d'.KeywordNode{startSeq="abcd"}
   */
   class KeywordNode {
   constructor() {
   /**
-   * The keyword.
-   * This value is non-null if the node represents a keyword.
+   * The startSeq.
+   * This value is non-null if the node represents a startSeq.
    * The value is null if the node is an intermediate node in the tree.
    */
-    this.keyword = null;
+    this.startSeq = null;
   /**
    * The character sequence that ends a comment.
-   * This value is non-null if the node represents a keyword that starts
+   * This value is non-null if the node represents a startSeq that starts
    * a comment.
    */
-    this.commentEnd = null;
+    this.endSeq = null;
   /**
    * The children map. The key of the map is the character that leads
    * from this tree node down to the next.
@@ -56,20 +56,20 @@
     this.children.set(ch, child);
   }
 
-  setKeyword(value) {
-     this.keyword = value;
+  setStartSeq(value) {
+     this.startSeq = value;
   }
 
-  getKeyword() {
-    return this.keyword;
+  getStartSeq() {
+    return this.startSeq;
   }
 
-  setCommentEnd(value) {
-    this.commentEnd = value;
+  setEndSeq(value) {
+    this.endSeq = value;
   }
 
-  getCommentEnd() {
-    return this.commentEnd;
+  getEndSeq() {
+    return this.endSeq;
   }
   }
 
@@ -82,7 +82,7 @@
    * You can activate tokenizaton of comments, by invoking addMultilineTokens(begin,end)
    * or addSingleline.
    * You can activate tokenization of positive integer numbers, by invoking addDigitTokens().
-   * You can activate tokenization of keywords, by adding keyword specials.
+   * You can activate tokenization of keywords, by adding startSeq specials.
    */
   class GreedyTokenizer {
   constructor() {
@@ -113,7 +113,7 @@
    */
   addComment(start, end) {
     let node = this.addKeywordRecursively(start);
-    node.setCommentEnd(end);
+    node.setEndSeq(end);
   }
 
   /**
@@ -125,18 +125,18 @@
 
 
   /**
-   * Adds a keyword.
+   * Adds a startSeq.
    *
-   * @param keyword the keyword token
+   * @param startSeq the startSeq token
    */
-  addKeyword(keyword) {
-    this.addKeywordRecursively(keyword);
+  addKeyword(startSeq) {
+    this.addKeywordRecursively(startSeq);
   }
 
-  addKeywordRecursively(keyword) {
+  addKeywordRecursively(startSeq) {
     let node = this.keywordTree;
-    for (var i = 0; i < keyword.length; i++) {
-      let ch = keyword.charAt(i);
+    for (var i = 0; i < startSeq.length; i++) {
+      let ch = startSeq.charAt(i);
       let child = node.getChild(ch);
       if (child == null) {
         child = new KeywordNode();
@@ -144,7 +144,7 @@
       }
       node = child;
     }
-    node.setKeyword(keyword);
+    node.setStartSeq(startSeq);
     return node;
   }
 
@@ -239,22 +239,22 @@
         start += 1;
       }
 
-      // try to tokenize a keyword or a comment
+      // try to tokenize a startSeq or a comment
       let node = this.keywordTree;
       let foundNode = null;
       let end = start;
       while (ch != TT_EOF && node.getChild(ch) != null) {
         node = node.getChild(ch);
-        if (node.getKeyword() != null) {
+        if (node.getStartSeq() != null) {
           foundNode = node;
           end = this.pos;
         }
         ch = this.read();
       }
       if (foundNode != null) {
-        let commentEnd = foundNode.getCommentEnd();
-        if (commentEnd != null) {
-          this.seekTo(commentEnd);
+        let endSeq = foundNode.getEndSeq();
+        if (endSeq != null) {
+          this.seekTo(endSeq);
           continue loop;
         }
 
@@ -262,7 +262,7 @@
         this.ttype = TT_KEYWORD;
         this.tstart = start;
         this.tend = end;
-        this.sval = foundNode.getKeyword();
+        this.sval = foundNode.getStartSeq();
         return this.ttype;
       }
       this.setPosition(start);

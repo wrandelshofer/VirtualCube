@@ -132,15 +132,9 @@ class TerminalSymbol extends Symbol {
   /**
    *
    * @param {String} name
-   * @param {String} alternativeName
    */
-  constructor(name, alternativeName) {
+  constructor(name) {
      super(name);
-    this.alternativeName = alternativeName;
-  }
-
-  getAlternativeName() {
-    return this.alternativeName;
   }
 
   toString() {
@@ -182,7 +176,7 @@ class CompositeSymbol extends Symbol {
  * Terminal symbols.
  */
 Symbol.NOP = new TerminalSymbol("NOP");
-Symbol.MOVE = new TerminalSymbol("move", "twist");
+Symbol.MOVE = new TerminalSymbol("move",);
 
 // Note: The ordering of the permutation face symbols is significant in ScriptASt.mjs PermutationNode.
 Symbol.FACE_R = new TerminalSymbol("permR");
@@ -195,38 +189,38 @@ Symbol.FACE_B = new TerminalSymbol("permB");
 Symbol.PERMUTATION_PLUS = new TerminalSymbol("permPlus");
 Symbol.PERMUTATION_MINUS = new TerminalSymbol("permMinus");
 Symbol.PERMUTATION_PLUSPLUS = new TerminalSymbol("permPlusPlus");
-Symbol.PERMUTATION_BEGIN = new TerminalSymbol("permBegin", "permutationBegin");
-Symbol.PERMUTATION_END = new TerminalSymbol("permEnd", "permutationEnd");
-Symbol.PERMUTATION_DELIMITER = new TerminalSymbol("permDelim", "permutationDelimiter");
-Symbol.DELIMITER = new TerminalSymbol("delimiter", "statementDelimiter");
+Symbol.PERMUTATION_BEGIN = new TerminalSymbol("permBegin",);
+Symbol.PERMUTATION_END = new TerminalSymbol("permEnd",);
+Symbol.PERMUTATION_DELIMITER = new TerminalSymbol("permDelim",);
+Symbol.DELIMITER = new TerminalSymbol("delimiter",);
 Symbol.INVERSION_BEGIN = new TerminalSymbol("inversionBegin");
 Symbol.INVERSION_END = new TerminalSymbol("inversionEnd");
 Symbol.INVERSION_OPERATOR = new TerminalSymbol("invertor");
 Symbol.REFLECTION_BEGIN = new TerminalSymbol("reflectionBegin");
 Symbol.REFLECTION_END = new TerminalSymbol("reflectionEnd");
 Symbol.REFLECTION_OPERATOR = new TerminalSymbol("reflector");
-Symbol.GROUPING_BEGIN = new TerminalSymbol("groupingBegin", "sequenceBegin");
-Symbol.GROUPING_END = new TerminalSymbol("groupingEnd", "sequenceEnd");
-Symbol.REPETITION_BEGIN = new TerminalSymbol("repetitionBegin", "repetitorBegin");
-Symbol.REPETITION_END = new TerminalSymbol("repetitionEnd", "repetitorEnd");
-Symbol.REPETITION_DELIMITER = new TerminalSymbol("repetitionDelim", "repetitorDelimiter");
+Symbol.GROUPING_BEGIN = new TerminalSymbol("groupingBegin",);
+Symbol.GROUPING_END = new TerminalSymbol("groupingEnd",);
+Symbol.REPETITION_BEGIN = new TerminalSymbol("repetitionBegin",);
+Symbol.REPETITION_END = new TerminalSymbol("repetitionEnd",);
+Symbol.REPETITION_DELIMITER = new TerminalSymbol("repetitionDelim",);
 Symbol.REPETITION_OPERATOR = new TerminalSymbol("repetitionOperator");
-Symbol.COMMUTATION_BEGIN = new TerminalSymbol("commutationBegin", "commutatorBegin");
-Symbol.COMMUTATION_END = new TerminalSymbol("commutationEnd", "commutatorEnd");
-Symbol.COMMUTATION_DELIMITER = new TerminalSymbol("commutationDelim", "commutatorDelimiter");
+Symbol.COMMUTATION_BEGIN = new TerminalSymbol("commutationBegin",);
+Symbol.COMMUTATION_END = new TerminalSymbol("commutationEnd",);
+Symbol.COMMUTATION_DELIMITER = new TerminalSymbol("commutationDelim",);
 Symbol.COMMUTATION_OPERATOR = new TerminalSymbol("commutationOperator");
-Symbol.CONJUGATION_BEGIN = new TerminalSymbol("conjugationBegin", "conjugatorBegin");
-Symbol.CONJUGATION_END = new TerminalSymbol("conjugationEnd", "conjugatorEnd");
-Symbol.CONJUGATION_DELIMITER = new TerminalSymbol("conjugationDelim", "conjugatorDelimiter");
+Symbol.CONJUGATION_BEGIN = new TerminalSymbol("conjugationBegin",);
+Symbol.CONJUGATION_END = new TerminalSymbol("conjugationEnd",);
+Symbol.CONJUGATION_DELIMITER = new TerminalSymbol("conjugationDelim",);
 Symbol.CONJUGATION_OPERATOR = new TerminalSymbol("conjugationOperator");
-Symbol.ROTATION_BEGIN = new TerminalSymbol("rotationBegin", "rotatorBegin");
-Symbol.ROTATION_END = new TerminalSymbol("rotationEnd", "rotatorEnd");
-Symbol.ROTATION_DELIMITER = new TerminalSymbol("rotationDelim", "rotatorDelimiter");
+Symbol.ROTATION_BEGIN = new TerminalSymbol("rotationBegin",);
+Symbol.ROTATION_END = new TerminalSymbol("rotationEnd",);
+Symbol.ROTATION_DELIMITER = new TerminalSymbol("rotationDelim",);
 Symbol.ROTATION_OPERATOR = new TerminalSymbol("rotationPOperator");
 Symbol.MACRO = new TerminalSymbol("macro");
-Symbol.MULTILINE_COMMENT_BEGIN = new TerminalSymbol("commentMultiLineBegin", "slashStarCommentBegin");
-Symbol.MULTILINE_COMMENT_END = new TerminalSymbol("commentMultiLineEnd", "slashStarCommentEnd");
-Symbol.SINGLELINE_COMMENT_BEGIN = new TerminalSymbol("commentSingleLineBegin", "slashSlashComment");
+Symbol.MULTILINE_COMMENT_BEGIN = new TerminalSymbol("commentMultiLineBegin",);
+Symbol.MULTILINE_COMMENT_END = new TerminalSymbol("commentMultiLineEnd",);
+Symbol.SINGLELINE_COMMENT_BEGIN = new TerminalSymbol("commentSingleLineBegin",);
 
 Symbol.COMMUTATION = new CompositeSymbol("commutation", [
   Symbol.COMMUTATION_BEGIN,
@@ -440,7 +434,7 @@ class Notation {
   addMacro(identifier, code) {
     this.macros.set(identifier, code);
   }
-  getKeywords() {
+  getStartSeqs() {
     return this.keywords;
   }
   getSpecials() {

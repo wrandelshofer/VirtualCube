@@ -351,7 +351,6 @@ class NotationData {
     this.description=null;
     this.date=null;
 
-    // FIXME we should store the actual notation data and create ScriptNotation on demand
     this.notation=new ScriptNotation.Notation();
   }
   setDefault(newValue) {
